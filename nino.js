@@ -14,11 +14,11 @@ const client = new Discord.Client();
 const prefix = '.nino';
 
 // Load command files
-client.commands = new Discord.Collection();
+let commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
     let command = require(`./commands/${file}`);
-    client.commands.set(command.name, command);
+    commands.set(command.name, command);
 }
 
 // Startup
@@ -33,8 +33,10 @@ client.on('message', message => {
 
     // Execute the command if the user has the Quintuplet role
     if (message.member.roles.cache.find(r => r.name === "Quintuplet"))
-        if (client.commands.has(command))
-            client.commands.get(command).execute(message, args, Discord, fs, moment);
+    {
+        let cmd = commands.get(command)
+        if (cmd) cmd.execute(message, args);
+    }
 });
 
 
