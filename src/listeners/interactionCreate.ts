@@ -1,4 +1,4 @@
-import { Client, BaseInteraction, AutocompleteInteraction, CommandInteraction } from "discord.js";
+import { Client, BaseInteraction, AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js";
 import type { Database } from '@firebase/database-types';
 
 import { DatabaseData } from "../misc/types";
@@ -13,7 +13,7 @@ import { UndoneCmd } from "../commands/undone.cmd";
 export default (client: Client, db: Database, dbdata: DatabaseData): void => {
   client.on('interactionCreate', async (interaction) => {
     if (!interaction.isCommand()) return;
-    const cmdInteraction = interaction as CommandInteraction
+    const cmdInteraction = interaction as ChatInputCommandInteraction
     const { commandName } = cmdInteraction;
     switch (commandName) {
       case 'newproject':

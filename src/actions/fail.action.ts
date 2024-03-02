@@ -1,7 +1,7 @@
-import { CommandInteraction, EmbedBuilder } from "discord.js";
+import { ChatInputCommandInteraction, EmbedBuilder } from "discord.js";
 import { generateAllowedMentions } from "./generateAllowedMentions.action";
 
-export const fail = async (faildesc: string, interaction: CommandInteraction) => {
+export const fail = async (faildesc: string, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
   const embed = new EmbedBuilder()
     .setTitle(`:(`)

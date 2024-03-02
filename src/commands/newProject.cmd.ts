@@ -1,23 +1,23 @@
-import { CacheType, Client, CommandInteraction, EmbedBuilder, Interaction } from "discord.js";
+import { ChatInputCommandInteraction, Client, EmbedBuilder } from "discord.js";
 import { generateAllowedMentions } from "../actions/generateAllowedMentions.action";
 import { DatabaseData, Project } from "../misc/types";
 import { Database } from "@firebase/database-types";
 
-export const NewProjectCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: CommandInteraction) => {
+export const NewProjectCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
   const { commandName, options, user, guildId } = interaction;
   if (guildId == null) return;
 
   await interaction.deferReply();
 
-  const nickname = String(options.get('nickname')!.value!);
-  const title = String(options.get('title')!.value!);
+  const nickname = options.getString('nickname')!;
+  const title = options.getString('title')!;
   const owner = String(user!.id);
-  const type = String(options.get('type')!.value!);
-  const length = Number(options.get('length')!.value!);
-  const poster = String(options.get('poster')!.value!);
-  const updateChannel = String(options.get('updatechannel')!.value!);
-  const releaseChannel = String(options.get('releasechannel')!.value!);
+  const type = options.getString('type')!;
+  const length = options.getNumber('length')!;
+  const poster = options.getString('poster')!;
+  const updateChannel = options.getChannel('updatechannel')!.id;
+  const releaseChannel = options.getChannel('releasechannel')!.id;
 
   const ref = db.ref(`/Projects/`).child(`${guildId}`).child(`${nickname}`);
   const newProj: Project = {

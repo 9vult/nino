@@ -302,8 +302,18 @@ export default (client: Client): void => {
       )
       .addStringOption(o =>
         o.setName('number')
-          .setDescription('What is being released?')
+          .setDescription('What is being released? [Number or Range]')
           .setRequired(true)
+      )
+      .addStringOption(o =>
+        o.setName('url')
+          .setDescription('Release URL')
+          .setRequired(true)
+      )
+      .addRoleOption(o =>
+        o.setName('role')
+          .setDescription('Role to ping')
+          .setRequired(false)
       );
 
     client.application.commands.create(helpCmd);

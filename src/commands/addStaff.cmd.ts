@@ -1,19 +1,19 @@
-import { CacheType, Client, CommandInteraction, EmbedBuilder, Interaction } from "discord.js";
+import { ChatInputCommandInteraction, Client, EmbedBuilder } from "discord.js";
 import { generateAllowedMentions } from "../actions/generateAllowedMentions.action";
 import { DatabaseData } from "../misc/types";
 import { Database } from "@firebase/database-types";
 import { fail } from "../actions/fail.action";
 
-export const AddStaffCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: CommandInteraction) => {
+export const AddStaffCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
   const { options, user, guildId } = interaction;
 
   await interaction.deferReply();
 
-  const project = String(options.get('project')!.value!);
-  const staff = String(options.get('member')!.value!);
-  const abbreviation = String(options.get('abbreviation')!.value!).toUpperCase();
-  const title = String(options.get('title')!.value!);
+  const project = options.getString('project')!;
+  const staff = options.getMember('member')!;
+  const abbreviation = options.getString('abbreviation')!.toUpperCase();
+  const title = options.getString('title')!;
 
   if (guildId == null || !(guildId in dbdata.guilds))
     return fail(`Guild ${guildId} does not exist.`, interaction);
