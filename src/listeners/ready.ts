@@ -63,6 +63,7 @@ export default (client: Client): void => {
         o.setName('project')
           .setDescription('Project nickname')
           .setRequired(true)
+          .setAutocomplete(true)
       )
       .addUserOption(o =>
         o.setName('member')
@@ -87,6 +88,7 @@ export default (client: Client): void => {
         o.setName('project')
           .setDescription('Project nickname')
           .setRequired(true)
+          .setAutocomplete(true)
       )
       .addStringOption(o =>
         o.setName('abbreviation')
@@ -101,6 +103,7 @@ export default (client: Client): void => {
         o.setName('project')
           .setDescription('Project nickname')
           .setRequired(true)
+          .setAutocomplete(true)
       )
       .addStringOption(o =>
         o.setName('abbreviation')
@@ -120,6 +123,7 @@ export default (client: Client): void => {
         o.setName('project')
           .setDescription('Project nickname')
           .setRequired(true)
+          .setAutocomplete(true)
       )
       .addNumberOption(o =>
         o.setName('episode')
@@ -149,6 +153,7 @@ export default (client: Client): void => {
         o.setName('project')
           .setDescription('Project nickname')
           .setRequired(true)
+          .setAutocomplete(true)
       )
       .addNumberOption(o =>
         o.setName('episode')
@@ -168,6 +173,7 @@ export default (client: Client): void => {
         o.setName('project')
           .setDescription('Project nickname')
           .setRequired(true)
+          .setAutocomplete(true)
       )
       .addNumberOption(o =>
         o.setName('episode')
@@ -192,6 +198,7 @@ export default (client: Client): void => {
         o.setName('project')
           .setDescription('Project nickname')
           .setRequired(true)
+          .setAutocomplete(true)
       )
       .addUserOption(o =>
         o.setName('member')
@@ -206,6 +213,7 @@ export default (client: Client): void => {
         o.setName('project')
           .setDescription('Project nickname')
           .setRequired(true)
+          .setAutocomplete(true)
       );
 
     const editProjectCmd = new SlashCommandBuilder()
@@ -215,6 +223,7 @@ export default (client: Client): void => {
         o.setName('project')
           .setDescription('Project nickname')
           .setRequired(true)
+          .setAutocomplete(true)
       )
       .addStringOption(o =>
         o.setName('option')
@@ -240,6 +249,7 @@ export default (client: Client): void => {
         o.setName('project')
           .setDescription('Project nickname')
           .setRequired(true)
+          .setAutocomplete(true)
       )
       .addNumberOption(o =>
         o.setName('episode')
@@ -259,6 +269,7 @@ export default (client: Client): void => {
         o.setName('project')
           .setDescription('Project nickname')
           .setRequired(true)
+          .setAutocomplete(true)
       )
       .addNumberOption(o =>
         o.setName('episode')
@@ -278,6 +289,7 @@ export default (client: Client): void => {
         o.setName('project')
           .setDescription('Project nickname')
           .setRequired(true)
+          .setAutocomplete(true)
       )
       .addStringOption(o =>
         o.setName('type')

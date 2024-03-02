@@ -1,8 +1,7 @@
 
 import { CacheType, Client, EmbedBuilder, Interaction } from "discord.js";
 import { generateAllowedMentions } from "../actions/generateAllowedMentions.action";
-import { helpText } from "src/misc/misc";
-import { VERSION } from "src/nino";
+import { VERSION } from "../nino";
 
 export const AboutCmd = async (interaction: Interaction<CacheType>) => {
   if (!interaction.isCommand()) return;

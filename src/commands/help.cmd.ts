@@ -1,7 +1,7 @@
 
 import { CacheType, Client, EmbedBuilder, Interaction } from "discord.js";
 import { generateAllowedMentions } from "../actions/generateAllowedMentions.action";
-import { helpText } from "src/misc/misc";
+import { helpText } from "../misc/misc";
 
 export const HelpCmd = async (interaction: Interaction<CacheType>) => {
   if (!interaction.isCommand()) return;

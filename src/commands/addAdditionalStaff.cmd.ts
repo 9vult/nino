@@ -3,10 +3,11 @@ import { CacheType, Client, EmbedBuilder, Interaction } from "discord.js";
 import { generateAllowedMentions } from "../actions/generateAllowedMentions.action";
 import { DatabaseData, Project } from "../misc/types";
 import { Database } from "@firebase/database-types";
+import { fail } from "../actions/fail.action";
 
 export const AddAdditionalStaffCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: Interaction<CacheType>) => {
   if (!interaction.isCommand()) return;
-  const { commandName, options, user, member } = interaction;
+  const { commandName, options, user, member, guildId } = interaction;
 
   await interaction.deferReply();
 
@@ -17,29 +18,23 @@ export const AddAdditionalStaffCmd = async (client: Client, db: Database, dbdata
   const title = String(options.get('title')!.value!);
 
   let epvalue;
-  let faildesc;
-  if (!(project in dbdata.projects))
-    faildesc = `Project ${project} does not exist.`;
-  if (dbdata.projects[project].owner !== user!.id)
-    faildesc = `You do not have permission to do that.`;
-  for (let ep in dbdata.projects[project].episodes)
-    if (dbdata.projects[project].episodes[ep].number == episode) {
-      epvalue = ep;
-      for (let pos in dbdata.projects[project].episodes[ep].additionalStaff)
-        if (dbdata.projects[project].episodes[ep].additionalStaff[pos].role.abbreviation == abbreviation) {
-          faildesc = `That position already exists.`;
-          break;
-        }
-    }
+  if (guildId == null || !(guildId in dbdata.guilds))
+    return fail(`Guild ${guildId} does not exist.`, interaction);
 
-  if (faildesc !== undefined) {
-    const embed = new EmbedBuilder()
-      .setTitle(`Project Creation`)
-      .setDescription(faildesc)
-      .setColor(0xd797ff);
-    await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
-    return;
-  }
+  let projects = dbdata.guilds[guildId];
+
+  if (!(project in projects))
+    return fail(`Project ${project} does not exist.`, interaction);
+  if (projects[project].owner !== user!.id)
+    return fail(`You do not have permission to do that.`, interaction);
+
+  for (let ep in projects[project].episodes)
+    if (projects[project].episodes[ep].number == episode) {
+      epvalue = ep;
+      for (let pos in projects[project].episodes[ep].additionalStaff)
+        if (projects[project].episodes[ep].additionalStaff[pos].role.abbreviation == abbreviation)
+          return fail(`That position already exists.`, interaction);
+    }
 
   db.ref(`/Projects/${project}/episodes/${epvalue}`).child("additionalStaff").push({
     id: staff,
@@ -52,7 +47,6 @@ export const AddAdditionalStaffCmd = async (client: Client, db: Database, dbdata
   db.ref(`/Projects/${project}/episodes/${epvalue}`).child("tasks").push({
     abbreviation, done: false
   });
-
 
   const embed = new EmbedBuilder()
     .setTitle(`Project Creation`)

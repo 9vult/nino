@@ -36,5 +36,5 @@ export type Task = {
 };
 
 export type DatabaseData = {
-  projects: {[key:string]: Project}
+  guilds: {[key:string]: {[key:string]: Project}}
 }

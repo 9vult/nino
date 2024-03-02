@@ -5,7 +5,8 @@ import { Database } from "@firebase/database-types";
 
 export const NewProjectCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: Interaction<CacheType>) => {
   if (!interaction.isCommand()) return;
-  const { commandName, options, user } = interaction;
+  const { commandName, options, user, guildId } = interaction;
+  if (guildId == null) return;
 
   await interaction.deferReply();
 
@@ -18,7 +19,7 @@ export const NewProjectCmd = async (client: Client, db: Database, dbdata: Databa
   const updateChannel = String(options.get('updatechannel')!.value!);
   const releaseChannel = String(options.get('releasechannel')!.value!);
 
-  const ref = db.ref(`/Projects/`).child(`${nickname}`);
+  const ref = db.ref(`/Projects/`).child(`${guildId}`).child(`${nickname}`);
   const newProj: Project = {
     nickname,
     title,

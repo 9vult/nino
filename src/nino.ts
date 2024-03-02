@@ -30,10 +30,10 @@ const client = new Client({
 });
 export const CLIENT: Client = client;
 
-let dbdata: DatabaseData = { projects: {}};
+let dbdata: DatabaseData = { guilds: {}};
 
 db.ref('/Projects').on("value", function(data: {[key:string]:any}) {
-  dbdata.projects = data.val();
+  dbdata.guilds = data.val();
 });
 
 // Set up listeners
