@@ -19,6 +19,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   let taskvalue;
   let isValidUser = false;
   let status = '';
+  let episodeDone = true;
   if (guildId == null || !(guildId in dbdata.guilds))
     return fail(`Guild ${guildId} does not exist.`, interaction);
 
@@ -45,6 +46,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
           if (taskObj.done)
             return fail(`Task ${abbreviation} is already done!`, interaction);
         }
+        else if (!taskObj.done) episodeDone = false;
         // Status string
         if (taskObj.abbreviation === abbreviation) status += `__~~${abbreviation}~~__ `;
         else if (taskObj.done) status += `~~${taskObj.abbreviation}~~ `;
@@ -70,13 +72,18 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
       abbreviation, done: true
     });
 
+  const episodeDoneText = episodeDone ? `\nAlso, episode ${episode} is now complete!` : '';
   const replyEmbed = new EmbedBuilder()
     .setAuthor({ name: projects[project].title })
     .setTitle(`Task Completed`)
-    .setDescription(`Task ${abbreviation} has been completed. Nice job!`)
+    .setDescription(`Task ${abbreviation} has been completed. Nice job!${episodeDoneText}`)
     .setColor(0xd797ff)
     .setFooter({ text: moment().format('MMMM D, YYYY h:mm:ss a') });
   await interaction.editReply({ embeds: [replyEmbed], allowedMentions: generateAllowedMentions([[], []]) });
+
+  if (episodeDone) {
+    db.ref(`/Projects/${guildId}/${project}/episodes/${epvalue}`).update({ done: true });
+  }
 
   const publishEmbed = new EmbedBuilder()
     .setAuthor({ name: projects[project].title })

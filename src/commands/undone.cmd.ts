@@ -71,6 +71,8 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
       abbreviation, done: false
     });
 
+  db.ref(`/Projects/${guildId}/${project}/episodes/${epvalue}`).update({ done: false });
+
   const embed = new EmbedBuilder()
     .setAuthor({ name: projects[project].title })
     .setTitle(`Task Undone`)
