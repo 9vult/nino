@@ -1,9 +1,9 @@
-import { CacheType, Client, EmbedBuilder, Interaction } from "discord.js";
+import { CacheType, Client, CommandInteraction, EmbedBuilder, Interaction } from "discord.js";
 import { generateAllowedMentions } from "../actions/generateAllowedMentions.action";
 import { DatabaseData, Project } from "../misc/types";
 import { Database } from "@firebase/database-types";
 
-export const NewProjectCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: Interaction<CacheType>) => {
+export const NewProjectCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: CommandInteraction) => {
   if (!interaction.isCommand()) return;
   const { commandName, options, user, guildId } = interaction;
   if (guildId == null) return;

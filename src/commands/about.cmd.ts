@@ -1,9 +1,9 @@
 
-import { CacheType, Client, EmbedBuilder, Interaction } from "discord.js";
+import { CacheType, Client, CommandInteraction, EmbedBuilder, Interaction } from "discord.js";
 import { generateAllowedMentions } from "../actions/generateAllowedMentions.action";
 import { VERSION } from "../nino";
 
-export const AboutCmd = async (interaction: Interaction<CacheType>) => {
+export const AboutCmd = async (interaction: CommandInteraction) => {
   if (!interaction.isCommand()) return;
   const embed = new EmbedBuilder()
     .setTitle(`Nino Fansub Management Bot`)

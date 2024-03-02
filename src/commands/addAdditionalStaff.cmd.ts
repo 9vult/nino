@@ -1,11 +1,11 @@
 
-import { CacheType, Client, EmbedBuilder, Interaction } from "discord.js";
+import { CacheType, Client, CommandInteraction, EmbedBuilder, Interaction } from "discord.js";
 import { generateAllowedMentions } from "../actions/generateAllowedMentions.action";
 import { DatabaseData, Project } from "../misc/types";
 import { Database } from "@firebase/database-types";
 import { fail } from "../actions/fail.action";
 
-export const AddAdditionalStaffCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: Interaction<CacheType>) => {
+export const AddAdditionalStaffCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: CommandInteraction) => {
   if (!interaction.isCommand()) return;
   const { commandName, options, user, member, guildId } = interaction;
 
@@ -36,7 +36,7 @@ export const AddAdditionalStaffCmd = async (client: Client, db: Database, dbdata
           return fail(`That position already exists.`, interaction);
     }
 
-  db.ref(`/Projects/${project}/episodes/${epvalue}`).child("additionalStaff").push({
+  db.ref(`/Projects/${guildId}/${project}/episodes/${epvalue}`).child("additionalStaff").push({
     id: staff,
     role: {
       abbreviation,
@@ -44,7 +44,7 @@ export const AddAdditionalStaffCmd = async (client: Client, db: Database, dbdata
     }
   });
 
-  db.ref(`/Projects/${project}/episodes/${epvalue}`).child("tasks").push({
+  db.ref(`/Projects/${guildId}/${project}/episodes/${epvalue}`).child("tasks").push({
     abbreviation, done: false
   });
 
