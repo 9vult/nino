@@ -1,8 +1,7 @@
-token.txt
 
 node_modules
 node_modules/*
-node_modules/*.*
-
-data/
-data/*
+.env
+firebase.json
+*.sh
+.vscode
