@@ -9,6 +9,7 @@ import { HelpCmd } from "../commands/help.cmd";
 import { AboutCmd } from "../commands/about.cmd";
 import { DoneCmd } from "../commands/done.cmd";
 import { UndoneCmd } from "../commands/undone.cmd";
+import { ReleaseCmd } from "../commands/release.cmd";
 
 export default (client: Client, db: Database, dbdata: DatabaseData): void => {
   client.on('interactionCreate', async (interaction) => {
@@ -30,6 +31,9 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
         break;
       case 'undone':
         await UndoneCmd(client, db, dbdata, cmdInteraction);
+        break;
+      case 'release':
+        await ReleaseCmd(client, db, dbdata, cmdInteraction);
         break;
       case 'help':
         await HelpCmd(cmdInteraction);
