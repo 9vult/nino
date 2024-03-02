@@ -17,6 +17,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
 
   let epvalue;
   let taskvalue;
+  let taskName;
   let isValidUser = false;
   let status = '';
   let episodeDone = true;
@@ -32,6 +33,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
     let staffObj = projects[project].keyStaff[staff];
     if (staffObj.id === user.id && staffObj.role.abbreviation === abbreviation || projects[project].owner === user.id) {
       isValidUser = true;
+      taskName = staffObj.role.title;
       status = `✅ **${staffObj.role.title}**\n`;
     }
   }
@@ -58,6 +60,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
           let addStaffObj = projects[project].episodes[ep].additionalStaff[addStaff];
           if (addStaffObj.id === addStaffObj.id && addStaffObj.role.abbreviation === abbreviation) {
             status = `✅ **${addStaffObj.role.title}**\n` + status;
+            taskName = addStaffObj.role.title;
             isValidUser = true;
           }
         }
@@ -75,8 +78,8 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   const episodeDoneText = episodeDone ? `\nAlso, episode ${episode} is now complete!` : '';
   const replyEmbed = new EmbedBuilder()
     .setAuthor({ name: projects[project].title })
-    .setTitle(`Task Completed`)
-    .setDescription(`Task ${abbreviation} has been completed. Nice job!${episodeDoneText}`)
+    .setTitle('✅')
+    .setDescription(`Nice job getting the ${taskName} done.${episodeDoneText}`)
     .setColor(0xd797ff)
     .setFooter({ text: moment().format('MMMM D, YYYY h:mm:ss a') });
   await interaction.editReply({ embeds: [replyEmbed], allowedMentions: generateAllowedMentions([[], []]) });

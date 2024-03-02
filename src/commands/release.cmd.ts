@@ -32,7 +32,7 @@ let publishRole = role !== null ? `<@&${role}> ` : '';
   const replyEmbed = new EmbedBuilder()
     .setAuthor({ name: projects[project].title })
     .setTitle(`Episode Released`)
-    .setDescription(`${projects[project].title} ${type} ${publishNumber} has been released. Nice job!`)
+    .setDescription(`Nice job releasing **${projects[project].title} ${type} ${publishNumber}**!\nI wasn't sure you'd be able to do it, but you did!`)
     .setColor(0xd797ff)
     .setFooter({ text: moment().format('MMMM D, YYYY h:mm:ss a') });
   await interaction.editReply({ embeds: [replyEmbed], allowedMentions: generateAllowedMentions([[], []]) });

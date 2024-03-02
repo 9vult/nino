@@ -47,7 +47,7 @@ export const NewProjectCmd = async (client: Client, db: Database, dbdata: Databa
 
   const embed = new EmbedBuilder()
     .setTitle(`Project Creation`)
-    .setDescription(`Created project ${nickname}.\nRemember to add staff/positions!`)
+    .setDescription(`Since you asked, I created project \`${nickname}\` for you.\nDo remember to add staff/positions, though.`)
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

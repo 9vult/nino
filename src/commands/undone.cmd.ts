@@ -17,6 +17,7 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
 
   let epvalue;
   let taskvalue;
+  let taskName;
   let isValidUser = false;
   let status = '';
   if (guildId == null || !(guildId in dbdata.guilds))
@@ -31,6 +32,7 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
     let staffObj = projects[project].keyStaff[staff];
     if (staffObj.id === user.id && staffObj.role.abbreviation === abbreviation || projects[project].owner === user.id) {
       isValidUser = true;
+      taskName = staffObj.role.title;
       status = `❌ **${staffObj.role.title}**\n`;
     }
   }
@@ -56,6 +58,7 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
           let addStaffObj = projects[project].episodes[ep].additionalStaff[addStaff];
           if (addStaffObj.id === addStaffObj.id && addStaffObj.role.abbreviation === abbreviation) {
             status = `❌ **${addStaffObj.role.title}**\n` + status;
+            taskName = addStaffObj.role.title;
             isValidUser = true;
           }
         }
@@ -75,8 +78,8 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
 
   const embed = new EmbedBuilder()
     .setAuthor({ name: projects[project].title })
-    .setTitle(`Task Undone`)
-    .setDescription(`Task ${abbreviation} has been marked incomplete.`)
+    .setTitle('❌')
+    .setDescription(`So the **${taskName}** wasn't done, after all. Typical.`)
     .setColor(0xd797ff)
     .setFooter({ text: moment().format('MMMM D, YYYY h:mm:ss a') });
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
