@@ -3,7 +3,6 @@ import { generateAllowedMentions } from "../actions/generateAllowedMentions.acti
 import { DatabaseData } from "../misc/types";
 import { Database } from "@firebase/database-types";
 import { fail } from "../actions/fail.action";
-import moment from "moment";
 
 export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -81,7 +80,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
     .setTitle('✅')
     .setDescription(`Nice job getting the ${taskName} done.${episodeDoneText}`)
     .setColor(0xd797ff)
-    .setFooter({ text: moment().format('MMMM D, YYYY h:mm:ss a') });
+    .setTimestamp(Date.now());
   await interaction.editReply({ embeds: [replyEmbed], allowedMentions: generateAllowedMentions([[], []]) });
 
   if (episodeDone) {
@@ -93,7 +92,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
     .setTitle(`Episode ${episode}`)
     .setThumbnail(projects[project].poster)
     .setDescription(status)
-    .setFooter({ text: moment().format('MMMM D, YYYY h:mm:ss a') });
+    .setTimestamp(Date.now());
   const publishChannel = client.channels.cache.get(projects[project].updateChannel);
   if (publishChannel?.isTextBased)
     (publishChannel as TextChannel).send({ embeds: [publishEmbed] })

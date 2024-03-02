@@ -3,7 +3,6 @@ import { generateAllowedMentions } from "../actions/generateAllowedMentions.acti
 import { DatabaseData } from "../misc/types";
 import { Database } from "@firebase/database-types";
 import { fail } from "../actions/fail.action";
-import moment from "moment";
 
 export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -34,7 +33,7 @@ let publishRole = role !== null ? `<@&${role}> ` : '';
     .setTitle(`Episode Released`)
     .setDescription(`Nice job releasing **${projects[project].title} ${type} ${publishNumber}**!\nI wasn't sure you'd be able to do it, but you did!`)
     .setColor(0xd797ff)
-    .setFooter({ text: moment().format('MMMM D, YYYY h:mm:ss a') });
+    .setTimestamp(Date.now());
   await interaction.editReply({ embeds: [replyEmbed], allowedMentions: generateAllowedMentions([[], []]) });
 
   const publishBody = `**${projects[project].title} - ${type} ${publishNumber}**\n${publishRole}${url}`;
