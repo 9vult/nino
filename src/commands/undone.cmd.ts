@@ -27,10 +27,9 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
   if (!(project in projects))
     return fail(`Project ${project} does not exist.`, interaction);
 
-  if (projects[project].owner === user.id) isValidUser = true;
   for (let staff in projects[project].keyStaff) {
     let staffObj = projects[project].keyStaff[staff];
-    if (staffObj.id === user.id && staffObj.role.abbreviation === abbreviation) {
+    if (staffObj.id === user.id && staffObj.role.abbreviation === abbreviation || projects[project].owner === user.id) {
       isValidUser = true;
       status = `❌ **${staffObj.role.title}**\n`;
     }
@@ -47,7 +46,8 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
             return fail(`Task ${abbreviation} is not done.`, interaction);
         }
         // Status string
-        if (taskObj.done) status += `~~${taskObj.abbreviation}~~ `;
+        if (taskObj.abbreviation === abbreviation) status += `__${abbreviation}__ `;
+        else if (taskObj.done) status += `~~${taskObj.abbreviation}~~ `;
         else status += `**${taskObj.abbreviation}** `;
       }
       if (taskvalue == undefined) return fail(`Task ${abbreviation} does not exist!`, interaction);

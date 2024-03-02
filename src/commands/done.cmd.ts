@@ -27,10 +27,9 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   if (!(project in projects))
     return fail(`Project ${project} does not exist.`, interaction);
 
-  if (projects[project].owner === user.id) isValidUser = true;
   for (let staff in projects[project].keyStaff) {
     let staffObj = projects[project].keyStaff[staff];
-    if (staffObj.id === user.id && staffObj.role.abbreviation === abbreviation) {
+    if (staffObj.id === user.id && staffObj.role.abbreviation === abbreviation || projects[project].owner === user.id) {
       isValidUser = true;
       status = `✅ **${staffObj.role.title}**\n`;
     }
