@@ -255,11 +255,13 @@ export default (client: Client): void => {
         o.setName('episode')
           .setDescription('Episode number')
           .setRequired(true)
+          .setAutocomplete(true)
       )
       .addStringOption(o =>
         o.setName('abbreviation')
           .setDescription('Position shorthand')
           .setRequired(true)
+          .setAutocomplete(true)
       );
 
     const undoneCmd = new SlashCommandBuilder()
@@ -275,11 +277,13 @@ export default (client: Client): void => {
         o.setName('episode')
           .setDescription('Episode number')
           .setRequired(true)
+          .setAutocomplete(true)
       )
       .addStringOption(o =>
         o.setName('abbreviation')
           .setDescription('Position shorthand')
           .setRequired(true)
+          .setAutocomplete(true)
       );
 
     const releaseCmd = new SlashCommandBuilder()
