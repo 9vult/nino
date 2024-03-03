@@ -10,6 +10,8 @@ import { AboutCmd } from "../commands/about.cmd";
 import { DoneCmd } from "../commands/done.cmd";
 import { UndoneCmd } from "../commands/undone.cmd";
 import { ReleaseCmd } from "../commands/release.cmd";
+import { SwapStaffCmd } from "../commands/swapStaff.cmd";
+import { SwapAdditionalStaffCmd } from "../commands/swapAdditionalStaff.cmd";
 
 export default (client: Client, db: Database, dbdata: DatabaseData): void => {
   client.on('interactionCreate', async (interaction) => {
@@ -34,6 +36,12 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
         break;
       case 'release':
         await ReleaseCmd(client, db, dbdata, cmdInteraction);
+        break;
+      case 'swapstaff':
+        await SwapStaffCmd(client, db, dbdata, cmdInteraction);
+        break;
+      case 'swapadditionalstaff':
+        await SwapAdditionalStaffCmd(client, db, dbdata, cmdInteraction);
         break;
       case 'help':
         await HelpCmd(cmdInteraction);

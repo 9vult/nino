@@ -1,5 +1,5 @@
 
-import { ChatInputCommandInteraction, Client, EmbedBuilder } from "discord.js";
+import { ChatInputCommandInteraction, Client, EmbedBuilder, GuildMember } from "discord.js";
 import { generateAllowedMentions } from "../actions/generateAllowedMentions.action";
 import { DatabaseData } from "../misc/types";
 import { Database } from "@firebase/database-types";
@@ -13,7 +13,7 @@ export const AddAdditionalStaffCmd = async (client: Client, db: Database, dbdata
 
   const project = options.getString('project')!;
   const episode = options.getNumber('episode')!;
-  const staff = options.getMember('member')!;
+  const staff = (options.getMember('member')! as GuildMember).id;
   const abbreviation = options.getString('abbreviation')!.toUpperCase();
   const title = options.getString('title')!;
 
@@ -50,7 +50,7 @@ export const AddAdditionalStaffCmd = async (client: Client, db: Database, dbdata
 
   const embed = new EmbedBuilder()
     .setTitle(`Project Creation`)
-    .setDescription(`Added <@${staff}> for position ${abbreviation}.`)
+    .setDescription(`Added <@${staff}> for position ${abbreviation} for episode ${episode}.`)
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }
