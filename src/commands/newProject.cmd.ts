@@ -1,14 +1,19 @@
-import { ChatInputCommandInteraction, Client, EmbedBuilder } from "discord.js";
+import { ChatInputCommandInteraction, Client, EmbedBuilder, GuildMember, PermissionsBitField } from "discord.js";
 import { generateAllowedMentions } from "../actions/generateAllowedMentions.action";
 import { DatabaseData, Project } from "../misc/types";
+import { fail } from "../actions/fail.action";
 import { Database } from "@firebase/database-types";
 
 export const NewProjectCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
-  const { commandName, options, user, guildId } = interaction;
+  const { options, user, member, guildId } = interaction;
   if (guildId == null) return;
 
   await interaction.deferReply();
+
+  if (!(member as GuildMember)?.permissions.has(PermissionsBitField.Flags.Administrator)) {
+    return fail("You must be an administrator to perform this action!", interaction);
+  }
 
   const nickname = options.getString('nickname')!;
   const title = options.getString('title')!;
