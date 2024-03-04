@@ -1,51 +1,27 @@
-# Nino
+# Nino Fansub Tracking Bot
 
-### Nino is a discord bot for tracking and managing episode-by-episode tasks for fansub groups.
+Nino is a bot for tracking fansub progress on Discord.
 
-## Commands
-### add
- - Add a new title
- - Syntax: `.nino add FullName | Nickname | EpisodeCount | Task1 Task2 ...`
- - Example: `.nino add Sword Art Online | SAO | 25 | TL ED TM TS QC`
+****
 
-### done
- - Mark a task as done
- - Syntax: `.nino done Nickname EpisodeNumber Task`
- - Example: `.nino done SAO 3 TL`
- - _Note: This command pushes an embed to #progress_
+### Setup
 
-### complete
- - Mark an episode as complete
- - Syntax: `.nino complete Nickname EpisodeNumber`
- - Example: `.nino complete SAO 3`
- - _Note: This command pushes an embed to #progress_
+ - Nino requires a [Firebase Real-Time Database](https://firebase.google.com/docs/database) for logging and leaderboards. The base tier is free, and it is highly unlikely Raiha will ever generate enough data to exceed the base tier.
 
-### release
- - Release an episode
- - Syntax: `.nino release Nickname <Episode/Volume/Batch> {EpisodeNumber/VolumeNumber} <ReleaseURL>`
- - Example: `.nino release SAO volume 3 https://example.com/sao_vol3`
- - Example: `.nino release SAO batch https://example.com/sao_batch`
- - _Note: Episode/Volume number is ONLY used for episode/volume releases_
- - _Note: This command pushes a message to #releases_
+Create a `.env` file in the project root and add the following to it: 
 
-### about
- - Sends an about box
- - Syntax: `.nino about`
+ - `TOKEN=[yourtoken]`
+ - `DATABASE_URL=[databaseurl]`
 
-### help
- - Sends a help box
- - Syntax: `.nino help`
- - _Note: More help coming soon_
+Then, place your `firebase.json` in the `/src/` folder.
 
-## Server Requirements
- - A `#progress` channel for Nino to write update embeds to
- - A `#releases` channel for Nino to write releases to
- - An `@Quintuplet` user role for administrative users
+### Development
 
-## Setup Requirements
- - Dependencies: `discord.js` and `moment.js`
- - Requires a node.js release of at least v12.0
- - Discord bot auth token should go in `nino/token.txt`
+Pull requests are always welcome.
 
-## Other Notes
- - Data is written to `nino/data/`
+### License
+
+Nino is licensed under LGPL v3.0.
+
+
+© 2024 9volt.
