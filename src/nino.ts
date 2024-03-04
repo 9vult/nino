@@ -1,6 +1,6 @@
 /**
  * Nino Fansub Management Bot
- * (c) 2020-2023 9volt
+ * (c) 2020-2024 9volt
  */
 
 import { Client, GatewayIntentBits } from "discord.js";
@@ -12,7 +12,7 @@ require('dotenv').config();
 var admin = require('firebase-admin');
 var firebase = require('./firebase.json');
 
-export const VERSION = "2.3.1";
+export const VERSION = "3.0.0";
 
 admin.initializeApp({
   credential: admin.credential.cert(firebase),
