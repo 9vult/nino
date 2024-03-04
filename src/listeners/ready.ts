@@ -230,15 +230,45 @@ export default (client: Client): void => {
           .setDescription('Option to change')
           .setRequired(true)
           .addChoices(
-            { name: 'Length', value: 'Length' },
+            { name: 'Title', value: 'Title' },
             { name: 'Poster', value: 'Poster' },
-            { name: 'UpdateChannel', value: 'UpdateChannel' },
-            { name: 'ReleaseChannel', value: 'ReleaseChannel' }
+            { name: 'UpdateChannelID', value: 'UpdateChannel' },
+            { name: 'ReleaseChannelID', value: 'ReleaseChannel' }
           )
       )
       .addStringOption(o =>
         o.setName('newvalue')
           .setDescription('New value')
+          .setRequired(true)
+      );
+
+    const addEpisodeCmd = new SlashCommandBuilder()
+      .setName('addepisode')
+      .setDescription('Add an episode')
+      .addStringOption(o =>
+        o.setName('project')
+          .setDescription('Project nickname')
+          .setRequired(true)
+          .setAutocomplete(true)
+      )
+      .addNumberOption(o =>
+        o.setName('number')
+          .setDescription('Episode number')
+          .setRequired(true)
+      );
+
+    const removeEpisodeCmd = new SlashCommandBuilder()
+      .setName('removeepisode')
+      .setDescription('Remove an episode')
+      .addStringOption(o =>
+        o.setName('project')
+          .setDescription('Project nickname')
+          .setRequired(true)
+          .setAutocomplete(true)
+      )
+      .addNumberOption(o =>
+        o.setName('number')
+          .setDescription('Episode number')
           .setRequired(true)
       );
 
@@ -332,6 +362,8 @@ export default (client: Client): void => {
     client.application.commands.create(transferOwnershipCmd);
     client.application.commands.create(deleteProjectCmd);
     client.application.commands.create(editProjectCmd);
+    client.application.commands.create(addEpisodeCmd);
+    client.application.commands.create(removeEpisodeCmd);
     client.application.commands.create(doneCmd);
     client.application.commands.create(undoneCmd);
     client.application.commands.create(releaseCmd);

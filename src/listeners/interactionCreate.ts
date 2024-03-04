@@ -16,6 +16,9 @@ import { TransferOwnershipCmd } from "../commands/transferOwnership.cmd";
 import { RemoveStaffCmd } from "../commands/removeStaff.cmd";
 import { RemoveAdditionalStaffCmd } from "../commands/removeAdditionalStaff.cmd";
 import { DeleteProjectCmd } from "../commands/deleteProject.cmd";
+import { EditProjectCmd } from "../commands/editProject.cmd";
+import { AddEpisodeCmd } from "../commands/addEpisode.cmd";
+import { RemoveEpisodeCmd } from "../commands/removeEpisodeCmd";
 
 export default (client: Client, db: Database, dbdata: DatabaseData): void => {
   client.on('interactionCreate', async (interaction) => {
@@ -30,8 +33,8 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
         await AddStaffCmd(client, db, dbdata, cmdInteraction);
         break;
       case 'swapstaff':
-          await SwapStaffCmd(client, db, dbdata, cmdInteraction);
-          break;
+        await SwapStaffCmd(client, db, dbdata, cmdInteraction);
+        break;
       case 'removestaff':
         await RemoveStaffCmd(client, db, dbdata, cmdInteraction);
         break;
@@ -39,10 +42,16 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
         await AddAdditionalStaffCmd(client, db, dbdata, cmdInteraction);
         break;
       case 'swapadditionalstaff':
-          await SwapAdditionalStaffCmd(client, db, dbdata, cmdInteraction);
-          break;
+        await SwapAdditionalStaffCmd(client, db, dbdata, cmdInteraction);
+        break;
       case 'removeadditionalstaff':
         await RemoveAdditionalStaffCmd(client, db, dbdata, cmdInteraction);
+        break;
+      case 'addepisode':
+        await AddEpisodeCmd(client, db, dbdata, cmdInteraction);
+        break;
+      case 'removeepisode':
+        await RemoveEpisodeCmd(client, db, dbdata, cmdInteraction);
         break;
       case 'done':
         await DoneCmd(client, db, dbdata, cmdInteraction);
@@ -55,6 +64,9 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
         break;
       case 'transferownership':
         await TransferOwnershipCmd(client, db, dbdata, cmdInteraction);
+        break;
+      case 'editproject':
+        await EditProjectCmd(client, db, dbdata, cmdInteraction);
         break;
       case 'deleteproject':
         await DeleteProjectCmd(client, db, dbdata, cmdInteraction);
