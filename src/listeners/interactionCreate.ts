@@ -13,6 +13,8 @@ import { ReleaseCmd } from "../commands/release.cmd";
 import { SwapStaffCmd } from "../commands/swapStaff.cmd";
 import { SwapAdditionalStaffCmd } from "../commands/swapAdditionalStaff.cmd";
 import { TransferOwnershipCmd } from "../commands/transferOwnership.cmd";
+import { RemoveStaffCmd } from "../commands/removeStaff.cmd";
+import { RemoveAdditionalStaffCmd } from "../commands/removeAdditionalStaff.cmd";
 
 export default (client: Client, db: Database, dbdata: DatabaseData): void => {
   client.on('interactionCreate', async (interaction) => {
@@ -26,8 +28,20 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
       case 'addstaff':
         await AddStaffCmd(client, db, dbdata, cmdInteraction);
         break;
+      case 'swapstaff':
+          await SwapStaffCmd(client, db, dbdata, cmdInteraction);
+          break;
+      case 'removestaff':
+        await RemoveStaffCmd(client, db, dbdata, cmdInteraction);
+        break;
       case 'addadditionalstaff':
         await AddAdditionalStaffCmd(client, db, dbdata, cmdInteraction);
+        break;
+      case 'swapadditionalstaff':
+          await SwapAdditionalStaffCmd(client, db, dbdata, cmdInteraction);
+          break;
+      case 'removeadditionalstaff':
+        await RemoveAdditionalStaffCmd(client, db, dbdata, cmdInteraction);
         break;
       case 'done':
         await DoneCmd(client, db, dbdata, cmdInteraction);
@@ -37,12 +51,6 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
         break;
       case 'release':
         await ReleaseCmd(client, db, dbdata, cmdInteraction);
-        break;
-      case 'swapstaff':
-        await SwapStaffCmd(client, db, dbdata, cmdInteraction);
-        break;
-      case 'swapadditionalstaff':
-        await SwapAdditionalStaffCmd(client, db, dbdata, cmdInteraction);
         break;
       case 'transferownership':
         await TransferOwnershipCmd(client, db, dbdata, cmdInteraction);
