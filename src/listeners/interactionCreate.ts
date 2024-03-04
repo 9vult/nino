@@ -102,9 +102,10 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
         choices = [];
         for (let ep in project.episodes) {
           let num = project.episodes[ep].number;
-          choices.push({ name: `${num}`, value: num });
+          if (String(num).startsWith(String(focusedOption.value)))
+            choices.push({ name: `${num}`, value: num });
         }
-        await interaction.respond(choices);
+        await interaction.respond(choices.slice(0, 25));
         return;
       }
       case 'abbreviation': {
@@ -118,6 +119,7 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
           if (project.episodes[ep].number == episode) {
             for (let taskId in project.episodes[ep].tasks) {
               let task = project.episodes[ep].tasks[taskId];
+              if (task.abbreviation.startsWith(focusedOption.value.toUpperCase()))
               choices.push({ name: task.abbreviation, value: task.abbreviation });
             }
           }

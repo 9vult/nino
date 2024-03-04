@@ -29,7 +29,7 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
 
   for (let staff in projects[project].keyStaff) {
     let staffObj = projects[project].keyStaff[staff];
-    if (staffObj.id === user.id && staffObj.role.abbreviation === abbreviation || projects[project].owner === user.id) {
+    if (staffObj.role.abbreviation === abbreviation && (staffObj.id === user.id || projects[project].owner === user.id)) {
       isValidUser = true;
       taskName = staffObj.role.title;
       status = `❌ **${staffObj.role.title}**\n`;
@@ -55,7 +55,7 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
       if (!isValidUser) { // Not key staff
         for (let addStaff in projects[project].episodes[ep].additionalStaff) {
           let addStaffObj = projects[project].episodes[ep].additionalStaff[addStaff];
-          if (addStaffObj.id === addStaffObj.id && addStaffObj.role.abbreviation === abbreviation) {
+          if (addStaffObj.role.abbreviation === abbreviation && (addStaffObj.id === user.id || projects[project].owner === user.id)) {
             status = `❌ **${addStaffObj.role.title}**\n` + status;
             taskName = addStaffObj.role.title;
             isValidUser = true;
