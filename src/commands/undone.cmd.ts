@@ -77,8 +77,8 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
 
   const embed = new EmbedBuilder()
     .setAuthor({ name: projects[project].title })
-    .setTitle('❌')
-    .setDescription(`So the **${taskName}** wasn't done, after all. Typical.`)
+    .setTitle('❌ Task Incomplete')
+    .setDescription(`So the episode ${episode} **${taskName}** wasn't done, after all. Typical.`)
     .setColor(0xd797ff)
     .setTimestamp(Date.now());
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });

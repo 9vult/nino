@@ -77,8 +77,8 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   const episodeDoneText = episodeDone ? `\nAlso, episode ${episode} is now complete!` : '';
   const replyEmbed = new EmbedBuilder()
     .setAuthor({ name: projects[project].title })
-    .setTitle('✅')
-    .setDescription(`Nice job getting the ${taskName} done.${episodeDoneText}`)
+    .setTitle('✅ Task Complete')
+    .setDescription(`Nice job getting the ${taskName} for episode ${episode} done.${episodeDoneText}`)
     .setColor(0xd797ff)
     .setTimestamp(Date.now());
   await interaction.editReply({ embeds: [replyEmbed], allowedMentions: generateAllowedMentions([[], []]) });
