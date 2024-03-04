@@ -15,6 +15,7 @@ import { SwapAdditionalStaffCmd } from "../commands/swapAdditionalStaff.cmd";
 import { TransferOwnershipCmd } from "../commands/transferOwnership.cmd";
 import { RemoveStaffCmd } from "../commands/removeStaff.cmd";
 import { RemoveAdditionalStaffCmd } from "../commands/removeAdditionalStaff.cmd";
+import { DeleteProjectCmd } from "../commands/deleteProject.cmd";
 
 export default (client: Client, db: Database, dbdata: DatabaseData): void => {
   client.on('interactionCreate', async (interaction) => {
@@ -54,6 +55,9 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
         break;
       case 'transferownership':
         await TransferOwnershipCmd(client, db, dbdata, cmdInteraction);
+        break;
+      case 'deleteproject':
+        await DeleteProjectCmd(client, db, dbdata, cmdInteraction);
         break;
       case 'help':
         await HelpCmd(cmdInteraction);

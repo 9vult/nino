@@ -38,7 +38,6 @@ export const RemoveAdditionalStaffCmd = async (client: Client, db: Database, dbd
       }
       if (success) {
         for (let task in projects[project].episodes[ep].tasks) {
-          console.log(task);
           if (projects[project].episodes[ep].tasks[task].abbreviation == abbreviation)
             db.ref(`/Projects/${guildId}/${project}/episodes/${epvalue}/tasks`).child(task).remove();
         }
@@ -48,7 +47,7 @@ export const RemoveAdditionalStaffCmd = async (client: Client, db: Database, dbd
     return fail(`Task ${abbreviation} was not found.`, interaction);
 
   const embed = new EmbedBuilder()
-    .setTitle(`Project Creation`)
+    .setTitle(`Project Modification`)
     .setDescription(`Removed position ${abbreviation} from episode ${episode}.`)
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
