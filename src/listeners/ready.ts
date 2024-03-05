@@ -316,6 +316,21 @@ export default (client: Client): void => {
           .setAutocomplete(true)
       );
 
+    const blameCmd = new SlashCommandBuilder()
+      .setName('blame')
+      .setDescription('Check the status of a project')
+      .addStringOption(o =>
+        o.setName('project')
+          .setDescription('Project name')
+          .setRequired(true)
+          .setAutocomplete(true)
+      )
+      .addNumberOption(o =>
+        o.setName('episode')
+          .setDescription('Episode number')
+          .setRequired(false)
+      );
+
     const releaseCmd = new SlashCommandBuilder()
       .setName('release')
       .setDescription('Release!')
@@ -366,6 +381,7 @@ export default (client: Client): void => {
     client.application.commands.create(removeEpisodeCmd);
     client.application.commands.create(doneCmd);
     client.application.commands.create(undoneCmd);
+    client.application.commands.create(blameCmd);
     client.application.commands.create(releaseCmd);
 
     console.log('Nino is ready to go!');

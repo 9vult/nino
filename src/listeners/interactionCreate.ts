@@ -19,6 +19,7 @@ import { DeleteProjectCmd } from "../commands/deleteProject.cmd";
 import { EditProjectCmd } from "../commands/editProject.cmd";
 import { AddEpisodeCmd } from "../commands/addEpisode.cmd";
 import { RemoveEpisodeCmd } from "../commands/removeEpisodeCmd";
+import { BlameCmd } from "../commands/blame.cmd";
 
 export default (client: Client, db: Database, dbdata: DatabaseData): void => {
   client.on('interactionCreate', async (interaction) => {
@@ -70,6 +71,9 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
         break;
       case 'deleteproject':
         await DeleteProjectCmd(client, db, dbdata, cmdInteraction);
+        break;
+      case 'blame':
+        await BlameCmd(client, db, dbdata, cmdInteraction);
         break;
       case 'help':
         await HelpCmd(cmdInteraction);

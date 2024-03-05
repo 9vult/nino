@@ -34,6 +34,7 @@ Then, place your `firebase.json` in the `/src/` folder.
 - /done
 - /undone
 - /release
+- /blame
 
 ### Development
 
