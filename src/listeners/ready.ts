@@ -329,6 +329,11 @@ export default (client: Client): void => {
         o.setName('episode')
           .setDescription('Episode number')
           .setRequired(false)
+      )
+      .addBooleanOption(o =>
+        o.setName('explain')
+          .setDescription('Explain what any of this even means')
+          .setRequired(false)
       );
 
     const releaseCmd = new SlashCommandBuilder()

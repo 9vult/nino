@@ -13,6 +13,7 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
 
   const project = options.getString('project')!;
   let episode: number | null = options.getNumber('episode');
+  let explain: boolean | null = options.getBoolean('explain');
 
   let epvalue;
   if (guildId == null || !(guildId in dbdata.guilds))
@@ -28,10 +29,20 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
     if ((episode != null && projObj.number === episode) || (episode == null && projObj.done == false)) {
       success = true;
       episode = projObj.number;
+      let map: {[key:string]:string} = {};
+      if (explain != null && explain == true) {
+        if (projects[project].keyStaff) Object.values(projects[project].keyStaff).forEach(ks => { map[ks.role.abbreviation] = ks.role.title; });
+        if (projObj.additionalStaff) Object.values(projObj.additionalStaff).forEach(as => { map[as.role.abbreviation] = as.role.title });
+      }
       for (let task in projects[project].episodes[ep].tasks) {
         let taskObj = projects[project].episodes[ep].tasks[task];
         if (taskObj.done) status += `~~${taskObj.abbreviation}~~ `;
         else status += `**${taskObj.abbreviation}** `;
+
+        if (explain != null && explain == true) {
+          let title = (taskObj.abbreviation in map) ? map[taskObj.abbreviation] : 'Unknown';
+          status += `: ${title}\n`;
+        }
       }
     }
   }
