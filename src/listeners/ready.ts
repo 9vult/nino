@@ -346,6 +346,7 @@ export default (client: Client): void => {
           .setRequired(true)
           .addChoices(
             { name: 'Episode', value: 'Episode' },
+            { name: 'Volume', value: 'Volume' },
             { name: 'Batch', value: 'Batch' }
           )
       )

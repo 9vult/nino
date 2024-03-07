@@ -29,9 +29,9 @@ let publishRole = role !== null ? `<@&${role}> ` : '';
     return fail('You do not have permission to do that.', interaction);
 
   const replyEmbed = new EmbedBuilder()
-    .setAuthor({ name: projects[project].title })
+    .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
     .setTitle(`Episode Released`)
-    .setDescription(`Nice job releasing **${projects[project].title} ${type} ${publishNumber}**!\nI wasn't sure you'd be able to do it, but you did!`)
+    .setDescription(`Nice job releasing **${projects[project].title} ${type} ${publishNumber}**!\nI'm proud of you!`)
     .setColor(0xd797ff)
     .setTimestamp(Date.now());
   await interaction.editReply({ embeds: [replyEmbed], allowedMentions: generateAllowedMentions([[], []]) });

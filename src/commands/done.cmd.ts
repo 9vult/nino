@@ -76,7 +76,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
 
   const episodeDoneText = episodeDone ? `\nAlso, episode ${episode} is now complete!` : '';
   const replyEmbed = new EmbedBuilder()
-    .setAuthor({ name: projects[project].title })
+    .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
     .setTitle('✅ Task Complete')
     .setDescription(`Nice job getting the **${taskName}** for episode ${episode} done.${episodeDoneText}`)
     .setColor(0xd797ff)
@@ -88,7 +88,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   }
 
   const publishEmbed = new EmbedBuilder()
-    .setAuthor({ name: projects[project].title })
+    .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
     .setTitle(`Episode ${episode}`)
     .setThumbnail(projects[project].poster)
     .setDescription(status)

@@ -76,7 +76,7 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
   db.ref(`/Projects/${guildId}/${project}/episodes/${epvalue}`).update({ done: false });
 
   const embed = new EmbedBuilder()
-    .setAuthor({ name: projects[project].title })
+    .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
     .setTitle('❌ Task Incomplete')
     .setDescription(`So the episode ${episode} **${taskName}** wasn't done, after all. Typical.`)
     .setColor(0xd797ff)
@@ -84,7 +84,7 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 
   const publishEmbed = new EmbedBuilder()
-    .setAuthor({ name: projects[project].title })
+    .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
     .setTitle(`Episode ${episode}`)
     .setThumbnail(projects[project].poster)
     .setDescription(status)

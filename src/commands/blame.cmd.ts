@@ -40,7 +40,7 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
     return fail('The project is complete, or the specified episode could not be found.', interaction);
 
   const embed = new EmbedBuilder()
-    .setAuthor({ name: projects[project].title })
+    .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
     .setTitle(`Episode ${episode}`)
     .setThumbnail(projects[project].poster)
     .setDescription(status)
