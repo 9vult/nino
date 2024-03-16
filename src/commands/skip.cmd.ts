@@ -33,7 +33,7 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
     if (staffObj.role.abbreviation === abbreviation && (staffObj.id === user.id || projects[project].owner === user.id)) {
       isValidUser = true;
       taskName = staffObj.role.title;
-      status = `⏭ **${staffObj.role.title}** (Skipped)\n`;
+      status = `:fast_forward: **${staffObj.role.title}** (Skipped)\n`;
     }
   }
 
@@ -58,7 +58,7 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
         for (let addStaff in projects[project].episodes[ep].additionalStaff) {
           let addStaffObj = projects[project].episodes[ep].additionalStaff[addStaff];
           if (addStaffObj.role.abbreviation === abbreviation && (addStaffObj.id === user.id || projects[project].owner === user.id)) {
-            status = `⏭ **${addStaffObj.role.title}** (Skipped)\n` + status;
+            status = `:fast_forward: **${addStaffObj.role.title}** (Skipped)\n` + status;
             taskName = addStaffObj.role.title;
             isValidUser = true;
           }
@@ -77,7 +77,7 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
   const episodeDoneText = episodeDone ? `\nAlso, episode ${episode} is now complete!` : '';
   const replyEmbed = new EmbedBuilder()
     .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
-    .setTitle('⏭ Task Skipped')
+    .setTitle(':fast_forward: Task Skipped')
     .setDescription(`**${taskName}** for episode ${episode} has been skipped.\nIf you wish to do it for realsies, \`/undone\` it first.${episodeDoneText}`)
     .setColor(0xd797ff)
     .setTimestamp(Date.now());
