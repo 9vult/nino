@@ -316,6 +316,28 @@ export default (client: Client): void => {
           .setAutocomplete(true)
       );
 
+    const skipCmd = new SlashCommandBuilder()
+      .setName('skip')
+      .setDescription('Skip a position')
+      .addStringOption(o =>
+        o.setName('project')
+          .setDescription('Project nickname')
+          .setRequired(true)
+          .setAutocomplete(true)
+      )
+      .addNumberOption(o =>
+        o.setName('episode')
+          .setDescription('Episode number')
+          .setRequired(true)
+          .setAutocomplete(true)
+      )
+      .addStringOption(o =>
+        o.setName('abbreviation')
+          .setDescription('Position shorthand')
+          .setRequired(true)
+          .setAutocomplete(true)
+      );
+
     const blameCmd = new SlashCommandBuilder()
       .setName('blame')
       .setDescription('Check the status of a project')
@@ -387,6 +409,7 @@ export default (client: Client): void => {
     client.application.commands.create(removeEpisodeCmd);
     client.application.commands.create(doneCmd);
     client.application.commands.create(undoneCmd);
+    client.application.commands.create(skipCmd);
     client.application.commands.create(blameCmd);
     client.application.commands.create(releaseCmd);
 

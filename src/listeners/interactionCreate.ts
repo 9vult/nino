@@ -20,6 +20,7 @@ import { EditProjectCmd } from "../commands/editProject.cmd";
 import { AddEpisodeCmd } from "../commands/addEpisode.cmd";
 import { RemoveEpisodeCmd } from "../commands/removeEpisodeCmd";
 import { BlameCmd } from "../commands/blame.cmd";
+import { SkipCmd } from "../commands/skip.cmd";
 
 export default (client: Client, db: Database, dbdata: DatabaseData): void => {
   client.on('interactionCreate', async (interaction) => {
@@ -59,6 +60,9 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
         break;
       case 'undone':
         await UndoneCmd(client, db, dbdata, cmdInteraction);
+        break;
+      case 'skip':
+        await SkipCmd(client, db, dbdata, cmdInteraction);
         break;
       case 'release':
         await ReleaseCmd(client, db, dbdata, cmdInteraction);
