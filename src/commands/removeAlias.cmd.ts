@@ -5,7 +5,7 @@ import { fail } from "../actions/fail.action";
 import { Database } from "@firebase/database-types";
 import { GetAlias } from "../actions/getalias.action";
 
-export const RemoveEpisodeCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
+export const RemoveAliasCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
   const { options, user, member, guildId } = interaction;
   if (guildId == null) return;
@@ -13,7 +13,7 @@ export const RemoveEpisodeCmd = async (client: Client, db: Database, dbdata: Dat
   await interaction.deferReply();
 
   const project = await GetAlias(db, dbdata, interaction, options.getString('project')!);
-  const number = options.getNumber('number')!;
+  const alias = options.getString('alias')!;
 
   if (guildId == null || !(guildId in dbdata.guilds))
     return fail(`Guild ${guildId} does not exist.`, interaction);
@@ -26,18 +26,11 @@ export const RemoveEpisodeCmd = async (client: Client, db: Database, dbdata: Dat
     return fail(`You do not have permission to do that.`, interaction);
 
   const ref = db.ref(`/Projects/`).child(`${guildId}`).child(`${project}`);
-  ref.update({ length: projects[project].length - 1 });
-
-  for (let ep in projects[project].episodes) {
-    if (projects[project].episodes[ep].number == number) {
-      db.ref(`/Projects/${guildId}/${project}/episodes/${ep}`).remove();
-      break;
-    }
-  }
+  ref.update({ aliases: projects[project].aliases.filter(a => a !== alias) });
 
   const embed = new EmbedBuilder()
     .setTitle(`Project Modification`)
-    .setDescription(`I removed episode ${number} from \`${project}\` for you.`)
+    .setDescription(`I removed the alias \`${alias}\` from \`${project}\` for you.`)
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

@@ -3,6 +3,7 @@ import { generateAllowedMentions } from "../actions/generateAllowedMentions.acti
 import { DatabaseData } from "../misc/types";
 import { Database } from "@firebase/database-types";
 import { fail } from "../actions/fail.action";
+import { GetAlias } from "../actions/getalias.action";
 
 export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -10,7 +11,7 @@ export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseD
 
   await interaction.deferReply();
 
-  const project = options.getString('project')!;
+  const project = await GetAlias(db, dbdata, interaction, options.getString('project')!);
   const type = options.getString('type')!;
   const number = options.getString('number')!;
   const url: string | null = options.getString('url');
@@ -23,7 +24,7 @@ let projects = dbdata.guilds[guildId];
 let publishNumber = type !== 'Batch' ? number : `(${number})`;
 let publishRole = role !== null ? `<@&${role}> ` : '';
 
-  if (!(project in projects))
+  if (!project || !(project in projects))
     return fail(`Project ${project} does not exist.`, interaction);
   if (projects[project].owner !== user.id)
     return fail('You do not have permission to do that.', interaction);

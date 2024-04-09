@@ -3,6 +3,7 @@ import { generateAllowedMentions } from "../actions/generateAllowedMentions.acti
 import { DatabaseData } from "../misc/types";
 import { Database } from "@firebase/database-types";
 import { fail } from "../actions/fail.action";
+import { GetAlias } from "../actions/getalias.action";
 
 export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -10,7 +11,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
 
   await interaction.deferReply();
 
-  const project = options.getString('project')!;
+  const project = await GetAlias(db, dbdata, interaction, options.getString('project')!);
   const episode = options.getNumber('episode')!;
   const abbreviation = options.getString('abbreviation')!.toUpperCase();
 
@@ -25,7 +26,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
 
   let projects = dbdata.guilds[guildId];
 
-  if (!(project in projects))
+  if (!project || !(project in projects))
     return fail(`Project ${project} does not exist.`, interaction);
 
   for (let staff in projects[project].keyStaff) {

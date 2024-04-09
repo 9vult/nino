@@ -232,6 +232,8 @@ export default (client: Client): void => {
           .addChoices(
             { name: 'Title', value: 'Title' },
             { name: 'Poster', value: 'Poster' },
+            { name: 'AniDB', value: 'AniDB' },
+            { name: 'AirTime24h', value: 'AirTime24h' },
             { name: 'UpdateChannelID', value: 'UpdateChannel' },
             { name: 'ReleaseChannelID', value: 'ReleaseChannel' }
           )
@@ -269,6 +271,36 @@ export default (client: Client): void => {
       .addNumberOption(o =>
         o.setName('number')
           .setDescription('Episode number')
+          .setRequired(true)
+      );
+
+    const addAliasCmd = new SlashCommandBuilder()
+      .setName('addalias')
+      .setDescription('Add an alias')
+      .addStringOption(o => 
+        o.setName('project')
+          .setDescription('Project nickname')
+          .setRequired(true)
+          .setAutocomplete(true)
+      )
+      .addStringOption(o =>
+        o.setName('alias')
+          .setDescription('Alias')
+          .setRequired(true)
+      );
+
+    const removeAliasCmd = new SlashCommandBuilder()
+      .setName('removealias')
+      .setDescription('Remove an alias')
+      .addStringOption(o => 
+        o.setName('project')
+          .setDescription('Project nickname')
+          .setRequired(true)
+          .setAutocomplete(true)
+      )
+      .addStringOption(o =>
+        o.setName('alias')
+          .setDescription('Alias')
           .setRequired(true)
       );
 
@@ -407,6 +439,8 @@ export default (client: Client): void => {
     client.application.commands.create(editProjectCmd);
     client.application.commands.create(addEpisodeCmd);
     client.application.commands.create(removeEpisodeCmd);
+    client.application.commands.create(addAliasCmd);
+    client.application.commands.create(removeAliasCmd);
     client.application.commands.create(doneCmd);
     client.application.commands.create(undoneCmd);
     client.application.commands.create(skipCmd);

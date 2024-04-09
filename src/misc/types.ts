@@ -1,6 +1,7 @@
 
 export interface Project {
   nickname: string,
+  aliases: string[],
   title: string,
   owner: string
   length: number,
@@ -9,6 +10,8 @@ export interface Project {
   keyStaff: Staff[],
   episodes: Episode[],
   done: boolean,
+  anidb: string,
+  airTime: string, // '14:30'
   updateChannel: string,
   releaseChannel: string
 };

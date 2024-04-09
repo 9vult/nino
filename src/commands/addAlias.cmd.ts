@@ -5,7 +5,7 @@ import { fail } from "../actions/fail.action";
 import { Database } from "@firebase/database-types";
 import { GetAlias } from "../actions/getalias.action";
 
-export const RemoveEpisodeCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
+export const AddAliasCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
   const { options, user, member, guildId } = interaction;
   if (guildId == null) return;
@@ -13,7 +13,7 @@ export const RemoveEpisodeCmd = async (client: Client, db: Database, dbdata: Dat
   await interaction.deferReply();
 
   const project = await GetAlias(db, dbdata, interaction, options.getString('project')!);
-  const number = options.getNumber('number')!;
+  const alias = options.getString('alias')!;
 
   if (guildId == null || !(guildId in dbdata.guilds))
     return fail(`Guild ${guildId} does not exist.`, interaction);
@@ -25,19 +25,19 @@ export const RemoveEpisodeCmd = async (client: Client, db: Database, dbdata: Dat
   if (projects[project].owner !== user!.id)
     return fail(`You do not have permission to do that.`, interaction);
 
-  const ref = db.ref(`/Projects/`).child(`${guildId}`).child(`${project}`);
-  ref.update({ length: projects[project].length - 1 });
+  let aliasProj = await GetAlias(db, dbdata, interaction, alias);
+  if (aliasProj)
+    return fail(`That alias is already in use in ${aliasProj}`, interaction);
 
-  for (let ep in projects[project].episodes) {
-    if (projects[project].episodes[ep].number == number) {
-      db.ref(`/Projects/${guildId}/${project}/episodes/${ep}`).remove();
-      break;
-    }
-  }
+  const ref = db.ref(`/Projects/`).child(`${guildId}`).child(`${project}`);
+  if (projects[project].aliases)
+    ref.update({ aliases: [...projects[project].aliases, alias] });
+  else 
+    ref.update({ aliases: [alias] });
 
   const embed = new EmbedBuilder()
     .setTitle(`Project Modification`)
-    .setDescription(`I removed episode ${number} from \`${project}\` for you.`)
+    .setDescription(`I added \`${alias}\` as an alias for \`${project}\` for you.`)
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }
