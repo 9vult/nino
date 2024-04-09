@@ -4,6 +4,7 @@ import { generateAllowedMentions } from "../actions/generateAllowedMentions.acti
 import { DatabaseData } from "../misc/types";
 import { Database } from "@firebase/database-types";
 import { fail } from "../actions/fail.action";
+import { GetAlias } from "../actions/getalias.action";
 
 export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -11,7 +12,7 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
 
   await interaction.deferReply();
 
-  const project = options.getString('project')!;
+  const project = await GetAlias(db, dbdata, interaction, options.getString('project')!);
   let episode: number | null = options.getNumber('episode');
   let explain: boolean | null = options.getBoolean('explain');
 
@@ -20,7 +21,7 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
     return fail(`Guild ${guildId} does not exist.`, interaction);
 
   let projects = dbdata.guilds[guildId];
-  if (!(project in projects))
+  if (!project || !(project in projects))
     return fail(`Project ${project} does not exist.`, interaction);
   let status = '';
   let success = false;

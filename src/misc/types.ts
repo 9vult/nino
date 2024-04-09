@@ -10,6 +10,7 @@ export interface Project {
   keyStaff: Staff[],
   episodes: Episode[],
   done: boolean,
+  anidb: string,
   updateChannel: string,
   releaseChannel: string
 };

@@ -272,6 +272,36 @@ export default (client: Client): void => {
           .setRequired(true)
       );
 
+    const addAliasCmd = new SlashCommandBuilder()
+      .setName('addalias')
+      .setDescription('Add an alias')
+      .addStringOption(o => 
+        o.setName('project')
+          .setDescription('Project nickname')
+          .setRequired(true)
+          .setAutocomplete(true)
+      )
+      .addStringOption(o =>
+        o.setName('alias')
+          .setDescription('Alias')
+          .setRequired(true)
+      );
+
+    const removeAliasCmd = new SlashCommandBuilder()
+      .setName('addalias')
+      .setDescription('Add an alias')
+      .addStringOption(o => 
+        o.setName('project')
+          .setDescription('Project nickname')
+          .setRequired(true)
+          .setAutocomplete(true)
+      )
+      .addStringOption(o =>
+        o.setName('alias')
+          .setDescription('Alias')
+          .setRequired(true)
+      );
+
     const doneCmd = new SlashCommandBuilder()
       .setName('done')
       .setDescription('Mark a position as done')
@@ -407,6 +437,8 @@ export default (client: Client): void => {
     client.application.commands.create(editProjectCmd);
     client.application.commands.create(addEpisodeCmd);
     client.application.commands.create(removeEpisodeCmd);
+    client.application.commands.create(addAliasCmd);
+    client.application.commands.create(removeAliasCmd);
     client.application.commands.create(doneCmd);
     client.application.commands.create(undoneCmd);
     client.application.commands.create(skipCmd);

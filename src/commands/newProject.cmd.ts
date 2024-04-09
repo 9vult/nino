@@ -28,6 +28,7 @@ export const NewProjectCmd = async (client: Client, db: Database, dbdata: Databa
   const newProj: Project = {
     nickname,
     title,
+    aliases: [],
     owner,
     length,
     poster,
@@ -35,6 +36,7 @@ export const NewProjectCmd = async (client: Client, db: Database, dbdata: Databa
     keyStaff: [],
     episodes: [],
     done: false,
+    anidb: '', // TODO
     updateChannel,
     releaseChannel
   };

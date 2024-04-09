@@ -3,6 +3,7 @@ import { generateAllowedMentions } from "../actions/generateAllowedMentions.acti
 import { DatabaseData, Project } from "../misc/types";
 import { fail } from "../actions/fail.action";
 import { Database } from "@firebase/database-types";
+import { GetAlias } from "../actions/getalias.action";
 
 export const EditProjectCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -11,12 +12,12 @@ export const EditProjectCmd = async (client: Client, db: Database, dbdata: Datab
 
   await interaction.deferReply();
 
-  const project = options.getString('project')!;
+  const project = await GetAlias(db, dbdata, interaction, options.getString('project')!);
   const option = options.getString('option')!;
   const newValue = options.getString('newvalue')!;
 
   let projects = dbdata.guilds[guildId];
-  if (!(project in projects))
+  if (!project || !(project in projects))
     return fail(`Project ${project} does not exist.`, interaction);
   if (projects[project].owner !== user!.id)
     return fail(`You do not have permission to do that.`, interaction);
