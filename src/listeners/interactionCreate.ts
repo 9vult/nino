@@ -98,8 +98,12 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
         case 'project': {
           if (guildId === null || !(guildId in dbdata.guilds)) break;
           let projects = dbdata.guilds[guildId];
-          choices = Object.keys(projects).filter(choice => choice.startsWith(focusedOption.value));
-          await interaction.respond(choices.map(choice => ({ name: choice, value: choice })));
+          let aliases = Object.values(projects).reduce((acc, cur) => {
+            if (cur.aliases) acc.push(...cur.aliases);
+            return acc;
+          }, [] as string[]);
+          choices = aliases.filter(choice => choice.startsWith(focusedOption.value));
+          await interaction.respond(choices.map(choice => ({ name: choice, value: choice })).slice(0, 25));
           return;
         }
         case 'episode': {

@@ -1,6 +1,7 @@
 
 export interface Project {
   nickname: string,
+  aliases: string[],
   title: string,
   owner: string
   length: number,
