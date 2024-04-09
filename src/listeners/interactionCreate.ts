@@ -22,7 +22,8 @@ import { RemoveEpisodeCmd } from "../commands/removeEpisodeCmd";
 import { BlameCmd } from "../commands/blame.cmd";
 import { SkipCmd } from "../commands/skip.cmd";
 import { AddAliasCmd } from "../commands/addAlias.cmd";
-import { RemoveAliasCmd } from "src/commands/removeAlias.cmd";
+import { RemoveAliasCmd } from "../commands/removeAlias.cmd";
+import { GetAlias } from "../actions/getalias.action";
 
 export default (client: Client, db: Database, dbdata: DatabaseData): void => {
   client.on('interactionCreate', async (interaction) => {
@@ -107,6 +108,7 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
           if (guildId === null || !(guildId in dbdata.guilds)) break;
           let projects = dbdata.guilds[guildId];
           let aliases = Object.values(projects).reduce((acc, cur) => {
+            acc.push(cur.nickname);
             if (cur.aliases) acc.push(...cur.aliases);
             return acc;
           }, [] as string[]);
@@ -115,9 +117,9 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
           return;
         }
         case 'episode': {
-          let projectName = options.getString('project');
+          let projectName = await GetAlias(db, dbdata, interaction, options.getString('project')!);
           if (guildId === null || projectName === null || projectName === '') break;
-          if (!(projectName in dbdata.guilds[guildId])) return;
+          if (!projectName || !(projectName in dbdata.guilds[guildId])) return;
           let project = dbdata.guilds[guildId][projectName];
           choices = [];
           for (let ep in project.episodes) {
@@ -129,10 +131,10 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
           return;
         }
         case 'abbreviation': {
-          let projectName = options.getString('project');
+          let projectName = await GetAlias(db, dbdata, interaction, options.getString('project')!);
           let episode = options.getNumber('episode');
           if (guildId === null || projectName === null || projectName === '' || episode === null) break;
-          if (!(projectName in dbdata.guilds[guildId])) break;
+          if (!projectName || !(projectName in dbdata.guilds[guildId])) break;
           let project = dbdata.guilds[guildId][projectName];
           choices = [];
           for (let ep in project.episodes) {

@@ -25,8 +25,15 @@ export const AddAliasCmd = async (client: Client, db: Database, dbdata: Database
   if (projects[project].owner !== user!.id)
     return fail(`You do not have permission to do that.`, interaction);
 
+  let aliasProj = await GetAlias(db, dbdata, interaction, alias);
+  if (aliasProj)
+    return fail(`That alias is already in use in ${aliasProj}`, interaction);
+
   const ref = db.ref(`/Projects/`).child(`${guildId}`).child(`${project}`);
-  ref.update({ aliases: [...projects[project].aliases, alias] });
+  if (projects[project].aliases)
+    ref.update({ aliases: [...projects[project].aliases, alias] });
+  else 
+    ref.update({ aliases: [alias] });
 
   const embed = new EmbedBuilder()
     .setTitle(`Project Modification`)

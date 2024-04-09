@@ -1,10 +1,10 @@
 
-import { ChatInputCommandInteraction } from "discord.js";
+import { AutocompleteInteraction, ChatInputCommandInteraction } from "discord.js";
 import { DatabaseData } from "../misc/types";
 import { Database } from "@firebase/database-types";
 
-export const GetAlias = async (db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction, query: string) => {
-  if (!interaction.isCommand()) return;
+export const GetAlias = async (db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction | AutocompleteInteraction, query: string) => {
+  if (!interaction.isCommand() && !interaction.isAutocomplete()) return;
   const { guildId } = interaction;
 
   if (guildId == null || !(guildId in dbdata.guilds))
