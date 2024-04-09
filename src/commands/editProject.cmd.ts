@@ -37,6 +37,14 @@ export const EditProjectCmd = async (client: Client, db: Database, dbdata: Datab
     case 'ReleaseChannel':
       ref.update({ releaseChannel: newValue });
       break;
+    case 'AniDB':
+      ref.update({ anidb: newValue });
+      break;
+    case 'AirTime24h':
+      const isTime = /^([0-9]{2}):([0-9]{2})$/.test(newValue);
+      if (!isTime) return fail(`Air time must be a 24-hour HH:MM time, ex: 16:30`, interaction);
+      ref.update({ airTime: newValue });
+      break;
   }
 
   const embed = new EmbedBuilder()

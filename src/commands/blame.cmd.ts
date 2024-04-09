@@ -5,6 +5,7 @@ import { DatabaseData } from "../misc/types";
 import { Database } from "@firebase/database-types";
 import { fail } from "../actions/fail.action";
 import { GetAlias } from "../actions/getalias.action";
+import { AirDate } from "../actions/airdate.action";
 
 export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -25,6 +26,7 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
     return fail(`Project ${project} does not exist.`, interaction);
   let status = '';
   let success = false;
+  let started = false;
   for (let ep in projects[project].episodes) {
     let projObj = projects[project].episodes[ep];
     if ((episode != null && projObj.number === episode) || (episode == null && projObj.done == false)) {
@@ -44,9 +46,13 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
           let title = (taskObj.abbreviation in map) ? map[taskObj.abbreviation] : 'Unknown';
           status += `: ${title}\n`;
         }
+        if (taskObj.done) started = true;
       }
     }
   }
+
+  if (projects[project].anidb && episode != null && !started)
+    status += `\n${await AirDate(projects[project].anidb, projects[project].airTime, episode)}`;
 
   if (!success)
     return fail('The project is complete, or the specified episode could not be found.', interaction);

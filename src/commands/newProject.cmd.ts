@@ -37,6 +37,7 @@ export const NewProjectCmd = async (client: Client, db: Database, dbdata: Databa
     episodes: [],
     done: false,
     anidb: '', // TODO
+    airTime: '00:00',
     updateChannel,
     releaseChannel
   };

@@ -11,6 +11,7 @@ export interface Project {
   episodes: Episode[],
   done: boolean,
   anidb: string,
+  airTime: string, // '14:30'
   updateChannel: string,
   releaseChannel: string
 };

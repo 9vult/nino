@@ -232,6 +232,8 @@ export default (client: Client): void => {
           .addChoices(
             { name: 'Title', value: 'Title' },
             { name: 'Poster', value: 'Poster' },
+            { name: 'AniDB', value: 'AniDB' },
+            { name: 'AirTime24h', value: 'AirTime24h' },
             { name: 'UpdateChannelID', value: 'UpdateChannel' },
             { name: 'ReleaseChannelID', value: 'ReleaseChannel' }
           )
