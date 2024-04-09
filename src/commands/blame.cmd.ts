@@ -44,7 +44,7 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
 
         if (explain != null && explain == true) {
           let title = (taskObj.abbreviation in map) ? map[taskObj.abbreviation] : 'Unknown';
-          status += `: ${title}\n`;
+          status += `: ${title}${taskObj.done ? ' *(done)*' : ''}\n`;
         }
         if (taskObj.done) started = true;
       }
