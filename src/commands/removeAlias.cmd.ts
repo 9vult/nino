@@ -5,7 +5,7 @@ import { fail } from "../actions/fail.action";
 import { Database } from "@firebase/database-types";
 import { GetAlias } from "../actions/getalias.action";
 
-export const AddAliasCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
+export const RemoveAliasCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
   const { options, user, member, guildId } = interaction;
   if (guildId == null) return;
@@ -26,11 +26,11 @@ export const AddAliasCmd = async (client: Client, db: Database, dbdata: Database
     return fail(`You do not have permission to do that.`, interaction);
 
   const ref = db.ref(`/Projects/`).child(`${guildId}`).child(`${project}`);
-  ref.update({ aliases: [...projects[project].aliases, alias] });
+  ref.update({ aliases: projects[project].aliases.filter(a => a !== alias) });
 
   const embed = new EmbedBuilder()
     .setTitle(`Project Modification`)
-    .setDescription(`I added \`${alias}\` as an alias for \`${project}\` for you.`)
+    .setDescription(`I removed the alias \`${alias}\` from \`${project}\` for you.`)
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

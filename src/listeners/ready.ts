@@ -288,8 +288,8 @@ export default (client: Client): void => {
       );
 
     const removeAliasCmd = new SlashCommandBuilder()
-      .setName('addalias')
-      .setDescription('Add an alias')
+      .setName('removealias')
+      .setDescription('Remove an alias')
       .addStringOption(o => 
         o.setName('project')
           .setDescription('Project nickname')

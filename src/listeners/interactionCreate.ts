@@ -21,6 +21,8 @@ import { AddEpisodeCmd } from "../commands/addEpisode.cmd";
 import { RemoveEpisodeCmd } from "../commands/removeEpisodeCmd";
 import { BlameCmd } from "../commands/blame.cmd";
 import { SkipCmd } from "../commands/skip.cmd";
+import { AddAliasCmd } from "../commands/addAlias.cmd";
+import { RemoveAliasCmd } from "src/commands/removeAlias.cmd";
 
 export default (client: Client, db: Database, dbdata: DatabaseData): void => {
   client.on('interactionCreate', async (interaction) => {
@@ -54,6 +56,12 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
         break;
       case 'removeepisode':
         await RemoveEpisodeCmd(client, db, dbdata, cmdInteraction);
+        break;
+      case 'addalias':
+        await AddAliasCmd(client, db, dbdata, cmdInteraction);
+        break;
+      case 'removealias':
+        await RemoveAliasCmd(client, db, dbdata, cmdInteraction);
         break;
       case 'done':
         await DoneCmd(client, db, dbdata, cmdInteraction);
