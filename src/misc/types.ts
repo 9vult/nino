@@ -30,12 +30,18 @@ export interface Staff {
 
 export interface Role {
   abbreviation: string,
-  title: string
+  title: string,
+  weight: number
 };
 
 export type Task = {
   abbreviation: string,
   done: boolean
+};
+
+export type WeightedStatusEntry = {
+  status: string,
+  weight: number
 };
 
 export type DatabaseData = {

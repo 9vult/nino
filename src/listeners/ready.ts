@@ -96,6 +96,27 @@ export default (client: Client): void => {
           .setRequired(true)
       );
 
+    const setWeightCmd = new SlashCommandBuilder()
+      .setName('setweight')
+      .setDescription('Set the weight of a Key Staff position')
+      .addStringOption(o =>
+        o.setName('project')
+          .setDescription('Project nickname')
+          .setRequired(true)
+          .setAutocomplete(true)
+      )
+      .addStringOption(o =>
+        o.setName('abbreviation')
+          .setDescription('Position shorthand')
+          .setRequired(true)
+          .setAutocomplete(true)
+      )
+      .addNumberOption(o =>
+        o.setName('weight')
+          .setDescription('Weight')
+          .setRequired(true)
+      );
+
     const swapStaffCmd = new SlashCommandBuilder()
       .setName('swapstaff')
       .setDescription('Swap staff into a project')
@@ -430,6 +451,7 @@ export default (client: Client): void => {
     client.application.commands.create(newProjectCmd);
     client.application.commands.create(addStaffCmd);
     client.application.commands.create(removeStaffCmd);
+    client.application.commands.create(setWeightCmd);
     client.application.commands.create(swapStaffCmd);
     client.application.commands.create(addAdditionalStaffCmd);
     client.application.commands.create(removeAdditionalStaffCmd);

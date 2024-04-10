@@ -24,6 +24,7 @@ import { SkipCmd } from "../commands/skip.cmd";
 import { AddAliasCmd } from "../commands/addAlias.cmd";
 import { RemoveAliasCmd } from "../commands/removeAlias.cmd";
 import { GetAlias } from "../actions/getalias.action";
+import { SetWeightCmd } from "../commands/setWeight.cmd";
 
 export default (client: Client, db: Database, dbdata: DatabaseData): void => {
   client.on('interactionCreate', async (interaction) => {
@@ -42,6 +43,9 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
         break;
       case 'removestaff':
         await RemoveStaffCmd(client, db, dbdata, cmdInteraction);
+        break;
+      case 'setweight':
+        await SetWeightCmd(client, db, dbdata, cmdInteraction);
         break;
       case 'addadditionalstaff':
         await AddAdditionalStaffCmd(client, db, dbdata, cmdInteraction);
@@ -133,16 +137,25 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
         case 'abbreviation': {
           let projectName = await GetAlias(db, dbdata, interaction, options.getString('project')!);
           let episode = options.getNumber('episode');
-          if (guildId === null || projectName === null || projectName === '' || episode === null) break;
+          if (guildId === null || projectName === null || projectName === '') break;
           if (!projectName || !(projectName in dbdata.guilds[guildId])) break;
           let project = dbdata.guilds[guildId][projectName];
           choices = [];
-          for (let ep in project.episodes) {
-            if (project.episodes[ep].number == episode) {
-              for (let taskId in project.episodes[ep].tasks) {
-                let task = project.episodes[ep].tasks[taskId];
-                if (task.abbreviation.startsWith(focusedOption.value.toUpperCase()))
-                  choices.push({ name: task.abbreviation, value: task.abbreviation });
+
+          if (!episode) {
+            for (let staffId in project.keyStaff) {
+              let role = project.keyStaff[staffId].role;
+              if (role.abbreviation.startsWith(focusedOption.value.toUpperCase()))
+                choices.push({ name: role.abbreviation, value: role.abbreviation });
+            }
+          } else {
+            for (let ep in project.episodes) {
+              if (project.episodes[ep].number == episode) {
+                for (let taskId in project.episodes[ep].tasks) {
+                  let task = project.episodes[ep].tasks[taskId];
+                  if (task.abbreviation.startsWith(focusedOption.value.toUpperCase()))
+                    choices.push({ name: task.abbreviation, value: task.abbreviation });
+                }
               }
             }
           }

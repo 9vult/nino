@@ -4,6 +4,7 @@ import { DatabaseData } from "../misc/types";
 import { Database } from "@firebase/database-types";
 import { fail } from "../actions/fail.action";
 import { GetAlias } from "../actions/getalias.action";
+import { EntriesToStatusString, GenerateEntries } from "../actions/generateEntries.action";
 
 export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -19,7 +20,6 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   let taskvalue;
   let taskName;
   let isValidUser = false;
-  let status = '';
   let episodeDone = true;
   if (guildId == null || !(guildId in dbdata.guilds))
     return fail(`Guild ${guildId} does not exist.`, interaction);
@@ -28,6 +28,9 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
 
   if (!project || !(project in projects))
     return fail(`Project ${project} does not exist.`, interaction);
+
+  let status = '';
+  let entries = GenerateEntries(dbdata, guildId, project, episode);
 
   for (let staff in projects[project].keyStaff) {
     let staffObj = projects[project].keyStaff[staff];
@@ -50,10 +53,13 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
         }
         else if (!taskObj.done) episodeDone = false;
         // Status string
-        if (taskObj.abbreviation === abbreviation) status += `__~~${abbreviation}~~__ `;
-        else if (taskObj.done) status += `~~${taskObj.abbreviation}~~ `;
-        else status += `**${taskObj.abbreviation}** `;
+        if (taskObj.abbreviation === abbreviation) entries[taskObj.abbreviation].status = `__~~${abbreviation}~~__`;
+        else if (taskObj.done) entries[taskObj.abbreviation].status = `~~${taskObj.abbreviation}~~`;
+        else entries[taskObj.abbreviation].status = `**${taskObj.abbreviation}**`;
       }
+
+      status = EntriesToStatusString(entries);
+
       if (taskvalue == undefined) return fail(`Task ${abbreviation} does not exist!`, interaction);
       if (!isValidUser) { // Not key staff
         for (let addStaff in projects[project].episodes[ep].additionalStaff) {
