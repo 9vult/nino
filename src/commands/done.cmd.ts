@@ -58,7 +58,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
         else entries[taskObj.abbreviation].status = `**${taskObj.abbreviation}**`;
       }
 
-      status = EntriesToStatusString(entries);
+      status += EntriesToStatusString(entries);
 
       if (taskvalue == undefined) return fail(`Task ${abbreviation} does not exist!`, interaction);
       if (!isValidUser) { // Not key staff
