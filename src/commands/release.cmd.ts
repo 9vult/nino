@@ -15,14 +15,14 @@ export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseD
   const type = options.getString('type')!;
   const number = options.getString('number')!;
   const url: string | null = options.getString('url');
-  const role = options.getRole('role')!.id;
+  const role = options.getRole('role');
   
   if (guildId == null || !(guildId in dbdata.guilds))
   return fail(`Guild ${guildId} does not exist.`, interaction);
 
 let projects = dbdata.guilds[guildId];
 let publishNumber = type !== 'Batch' ? number : `(${number})`;
-let publishRole = role !== null ? `<@&${role}> ` : '';
+let publishRole = role !== null ? `<@&${role.id}> ` : '';
 
   if (!project || !(project in projects))
     return fail(`Project ${project} does not exist.`, interaction);
