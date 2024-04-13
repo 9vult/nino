@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, Client, EmbedBuilder, TextChannel } from "discord.js";
+import { ChatInputCommandInteraction, Client, EmbedBuilder, TextChannel, WebhookClient } from "discord.js";
 import { generateAllowedMentions } from "../actions/generateAllowedMentions.action";
 import { DatabaseData } from "../misc/types";
 import { Database } from "@firebase/database-types";
@@ -41,4 +41,23 @@ let publishRole = role !== null ? `<@&${role.id}> ` : '';
   const publishChannel = client.channels.cache.get(projects[project].releaseChannel);
   if (publishChannel?.isTextBased)
     (publishChannel as TextChannel).send(publishBody);
+
+  if (!projects[project].observers) return; // Stop here if there's no observers
+  for (let observerid in projects[project].observers) {
+    const observer = projects[project].observers[observerid];
+    if (!observer.releasesWebhook) continue;
+    try {
+      fetch(observer.releasesWebhook, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          username: 'Nino',
+          avatar_url: 'https://i.imgur.com/PWtteaY.png',
+          content: `**${projects[project].title} - ${type} ${publishNumber}**\n${url}`,
+        })
+      });
+    } catch {
+      interaction.channel?.send(`Webhook ${observer.releasesWebhook} failed.`);
+    }
+  }
 }

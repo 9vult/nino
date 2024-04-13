@@ -411,6 +411,46 @@ export default (client: Client): void => {
           .setRequired(false)
       );
 
+    const addObserver = new SlashCommandBuilder()
+      .setName('addobserver')
+      .setDescription('Add a server to observe this project')
+      .addStringOption(o =>
+        o.setName('project')
+          .setDescription('Project name')
+          .setRequired(true)
+          .setAutocomplete(true)
+      )
+      .addStringOption(o =>
+        o.setName('guild')
+          .setDescription('Guild ID')
+          .setRequired(true)
+      )
+      .addStringOption(o =>
+        o.setName('updates')
+          .setDescription('Webhook URL for updates')
+          .setRequired(false)
+      )
+      .addStringOption(o =>
+        o.setName('releases')
+          .setDescription('Webhook URL for releases')
+          .setRequired(false)
+      );
+
+    const removeObserver = new SlashCommandBuilder()
+      .setName('removeobserver')
+      .setDescription('Remove a server observing this project')
+      .addStringOption(o =>
+        o.setName('project')
+          .setDescription('Project name')
+          .setRequired(true)
+          .setAutocomplete(true)
+      )
+      .addStringOption(o =>
+        o.setName('guild')
+          .setDescription('Guild ID')
+          .setRequired(true)
+      );
+
     const releaseCmd = new SlashCommandBuilder()
       .setName('release')
       .setDescription('Release!')
@@ -468,6 +508,8 @@ export default (client: Client): void => {
     client.application.commands.create(skipCmd);
     client.application.commands.create(blameCmd);
     client.application.commands.create(releaseCmd);
+    client.application.commands.create(addObserver);
+    client.application.commands.create(removeObserver);
 
     console.log('Nino is ready to go!');
   });

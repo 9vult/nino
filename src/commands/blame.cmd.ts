@@ -4,25 +4,26 @@ import { generateAllowedMentions } from "../actions/generateAllowedMentions.acti
 import { DatabaseData, WeightedStatusEntry } from "../misc/types";
 import { Database } from "@firebase/database-types";
 import { fail } from "../actions/fail.action";
-import { GetAlias } from "../actions/getalias.action";
+import { GetAlias, GetObserverAlias } from "../actions/getalias.action";
 import { AirDate } from "../actions/airdate.action";
 import { EntriesToStatusString, GenerateEntries } from "../actions/generateEntries.action";
 
 export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
-  const { options, guildId } = interaction;
-
+  const { options } = interaction;
   await interaction.deferReply();
-
-  const project = await GetAlias(db, dbdata, interaction, options.getString('project')!);
+  
+  const { guildId, project} = await GetObserverAlias(db, dbdata, interaction, options.getString('project')!);
+  let selGuildId = guildId;
+  
   let episode: number | null = options.getNumber('episode');
   let explain: boolean | null = options.getBoolean('explain');
 
   let epvalue;
-  if (guildId == null || !(guildId in dbdata.guilds))
-    return fail(`Guild ${guildId} does not exist.`, interaction);
+  if (selGuildId == null || !(selGuildId in dbdata.guilds))
+    return fail(`Guild ${selGuildId} does not exist.`, interaction);
 
-  let projects = dbdata.guilds[guildId];
+  let projects = dbdata.guilds[selGuildId];
   if (!project || !(project in projects))
     return fail(`Project ${project} does not exist.`, interaction);
   let status = '';
@@ -34,7 +35,7 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
     if ((episode != null && projObj.number === episode) || (episode == null && projObj.done == false)) {
       success = true;
       episode = projObj.number;
-      entries = GenerateEntries(dbdata, guildId, project, episode);
+      entries = GenerateEntries(dbdata, selGuildId, project, episode);
       let map: {[key:string]:string} = {};
       if (explain != null && explain == true) {
         if (projects[project].keyStaff) Object.values(projects[project].keyStaff).forEach(ks => { map[ks.role.abbreviation] = ks.role.title; });

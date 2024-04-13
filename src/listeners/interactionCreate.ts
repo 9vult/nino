@@ -25,6 +25,8 @@ import { AddAliasCmd } from "../commands/addAlias.cmd";
 import { RemoveAliasCmd } from "../commands/removeAlias.cmd";
 import { GetAlias } from "../actions/getalias.action";
 import { SetWeightCmd } from "../commands/setWeight.cmd";
+import { AddObserverCmd } from "../commands/addObserver.cmd";
+import { RemoveObserverCmd } from "../commands/removeObserver.cmd";
 
 export default (client: Client, db: Database, dbdata: DatabaseData): void => {
   client.on('interactionCreate', async (interaction) => {
@@ -92,6 +94,12 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
       case 'blame':
         await BlameCmd(client, db, dbdata, cmdInteraction);
         break;
+      case 'addobserver':
+        await AddObserverCmd(client, db, dbdata, cmdInteraction);
+        break;
+      case 'removeobserver':
+        await RemoveObserverCmd(client, db, dbdata, cmdInteraction);
+        break;
       case 'help':
         await HelpCmd(cmdInteraction);
         break;
@@ -103,19 +111,26 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
 
   client.on('interactionCreate', async (interaction: BaseInteraction) => {
     if (!interaction.isAutocomplete()) return;
-    const { options, guildId } = interaction as AutocompleteInteraction;
+    const { options, guildId, commandName } = interaction as AutocompleteInteraction;
     let focusedOption = options.getFocused(true);
     let choices;
     try {
       switch (focusedOption.name) {
         case 'project': {
-          if (guildId === null || !(guildId in dbdata.guilds)) break;
-          let projects = dbdata.guilds[guildId];
-          let aliases = Object.values(projects).reduce((acc, cur) => {
-            acc.push(cur.nickname);
-            if (cur.aliases) acc.push(...cur.aliases);
-            return acc;
-          }, [] as string[]);
+          if (guildId === null || (!(guildId in dbdata.guilds) && !(guildId in dbdata.observers))) break;
+          let aliases: string[] = [];
+          const guilds = (commandName === 'blame' && guildId in dbdata.observers) 
+            ? [guildId, ...Object.keys(dbdata.observers[guildId])] : [guildId];
+          for (let curGuildId of guilds) {
+            if (!(curGuildId in dbdata.guilds)) continue;
+            let projects = dbdata.guilds[curGuildId];
+            const newAliases = Object.values(projects).reduce((acc, cur) => {
+              acc.push(cur.nickname);
+              if (cur.aliases) acc.push(...cur.aliases);
+              return acc;
+            }, [] as string[])
+            aliases = [...aliases, ...newAliases];
+          }
           choices = aliases.filter(choice => choice.startsWith(focusedOption.value));
           await interaction.respond(choices.map(choice => ({ name: choice, value: choice })).slice(0, 25));
           return;

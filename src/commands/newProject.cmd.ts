@@ -39,7 +39,8 @@ export const NewProjectCmd = async (client: Client, db: Database, dbdata: Databa
     anidb: '', // TODO
     airTime: '00:00',
     updateChannel,
-    releaseChannel
+    releaseChannel,
+    observers: []
   };
   ref.set(newProj);
 

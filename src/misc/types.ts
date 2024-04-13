@@ -13,7 +13,8 @@ export interface Project {
   anidb: string,
   airTime: string, // '14:30'
   updateChannel: string,
-  releaseChannel: string
+  releaseChannel: string,
+  observers: Observer[]
 };
 
 export interface Episode {
@@ -39,11 +40,23 @@ export type Task = {
   done: boolean
 };
 
+export type Observer = {
+  guildId: string,
+  updatesWebhook: string | undefined,
+  releasesWebhook: string | undefined
+};
+
+export type ObserverAliasResult = {
+  guildId: string | undefined,
+  project: string | undefined
+};
+
 export type WeightedStatusEntry = {
   status: string,
   weight: number
 };
 
 export type DatabaseData = {
-  guilds: {[key:string]: {[key:string]: Project}}
-}
+  guilds: {[key:string]: {[key:string]: Project}},
+  observers: {[key:string]: {[key:string]: string[]}}
+};

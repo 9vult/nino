@@ -12,7 +12,7 @@ require('dotenv').config();
 var admin = require('firebase-admin');
 var firebase = require('./firebase.json');
 
-export const VERSION = "3.1.0";
+export const VERSION = "3.2.0";
 
 admin.initializeApp({
   credential: admin.credential.cert(firebase),
@@ -30,10 +30,14 @@ const client = new Client({
 });
 export const CLIENT: Client = client;
 
-let dbdata: DatabaseData = { guilds: {}};
+let dbdata: DatabaseData = { guilds: {}, observers: {}};
 
 db.ref('/Projects').on("value", function(data: {[key:string]:any}) {
   dbdata.guilds = data.val();
+});
+
+db.ref('/Observers').on("value", function(data: {[key:string]:any}) {
+  dbdata.observers = data.val();
 });
 
 // Set up listeners
