@@ -1,5 +1,32 @@
 # Nino Documentation
 
+## Getting Started
+
+### Creating a project
+
+Despite there being a single "[/newproject](#newproject)" command, it actually takes
+a few different commands to get a project fully set up. Here's an outline of
+the steps to take to bootstrap a project:
+
+1. Run [/newproject](#newproject). The newproject command will set all the basic information,
+  most relating to the display in progress updates.
+2. [/addstaff](#addstaff) to the project. These Key Staff are the tasks that will be done on every episode.
+  You can set placeholder members and [/swapstaff](#swapstaff) later on.
+3. If there are any tasks that will only be on a single episode, such as song styling
+  on episode 1, use [/addadditionalstaff](#addadditionalstaff).
+4. Use [/editproject](#editproject) to set the AniDB ID and Air Time if you would like
+  episode air times to be displayed in [/blame](#blame) for untouched episodes.
+5. Add any aliases you might want with [/addalias](#addalias) to make commands more accessible.
+6. You're all set!
+
+- **Rec**: I recommend setting the Name of staff positions to `-ing` verbs, as they will look
+  the best in progress updates and [/blame with explain flag](#blame).
+- **Note**: By default, Key Staff will be displayed in creation order. Use [/setweight](#setweight) to change the order.
+- **Note**: Additional Staff will always be displayed after Key Staff. This cannot be changed.
+- **Info**: If you are coming from Deschtimes and have been using the Joint feature to relay
+  progress updates and [/blame](#blame) functionality to another server, see the section
+  for [adding an observer](#addobserver).
+
 ## Commands - Project management
 
 ### newproject
