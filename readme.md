@@ -18,24 +18,7 @@ Then, place your `firebase.json` in the `/src/` folder.
 
 ### Command List
 
-- /help
-- /about
-- /newproject
-- /editproject
-- /deleteproject
-- /addstaff
-- /swapstaff
-- /removestaff
-- /addadditionalstaff
-- /swapadditionalstaff
-- /removeadditionalstaff
-- /transferownership
-- /addepisode
-- /removeepisode
-- /done
-- /undone
-- /release
-- /blame
+See the [Documentation](./docs.md) for more information.
 
 ### Development
 
