@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, Client, EmbedBuilder, TextChannel, WebhookClient } from "discord.js";
+import { ChannelType, ChatInputCommandInteraction, Client, EmbedBuilder, TextChannel, WebhookClient } from "discord.js";
 import { generateAllowedMentions } from "../actions/generateAllowedMentions.action";
 import { DatabaseData } from "../misc/types";
 import { Database } from "@firebase/database-types";
@@ -40,7 +40,11 @@ let publishRole = role !== null ? `<@&${role.id}> ` : '';
   const publishBody = `**${projects[project].title} - ${type} ${publishNumber}**\n${publishRole}${url}`;
   const publishChannel = client.channels.cache.get(projects[project].releaseChannel);
   if (publishChannel?.isTextBased)
-    (publishChannel as TextChannel).send(publishBody);
+    (publishChannel as TextChannel).send(publishBody)
+    .then((msg) => {
+      if (msg.channel.type === ChannelType.GuildAnnouncement)
+        msg.crosspost().catch(console.error);
+    });
 
   if (!projects[project].observers) return; // Stop here if there's no observers
   for (let observerid in projects[project].observers) {
