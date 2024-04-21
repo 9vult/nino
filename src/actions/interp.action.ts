@@ -1,7 +1,7 @@
 
 export const interp = (input: string, swaps: {[key:string]:any}) => {
-  for (let key in Object.keys(swaps)) {
-    input.replaceAll(key, swaps[key]);
+  for (let key of Object.keys(swaps)) {
+    input = input.replaceAll(key, swaps[key]);
   }
   return input;
 };
