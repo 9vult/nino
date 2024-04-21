@@ -12,10 +12,9 @@ import { GetStr } from "../actions/i18n.action";
 
 export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
-  const { options } = interaction;
+  const { options, locale } = interaction;
   
   await interaction.deferReply();
-  const locale = interaction.locale;
   
   const { guildId, project} = await GetObserverAlias(db, dbdata, interaction, options.getString('project')!);
   let selGuildId = guildId;
@@ -30,6 +29,7 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
   let projects = dbdata.guilds[selGuildId];
   if (!project || !(project in projects))
     return fail(interp(GetStr(dbdata.i18n, 'noSuchproject', interaction.locale), { '$PROJECT': project }), interaction);
+
   let status = '';
   let entries: {[key:string]:WeightedStatusEntry} = {};
   let success = false;

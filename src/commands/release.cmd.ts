@@ -6,31 +6,26 @@ import { fail } from "../actions/fail.action";
 import { GetAlias } from "../actions/getalias.action";
 import { interp } from "../actions/interp.action";
 import { GetStr } from "../actions/i18n.action";
+import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 
 export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
-  const { options, user, guildId } = interaction;
+  const { options, locale } = interaction;
 
   await interaction.deferReply();
-  const locale = interaction.locale;
 
-  const project = await GetAlias(db, dbdata, interaction, options.getString('project')!);
+  const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!);
   const type = options.getString('type')!;
   const number = options.getString('number')!;
   const url: string | null = options.getString('url');
   const role = options.getRole('role');
   
-  if (guildId == null || !(guildId in dbdata.guilds))
-  return fail(interp(GetStr(dbdata.i18n, 'noSuchGuild', locale), { '$GUILDID': guildId }), interaction);
-
-  let projects = dbdata.guilds[guildId];
   let publishNumber = type !== 'Batch' ? number : `(${number})`;
   let publishRole = role !== null ? `<@&${role.id}> ` : '';
 
-  if (!project || !(project in projects))
-    return fail(interp(GetStr(dbdata.i18n, 'noSuchproject', interaction.locale), { '$PROJECT': project }), interaction);
-  if (projects[project].owner !== user.id)
-    return fail(GetStr(dbdata.i18n, 'permissionDenied', locale), interaction);
+  let verification = await VerifyInteraction(dbdata, interaction, alias);
+  if (!verification) return;
+  const { projects, project } = InteractionData(dbdata, interaction, alias);
 
   const replyEmbed = new EmbedBuilder()
     .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })

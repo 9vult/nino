@@ -7,30 +7,25 @@ import { fail } from "../actions/fail.action";
 import { GetAlias } from "../actions/getalias.action";
 import { interp } from "../actions/interp.action";
 import { GetStr } from "../actions/i18n.action";
+import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 
 export const AddAdditionalStaffCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
-  const { commandName, options, user, member, guildId } = interaction;
+  const { options, guildId, locale } = interaction;
 
   await interaction.deferReply();
-  const locale = interaction.locale;
 
-  const project = await GetAlias(db, dbdata, interaction, options.getString('project')!);
+  const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!);
   const episode = options.getNumber('episode')!;
   const staff = (options.getMember('member')! as GuildMember).id;
   const abbreviation = options.getString('abbreviation')!.toUpperCase();
   const title = options.getString('title')!;
 
   let epvalue;
-  if (guildId == null || !(guildId in dbdata.guilds))
-    return fail(interp(GetStr(dbdata.i18n, 'noSuchGuild', locale), { '$GUILDID': guildId }), interaction);
-
-  let projects = dbdata.guilds[guildId];
-
-  if (!project || !(project in projects))
-    return fail(interp(GetStr(dbdata.i18n, 'noSuchproject', interaction.locale), { '$PROJECT': project }), interaction);
-  if (projects[project].owner !== user!.id)
-    return fail(GetStr(dbdata.i18n, 'permissionDenied', locale), interaction);
+  let verification = await VerifyInteraction(dbdata, interaction, alias);
+  if (!verification) return;
+  const { projects, project } = InteractionData(dbdata, interaction, alias);
+  
 
   for (let ep in projects[project].episodes)
     if (projects[project].episodes[ep].number == episode) {

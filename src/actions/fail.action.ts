@@ -8,5 +8,5 @@ export const fail = async (faildesc: string, interaction: ChatInputCommandIntera
     .setDescription(faildesc)
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
-  return;
+  return false;
 }
