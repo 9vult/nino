@@ -7,11 +7,15 @@ import { fail } from "../actions/fail.action";
 import { GetAlias, GetObserverAlias } from "../actions/getalias.action";
 import { AirDate } from "../actions/airdate.action";
 import { EntriesToStatusString, GenerateEntries } from "../actions/generateEntries.action";
+import { interp } from "../actions/interp.action";
+import { GetStr } from "../actions/i18n.action";
 
 export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
   const { options } = interaction;
+  
   await interaction.deferReply();
+  const locale = interaction.locale;
   
   const { guildId, project} = await GetObserverAlias(db, dbdata, interaction, options.getString('project')!);
   let selGuildId = guildId;
@@ -21,11 +25,11 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
 
   let epvalue;
   if (selGuildId == null || !(selGuildId in dbdata.guilds))
-    return fail(`Guild ${selGuildId} does not exist.`, interaction);
+    return fail(interp(GetStr(dbdata.i18n, 'noSuchGuild', locale), { '$GUILDID': selGuildId }), interaction);
 
   let projects = dbdata.guilds[selGuildId];
   if (!project || !(project in projects))
-    return fail(`Project ${project} does not exist.`, interaction);
+    return fail(interp(GetStr(dbdata.i18n, 'noSuchproject', interaction.locale), { '$PROJECT': project }), interaction);
   let status = '';
   let entries: {[key:string]:WeightedStatusEntry} = {};
   let success = false;
@@ -56,7 +60,7 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
   }
 
   if (!success)
-    return fail('The project is complete, or the specified episode could not be found.', interaction);
+    return fail(GetStr(dbdata.i18n, 'blameFailure', locale), interaction);
 
   if (explain != null && explain == true)
     status = EntriesToStatusString(entries, '\n');
@@ -68,7 +72,7 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
 
   const embed = new EmbedBuilder()
     .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
-    .setTitle(`Episode ${episode}`)
+    .setTitle(interp(GetStr(dbdata.i18n, 'blame', interaction.locale), { '$EPISODE': episode }))
     .setThumbnail(projects[project].poster)
     .setDescription(status)
     .setColor(0xd797ff)

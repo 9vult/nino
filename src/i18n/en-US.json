@@ -1,0 +1,242 @@
+{
+  "lang": "en-US",
+  "commands": {
+    "help": {
+      "name": "help",
+      "description": "Nino Help"
+    },
+    "about": {
+      "name": "about",
+      "description": "About Nino"
+    },
+    "newproject": {
+      "name": "newproject",
+      "description": "Create a new project"
+    },
+    "addstaff": {
+      "name": "addstaff",
+      "description": "Add staff to a project"
+    },
+    "removestaff": {
+      "name": "removestaff",
+      "description": "Remove staff from a project"
+    },
+    "setweight": {
+      "name": "setweight",
+      "description": "Set the weight of a Key Staff position"
+    },
+    "swapstaff": {
+      "name": "swapstaff",
+      "description": "Swap staff into a project"
+    },
+    "addadditionalstaff": {
+      "name": "addadditionalstaff",
+      "description": "Add additional staff to an episode"
+    },
+    "removeadditionalstaff": {
+      "name": "removeadditionalstaff",
+      "description": "Remove additional staff from an episode"
+    },
+    "swapadditionalstaff": {
+      "name": "swapadditionalstaff",
+      "description": "Swap additional staff into an episode"
+    },
+    "transferownership": {
+      "name": "transferownership",
+      "description": "Transfer project ownership to someone else"
+    },
+    "deleteproject": {
+      "name": "deleteproject",
+      "description": "Delete a project"
+    },
+    "editproject": {
+      "name": "editproject",
+      "description": "Edit a project"
+    },
+    "addepisode": {
+      "name": "addepisode",
+      "description": "Add an episode"
+    },
+    "removeepisode": {
+      "name": "removeepisode",
+      "description": "Remove an episode"
+    },
+    "addalias": {
+      "name": "addalias",
+      "description": "Add an alias"
+    },
+    "removealias": {
+      "name": "removealias",
+      "description": "Remove an alias"
+    },
+    "done": {
+      "name": "done",
+      "description": "Mark a position as done"
+    },
+    "undone": {
+      "name": "undone",
+      "description": "Mark a position as not done"
+    },
+    "skip": {
+      "name": "skip",
+      "description": "Skip a position"
+    },
+    "blame": {
+      "name": "blame",
+      "description": "Check the status of a project"
+    },
+    "addobserver": {
+      "name": "addobserver",
+      "description": "Add a server to observe this project"
+    },
+    "removeobserver": {
+      "name": "removeobserver",
+      "description": "Remove a server observing this project"
+    },
+    "release": {
+      "name": "release",
+      "description": "Release!"
+    }
+  },
+  "options": {
+    "nickname": {
+      "name": "nickname",
+      "description": "Project nickname"
+    },
+    "title": {
+      "name": "title",
+      "description": "Full series title"
+    },
+    "projecttype": {
+      "name": "projecttype",
+      "description": "Project type"
+    },
+    "length": {
+      "name": "length",
+      "description": "Number of episodes"
+    },
+    "poster": {
+      "name": "poster",
+      "description": "Poster image URL"
+    },
+    "updatechannel": {
+      "name": "updatechannel",
+      "description": "Channel to post updates to"
+    },
+    "releasechannel": {
+      "name": "releasechannel",
+      "description": "Channel to post releases to"
+    },
+    "project": {
+      "name": "project",
+      "description": "Project nickname"
+    },
+    "member": {
+      "name": "member",
+      "description": "Staff member"
+    },
+    "abbreviation": {
+      "name": "abbreviation",
+      "description": "Position shorthand"
+    },
+    "name": {
+      "name": "name",
+      "description": "Full position name"
+    },
+    "weight": {
+      "name": "weight",
+      "description": "Weight"
+    },
+    "episode": {
+      "name": "episode",
+      "description": "Episode number"
+    },
+    "option": {
+      "name": "option",
+      "description": "Option to change"
+    },
+    "newvalue": {
+      "name": "newvalue",
+      "description": "New value"
+    },
+    "alias": {
+      "name": "alias",
+      "description": "Alias"
+    },
+    "explain": {
+      "name": "explain",
+      "description": "Explain what any of this even means"
+    },
+    "guild": {
+      "name": "guild",
+      "description": "Guild ID"
+    },
+    "updates": {
+      "name": "updates",
+      "description": "Webhook URL for updates"
+    },
+    "releases": {
+      "name": "releases",
+      "description": "Webhook URL for releases"
+    },
+    "type": {
+      "name": "type",
+      "description": "Type of release"
+    },
+    "number": {
+      "name": "number",
+      "description": "What is being released? [Number or Range]"
+    },
+    "url": {
+      "name": "url",
+      "description": "Release URL"
+    },
+    "role": {
+      "name": "role",
+      "description": "Role to ping"
+    }
+  },
+  "strings": {
+    "projectModificationTitle": "Project Modification",
+    "projectCreationTitle": "Project Creation",
+    "projectDeletionTitle": "Project Deletion",
+    "permissionDenied": "You do not have permission to do that.",
+    "noSuchGuild": "Guild $GUILDID does not exist.",
+    "noSuchProject": "Project `$PROJECT` does not exist.",
+    "noSuchTask": "Task $ABBREVIATION does not exist!",
+    "noSuchObserver": "That observer does not exist!",
+    "aliasInUse": "That alias is already in use in `$ALIASPROJ`.",
+    "aliasAdded": "I added $ALIAS as an alias for `$PROJECT` for you.",
+    "aliasRemoved": "I removed the alias $ALIAS from `$PROJECT` for you.",
+    "positionExists": "That position already exists.",
+    "addAdditionalStaff": "Added <@$STAFF> for position $ABBREVIATION for episode $EPISODE.",
+    "addEpisode": "I added episode $NUMBER to `$PROJECT` for you.",
+    "removeEpisode": "I removed episode $NUMBER from `$PROJECT` for you.",
+    "addObserver": "I added the observer $OBSERVINGGUILD to `$PROJECT` for you.",
+    "removeObserver": "I removed the observer $OBSERVINGGUILD from `$PROJECT` for you.",
+    "addStaff": "Added <@$STAFF> for position $ABBREVIATION.",
+    "removeStaff": "Removed position $ABBREVIATION from the project.",
+    "blameFailure": "The project is complete, or the specified episode could not be found.",
+    "blame": "Episode $EPISODE",
+    "deleteProject": "Cleaned out the `$PROJECT` project for you. 残念。",
+    "taskAlreadyDone": "Task $ABBREVIATION is already done!",
+    "episodeDone": "Also, episode $EPISODE is now complete!",
+    "taskCompleteTitle": "Task Complete",
+    "taskCompleteBody": "Nice job getting the **$TASKNAME** for episode $EPISODE done.",
+    "taskNotDone": "Task $ABBREVIATION is not done.",
+    "taskIncompleteTitle": "Task Incomplete",
+    "taskIncompleteBody": "So the episode $EPISODE **$TASKNAME** wasn't done, after all. Typical.",
+    "skipped": "(Skipped)",
+    "taskSkippedTitle": "Task Skipped",
+    "taskSkippedBody": "**$TASKNAME** for episode $EPISODE has been skipped.\nIf you wish to do it for realsies, `/undone` it first.",
+    "airTimeFail": "Air time must be a 24-hour HH:MM time, ex: 16:30",
+    "projectEdited": "I updated `$PROJECT` for you.",
+    "episodeReleasedTitle": "Episode Released",
+    "episodeReleasedBody": "Nice job releasing **$TITLE $TYPE $PUBLISHNUMBER**!\nI'm proud of you!",
+    "additionalStaffRemoved": "Removed position $ABBREVIATION from $EPISODE.",
+    "setWeight": "Set weight of position $ABBREVIATION to $WEIGHT.",
+    "swapAdditionalStaff": "Swapped <@$STAFF> in for position $ABBREVIATION for episode $EPISODE.",
+    "swapStaff": "Swapped <@$STAFF> in for position $ABBREVIATION.",
+    "transferOwnership": "Made <@$STAFF> owner of $PROJECT. Good luck!"
+  }
+}

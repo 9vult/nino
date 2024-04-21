@@ -5,12 +5,15 @@ import { Database } from "@firebase/database-types";
 import { fail } from "../actions/fail.action";
 import { GetAlias } from "../actions/getalias.action";
 import { EntriesToStatusString, GenerateEntries } from "../actions/generateEntries.action";
+import { interp } from "../actions/interp.action";
+import { GetStr } from "../actions/i18n.action";
 
 export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
   const { options, user, guildId } = interaction;
 
   await interaction.deferReply();
+  const locale = interaction.locale;
 
   const project = await GetAlias(db, dbdata, interaction, options.getString('project')!);
   const episode = options.getNumber('episode')!;
@@ -22,12 +25,12 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   let isValidUser = false;
   let episodeDone = true;
   if (guildId == null || !(guildId in dbdata.guilds))
-    return fail(`Guild ${guildId} does not exist.`, interaction);
+    return fail(interp(GetStr(dbdata.i18n, 'noSuchGuild', locale), { '$GUILDID': guildId }), interaction);
 
   let projects = dbdata.guilds[guildId];
 
   if (!project || !(project in projects))
-    return fail(`Project ${project} does not exist.`, interaction);
+    return fail(interp(GetStr(dbdata.i18n, 'noSuchproject', interaction.locale), { '$PROJECT': project }), interaction);
 
   let status = '';
   let entries = GenerateEntries(dbdata, guildId, project, episode);
@@ -49,7 +52,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
         if (taskObj.abbreviation === abbreviation) {
           taskvalue = task;
           if (taskObj.done)
-            return fail(`Task ${abbreviation} is already done!`, interaction);
+            return fail(interp(GetStr(dbdata.i18n, 'taskAlreadyDone', interaction.locale), { '$ABBREVIATION': abbreviation }), interaction);
         }
         else if (!taskObj.done) episodeDone = false;
         // Status string
@@ -60,7 +63,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
 
       status += EntriesToStatusString(entries);
 
-      if (taskvalue == undefined) return fail(`Task ${abbreviation} does not exist!`, interaction);
+      if (taskvalue == undefined) return fail(interp(GetStr(dbdata.i18n, 'noSuchTask', interaction.locale), { '$ABBREVIATION': abbreviation }), interaction);
       if (!isValidUser) { // Not key staff
         for (let addStaff in projects[project].episodes[ep].additionalStaff) {
           let addStaffObj = projects[project].episodes[ep].additionalStaff[addStaff];
@@ -75,17 +78,17 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   }
 
   if (!isValidUser)
-    return fail('You do not have permission to do that.', interaction);
+    return fail(GetStr(dbdata.i18n, 'permissionDenied', locale), interaction);
   if (taskvalue != undefined)
     db.ref(`/Projects/${guildId}/${project}/episodes/${epvalue}/tasks/${taskvalue}`).update({
       abbreviation, done: true
     });
 
-  const episodeDoneText = episodeDone ? `\nAlso, episode ${episode} is now complete!` : '';
+  const episodeDoneText = episodeDone ? `\n${interp(GetStr(dbdata.i18n, 'episodeDone', interaction.locale), { '$EPISODE': episode })}` : '';
   const replyEmbed = new EmbedBuilder()
     .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
-    .setTitle('✅ Task Complete')
-    .setDescription(`Nice job getting the **${taskName}** for episode ${episode} done.${episodeDoneText}`)
+    .setTitle(`✅ ${GetStr(dbdata.i18n, 'taskCompleteTitle', interaction.locale)}`)
+    .setDescription(`${interp(GetStr(dbdata.i18n, 'taskCompleteBody', interaction.locale), { '$TASKNAME': taskName, '$EPISODE': episode })}${episodeDoneText}`)
     .setColor(0xd797ff)
     .setTimestamp(Date.now());
   await interaction.editReply({ embeds: [replyEmbed], allowedMentions: generateAllowedMentions([[], []]) });

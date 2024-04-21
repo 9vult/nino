@@ -58,5 +58,6 @@ export type WeightedStatusEntry = {
 
 export type DatabaseData = {
   guilds: {[key:string]: {[key:string]: Project}},
-  observers: {[key:string]: {[key:string]: string[]}}
+  observers: {[key:string]: {[key:string]: string[]}},
+  i18n: any
 };
