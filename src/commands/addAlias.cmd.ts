@@ -20,11 +20,11 @@ export const AddAliasCmd = async (client: Client, db: Database, dbdata: Database
 
   let verification = await VerifyInteraction(dbdata, interaction, alias);
   if (!verification) return;
-  const { projects, project } = InteractionData(dbdata, interaction, newAlias);
+  const { projects, project } = InteractionData(dbdata, interaction, alias);
 
   let aliasProj = await GetAlias(db, dbdata, interaction, newAlias);
   if (aliasProj)
-  return fail(interp(GetStr(dbdata.i18n, 'aliasInUse', locale), { '$ALIASPROJ': aliasProj }), interaction);
+    return fail(interp(GetStr(dbdata.i18n, 'aliasInUse', locale), { '$ALIASPROJ': aliasProj }), interaction);
 
   const ref = db.ref(`/Projects/`).child(`${guildId}`).child(`${project}`);
   if (projects[project].aliases)

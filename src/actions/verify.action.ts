@@ -12,7 +12,7 @@ export const VerifyInteraction = async (dbdata: DatabaseData, interaction: ChatI
   let projects = dbdata.guilds[guildId];
 
   if (!project || !(project in projects))
-    return await fail(interp(GetStr(dbdata.i18n, 'noSuchproject', interaction.locale), { '$PROJECT': project }), interaction);
+    return await fail(GetStr(dbdata.i18n, 'noSuchProject', interaction.locale), interaction);
   
   if (!checkOwner) return true;
   

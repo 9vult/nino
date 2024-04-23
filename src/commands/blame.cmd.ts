@@ -16,7 +16,7 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
   
   await interaction.deferReply();
   
-  const { guildId, project} = await GetObserverAlias(db, dbdata, interaction, options.getString('project')!);
+  const { guildId, project } = await GetObserverAlias(db, dbdata, interaction, options.getString('project')!);
   let selGuildId = guildId;
   
   let episode: number | null = options.getNumber('episode');
@@ -24,11 +24,11 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
 
   let epvalue;
   if (selGuildId == null || !(selGuildId in dbdata.guilds))
-    return fail(interp(GetStr(dbdata.i18n, 'noSuchGuild', locale), { '$GUILDID': selGuildId }), interaction);
+    return fail(GetStr(dbdata.i18n, 'noSuchProject', interaction.locale), interaction);
 
   let projects = dbdata.guilds[selGuildId];
   if (!project || !(project in projects))
-    return fail(interp(GetStr(dbdata.i18n, 'noSuchproject', interaction.locale), { '$PROJECT': project }), interaction);
+    return fail(GetStr(dbdata.i18n, 'noSuchProject', interaction.locale), interaction);
 
   let status = '';
   let entries: {[key:string]:WeightedStatusEntry} = {};

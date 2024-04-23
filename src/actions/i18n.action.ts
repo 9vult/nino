@@ -29,7 +29,7 @@ export const GetStr = (dict: {[key:string]:any}, key: string, locale: string) =>
     ? definitions['strings'][key] 
     : (dict['en-US']['strings'][key]) 
       ? dict['en-US']['strings'][key]
-      : 'i18n string not found';
+      : `i18n string ${key} not found`;
 };
 
 export const LoadI18Ns = () => {

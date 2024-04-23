@@ -202,7 +202,7 @@
     "projectDeletionTitle": "Project Deletion",
     "permissionDenied": "You do not have permission to do that.",
     "noSuchGuild": "Guild $GUILDID does not exist.",
-    "noSuchProject": "Project `$PROJECT` does not exist.",
+    "noSuchProject": "That project does not exist!",
     "noSuchTask": "Task $ABBREVIATION does not exist!",
     "noSuchObserver": "That observer does not exist!",
     "aliasInUse": "That alias is already in use in `$ALIASPROJ`.",
