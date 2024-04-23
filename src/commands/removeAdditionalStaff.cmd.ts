@@ -5,27 +5,24 @@ import { DatabaseData } from "../misc/types";
 import { Database } from "@firebase/database-types";
 import { fail } from "../actions/fail.action";
 import { GetAlias } from "../actions/getalias.action";
+import { interp } from "../actions/interp.action";
+import { GetStr } from "../actions/i18n.action";
+import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 
 export const RemoveAdditionalStaffCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
-  const { commandName, options, user, member, guildId } = interaction;
+  const { options, guildId, locale } = interaction;
 
   await interaction.deferReply();
 
-  const project = await GetAlias(db, dbdata, interaction, options.getString('project')!);
+  const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!);
   const episode = options.getNumber('episode')!;
   const abbreviation = options.getString('abbreviation')!.toUpperCase();
 
   let epvalue;
-  if (guildId == null || !(guildId in dbdata.guilds))
-    return fail(`Guild ${guildId} does not exist.`, interaction);
-
-  let projects = dbdata.guilds[guildId];
-
-  if (!project || !(project in projects))
-    return fail(`Project ${project} does not exist.`, interaction);
-  if (projects[project].owner !== user!.id)
-    return fail(`You do not have permission to do that.`, interaction);
+  let verification = await VerifyInteraction(dbdata, interaction, alias);
+  if (!verification) return;
+  const { projects, project } = InteractionData(dbdata, interaction, alias);
 
   let success = false;
   for (let ep in projects[project].episodes)
@@ -45,11 +42,11 @@ export const RemoveAdditionalStaffCmd = async (client: Client, db: Database, dbd
       }
     }
   if (!success)
-    return fail(`Task ${abbreviation} was not found.`, interaction);
+    return fail(interp(GetStr(dbdata.i18n, 'noSuchTask', interaction.locale), { '$ABBREVIATION': abbreviation }), interaction);
 
   const embed = new EmbedBuilder()
-    .setTitle(`Project Modification`)
-    .setDescription(`Removed position ${abbreviation} from episode ${episode}.`)
+    .setTitle(GetStr(dbdata.i18n, 'projectModificationTitle', locale))
+    .setDescription(interp(GetStr(dbdata.i18n, 'additionalStaffRemoved', interaction.locale), { '$ABBREVIATION': abbreviation, '$EPISODE': episode }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

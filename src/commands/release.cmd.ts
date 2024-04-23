@@ -4,35 +4,33 @@ import { DatabaseData } from "../misc/types";
 import { Database } from "@firebase/database-types";
 import { fail } from "../actions/fail.action";
 import { GetAlias } from "../actions/getalias.action";
+import { interp } from "../actions/interp.action";
+import { GetStr } from "../actions/i18n.action";
+import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 
 export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
-  const { options, user, guildId } = interaction;
+  const { options, locale } = interaction;
 
   await interaction.deferReply();
 
-  const project = await GetAlias(db, dbdata, interaction, options.getString('project')!);
+  const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!);
   const type = options.getString('type')!;
   const number = options.getString('number')!;
   const url: string | null = options.getString('url');
   const role = options.getRole('role');
   
-  if (guildId == null || !(guildId in dbdata.guilds))
-  return fail(`Guild ${guildId} does not exist.`, interaction);
+  let publishNumber = type !== 'Batch' ? number : `(${number})`;
+  let publishRole = role !== null ? `<@&${role.id}> ` : '';
 
-let projects = dbdata.guilds[guildId];
-let publishNumber = type !== 'Batch' ? number : `(${number})`;
-let publishRole = role !== null ? `<@&${role.id}> ` : '';
-
-  if (!project || !(project in projects))
-    return fail(`Project ${project} does not exist.`, interaction);
-  if (projects[project].owner !== user.id)
-    return fail('You do not have permission to do that.', interaction);
+  let verification = await VerifyInteraction(dbdata, interaction, alias);
+  if (!verification) return;
+  const { projects, project } = InteractionData(dbdata, interaction, alias);
 
   const replyEmbed = new EmbedBuilder()
     .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
-    .setTitle(`Episode Released`)
-    .setDescription(`Nice job releasing **${projects[project].title} ${type} ${publishNumber}**!\nI'm proud of you!`)
+    .setTitle(GetStr(dbdata.i18n, 'episodeReleasedTitle', locale))
+    .setDescription(interp(GetStr(dbdata.i18n, 'episodeReleasedBody', interaction.locale), { '$TITLE': projects[project].title, '$TYPE': type, '$PUBLISHNUMBER': publishNumber }))
     .setColor(0xd797ff)
     .setTimestamp(Date.now());
   await interaction.editReply({ embeds: [replyEmbed], allowedMentions: generateAllowedMentions([[], []]) });

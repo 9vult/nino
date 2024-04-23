@@ -5,14 +5,17 @@ import { Database } from "@firebase/database-types";
 import { fail } from "../actions/fail.action";
 import { GetAlias } from "../actions/getalias.action";
 import { EntriesToStatusString, GenerateEntries } from "../actions/generateEntries.action";
+import { interp } from "../actions/interp.action";
+import { GetStr } from "../actions/i18n.action";
+import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 
 export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
-  const { options, user, guildId } = interaction;
+  const { options, user, guildId, locale } = interaction;
 
   await interaction.deferReply();
 
-  const project = await GetAlias(db, dbdata, interaction, options.getString('project')!);
+  const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!);
   const episode = options.getNumber('episode')!;
   const abbreviation = options.getString('abbreviation')!.toUpperCase();
 
@@ -20,16 +23,13 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
   let taskvalue;
   let taskName;
   let isValidUser = false;
-  if (guildId == null || !(guildId in dbdata.guilds))
-    return fail(`Guild ${guildId} does not exist.`, interaction);
 
-  let projects = dbdata.guilds[guildId];
-
-  if (!project || !(project in projects))
-    return fail(`Project ${project} does not exist.`, interaction);
+  let verification = await VerifyInteraction(dbdata, interaction, alias, false);
+  if (!verification) return;
+  const { projects, project } = InteractionData(dbdata, interaction, alias);
 
   let status = '';
-  let entries = GenerateEntries(dbdata, guildId, project, episode);
+  let entries = GenerateEntries(dbdata, guildId!, project, episode);
 
   for (let staff in projects[project].keyStaff) {
     let staffObj = projects[project].keyStaff[staff];
@@ -48,7 +48,7 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
         if (taskObj.abbreviation === abbreviation) {
           taskvalue = task;
           if (!taskObj.done)
-            return fail(`Task ${abbreviation} is not done.`, interaction);
+            return fail(interp(GetStr(dbdata.i18n, 'taskNotDone', interaction.locale), { '$ABBREVIATION': abbreviation }), interaction);
         }
         // Status string
         if (taskObj.abbreviation === abbreviation) entries[taskObj.abbreviation].status = `__${abbreviation}__`;
@@ -58,7 +58,7 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
 
       status += EntriesToStatusString(entries);
 
-      if (taskvalue == undefined) return fail(`Task ${abbreviation} does not exist!`, interaction);
+      if (taskvalue == undefined) return fail(interp(GetStr(dbdata.i18n, 'noSuchTask', interaction.locale), { '$ABBREVIATION': abbreviation }), interaction);
       if (!isValidUser) { // Not key staff
         for (let addStaff in projects[project].episodes[ep].additionalStaff) {
           let addStaffObj = projects[project].episodes[ep].additionalStaff[addStaff];
@@ -73,7 +73,7 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
   }
 
   if (!isValidUser)
-    return fail('You do not have permission to do that.', interaction);
+    return fail(GetStr(dbdata.i18n, 'permissionDenied', locale), interaction);
 
   if (taskvalue != undefined)
     db.ref(`/Projects/${guildId}/${project}/episodes/${epvalue}/tasks/${taskvalue}`).update({
@@ -84,8 +84,8 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
 
   const embed = new EmbedBuilder()
     .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
-    .setTitle('❌ Task Incomplete')
-    .setDescription(`So the episode ${episode} **${taskName}** wasn't done, after all. Typical.`)
+    .setTitle(`❌ ${GetStr(dbdata.i18n, 'taskIncompleteTitle', interaction.locale)}`)
+    .setDescription(interp(GetStr(dbdata.i18n, 'taskIncompleteBody', interaction.locale), { '$TASKNAME': taskName, '$EPISODE': episode }))
     .setColor(0xd797ff)
     .setTimestamp(Date.now());
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });

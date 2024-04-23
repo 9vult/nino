@@ -7,6 +7,7 @@ import { Client, GatewayIntentBits } from "discord.js";
 import interactionCreate from "./listeners/interactionCreate";
 import ready from "./listeners/ready";
 import { DatabaseData, Project } from "./misc/types";
+import { LoadI18Ns } from "./actions/i18n.action";
 
 require('dotenv').config();
 var admin = require('firebase-admin');
@@ -30,7 +31,7 @@ const client = new Client({
 });
 export const CLIENT: Client = client;
 
-let dbdata: DatabaseData = { guilds: {}, observers: {}};
+let dbdata: DatabaseData = { guilds: {}, observers: {}, i18n: {}};
 
 db.ref('/Projects').on("value", function(data: {[key:string]:any}) {
   dbdata.guilds = data.val();
@@ -40,8 +41,10 @@ db.ref('/Observers').on("value", function(data: {[key:string]:any}) {
   dbdata.observers = data.val();
 });
 
+dbdata.i18n = LoadI18Ns();
+
 // Set up listeners
-ready(client);
+ready(client, dbdata);
 interactionCreate(client, db, dbdata);
 
 client.login(process.env.TOKEN);

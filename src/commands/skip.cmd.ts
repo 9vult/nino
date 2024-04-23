@@ -4,14 +4,17 @@ import { DatabaseData } from "../misc/types";
 import { Database } from "@firebase/database-types";
 import { fail } from "../actions/fail.action";
 import { GetAlias } from "../actions/getalias.action";
+import { interp } from "../actions/interp.action";
+import { GetStr } from "../actions/i18n.action";
+import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 
 export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
-  const { options, user, guildId } = interaction;
+  const { options, user, guildId, locale } = interaction;
 
   await interaction.deferReply();
 
-  const project = await GetAlias(db, dbdata, interaction, options.getString('project')!);
+  const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!);
   const episode = options.getNumber('episode')!;
   const abbreviation = options.getString('abbreviation')!.toUpperCase();
 
@@ -21,20 +24,17 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
   let isValidUser = false;
   let status = '';
   let episodeDone = true;
-  if (guildId == null || !(guildId in dbdata.guilds))
-    return fail(`Guild ${guildId} does not exist.`, interaction);
 
-  let projects = dbdata.guilds[guildId];
-
-  if (!project || !(project in projects))
-    return fail(`Project ${project} does not exist.`, interaction);
+  let verification = await VerifyInteraction(dbdata, interaction, alias, false);
+  if (!verification) return;
+  const { projects, project } = InteractionData(dbdata, interaction, alias);
 
   for (let staff in projects[project].keyStaff) {
     let staffObj = projects[project].keyStaff[staff];
     if (staffObj.role.abbreviation === abbreviation && (staffObj.id === user.id || projects[project].owner === user.id)) {
       isValidUser = true;
       taskName = staffObj.role.title;
-      status = `:fast_forward: **${staffObj.role.title}** (Skipped)\n`;
+      status = `:fast_forward: **${staffObj.role.title}** ${GetStr(dbdata.i18n, 'skipped', interaction.locale)}\n`;
     }
   }
 
@@ -46,7 +46,7 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
         if (taskObj.abbreviation === abbreviation) {
           taskvalue = task;
           if (taskObj.done)
-            return fail(`Task ${abbreviation} is already done!`, interaction);
+            return fail(interp(GetStr(dbdata.i18n, 'taskAlreadyDone', interaction.locale), { '$ABBREVIATION': abbreviation }), interaction);
         }
         else if (!taskObj.done) episodeDone = false;
         // Status string
@@ -54,12 +54,12 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
         else if (taskObj.done) status += `~~${taskObj.abbreviation}~~ `;
         else status += `**${taskObj.abbreviation}** `;
       }
-      if (taskvalue == undefined) return fail(`Task ${abbreviation} does not exist!`, interaction);
+      if (taskvalue == undefined) return fail(interp(GetStr(dbdata.i18n, 'noSuchTask', interaction.locale), { '$ABBREVIATION': abbreviation }), interaction);
       if (!isValidUser) { // Not key staff
         for (let addStaff in projects[project].episodes[ep].additionalStaff) {
           let addStaffObj = projects[project].episodes[ep].additionalStaff[addStaff];
           if (addStaffObj.role.abbreviation === abbreviation && (addStaffObj.id === user.id || projects[project].owner === user.id)) {
-            status = `:fast_forward: **${addStaffObj.role.title}** (Skipped)\n` + status;
+            status = `:fast_forward: **${addStaffObj.role.title}** ${GetStr(dbdata.i18n, 'skipped', interaction.locale)}\n` + status;
             taskName = addStaffObj.role.title;
             isValidUser = true;
           }
@@ -69,17 +69,17 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
   }
 
   if (!isValidUser)
-    return fail('You do not have permission to do that.', interaction);
+    return fail(GetStr(dbdata.i18n, 'permissionDenied', locale), interaction);
   if (taskvalue != undefined)
     db.ref(`/Projects/${guildId}/${project}/episodes/${epvalue}/tasks/${taskvalue}`).update({
       abbreviation, done: true
     });
 
-  const episodeDoneText = episodeDone ? `\nAlso, episode ${episode} is now complete!` : '';
+  const episodeDoneText = episodeDone ? `\n${interp(GetStr(dbdata.i18n, 'episodeDone', interaction.locale), { '$EPISODE': episode })}` : '';
   const replyEmbed = new EmbedBuilder()
     .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
-    .setTitle(':fast_forward: Task Skipped')
-    .setDescription(`**${taskName}** for episode ${episode} has been skipped.\nIf you wish to do it for realsies, \`/undone\` it first.${episodeDoneText}`)
+    .setTitle(`:fast_forward: ${GetStr(dbdata.i18n, 'taskSkippedTitle', interaction.locale)}`)
+    .setDescription(`${interp(GetStr(dbdata.i18n, 'taskSkippedBody', interaction.locale), { '$TASKNAME': taskName, '$EPISODE': episode })}${episodeDoneText}`)
     .setColor(0xd797ff)
     .setTimestamp(Date.now());
   await interaction.editReply({ embeds: [replyEmbed], allowedMentions: generateAllowedMentions([[], []]) });
