@@ -185,6 +185,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
           if (taskObj.abbreviation === abbreviation) entries[taskObj.abbreviation].status = `__~~${abbreviation}~~__`;
           else if (taskObj.done) entries[taskObj.abbreviation].status = `~~${taskObj.abbreviation}~~`;
           else entries[taskObj.abbreviation].status = `**${taskObj.abbreviation}**`;
+          if (!taskObj.done) episodeDone = false;
         }
         status += EntriesToStatusString(entries);
         db.ref(`/Projects/${guildId}/${project}/episodes/${nextEpisodeKey!}/tasks/${nextEpisodeTaskKey!}`).update({
