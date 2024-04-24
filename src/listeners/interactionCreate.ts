@@ -161,20 +161,22 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
           let project = dbdata.guilds[guildId][projectName];
           choices = [];
 
-          if (!episode) {
+          if (!episode && commandName !== 'done') { // No Additional Staff
             for (let staffId in project.keyStaff) {
               let role = project.keyStaff[staffId].role;
               if (role.abbreviation.startsWith(focusedOption.value.toUpperCase()))
                 choices.push({ name: role.abbreviation, value: role.abbreviation });
-            }
+            }            
           } else {
             for (let ep in project.episodes) {
-              if (project.episodes[ep].number == episode) {
+              let epObj = project.episodes[ep];
+              if ((episode != null && epObj.number === episode) || (episode == null && epObj.done == false)) {  // Specified, or first undone
                 for (let taskId in project.episodes[ep].tasks) {
                   let task = project.episodes[ep].tasks[taskId];
                   if (task.abbreviation.startsWith(focusedOption.value.toUpperCase()))
                     choices.push({ name: task.abbreviation, value: task.abbreviation });
                 }
+                break;
               }
             }
           }

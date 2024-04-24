@@ -17,7 +17,7 @@ export const AddStaffCmd = async (client: Client, db: Database, dbdata: Database
   const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!);
   const staff = (options.getMember('member')! as GuildMember).id;
   const abbreviation = options.getString('abbreviation')!.toUpperCase();
-  const title = options.getString('title')!;
+  const title = options.getString('name')!;
 
   let verification = await VerifyInteraction(dbdata, interaction, alias);
   if (!verification) return;

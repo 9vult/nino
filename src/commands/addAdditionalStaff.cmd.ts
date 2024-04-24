@@ -19,7 +19,7 @@ export const AddAdditionalStaffCmd = async (client: Client, db: Database, dbdata
   const episode = options.getNumber('episode')!;
   const staff = (options.getMember('member')! as GuildMember).id;
   const abbreviation = options.getString('abbreviation')!.toUpperCase();
-  const title = options.getString('title')!;
+  const title = options.getString('name')!;
 
   let epvalue;
   let verification = await VerifyInteraction(dbdata, interaction, alias);

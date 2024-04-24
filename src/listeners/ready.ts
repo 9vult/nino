@@ -464,20 +464,20 @@ export default (client: Client, dbdata: DatabaseData): void => {
           .setRequired(true)
           .setAutocomplete(true)
       )
-      .addNumberOption(o =>
-        o.setName('episode')
-          .setDescription('Episode number')
-          .setNameLocalizations(GetNames(d, 'options', 'episode'))
-          .setDescriptionLocalizations(GetDescs(d, 'options', 'episode'))
-          .setRequired(true)
-          .setAutocomplete(true)
-      )
       .addStringOption(o =>
         o.setName('abbreviation')
           .setDescription('Position shorthand')
           .setNameLocalizations(GetNames(d, 'options', 'abbreviation'))
           .setDescriptionLocalizations(GetDescs(d, 'options', 'abbreviation'))
           .setRequired(true)
+          .setAutocomplete(true)
+      )
+      .addNumberOption(o =>
+        o.setName('episode')
+          .setDescription('Episode number')
+          .setNameLocalizations(GetNames(d, 'options', 'episode'))
+          .setDescriptionLocalizations(GetDescs(d, 'options', 'episode'))
+          .setRequired(false)
           .setAutocomplete(true)
       );
 
