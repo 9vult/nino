@@ -96,6 +96,10 @@
     "release": {
       "name": "release",
       "description": "Release!"
+    },
+    "roster": {
+      "name": "roster",
+      "description": "See who's working on an episode"
     }
   },
   "options": {
@@ -237,6 +241,7 @@
     "setWeight": "Set weight of position $ABBREVIATION to $WEIGHT.",
     "swapAdditionalStaff": "Swapped <@$STAFF> in for position $ABBREVIATION for episode $EPISODE.",
     "swapStaff": "Swapped <@$STAFF> in for position $ABBREVIATION.",
-    "transferOwnership": "Made <@$STAFF> owner of $PROJECT. Good luck!"
+    "transferOwnership": "Made <@$STAFF> owner of $PROJECT. Good luck!",
+    "noRoster": "There are no key staff assigned to that project."
   }
 }

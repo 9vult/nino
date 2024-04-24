@@ -27,6 +27,7 @@ import { GetAlias } from "../actions/getalias.action";
 import { SetWeightCmd } from "../commands/setWeight.cmd";
 import { AddObserverCmd } from "../commands/addObserver.cmd";
 import { RemoveObserverCmd } from "../commands/removeObserver.cmd";
+import { RosterCmd } from "../commands/roster.cmd";
 
 export default (client: Client, db: Database, dbdata: DatabaseData): void => {
   client.on('interactionCreate', async (interaction) => {
@@ -93,6 +94,9 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
         break;
       case 'blame':
         await BlameCmd(client, db, dbdata, cmdInteraction);
+        break;
+      case 'roster':
+        await RosterCmd(client, db, dbdata, cmdInteraction);
         break;
       case 'addobserver':
         await AddObserverCmd(client, db, dbdata, cmdInteraction);

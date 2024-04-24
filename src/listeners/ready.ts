@@ -569,6 +569,27 @@ export default (client: Client, dbdata: DatabaseData): void => {
           .setRequired(false)
       );
 
+    const rosterCmd = new SlashCommandBuilder()
+      .setName('roster')
+      .setDescription('See who\'s working on an episode')
+      .setNameLocalizations(GetNames(d, 'commands', 'roster'))
+      .setDescriptionLocalizations(GetDescs(d, 'commands', 'roster'))
+      .addStringOption(o =>
+        o.setName('project')
+          .setDescription('Project name')
+          .setNameLocalizations(GetNames(d, 'options', 'project'))
+          .setDescriptionLocalizations(GetDescs(d, 'options', 'project'))
+          .setRequired(true)
+          .setAutocomplete(true)
+      )
+      .addNumberOption(o =>
+        o.setName('episode')
+          .setDescription('Episode number')
+          .setNameLocalizations(GetNames(d, 'options', 'episode'))
+          .setDescriptionLocalizations(GetDescs(d, 'options', 'episode'))
+          .setRequired(true)
+      )
+
     const addObserver = new SlashCommandBuilder()
       .setName('addobserver')
       .setDescription('Add a server to observe this project')
@@ -693,6 +714,7 @@ export default (client: Client, dbdata: DatabaseData): void => {
     client.application.commands.create(undoneCmd);
     client.application.commands.create(skipCmd);
     client.application.commands.create(blameCmd);
+    client.application.commands.create(rosterCmd);
     client.application.commands.create(releaseCmd);
     client.application.commands.create(addObserver);
     client.application.commands.create(removeObserver);
