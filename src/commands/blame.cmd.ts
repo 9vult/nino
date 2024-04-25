@@ -34,11 +34,13 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
   let entries: {[key:string]:WeightedStatusEntry} = {};
   let success = false;
   let started = false;
+  let updateTime = 0;
   for (let ep in projects[project].episodes) {
     let projObj = projects[project].episodes[ep];
     if ((episode != null && projObj.number === episode) || (episode == null && projObj.done == false)) {
       success = true;
       episode = projObj.number;
+      if (projObj.updated) updateTime = projObj.updated;
       entries = GenerateEntries(dbdata, selGuildId, project, episode);
       let map: {[key:string]:string} = {};
       if (explain != null && explain == true) {
@@ -68,7 +70,9 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
     status = EntriesToStatusString(entries);
 
   if (projects[project].anidb && episode != null && !started)
-    status += `\n${await AirDate(projects[project].anidb, projects[project].airTime, episode)}`;
+    status += `\n\n${await AirDate(projects[project].anidb, projects[project].airTime, episode, dbdata, locale)}`;
+  else if (updateTime !== 0)
+    status += `\n\n${interp(GetStr(dbdata.i18n, 'updated', locale), { '$REL': `<t:${updateTime}:R>` })}`;
 
   const embed = new EmbedBuilder()
     .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })

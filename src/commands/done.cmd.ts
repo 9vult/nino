@@ -133,6 +133,10 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
     db.ref(`/Projects/${guildId}/${project}/episodes/${workingEpisodeKey!}/tasks/${workingEpisodeTaskKey!}`).update({
       abbreviation, done: true
     });
+    const utc = Math.floor(new Date().getTime() / 1000);
+    db.ref(`/Projects/${guildId}/${project}/episodes/${nextEpisodeKey!}`).update({
+      updated: utc
+    });
     postable = true;
   }
 
@@ -190,6 +194,10 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
         status += EntriesToStatusString(entries);
         db.ref(`/Projects/${guildId}/${project}/episodes/${nextEpisodeKey!}/tasks/${nextEpisodeTaskKey!}`).update({
           abbreviation, done: true
+        });
+        const utc = Math.floor(new Date().getTime() / 1000);
+        db.ref(`/Projects/${guildId}/${project}/episodes/${nextEpisodeKey!}`).update({
+          updated: utc
         });
         postable = true;
       }

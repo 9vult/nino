@@ -70,10 +70,15 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
 
   if (!isValidUser)
     return fail(GetStr(dbdata.i18n, 'permissionDenied', locale), interaction);
-  if (taskvalue != undefined)
+  if (taskvalue != undefined) {
     db.ref(`/Projects/${guildId}/${project}/episodes/${epvalue}/tasks/${taskvalue}`).update({
       abbreviation, done: true
     });
+    const utc = Math.floor(new Date().getTime() / 1000);
+    db.ref(`/Projects/${guildId}/${project}/episodes/${epvalue!}`).update({
+      updated: utc
+    });
+  }
 
   const episodeDoneText = episodeDone ? `\n${interp(GetStr(dbdata.i18n, 'episodeDone', interaction.locale), { '$EPISODE': episode })}` : '';
   const replyEmbed = new EmbedBuilder()

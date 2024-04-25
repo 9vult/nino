@@ -21,7 +21,8 @@ export interface Episode {
   number: number,
   done: boolean,
   additionalStaff: Staff[],
-  tasks: Task[]
+  tasks: Task[],
+  updated: number | undefined
 };
 
 export interface Staff {

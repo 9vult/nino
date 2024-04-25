@@ -50,7 +50,8 @@ export const NewProjectCmd = async (client: Client, db: Database, dbdata: Databa
       number: i,
       done: false,
       additionalStaff: [],
-      tasks: []
+      tasks: [],
+      updated: undefined
     });
   }
 

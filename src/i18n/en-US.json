@@ -251,6 +251,14 @@
     "proceed": "Do it!",
     "cancel": "Cancel",
     "choice": "What do you want me to do?",
-    "genericError": "An Error Occured."
+    "genericError": "An Error Occured.",
+    "anidbApiError": "Air date unknown: AniDB API error",
+    "anidbRequestEmpty": "Air date unknown: AniDB request empty",
+    "anidbError": "Air date unknown: AniDB error",
+    "anidbNotSpecified": "Air date unknown: Not specified on AniDB",
+    "airdateFuture": "Airs on $DATE ($REL)",
+    "airdatePast": "Aired on $DATE ($REL)",
+    "updated": "Last updated $REL",
+    "estimate": "Estimate"
   }
 }

@@ -75,10 +75,15 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
   if (!isValidUser)
     return fail(GetStr(dbdata.i18n, 'permissionDenied', locale), interaction);
 
-  if (taskvalue != undefined)
+  if (taskvalue != undefined) {
     db.ref(`/Projects/${guildId}/${project}/episodes/${epvalue}/tasks/${taskvalue}`).update({
       abbreviation, done: false
     });
+    const utc = Math.floor(new Date().getTime() / 1000);
+    db.ref(`/Projects/${guildId}/${project}/episodes/${epvalue!}`).update({
+      updated: utc
+    });
+  }
 
   db.ref(`/Projects/${guildId}/${project}/episodes/${epvalue}`).update({ done: false });
 
