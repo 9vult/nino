@@ -219,8 +219,16 @@ Mark a task as complete. Accessible by assigned user and project owner.
 | Parameter | Required | Type | Description |
 |-----------|----------|------|-------------|
 | project | yes | string | Project nickname |
-| episode | yes | number | Episode number |
 | abbreviation | yes | string | Shorthand for the position (ex: TM) |
+| episode | no | number | Episode number |
+
+If an episode is not specified, Nino will first try to mark the task in the "current working episode"
+(the first not-done episode) as done. If the task there is complete, the first subsequent episode where
+the task is incomplete will be found, and the user will be asked if they want to mark that episode or do nothing.
+
+- The look-ahead feature does not work on Additional Staff
+- Role autocomplete suggestions for Additional Staff will be accurate only to the working episode, even if another
+episode is then specified, due to a Discord limitation. This does not affect manual entry of the role.
 
 ### undone
 
@@ -263,6 +271,15 @@ Check the status of a project or episode. Accessible by everyone.
 | project | yes | string | Project nickname |
 | episode | no | number | Episode number |
 | explain | no | boolean | Display more details about the positions |
+
+### roster
+
+Check who is assigned to what for an episode. Accessible by Key Staff.
+
+| Parameter | Required | Type | Description |
+|-----------|----------|------|-------------|
+| project | yes | string | Project nickname |
+| episode | yes | number | Episode number |
 
 ## Commands - Other
 

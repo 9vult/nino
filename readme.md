@@ -20,6 +20,10 @@ Then, place your `firebase.json` in the `/src/` folder.
 
 See the [Documentation](./docs.md) for more information.
 
+### Localization
+
+Localization pull requests are welcome! Please use `i18n/en_us.json` as your template, and don't break the template strings :D (`$VARIABLE`)
+
 ### Development
 
 Pull requests are always welcome.
