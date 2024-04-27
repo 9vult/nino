@@ -1,0 +1,37 @@
+{
+  "lang": "ja",
+  "commands": {
+    "blame": {
+      "name": "咎める",
+      "description": "プロジェクトの状況を確認する"
+    }
+  },
+  "options": {
+    "project": {
+      "name": "プロジェクト",
+      "description": "プロジェクトのニックネーム"
+    },
+    "episode": {
+      "name": "エピソード",
+      "description": "エピソードの番号"
+    },
+    "explain": {
+      "name": "説明する",
+      "description": "これが何を意味するのかを説明する"
+    }
+  },
+  "strings": {
+    "noSuchGuild": "ギルド$GUILDIDはありません。",
+    "noSuchProject": "そのプロジェクトはありません！",
+    "blameFailure": "そのプロジェクトはもう終わりだかそのエピソードはありません。",
+    "blame": "エピソード $EPISODE",
+    "anidbApiError": "放送日不明：AniDB APIエラー",
+    "anidbRequestEmpty": "放送日不明：AniDB リクエストが空だった",
+    "anidbError": "放送日不明：AniDBエラー",
+    "anidbNotSpecified": "放送日不明：AniDBにはそのアニメはありません",
+    "airdateFuture": "$DATE放送（$REL）",
+    "airdatePast": "$DATE放送（$REL）",
+    "updated": "最終更新日は$REL",
+    "estimate": "推定"
+  }
+}
