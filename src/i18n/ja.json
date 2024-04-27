@@ -24,7 +24,7 @@
     "noSuchGuild": "ギルド$GUILDIDはありません。",
     "noSuchProject": "そのプロジェクトはありません！",
     "blameFailure": "そのプロジェクトはもう終わりだかそのエピソードはありません。",
-    "blame": "エピソード $EPISODE",
+    "blame": "第$EPISODE話",
     "anidbApiError": "放送日不明：AniDB APIエラー",
     "anidbRequestEmpty": "放送日不明：AniDB リクエストが空だった",
     "anidbError": "放送日不明：AniDBエラー",
