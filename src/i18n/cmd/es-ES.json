@@ -1,0 +1,23 @@
+{
+  "lang": "es-ES",
+  "commands": {
+    "blame": {
+      "name": "culpar",
+      "description": "Comprobar el estado de un proyecto"
+    }
+  },
+  "options": {
+    "project": {
+      "name": "proyecto",
+      "description": "Apodo del proyecto"
+    },
+    "episode": {
+      "name": "episodio",
+      "description": "Episode number"
+    },
+    "explain": {
+      "name": "explicar",
+      "description": "Explique qué significa todo esto"
+    }
+  }
+}

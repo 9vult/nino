@@ -1,0 +1,14 @@
+{
+  "noSuchGuild": "El gremio {{guildId}} no existe.",
+  "noSuchProject": "¡Ese proyecto no existe!",
+  "blameFailure": "Ese proyecto está terminado, o el episodio solicitado no existe.",
+  "blame": "Episodio {{episode, number}}",
+  "anidbApiError": "Se desconoce la fecha de emisión: Error de la API AniDB",
+  "anidbRequestEmpty": "Se desconoce la fecha de emisión: La solicitud de AniDB estaba vacía",
+  "anidbError": "Se desconoce la fecha de emisión: Error AniDB",
+  "anidbNotSpecified": "Se desconoce la fecha de emisión: El anime no aparece en AniDB",
+  "airdateFuture": "Se emite el {{- date}} ({{- rel}})",
+  "airdatePast": "Emitido el {{- date}} ({{- rel}})",
+  "updated": "Última actualización: {{- rel}}",
+  "estimate": "Estimación"
+}

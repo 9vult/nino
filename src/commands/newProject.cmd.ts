@@ -3,16 +3,17 @@ import { generateAllowedMentions } from "../actions/generateAllowedMentions.acti
 import { DatabaseData, Project } from "../misc/types";
 import { fail } from "../actions/fail.action";
 import { Database } from "@firebase/database-types";
+import { t } from "i18next";
 
 export const NewProjectCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
-  const { options, user, member, guildId } = interaction;
+  const { options, user, member, guildId, locale: lng } = interaction;
   if (guildId == null) return;
 
   await interaction.deferReply();
 
   if (!(member as GuildMember)?.permissions.has(PermissionsBitField.Flags.Administrator)) {
-    return fail("You must be an administrator to perform this action!", interaction);
+    return fail(t('notAdmin', { lng }), interaction);
   }
 
   const nickname = options.getString('nickname')!;
@@ -51,13 +52,13 @@ export const NewProjectCmd = async (client: Client, db: Database, dbdata: Databa
       done: false,
       additionalStaff: [],
       tasks: [],
-      updated: undefined
+      updated: 0
     });
   }
 
   const embed = new EmbedBuilder()
-    .setTitle(`Project Creation`)
-    .setDescription(`Since you asked, I created project \`${nickname}\` for you.\nDo remember to add staff/positions, though.`)
+    .setTitle(t('projectCreationTitle', { lng }))
+    .setDescription(t('projectCreationHint', { lng, nickname }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

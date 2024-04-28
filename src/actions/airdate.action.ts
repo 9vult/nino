@@ -1,21 +1,20 @@
 import { XMLParser } from "fast-xml-parser";
 import { DatabaseData } from "../misc/types";
-import { GetStr } from "./i18n.action";
-import { interp } from "./interp.action";
+import { t } from "i18next";
 
-export const AirDate = async (anidb: string, airTime: string | undefined, episodeNumber: number, dbdata: DatabaseData, locale: string) => {
+export const AirDate = async (anidb: string, airTime: string | undefined, episodeNumber: number, dbdata: DatabaseData, lng: string) => {
   if (!airTime) airTime = '00:00';
 
   const cid = process.env.ANIDB_API_CLIENT_NAME;
   const baseUrl = `http://api.anidb.net:9001/httpapi?client=${cid}&clientver=1&protover=1&request=anime&aid=${anidb}`;
 
   const response = await fetch(baseUrl);
-  if (!response.ok) return GetStr(dbdata.i18n, 'anidbApiError', locale);
+  if (!response.ok) return t('anidbApiError', { lng });
   let reqtext = await response.text();
-  if (!reqtext) return GetStr(dbdata.i18n, 'anidbRequestEmpty', locale);
+  if (!reqtext) return t('anidbRequestEmpty', { lng });
   let parser = new XMLParser();
   let xml = parser.parse(reqtext);
-  if (Object.keys(xml)[0] == 'error') return GetStr(dbdata.i18n, 'anidbError', locale);
+  if (Object.keys(xml)[0] == 'error') return t('anidbError', { lng });
 
   const episodes = xml.anime.episodes.episode;
   const desiredEpisode = episodes.find((ep: any) => ep.epno == episodeNumber);
@@ -29,8 +28,8 @@ export const AirDate = async (anidb: string, airTime: string | undefined, episod
       const utc = Math.floor(date.getTime() / 1000);
       // return `${future ? 'Airs' : 'Aired'} on <t:${utc}:D> (<t:${utc}:R>)`;
       return future 
-        ? interp(GetStr(dbdata.i18n, 'airdateFuture', locale), { '$DATE': `<t:${utc}:D>`, '$REL': `<t:${utc}:R>` })
-        : interp(GetStr(dbdata.i18n, 'airdatePast', locale), { '$DATE': `<t:${utc}:D>`, '$REL': `<t:${utc}:R>` });
+        ? t('airdateFuture', { lng, date: `<t:${utc}:D>`, rel: `<t:${utc}:R>` })
+        : t('airdatePast', { lng, date: `<t:${utc}:D>`, rel: `<t:${utc}:R>` });
     }
   }
 
@@ -43,11 +42,11 @@ export const AirDate = async (anidb: string, airTime: string | undefined, episod
     date.setDate(date.getDate() + (7 * (episodeNumber - 1)));
     let future = (date > new Date());
     const utc = Math.floor(date.getTime() / 1000);
-    return `${GetStr(dbdata.i18n, 'estimate', locale)}: `
+    return `${t('estimate', { lng })}: `
       + future 
-        ? interp(GetStr(dbdata.i18n, 'airdateFuture', locale), { '$DATE': `<t:${utc}:D>`, '$REL': `<t:${utc}:R>` })
-        : interp(GetStr(dbdata.i18n, 'airdatePast', locale), { '$DATE': `<t:${utc}:D>`, '$REL': `<t:${utc}:R>` });
+        ? t('airdateFuture', { lng, date: `<t:${utc}:D>`, rel: `<t:${utc}:R>` })
+        : t('airdatePast', { lng, date: `<t:${utc}:D>`, rel: `<t:${utc}:R>` });
   }
 
-  return GetStr(dbdata.i18n, 'anidbNotSpecified', locale);
+  return t('anidbNotSpecified', { lng });
 }

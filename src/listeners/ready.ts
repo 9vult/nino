@@ -1,5 +1,5 @@
 import { Client, SlashCommandBuilder } from "discord.js";
-import { GetDescriptions as GetDescs, GetNames, LoadI18Ns } from "../actions/i18n.action";
+import { GetDescriptions as GetDescs, GetNames, LoadCmdI18Ns } from "../actions/i18n.action";
 import { DatabaseData } from "../misc/types";
 
 export default (client: Client, dbdata: DatabaseData): void => {

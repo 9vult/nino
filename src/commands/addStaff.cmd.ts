@@ -4,13 +4,12 @@ import { DatabaseData } from "../misc/types";
 import { Database } from "@firebase/database-types";
 import { fail } from "../actions/fail.action";
 import { GetAlias } from "../actions/getalias.action";
-import { interp } from "../actions/interp.action";
-import { GetStr } from "../actions/i18n.action";
 import { InteractionData, VerifyInteraction } from "../actions/verify.action";
+import { t } from "i18next";
 
 export const AddStaffCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
-  const { options, guildId, locale } = interaction;
+  const { options, guildId, locale: lng } = interaction;
 
   await interaction.deferReply();
 
@@ -25,7 +24,7 @@ export const AddStaffCmd = async (client: Client, db: Database, dbdata: Database
 
   for (let pos in projects[project].keyStaff)
     if (projects[project].keyStaff[pos].role.abbreviation == abbreviation)
-      return fail(GetStr(dbdata.i18n, 'positionExists', locale), interaction);
+      return fail(t('positionExists', { lng }), interaction);
 
   db.ref(`/Projects/${guildId}/${project}`).child("keyStaff").push({
     id: staff,
@@ -42,9 +41,10 @@ export const AddStaffCmd = async (client: Client, db: Database, dbdata: Database
     });
   }
 
+  const staffMention = `<@${staff}>`;
   const embed = new EmbedBuilder()
-    .setTitle(GetStr(dbdata.i18n, 'projectCreationTitle', locale))
-    .setDescription(interp(GetStr(dbdata.i18n, 'addStaff', interaction.locale), { '$STAFF': staff, '$ABBREVIATION': abbreviation }))
+    .setTitle(t('projectCreationTitle', { lng }))
+    .setDescription(t('addStaff', { lng, staff: staffMention, abbreviation }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

@@ -6,12 +6,11 @@ import { Database } from "@firebase/database-types";
 import { fail } from "../actions/fail.action";
 import { GetAlias } from "../actions/getalias.action";
 import { EntriesToStatusString, GenerateEntries } from "../actions/generateEntries.action";
-import { interp } from "../actions/interp.action";
-import { GetStr } from "../actions/i18n.action";
+import { t } from "i18next";
 
 export const RosterCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
-  const { options, locale, user, guildId } = interaction;
+  const { options, locale: lng, user, guildId } = interaction;
   
   await interaction.deferReply();
   
@@ -20,18 +19,18 @@ export const RosterCmd = async (client: Client, db: Database, dbdata: DatabaseDa
   let episode: number = options.getNumber('episode')!;
 
   if (guildId == null || !(guildId in dbdata.guilds))
-    return fail(GetStr(dbdata.i18n, 'noSuchProject', locale), interaction);
+    return fail(t('noSuchProject', { lng }), interaction);
 
   let projects = dbdata.guilds[guildId];
   if (!project || !(project in projects))
-    return fail(GetStr(dbdata.i18n, 'noSuchProject', locale), interaction);
+    return fail(t('noSuchProject', { lng }), interaction);
 
-  if (!projects[project].keyStaff) return fail(GetStr(dbdata.i18n, 'noRoster', locale), interaction);
+  if (!projects[project].keyStaff) return fail(t('noRoster', { lng }), interaction);
   
   // Check if the user is a Key Staff
   if (projects[project].owner !== user!.id
     && !Object.values(projects[project].keyStaff).map((s) => s.id).includes(user!.id))
-      return await fail(GetStr(dbdata.i18n, 'permissionDenied', locale), interaction);
+      return await fail(t('permissionDenied', { lng }), interaction);
 
   let status = '';
   let entries: {[key:string]:WeightedStatusEntry} = {};
@@ -58,13 +57,13 @@ export const RosterCmd = async (client: Client, db: Database, dbdata: DatabaseDa
   }
 
   if (!success)
-    return fail(GetStr(dbdata.i18n, 'blameFailure', locale), interaction);
+    return fail(t('blameFailure', { lng }), interaction);
 
   status = EntriesToStatusString(entries, '\n');
 
   const embed = new EmbedBuilder()
     .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
-    .setTitle(interp(GetStr(dbdata.i18n, 'blame', interaction.locale), { '$EPISODE': episode }))
+    .setTitle(t('blame', { lng, episode }))
     .setThumbnail(projects[project].poster)
     .setDescription(status)
     .setColor(0xd797ff)

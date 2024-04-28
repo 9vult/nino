@@ -1,0 +1,14 @@
+{
+  "noSuchGuild": "ギルド{{guildId}}はありません。",
+  "noSuchProject": "そのプロジェクトはありません！",
+  "blameFailure": "そのプロジェクトはもう終わりだかそのエピソードはありません。",
+  "blame": "第{{episode, number}}話",
+  "anidbApiError": "放送日不明：AniDB APIエラー",
+  "anidbRequestEmpty": "放送日不明：AniDB リクエストが空だった",
+  "anidbError": "放送日不明：AniDBエラー",
+  "anidbNotSpecified": "放送日不明：AniDBにはそのアニメはありません",
+  "airdateFuture": "{{- date}}放送（{{- rel}}）",
+  "airdatePast": "{{- date}}放送（{{- rel}}）",
+  "updated": "最終更新日は{{- rel}}",
+  "estimate": "推定"
+}

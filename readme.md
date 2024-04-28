@@ -22,7 +22,7 @@ See the [Documentation](./docs.md) for more information.
 
 ### Localization
 
-Localization pull requests are welcome! Please use `i18n/en_us.json` as your template, and don't break the template strings :D (`$VARIABLE`)
+Localization pull requests are welcome! You will need to create two json files, one in `i18n/cmd` for slash commands, and one in `i18n/str` for strings. For plurals, see the information on the [i18next website](https://www.i18next.com/translation-function/plurals). 
 
 ### Development
 

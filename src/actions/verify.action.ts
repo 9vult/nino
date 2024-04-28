@@ -1,23 +1,22 @@
 import { ChatInputCommandInteraction } from "discord.js";
 import { DatabaseData } from "../misc/types";
 import { fail } from "./fail.action";
-import { interp } from "./interp.action";
-import { GetStr } from "./i18n.action";
+import { t } from "i18next";
 
 export const VerifyInteraction = async (dbdata: DatabaseData, interaction: ChatInputCommandInteraction, project: string | undefined, checkOwner: boolean = true) => {
-  const { user, guildId, locale } = interaction;
+  const { user, guildId, locale: lng } = interaction;
   if (guildId == null || !(guildId in dbdata.guilds))
-    return await fail(interp(GetStr(dbdata.i18n, 'noSuchGuild', locale), { '$GUILDID': guildId }), interaction);
+    return await fail(t('noSuchGuild', { lng, guildId }), interaction);
 
   let projects = dbdata.guilds[guildId];
 
   if (!project || !(project in projects))
-    return await fail(GetStr(dbdata.i18n, 'noSuchProject', interaction.locale), interaction);
+    return await fail(t('noSuchProject', { lng }), interaction);
   
   if (!checkOwner) return true;
   
   if (projects[project].owner !== user!.id)
-    return await fail(GetStr(dbdata.i18n, 'permissionDenied', locale), interaction);
+    return await fail(t('permissionDenied', { lng }), interaction);
 
   return true;
 }

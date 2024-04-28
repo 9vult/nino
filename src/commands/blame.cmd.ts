@@ -1,18 +1,17 @@
 
-import { ChatInputCommandInteraction, Client, EmbedBuilder, GuildMember } from "discord.js";
+import { ChatInputCommandInteraction, Client, EmbedBuilder } from "discord.js";
 import { generateAllowedMentions } from "../actions/generateAllowedMentions.action";
 import { DatabaseData, WeightedStatusEntry } from "../misc/types";
 import { Database } from "@firebase/database-types";
 import { fail } from "../actions/fail.action";
-import { GetAlias, GetObserverAlias } from "../actions/getalias.action";
+import { GetObserverAlias } from "../actions/getalias.action";
 import { AirDate } from "../actions/airdate.action";
 import { EntriesToStatusString, GenerateEntries } from "../actions/generateEntries.action";
-import { interp } from "../actions/interp.action";
-import { GetStr } from "../actions/i18n.action";
+import { t } from "i18next";
 
 export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
-  const { options, locale } = interaction;
+  const { options, locale: lng } = interaction;
   
   await interaction.deferReply();
   
@@ -24,11 +23,11 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
 
   let epvalue;
   if (selGuildId == null || !(selGuildId in dbdata.guilds))
-    return fail(GetStr(dbdata.i18n, 'noSuchProject', interaction.locale), interaction);
+    return fail(t('noSuchProject', { lng }), interaction);
 
   let projects = dbdata.guilds[selGuildId];
   if (!project || !(project in projects))
-    return fail(GetStr(dbdata.i18n, 'noSuchProject', interaction.locale), interaction);
+    return fail(t('noSuchProject', { lng }), interaction);
 
   let status = '';
   let entries: {[key:string]:WeightedStatusEntry} = {};
@@ -40,7 +39,7 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
     if ((episode != null && projObj.number === episode) || (episode == null && projObj.done == false)) {
       success = true;
       episode = projObj.number;
-      if (projObj.updated) updateTime = projObj.updated;
+      if (projObj.updated && projObj.updated !== 0) updateTime = projObj.updated;
       entries = GenerateEntries(dbdata, selGuildId, project, episode);
       let map: {[key:string]:string} = {};
       if (explain != null && explain == true) {
@@ -62,7 +61,7 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
   }
 
   if (!success)
-    return fail(GetStr(dbdata.i18n, 'blameFailure', locale), interaction);
+    return fail(t('blameFailure', { lng }), interaction);
 
   if (explain != null && explain == true)
     status = EntriesToStatusString(entries, '\n');
@@ -70,13 +69,13 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
     status = EntriesToStatusString(entries);
 
   if (projects[project].anidb && episode != null && !started)
-    status += `\n\n${await AirDate(projects[project].anidb, projects[project].airTime, episode, dbdata, locale)}`;
+    status += `\n\n${await AirDate(projects[project].anidb, projects[project].airTime, episode, dbdata, lng)}`;
   else if (updateTime !== 0)
-    status += `\n\n${interp(GetStr(dbdata.i18n, 'updated', locale), { '$REL': `<t:${updateTime}:R>` })}`;
+    status += `\n\n${t('updated', { lng, rel: `<t:${updateTime}:R>` })}`;
 
   const embed = new EmbedBuilder()
     .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
-    .setTitle(interp(GetStr(dbdata.i18n, 'blame', interaction.locale), { '$EPISODE': episode }))
+    .setTitle(t('blame', { lng, episode }))
     .setThumbnail(projects[project].poster)
     .setDescription(status)
     .setColor(0xd797ff)

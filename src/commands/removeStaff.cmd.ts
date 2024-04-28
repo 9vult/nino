@@ -1,16 +1,15 @@
-import { ChatInputCommandInteraction, Client, EmbedBuilder, GuildMember } from "discord.js";
+import { ChatInputCommandInteraction, Client, EmbedBuilder } from "discord.js";
 import { generateAllowedMentions } from "../actions/generateAllowedMentions.action";
 import { DatabaseData } from "../misc/types";
 import { Database } from "@firebase/database-types";
 import { fail } from "../actions/fail.action";
 import { GetAlias } from "../actions/getalias.action";
-import { interp } from "../actions/interp.action";
-import { GetStr } from "../actions/i18n.action";
 import { InteractionData, VerifyInteraction } from "../actions/verify.action";
+import { t } from "i18next";
 
 export const RemoveStaffCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
-  const { options, guildId, locale } = interaction;
+  const { options, guildId, locale: lng } = interaction;
 
   await interaction.deferReply();
 
@@ -29,7 +28,7 @@ export const RemoveStaffCmd = async (client: Client, db: Database, dbdata: Datab
     }
 
 if (!success)
-  return fail(interp(GetStr(dbdata.i18n, 'noSuchTask', interaction.locale), { '$ABBREVIATION': abbreviation }), interaction);
+  return fail(t('noSuchTask', { lng, abbreviation }), interaction);
 
 
   const episodes = projects[project].episodes;
@@ -41,8 +40,8 @@ if (!success)
   }
 
   const embed = new EmbedBuilder()
-    .setTitle(GetStr(dbdata.i18n, 'projectModificationTitle', locale))
-    .setDescription(interp(GetStr(dbdata.i18n, 'removeStaff', interaction.locale), { '$ABBREVIATION': abbreviation }))
+    .setTitle(t('projectModificationTitle', { lng }))
+    .setDescription(t('removeStaff',  { lng, abbreviation }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

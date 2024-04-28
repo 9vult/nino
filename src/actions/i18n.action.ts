@@ -1,4 +1,6 @@
 import { readdirSync } from "fs"
+import i18next from "i18next";
+import Backend, { FsBackendOptions } from "i18next-fs-backend";
 import path from "path";
 
 export const GetNames = (dict: {[key:string]:any}, cat: string, key: string) => {
@@ -21,25 +23,34 @@ export const GetDescriptions = (dict: {[key:string]:any}, cat: string, key: stri
   return results;
 };
 
-export const GetStr = (dict: {[key:string]:any}, key: string, locale: string) => {
-  let definitions = dict[locale];
-  if (!definitions) definitions = dict['en-US'];
-  if (!definitions['strings']) definitions = dict['en-US'];
-  return (definitions['strings'][key]) 
-    ? definitions['strings'][key] 
-    : (dict['en-US']['strings'][key]) 
-      ? dict['en-US']['strings'][key]
-      : `i18n string ${key} not found`;
-};
-
-export const LoadI18Ns = () => {
+export const LoadCmdI18Ns = () => {
   let results: {[key:string]:any} = {};
-  const files = readdirSync(path.resolve(__dirname, '../i18n'));
+  const files = readdirSync(path.resolve(__dirname, '../i18n/cmd'));
 
   for (let file of files) {
     if (!file.endsWith('.json')) continue;
-    let imp = require(`../i18n/${file}`);
+    let imp = require(`../i18n/cmd/${file}`);
     results[imp['lang']] = imp;
   }
   return results;
 };
+
+export const InitI18Next = () => {
+  const langs = readdirSync(path.resolve(__dirname, '../i18n/str'))
+    .filter(f => f.endsWith('.json'))
+    .map(f => f.replace('.json', ''));
+
+  i18next
+    .use(Backend)
+    .init<FsBackendOptions>({
+      backend: {
+        loadPath: path.join(__dirname, '../i18n/str/{{lng}}.json')
+      },
+      lng: 'en-US',
+      fallbackLng: 'en-US',
+      ns: 'common',
+      defaultNS: 'common',
+      preload: langs,
+      debug: false
+    });
+}

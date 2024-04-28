@@ -5,13 +5,12 @@ import { Database } from "@firebase/database-types";
 import { fail } from "../actions/fail.action";
 import { GetAlias } from "../actions/getalias.action";
 import { EntriesToStatusString, GenerateEntries } from "../actions/generateEntries.action";
-import { interp } from "../actions/interp.action";
-import { GetStr } from "../actions/i18n.action";
 import { InteractionData, VerifyInteraction } from "../actions/verify.action";
+import { t } from "i18next";
 
 export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
-  const { options, user, guildId, locale } = interaction;
+  const { options, user, guildId, locale: lng } = interaction;
 
   await interaction.deferReply();
 
@@ -73,7 +72,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
     if (success) break;
   }
   if (!success || !nextEpisode || !workingEpisode)
-    return fail(GetStr(dbdata.i18n, 'doneFailure', locale), interaction);
+    return fail(t('doneFailure', { lng }), interaction);
 
   // Get the status of the task at the working episode
   for (let task in workingEpisode.tasks) {
@@ -107,7 +106,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   }
 
   if (!isValidUser)
-    return fail(GetStr(dbdata.i18n, 'permissionDenied', locale), interaction);
+    return fail(t('permissionDenied', { lng }), interaction);
 
   // User is valid (yippee!) so proceed
   // OPTION ONE
@@ -122,7 +121,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
       let taskObj = workingEpisode.tasks[task];
       if (taskObj.abbreviation === abbreviation) {
         if (taskObj.done)
-          return fail(interp(GetStr(dbdata.i18n, 'taskAlreadyDone', interaction.locale), { '$ABBREVIATION': abbreviation }), interaction);
+          return fail(t('taskAlreadyDone', {lng, abbreviation}), interaction);
       }
       else if (!taskObj.done) episodeDone = false;
       // Status string
@@ -147,24 +146,24 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   // Episode number is UNSPECIFIED, Working Episode != Next Episode *BUT* they are Additional Staff (FAIL)
   if ((!postable && selectedEpisode != null && workingEpisodeTask?.done)
     || (!postable && isAdditionalStaff && selectedEpisode == null && workingEpisode != nextEpisode)) {
-    return fail(interp(GetStr(dbdata.i18n, 'taskAlreadyDone', interaction.locale), { '$ABBREVIATION': abbreviation }), interaction);
+    return fail(t('taskAlreadyDone', {lng, abbreviation}), interaction);
   }
 
   // OPTION FIVE
   // Episode number is UNSPECIFIED, Working Episode != Next Episode (NOT ADDITIONAL STAFF)
   if (!postable && selectedEpisode == null && workingEpisode != nextEpisode) {
-    const msgBody = interp(GetStr(dbdata.i18n, 'inTheDust', locale), { '$CURRENTEPISODE': workingEpisode.number, '$TASKNAME': taskName, '$NEXTEPISODE': nextEpisode.number });
+    const msgBody = t('inTheDust', { lng, currentEpisode: workingEpisode.number, taskName, nextEpisode: nextEpisode.number });
     const proceed = new ButtonBuilder()
       .setCustomId('ninodoneproceed')
-      .setLabel(GetStr(dbdata.i18n, 'proceed', locale))
+      .setLabel(t('proceed', { lng }))
       .setStyle(ButtonStyle.Danger);
     const cancel = new ButtonBuilder()
       .setCustomId('ninodonecancel')
-      .setLabel(GetStr(dbdata.i18n, 'cancel', locale))
+      .setLabel(t('cancel', { lng }))
       .setStyle(ButtonStyle.Secondary);
     const replyEmbed = new EmbedBuilder()
       .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
-      .setTitle(`❓ ${GetStr(dbdata.i18n, 'choice', interaction.locale)}`)
+      .setTitle(`❓ ${t('choice', { lng })}`)
       .setDescription(msgBody)
       .setColor(0xd797ff)
       .setTimestamp(Date.now());
@@ -179,16 +178,13 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
     try {
       const confirmation = await btnResponse.awaitMessageComponent({ filter: collectorFilter, time: 60_000 });
       if (confirmation.customId === 'ninodonecancel') {
-        editBody = GetStr(dbdata.i18n, 'dontDoIt', locale);
+        editBody = t('dontDoIt', { lng });
       }
       else if (confirmation.customId === 'ninodoneproceed') {
         replied = true;
         let diff = Math.ceil(nextEpisode.number - workingEpisode.number);
-        let plural = diff != 1;
-        if (!plural)
-          editBody = interp(GetStr(dbdata.i18n, 'doItNow', locale), { '$TASKNAME': taskName, '$DIFF': diff });
-        else
-          editBody = interp(GetStr(dbdata.i18n, 'doItNowPlural', locale), { '$TASKNAME': taskName, '$DIFF': diff });
+        editBody = t('doItNow', { lng, taskName, count: diff });
+
         entries = GenerateEntries(dbdata, guildId!, project, nextEpisode.number);
         for (let task in nextEpisode.tasks) {
           let taskObj = nextEpisode.tasks[task];
@@ -209,12 +205,12 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
         postable = true;
       }
     } catch (e) {
-      editBody = GetStr(dbdata.i18n, 'noResponse', interaction.locale);
+      editBody = t('noResponse', { lng });
     }
     const editedEmbed = new EmbedBuilder()
       .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
-      .setTitle(`❓ ${GetStr(dbdata.i18n, 'choice', interaction.locale)}`)
-      .setDescription(editBody)
+      .setTitle(`❓ ${t('choice', { lng })}`)
+      .setDescription(editBody ?? 'i18n failed')
       .setColor(0xd797ff)
       .setTimestamp(Date.now());
     await interaction.editReply({ embeds: [editedEmbed], components: [] });
@@ -226,11 +222,11 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
     db.ref(`/Projects/${guildId}/${project}/episodes/${nextEpisodeKey!}`).update({ done: true });
   }
 
-  const episodeDoneText = episodeDone ? `\n${interp(GetStr(dbdata.i18n, 'episodeDone', interaction.locale), { '$EPISODE': nextEpisode.number })}` : '';
+  const episodeDoneText = episodeDone ? `\n${t('episodeDone', { lng, episode: nextEpisode.number })}` : '';
   const replyEmbed = new EmbedBuilder()
     .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
-    .setTitle(`✅ ${GetStr(dbdata.i18n, 'taskCompleteTitle', interaction.locale)}`)
-    .setDescription(`${interp(GetStr(dbdata.i18n, 'taskCompleteBody', interaction.locale), { '$TASKNAME': taskName, '$EPISODE': nextEpisode.number })}${episodeDoneText}`)
+    .setTitle(`✅ ${t('taskCompleteTitle', { lng })}`)
+    .setDescription(`${t('taskCompleteBody', { lng, taskName, episode: nextEpisode.number })}${episodeDoneText}`)
     .setColor(0xd797ff)
     .setTimestamp(Date.now());
   if (!replied)

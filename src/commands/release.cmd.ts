@@ -1,16 +1,14 @@
-import { ChannelType, ChatInputCommandInteraction, Client, EmbedBuilder, TextChannel, WebhookClient } from "discord.js";
+import { ChannelType, ChatInputCommandInteraction, Client, EmbedBuilder, TextChannel } from "discord.js";
 import { generateAllowedMentions } from "../actions/generateAllowedMentions.action";
 import { DatabaseData } from "../misc/types";
 import { Database } from "@firebase/database-types";
-import { fail } from "../actions/fail.action";
 import { GetAlias } from "../actions/getalias.action";
-import { interp } from "../actions/interp.action";
-import { GetStr } from "../actions/i18n.action";
 import { InteractionData, VerifyInteraction } from "../actions/verify.action";
+import { t } from "i18next";
 
 export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
-  const { options, locale } = interaction;
+  const { options, locale: lng } = interaction;
 
   await interaction.deferReply();
 
@@ -29,8 +27,8 @@ export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseD
 
   const replyEmbed = new EmbedBuilder()
     .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
-    .setTitle(GetStr(dbdata.i18n, 'episodeReleasedTitle', locale))
-    .setDescription(interp(GetStr(dbdata.i18n, 'episodeReleasedBody', interaction.locale), { '$TITLE': projects[project].title, '$TYPE': type, '$PUBLISHNUMBER': publishNumber }))
+    .setTitle(t('episodeReleasedTitle', { lng }))
+    .setDescription(t('episodeReleasedBody', { lng, title: projects[project].title, type, publishNumber }))
     .setColor(0xd797ff)
     .setTimestamp(Date.now());
   await interaction.editReply({ embeds: [replyEmbed], allowedMentions: generateAllowedMentions([[], []]) });
