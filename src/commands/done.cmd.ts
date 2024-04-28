@@ -183,7 +183,12 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
       }
       else if (confirmation.customId === 'ninodoneproceed') {
         replied = true;
-        editBody = interp(GetStr(dbdata.i18n, 'doItNow', locale), { '$TASKNAME': taskName, '$DIFF': Math.ceil(nextEpisode.number - workingEpisode.number) });
+        let diff = Math.ceil(nextEpisode.number - workingEpisode.number);
+        let plural = diff != 1;
+        if (!plural)
+          editBody = interp(GetStr(dbdata.i18n, 'doItNow', locale), { '$TASKNAME': taskName, '$DIFF': diff });
+        else
+          editBody = interp(GetStr(dbdata.i18n, 'doItNowPlural', locale), { '$TASKNAME': taskName, '$DIFF': diff });
         entries = GenerateEntries(dbdata, guildId!, project, nextEpisode.number);
         for (let task in nextEpisode.tasks) {
           let taskObj = nextEpisode.tasks[task];
