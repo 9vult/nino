@@ -35,6 +35,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   let nextEpisodeKey: string;
   let nextEpisodeTaskKey: string;
   let postable = false;
+  let replied = false;
 
   let verification = await VerifyInteraction(dbdata, interaction, alias, false);
   if (!verification) return;
@@ -167,11 +168,11 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
       .setDescription(msgBody)
       .setColor(0xd797ff)
       .setTimestamp(Date.now());
-    const row = new ActionRowBuilder<ButtonBuilder>().addComponents(proceed, cancel);
-    const btnResponse = await interaction.editReply({
-      embeds: [replyEmbed],
-      components: [row]
-    });
+      const row = new ActionRowBuilder<ButtonBuilder>().addComponents(proceed, cancel);
+      const btnResponse = await interaction.editReply({
+        embeds: [replyEmbed],
+        components: [row]
+      });
 
     const collectorFilter = (i: any) => i.user.id === interaction.user.id;
     let editBody;
@@ -181,7 +182,8 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
         editBody = GetStr(dbdata.i18n, 'dontDoIt', locale);
       }
       else if (confirmation.customId === 'ninodoneproceed') {
-        editBody = GetStr(dbdata.i18n, 'doItNow', locale);
+        replied = true;
+        editBody = interp(GetStr(dbdata.i18n, 'doItNow', locale), { '$TASKNAME': taskName, '$DIFF': Math.ceil(nextEpisode.number - workingEpisode.number) });
         entries = GenerateEntries(dbdata, guildId!, project, nextEpisode.number);
         for (let task in nextEpisode.tasks) {
           let taskObj = nextEpisode.tasks[task];
@@ -210,7 +212,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
       .setDescription(editBody)
       .setColor(0xd797ff)
       .setTimestamp(Date.now());
-    await interaction.editReply({ embeds: [editedEmbed], components: [] })
+    await interaction.editReply({ embeds: [editedEmbed], components: [] });
   }
 
   if (!postable) return;
@@ -226,7 +228,10 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
     .setDescription(`${interp(GetStr(dbdata.i18n, 'taskCompleteBody', interaction.locale), { '$TASKNAME': taskName, '$EPISODE': nextEpisode.number })}${episodeDoneText}`)
     .setColor(0xd797ff)
     .setTimestamp(Date.now());
-  await interaction.editReply({ embeds: [replyEmbed], allowedMentions: generateAllowedMentions([[], []]) });
+  if (!replied)
+    await interaction.editReply({ embeds: [replyEmbed], allowedMentions: generateAllowedMentions([[], []]) });
+  else
+    await interaction.followUp({ embeds: [replyEmbed], allowedMentions: generateAllowedMentions([[], []]) });
 
   const publishEmbed = new EmbedBuilder()
     .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })

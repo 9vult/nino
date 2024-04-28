@@ -247,7 +247,7 @@
     "inTheDust": "Your team is still working on episode **$CURRENTEPISODE**, but your task there is already done.\nThe next episode awaiting **$TASKNAME** is episode **$NEXTEPISODE**; did you want me to mark that one done instead?",
     "noResponse": "I waited a whole minute, and you didn't tell me what you wanted!",
     "dontDoIt": "Okay; I won't touch anything, then.",
-    "doItNow": "Okay, I'll do that for you.",
+    "doItNow": "Okay, I'll do that for you.\n**$TASKNAME** is now **$DIFF** episodes ahead.",
     "proceed": "Do it!",
     "cancel": "Cancel",
     "choice": "What do you want me to do?",
