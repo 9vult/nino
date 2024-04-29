@@ -52,7 +52,7 @@
   "choice": "What do you want me to do?",
   "genericError": "An Error Occured.",
   "anidbApiError": "Air date unknown: AniDB API error",
-  "anidbRequestEmpty": "Air date unknown: AniDB request empty",
+  "anidbResponseEmpty": "Air date unknown: AniDB response empty",
   "anidbError": "Air date unknown: AniDB error",
   "anidbNotSpecified": "Air date unknown: Not specified on AniDB",
   "airdateFuture": "Airs on {{- date}} ({{- rel}})",

@@ -4,7 +4,7 @@
   "blameFailure": "そのプロジェクトはもう終わりだかそのエピソードはありません。",
   "blame": "第{{episode, number}}話",
   "anidbApiError": "放送日不明：AniDB APIエラー",
-  "anidbRequestEmpty": "放送日不明：AniDB リクエストが空だった",
+  "anidbResponseEmpty": "放送日不明：AniDB レスポンスが空だった",
   "anidbError": "放送日不明：AniDBエラー",
   "anidbNotSpecified": "放送日不明：AniDBにはそのアニメはありません",
   "airdateFuture": "{{- date}}放送（{{- rel}}）",

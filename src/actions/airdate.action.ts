@@ -10,10 +10,10 @@ export const AirDate = async (anidb: string, airTime: string | undefined, episod
 
   const response = await fetch(baseUrl);
   if (!response.ok) return t('anidbApiError', { lng });
-  let reqtext = await response.text();
-  if (!reqtext) return t('anidbRequestEmpty', { lng });
+  let resptext = await response.text();
+  if (!resptext) return t('anidbResponseEmpty', { lng });
   let parser = new XMLParser();
-  let xml = parser.parse(reqtext);
+  let xml = parser.parse(resptext);
   if (Object.keys(xml)[0] == 'error') return t('anidbError', { lng });
 
   const episodes = xml.anime.episodes.episode;
