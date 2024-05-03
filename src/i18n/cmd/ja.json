@@ -2,21 +2,21 @@
   "lang": "ja",
   "commands": {
     "blame": {
-      "name": "咎める",
+      "name": "blame",
       "description": "プロジェクトの状況を確認する"
     }
   },
   "options": {
     "project": {
-      "name": "プロジェクト",
+      "name": "project",
       "description": "プロジェクトのニックネーム"
     },
     "episode": {
-      "name": "エピソード",
+      "name": "episode",
       "description": "エピソードの番号"
     },
     "explain": {
-      "name": "説明する",
+      "name": "explain",
       "description": "これが何を意味するのかを説明する"
     }
   }
