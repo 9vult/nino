@@ -14,9 +14,13 @@ export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseD
 
   const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!);
   const type = options.getString('type')!;
-  const number = options.getString('number')!;
+  let number = options.getString('number')!;
   const url: string | null = options.getString('url');
   const role = options.getRole('role');
+
+  if (!isNaN(Number(number))) {
+    number = `${Number(number)}`;
+  }
   
   let publishNumber = type !== 'Batch' ? number : `(${number})`;
   let publishRole = role !== null ? `<@&${role.id}> ` : '';
