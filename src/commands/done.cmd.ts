@@ -18,12 +18,14 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   const abbreviation = options.getString('abbreviation')!.toUpperCase();
   let selectedEpisode: number | null = options.getNumber('episode');
 
-  let status = '';
+  let localStatus = '';
+  let publicStatus = '';
   let taskName;
   let isValidUser = false;
   let isAdditionalStaff = false;
   let episodeDone = true;
-  let entries: { [key: string]: WeightedStatusEntry };
+  let localEntries: { [key: string]: WeightedStatusEntry };
+  let publicEntries: { [key: string]: WeightedStatusEntry };
 
   let workingEpisode: Episode | undefined;
   let workingEpisodeTask: Task | undefined;
@@ -40,6 +42,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   if (!verification) return;
   const { projects, project } = InteractionData(dbdata, interaction, alias);
 
+  let extended = dbdata.configuration && dbdata.configuration[guildId!].progressDisplay && dbdata.configuration[guildId!].progressDisplay == 'Extended';
 
   // Find selected episode or current working episode
   let success = false;
@@ -90,14 +93,14 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
     if (staffObj.role.abbreviation === abbreviation && (staffObj.id === user.id || projects[project].owner === user.id)) {
       isValidUser = true;
       taskName = staffObj.role.title;
-      status = `✅ **${staffObj.role.title}**\n`;
+      localStatus = `✅ **${staffObj.role.title}**\n`;
     }
   }
   if (!isValidUser) { // Not key staff
     for (let addStaff in workingEpisode.additionalStaff) {
       let addStaffObj = workingEpisode.additionalStaff[addStaff];
       if (addStaffObj.role.abbreviation === abbreviation && (addStaffObj.id === user.id || projects[project].owner === user.id)) {
-        status = `✅ **${addStaffObj.role.title}**\n`;
+        localStatus = `✅ **${addStaffObj.role.title}**\n`;
         taskName = addStaffObj.role.title;
         isValidUser = true;
         isAdditionalStaff = true;
@@ -116,7 +119,15 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
 
   if ((!postable && selectedEpisode != null && !workingEpisodeTask?.done)
     || (selectedEpisode == null && workingEpisode == nextEpisode)) {
-    entries = GenerateEntries(dbdata, guildId!, project, workingEpisode.number);
+    localEntries = GenerateEntries(dbdata, guildId!, project, workingEpisode.number);
+
+    let map: {[key:string]:string} = {};
+    if (extended) {
+      publicEntries = GenerateEntries(dbdata, guildId!, project, workingEpisode.number);
+      if (projects[project].keyStaff) Object.values(projects[project].keyStaff).forEach(ks => { map[ks.role.abbreviation] = ks.role.title; });
+      if (nextEpisode.additionalStaff) Object.values(nextEpisode.additionalStaff).forEach(as => { map[as.role.abbreviation] = as.role.title });
+    }
+
     for (let task in workingEpisode.tasks) {
       let taskObj = workingEpisode.tasks[task];
       if (taskObj.abbreviation === abbreviation) {
@@ -125,11 +136,20 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
       }
       else if (!taskObj.done) episodeDone = false;
       // Status string
-      if (taskObj.abbreviation === abbreviation) entries[taskObj.abbreviation].status = `__~~${abbreviation}~~__`;
-      else if (taskObj.done) entries[taskObj.abbreviation].status = `~~${taskObj.abbreviation}~~`;
-      else entries[taskObj.abbreviation].status = `**${taskObj.abbreviation}**`;
+      let stat = '';
+      if (taskObj.abbreviation === abbreviation) stat = `__~~${abbreviation}~~__`;
+      else if (taskObj.done) stat = `~~${taskObj.abbreviation}~~`;
+      else stat = `**${taskObj.abbreviation}**`;
+      localEntries[taskObj.abbreviation].status = stat;
+
+      if (extended) {
+        let title = (taskObj.abbreviation in map) ? map[taskObj.abbreviation] : 'Unknown';
+        publicEntries![taskObj.abbreviation].status = `${stat}: ${title}${taskObj.done ? ' *(done)*' : ''}`;
+      }
     }
-    status += EntriesToStatusString(entries);
+    publicStatus += localStatus;
+    if (extended) publicStatus += EntriesToStatusString(publicEntries!, '\n');
+    localStatus += EntriesToStatusString(localEntries);
     db.ref(`/Projects/${guildId}/${project}/episodes/${workingEpisodeKey!}/tasks/${workingEpisodeTaskKey!}`).update({
       abbreviation, done: true
     });
@@ -185,16 +205,34 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
         let diff = Math.ceil(nextEpisode.number - workingEpisode.number);
         editBody = t('doItNow', { lng, taskName, count: diff });
 
-        entries = GenerateEntries(dbdata, guildId!, project, nextEpisode.number);
+        localEntries = GenerateEntries(dbdata, guildId!, project, nextEpisode.number);
+        
+        let map: {[key:string]:string} = {};
+        if (extended) {
+          publicEntries = GenerateEntries(dbdata, guildId!, project, workingEpisode.number);
+          if (projects[project].keyStaff) Object.values(projects[project].keyStaff).forEach(ks => { map[ks.role.abbreviation] = ks.role.title; });
+          if (nextEpisode.additionalStaff) Object.values(nextEpisode.additionalStaff).forEach(as => { map[as.role.abbreviation] = as.role.title });
+        }
+
         for (let task in nextEpisode.tasks) {
           let taskObj = nextEpisode.tasks[task];
           // Status string
-          if (taskObj.abbreviation === abbreviation) entries[taskObj.abbreviation].status = `__~~${abbreviation}~~__`;
-          else if (taskObj.done) entries[taskObj.abbreviation].status = `~~${taskObj.abbreviation}~~`;
-          else entries[taskObj.abbreviation].status = `**${taskObj.abbreviation}**`;
+          let stat = '';
+          if (taskObj.abbreviation === abbreviation) stat = `__~~${abbreviation}~~__`;
+          else if (taskObj.done) stat = `~~${taskObj.abbreviation}~~`;
+          else stat = `**${taskObj.abbreviation}**`;
+          localEntries[taskObj.abbreviation].status = stat;
+
+          if (extended) {
+            let title = (taskObj.abbreviation in map) ? map[taskObj.abbreviation] : 'Unknown';
+            publicEntries![taskObj.abbreviation].status = `${stat}: ${title}${taskObj.done ? ' *(done)*' : ''}`;
+          }
+
           if (!taskObj.done) episodeDone = false;
         }
-        status += EntriesToStatusString(entries);
+        publicStatus += localStatus;
+        if (extended) publicStatus += EntriesToStatusString(publicEntries!, '\n');
+        localStatus += EntriesToStatusString(localEntries);
         db.ref(`/Projects/${guildId}/${project}/episodes/${nextEpisodeKey!}/tasks/${nextEpisodeTaskKey!}`).update({
           abbreviation, done: true
         });
@@ -238,7 +276,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
     .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
     .setTitle(`Episode ${nextEpisode.number}`)
     .setThumbnail(projects[project].poster)
-    .setDescription(status)
+    .setDescription(!extended ? localStatus : publicStatus)
     .setTimestamp(Date.now());
   const publishChannel = client.channels.cache.get(projects[project].updateChannel);
   if (publishChannel?.isTextBased)

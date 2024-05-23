@@ -57,8 +57,13 @@ export type WeightedStatusEntry = {
   weight: number
 };
 
+export type Configuration = {
+  progressDisplay: string | undefined
+};
+
 export type DatabaseData = {
   guilds: {[key:string]: {[key:string]: Project}},
   observers: {[key:string]: {[key:string]: string[]}},
+  configuration: {[key:string]: Configuration},
   i18n: any
 };

@@ -100,6 +100,14 @@
     "roster": {
       "name": "roster",
       "description": "See who's working on an episode"
+    },
+    "configuration": {
+      "name": "configuration",
+      "description": "Guild-level configuration"
+    },
+    "progress_display": {
+      "name": "progress_display",
+      "description": "Select a progress embed type"
     }
   },
   "options": {
@@ -198,6 +206,10 @@
     "role": {
       "name": "role",
       "description": "Role to ping"
+    },
+    "embedtype": {
+      "name": "embed_type",
+      "description": "Embed type"
     }
   }
 }

@@ -28,6 +28,7 @@ import { SetWeightCmd } from "../commands/setWeight.cmd";
 import { AddObserverCmd } from "../commands/addObserver.cmd";
 import { RemoveObserverCmd } from "../commands/removeObserver.cmd";
 import { RosterCmd } from "../commands/roster.cmd";
+import { ConfigurationCmd } from "../commands/configuration.cmd";
 
 export default (client: Client, db: Database, dbdata: DatabaseData): void => {
   client.on('interactionCreate', async (interaction) => {
@@ -109,6 +110,9 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
         break;
       case 'about':
         await AboutCmd(cmdInteraction);
+        break;
+      case 'configuration':
+        await ConfigurationCmd(client, db, dbdata, cmdInteraction);
         break;
     }
   });

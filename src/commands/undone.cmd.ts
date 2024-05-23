@@ -27,21 +27,34 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
   if (!verification) return;
   const { projects, project } = InteractionData(dbdata, interaction, alias);
 
-  let status = '';
-  let entries = GenerateEntries(dbdata, guildId!, project, episode);
+  let localStatus = '';
+  let publicStatus = '';
+  let localEntries = GenerateEntries(dbdata, guildId!, project, episode);
+  let publicEntries = GenerateEntries(dbdata, guildId!, project, episode);
+
+  let extended = dbdata.configuration && dbdata.configuration[guildId!].progressDisplay && dbdata.configuration[guildId!].progressDisplay == 'Extended';
 
   for (let staff in projects[project].keyStaff) {
     let staffObj = projects[project].keyStaff[staff];
     if (staffObj.role.abbreviation === abbreviation && (staffObj.id === user.id || projects[project].owner === user.id)) {
       isValidUser = true;
       taskName = staffObj.role.title;
-      status = `❌ **${staffObj.role.title}**\n`;
+      localStatus = `❌ **${staffObj.role.title}**\n`;
     }
   }
 
   for (let ep in projects[project].episodes) {
     if (projects[project].episodes[ep].number == episode) {
       epvalue = ep;
+
+      let map: {[key:string]:string} = {};
+      if (extended) {
+        publicEntries = GenerateEntries(dbdata, guildId!, project, projects[project].episodes[ep].number);
+        if (projects[project].keyStaff) Object.values(projects[project].keyStaff).forEach(ks => { map[ks.role.abbreviation] = ks.role.title; });
+        if (projects[project].episodes[ep].additionalStaff)
+          Object.values(projects[project].episodes[ep].additionalStaff).forEach(as => { map[as.role.abbreviation] = as.role.title });
+      }
+
       for (let task in projects[project].episodes[ep].tasks) {
         let taskObj = projects[project].episodes[ep].tasks[task];
         if (taskObj.abbreviation === abbreviation) {
@@ -50,19 +63,31 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
             return fail(t('taskNotDone', { lng, abbreviation }), interaction);
         }
         // Status string
-        if (taskObj.abbreviation === abbreviation) entries[taskObj.abbreviation].status = `__${abbreviation}__`;
-        else if (taskObj.done) entries[taskObj.abbreviation].status = `~~${taskObj.abbreviation}~~`;
-        else entries[taskObj.abbreviation].status = `**${taskObj.abbreviation}**`;
+        let stat = '';
+        if (taskObj.abbreviation === abbreviation) stat = `__${abbreviation}__`;
+        else if (taskObj.done) stat = `~~${taskObj.abbreviation}~~`;
+        else stat = `**${taskObj.abbreviation}**`;
+
+        localEntries[taskObj.abbreviation].status = stat;
+
+        if (extended) {
+          let title = (taskObj.abbreviation in map) ? map[taskObj.abbreviation] : 'Unknown';
+          let suffix = taskObj.abbreviation == abbreviation ? ' (incomplete)' : taskObj.done ? ' *(done)*' : ''
+          publicEntries![taskObj.abbreviation].status = `${stat}: ${title}${suffix}`;
+        }
       }
 
-      status += EntriesToStatusString(entries);
+      publicStatus += localStatus;
+      if (extended) publicStatus += EntriesToStatusString(publicEntries!, '\n');
+      localStatus += EntriesToStatusString(localEntries);
 
       if (taskvalue == undefined) return fail(t('noSuchTask', { lng, abbreviation }), interaction);
       if (!isValidUser) { // Not key staff
         for (let addStaff in projects[project].episodes[ep].additionalStaff) {
           let addStaffObj = projects[project].episodes[ep].additionalStaff[addStaff];
           if (addStaffObj.role.abbreviation === abbreviation && (addStaffObj.id === user.id || projects[project].owner === user.id)) {
-            status = `❌ **${addStaffObj.role.title}**\n` + status;
+            localStatus = `❌ **${addStaffObj.role.title}**\n` + localStatus;
+            publicStatus = `❌ **${addStaffObj.role.title}**\n` + publicStatus;
             taskName = addStaffObj.role.title;
             isValidUser = true;
           }
@@ -98,7 +123,7 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
     .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
     .setTitle(`Episode ${episode}`)
     .setThumbnail(projects[project].poster)
-    .setDescription(status)
+    .setDescription(!extended ? localStatus : publicStatus)
     .setTimestamp(Date.now());
   const publishChannel = client.channels.cache.get(projects[project].updateChannel);
   if (publishChannel?.isTextBased)

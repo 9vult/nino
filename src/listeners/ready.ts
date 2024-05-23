@@ -590,7 +590,7 @@ export default (client: Client, dbdata: DatabaseData): void => {
           .setRequired(true)
       )
 
-    const addObserver = new SlashCommandBuilder()
+    const addObserverCmd = new SlashCommandBuilder()
       .setName('addobserver')
       .setDescription('Add a server to observe this project')
       .setNameLocalizations(GetNames(d, 'commands', 'addobserver'))
@@ -625,7 +625,7 @@ export default (client: Client, dbdata: DatabaseData): void => {
           .setRequired(false)
       );
 
-    const removeObserver = new SlashCommandBuilder()
+    const removeObserverCmd = new SlashCommandBuilder()
       .setName('removeobserver')
       .setDescription('Remove a server observing this project')
       .setNameLocalizations(GetNames(d, 'commands', 'removeobserver'))
@@ -693,6 +693,29 @@ export default (client: Client, dbdata: DatabaseData): void => {
           .setRequired(false)
       );
 
+    const configurationCmd = new SlashCommandBuilder()
+      .setName('configuration')
+      .setDescription('Guild-level configuration')
+      .setNameLocalizations(GetNames(d, 'commands', 'configuration'))
+      .setDescriptionLocalizations(GetDescs(d, 'commands', 'configuration'))
+      .addSubcommand(s => 
+        s.setName('progress_display')
+        .setDescription('Select a progress embed type')
+        .setNameLocalizations(GetNames(d, 'commands', 'progress_display'))
+        .setDescriptionLocalizations(GetDescs(d, 'commands', 'progress_display'))
+        .addStringOption(o =>
+          o.setName('embed_type')
+            .setDescription('Embed type')
+            .setNameLocalizations(GetNames(d, 'options', 'embed_type'))
+            .setDescriptionLocalizations(GetDescs(d, 'options', 'embed_type'))
+            .setRequired(true)
+            .addChoices(
+              { name: 'Normal', value: 'Normal' },
+              { name: 'Extended', value: 'Extended' }
+            )
+        )
+      );
+
     client.application.commands.create(helpCmd);
     client.application.commands.create(aboutCmd);
     client.application.commands.create(newProjectCmd);
@@ -716,8 +739,9 @@ export default (client: Client, dbdata: DatabaseData): void => {
     client.application.commands.create(blameCmd);
     client.application.commands.create(rosterCmd);
     client.application.commands.create(releaseCmd);
-    client.application.commands.create(addObserver);
-    client.application.commands.create(removeObserver);
+    client.application.commands.create(addObserverCmd);
+    client.application.commands.create(removeObserverCmd);
+    client.application.commands.create(configurationCmd);
 
     console.log('Nino is ready to go!');
   });

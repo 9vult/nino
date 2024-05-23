@@ -31,7 +31,7 @@ const client = new Client({
 });
 export const CLIENT: Client = client;
 
-let dbdata: DatabaseData = { guilds: {}, observers: {}, i18n: {}};
+let dbdata: DatabaseData = { guilds: {}, observers: {}, configuration: {}, i18n: {}};
 
 db.ref('/Projects').on("value", function(data: {[key:string]:any}) {
   dbdata.guilds = data.val();
@@ -39,6 +39,10 @@ db.ref('/Projects').on("value", function(data: {[key:string]:any}) {
 
 db.ref('/Observers').on("value", function(data: {[key:string]:any}) {
   dbdata.observers = data.val();
+});
+
+db.ref('/Configuration').on("value", function(data: {[key:string]:any}) {
+  dbdata.configuration = data.val();
 });
 
 dbdata.i18n = LoadCmdI18Ns();
