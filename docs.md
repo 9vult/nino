@@ -172,6 +172,31 @@ Remove an observer server.
 | project | yes | string | Project nickname |
 | guild | yes | string | ID of the guild to remove |
 
+### addadmin
+
+Add a user as an administrator for the project. Project administrators have access to most of the commands traditionally relegated to the owner, except:
+
+- [/addadmin](#addadmin)
+- [/addobserver](#addobserver)
+- [/deleteproject](#deleteproject)
+- [/transferownership](#transferownership)
+- [/removeadmin](#removeadmin)
+- [/removeobserver](#removeobserver)
+
+| Parameter | Required | Type | Description |
+|-----------|----------|------|-------------|
+| project | yes | string | Project nickname |
+| member | yes | user | User to add as an admin |
+
+### removeadmin
+
+Remove an administrator from the project.
+
+| Parameter | Required | Type | Description |
+|-----------|----------|------|-------------|
+| project | yes | string | Project nickname |
+| member | yes | user | User to remove |
+
 ### transferownership
 
 Transfer ownership of the project to someone else.
@@ -209,6 +234,19 @@ Options:
 | AirTime24h | time | 24-hour air time (Japan time) of episodes (ex: `16:30`) |
 | UpdateChannelID | string | ID of channel to post updates in |
 | ReleaseChannelID | string | ID of channel to post releases in |
+
+### configuration
+
+Subcommands for server configuration
+
+#### progress_display
+
+Options:
+
+| Option | Description |
+|--------|-------------|
+| Normal | Progress display will use abbreviations |
+| Extended | Progress display will mimic [/done with the `explain` toggle enabled](#done)  |
 
 ## Commands - Progress
 
