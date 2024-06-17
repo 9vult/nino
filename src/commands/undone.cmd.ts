@@ -32,7 +32,7 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
   let localEntries = GenerateEntries(dbdata, guildId!, project, episode);
   let publicEntries = GenerateEntries(dbdata, guildId!, project, episode);
 
-  let extended = dbdata.configuration && dbdata.configuration[guildId!].progressDisplay && dbdata.configuration[guildId!].progressDisplay == 'Extended';
+  let extended = dbdata.configuration && dbdata.configuration[guildId!] && dbdata.configuration[guildId!].progressDisplay && dbdata.configuration[guildId!].progressDisplay == 'Extended';
 
   for (let staff in projects[project].keyStaff) {
     let staffObj = projects[project].keyStaff[staff];

@@ -42,7 +42,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   if (!verification) return;
   const { projects, project } = InteractionData(dbdata, interaction, alias);
 
-  let extended = dbdata.configuration && dbdata.configuration[guildId!].progressDisplay && dbdata.configuration[guildId!].progressDisplay == 'Extended';
+  let extended = dbdata.configuration && dbdata.configuration[guildId!] && dbdata.configuration[guildId!].progressDisplay && dbdata.configuration[guildId!].progressDisplay == 'Extended';
 
   // Find selected episode or current working episode
   let success = false;
