@@ -18,7 +18,7 @@ export const AddObserverCmd = async (client: Client, db: Database, dbdata: Datab
   const updatesWH: string | null = options.getString('updates');
   const relesesWH: string | null = options.getString('releases');
 
-  let verification = await VerifyInteraction(dbdata, interaction, alias);
+  let verification = await VerifyInteraction(dbdata, interaction, alias, true, true); // exclude admins
   if (!verification) return;
   const { project } = InteractionData(dbdata, interaction, alias);
 

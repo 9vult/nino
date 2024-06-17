@@ -41,7 +41,8 @@ export const NewProjectCmd = async (client: Client, db: Database, dbdata: Databa
     airTime: '00:00',
     updateChannel,
     releaseChannel,
-    observers: []
+    observers: [],
+    administrators: []
   };
   ref.set(newProj);
 

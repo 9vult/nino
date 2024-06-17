@@ -15,7 +15,7 @@ export const TransferOwnershipCmd = async (client: Client, db: Database, dbdata:
   const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!);
   const staff = (options.getMember('member')! as GuildMember).id;
 
-  let verification = await VerifyInteraction(dbdata, interaction, alias);
+  let verification = await VerifyInteraction(dbdata, interaction, alias, true, true); // exclude admins
   if (!verification) return;
   const { project } = InteractionData(dbdata, interaction, alias);
 

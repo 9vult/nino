@@ -17,6 +17,8 @@
   "removeEpisode": "I removed episode {{number, number}} from `{{project}}` for you.",
   "addObserver": "I added the observer {{observingGuild}} to `{{project}}` for you.",
   "removeObserver": "I removed the observer {{observingGuild}} from `{{project}}` for you.",
+  "addAdmin": "Added {{- staff}} as an administrator for `{{project}}`.",
+  "removeAdmin": "I removed {{- staff}}'s administrator privileges for `{{project}}`.",
   "addStaff": "Added {{- staff}} for position {{abbreviation}}.",
   "removeStaff": "Removed position {{abbreviation}} from the project.",
   "blameFailure": "The project is complete, or the specified episode could not be found.",

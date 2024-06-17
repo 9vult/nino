@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, Client, EmbedBuilder } from "discord.js";
+import { ChatInputCommandInteraction, Client, EmbedBuilder, GuildMember } from "discord.js";
 import { generateAllowedMentions } from "../actions/generateAllowedMentions.action";
 import { DatabaseData } from "../misc/types";
 import { Database } from "@firebase/database-types";
@@ -6,23 +6,27 @@ import { GetAlias } from "../actions/getalias.action";
 import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 import { t } from "i18next";
 
-export const DeleteProjectCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
+export const RemoveAdminCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
   const { options, guildId, locale: lng } = interaction;
+  if (guildId == null) return;
 
   await interaction.deferReply();
 
   const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!);
+  const staff = (options.getMember('member')! as GuildMember).id;
 
   let verification = await VerifyInteraction(dbdata, interaction, alias, true, true); // exclude admins
   if (!verification) return;
-  const { project } = InteractionData(dbdata, interaction, alias);
+  const { projects, project } = InteractionData(dbdata, interaction, alias);
 
-  db.ref(`/Projects/${guildId}/${project}`).remove();
+  const ref = db.ref(`/Projects/`).child(`${guildId}`).child(`${project}`);
+  ref.update({ administrators: projects[project].administrators.filter(a => a !== staff) });
 
+  const staffMention = `<@${staff}>`;
   const embed = new EmbedBuilder()
-    .setTitle(t('projectDeletionTitle', { lng }))
-    .setDescription(t('deleteProject', { lng, project }))
+    .setTitle(t('projectModificationTitle', { lng }))
+    .setDescription(t('removeAdmin', { lng, staff: staffMention, project }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

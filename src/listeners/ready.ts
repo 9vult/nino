@@ -646,6 +646,48 @@ export default (client: Client, dbdata: DatabaseData): void => {
           .setRequired(true)
       );
 
+    const addAdminCmd = new SlashCommandBuilder()
+      .setName('addadmin')
+      .setDescription('Add an administrator to this project')
+      .setNameLocalizations(GetNames(d, 'commands', 'addadmin'))
+      .setDescriptionLocalizations(GetDescs(d, 'commands', 'addadmin'))
+      .addStringOption(o =>
+        o.setName('project')
+          .setDescription('Project name')
+          .setNameLocalizations(GetNames(d, 'options', 'project'))
+          .setDescriptionLocalizations(GetDescs(d, 'options', 'project'))
+          .setRequired(true)
+          .setAutocomplete(true)
+      )
+      .addUserOption(o =>
+        o.setName('member')
+          .setDescription('Staff member')
+          .setNameLocalizations(GetNames(d, 'options', 'member'))
+          .setDescriptionLocalizations(GetDescs(d, 'options', 'member'))
+          .setRequired(true)
+      );
+
+    const removeAdminCmd = new SlashCommandBuilder()
+      .setName('removeadmin')
+      .setDescription('Remove an administrator from this project')
+      .setNameLocalizations(GetNames(d, 'commands', 'removeadmin'))
+      .setDescriptionLocalizations(GetDescs(d, 'commands', 'removeadmin'))
+      .addStringOption(o =>
+        o.setName('project')
+          .setDescription('Project name')
+          .setNameLocalizations(GetNames(d, 'options', 'project'))
+          .setDescriptionLocalizations(GetDescs(d, 'options', 'project'))
+          .setRequired(true)
+          .setAutocomplete(true)
+      )
+      .addUserOption(o =>
+        o.setName('member')
+          .setDescription('Staff member')
+          .setNameLocalizations(GetNames(d, 'options', 'member'))
+          .setDescriptionLocalizations(GetDescs(d, 'options', 'member'))
+          .setRequired(true)
+      );
+
     const releaseCmd = new SlashCommandBuilder()
       .setName('release')
       .setDescription('Release!')
@@ -741,6 +783,8 @@ export default (client: Client, dbdata: DatabaseData): void => {
     client.application.commands.create(releaseCmd);
     client.application.commands.create(addObserverCmd);
     client.application.commands.create(removeObserverCmd);
+    client.application.commands.create(addAdminCmd);
+    client.application.commands.create(removeAdminCmd);
     client.application.commands.create(configurationCmd);
 
     console.log('Nino is ready to go!');

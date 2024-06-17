@@ -17,7 +17,7 @@ export const RemoveObserverCmd = async (client: Client, db: Database, dbdata: Da
   const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!);
   const observingGuild = options.getString('guild')!;
 
-  let verification = await VerifyInteraction(dbdata, interaction, alias);
+  let verification = await VerifyInteraction(dbdata, interaction, alias, true, true); // exclude admins
   if (!verification) return;
   const { projects, project } = InteractionData(dbdata, interaction, alias);
 

@@ -3,7 +3,7 @@ import { DatabaseData } from "../misc/types";
 import { fail } from "./fail.action";
 import { t } from "i18next";
 
-export const VerifyInteraction = async (dbdata: DatabaseData, interaction: ChatInputCommandInteraction, project: string | undefined, checkOwner: boolean = true) => {
+export const VerifyInteraction = async (dbdata: DatabaseData, interaction: ChatInputCommandInteraction, project: string | undefined, checkOwner: boolean = true, excludeAdmins: boolean = false) => {
   const { user, guildId, locale: lng } = interaction;
   if (guildId == null || !(guildId in dbdata.guilds))
     return await fail(t('noSuchGuild', { lng, guildId }), interaction);
@@ -15,7 +15,14 @@ export const VerifyInteraction = async (dbdata: DatabaseData, interaction: ChatI
   
   if (!checkOwner) return true;
   
-  if (projects[project].owner !== user!.id)
+  const isAdmin = projects[project].administrators && projects[project].administrators.includes(user!.id);
+  const isOwner = projects[project].owner == user!.id;
+  
+  // Only owner allowed
+  if (excludeAdmins && !isOwner)
+    return await fail(t('permissionDenied', { lng }), interaction);
+  // Owner and admins allowed
+  if (!isAdmin && !isOwner)
     return await fail(t('permissionDenied', { lng }), interaction);
 
   return true;

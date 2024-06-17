@@ -14,7 +14,8 @@ export interface Project {
   airTime: string, // '14:30'
   updateChannel: string,
   releaseChannel: string,
-  observers: Observer[]
+  observers: Observer[],
+  administrators: string[]
 };
 
 export interface Episode {

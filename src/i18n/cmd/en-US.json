@@ -93,6 +93,14 @@
       "name": "removeobserver",
       "description": "Remove a server observing this project"
     },
+    "addadmin": {
+      "name": "addadmin",
+      "description": "Add an administrator to this project"
+    },
+    "removeadmin": {
+      "name": "removeadmin",
+      "description": "Remove an administrator from this project"
+    },
     "release": {
       "name": "release",
       "description": "Release!"

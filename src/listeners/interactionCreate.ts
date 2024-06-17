@@ -29,6 +29,8 @@ import { AddObserverCmd } from "../commands/addObserver.cmd";
 import { RemoveObserverCmd } from "../commands/removeObserver.cmd";
 import { RosterCmd } from "../commands/roster.cmd";
 import { ConfigurationCmd } from "../commands/configuration.cmd";
+import { AddAdminCmd } from "../commands/addAdmin.cmd";
+import { RemoveAdminCmd } from "../commands/removeAdmin.cmd";
 
 export default (client: Client, db: Database, dbdata: DatabaseData): void => {
   client.on('interactionCreate', async (interaction) => {
@@ -104,6 +106,12 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
         break;
       case 'removeobserver':
         await RemoveObserverCmd(client, db, dbdata, cmdInteraction);
+        break;
+      case 'addadmin':
+        await AddAdminCmd(client, db, dbdata, cmdInteraction);
+        break;
+      case 'removeadmin':
+        await RemoveAdminCmd(client, db, dbdata, cmdInteraction);
         break;
       case 'help':
         await HelpCmd(cmdInteraction);
