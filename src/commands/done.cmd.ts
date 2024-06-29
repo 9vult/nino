@@ -272,6 +272,27 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   else
     await interaction.followUp({ embeds: [replyEmbed], allowedMentions: generateAllowedMentions([[], []]) });
 
+  // If the episode is done, check if the project as a whole is complete
+  if (episodeDone) {
+    let projectComplete = true;
+    for (let ep in projects[project].episodes) {
+      let projObj = projects[project].episodes[ep];
+      if (projObj.number != workingEpisode.number && !projObj.done) {
+        projectComplete = false;
+        break;
+      }
+    }    
+    if (projectComplete) {
+      db.ref(`/Projects/${guildId}/${project}`).update({ done: true });
+      const completeEmbed = new EmbedBuilder()
+        .setTitle(`${t('youDidItTitle', { lng })}`)
+        .setDescription(`${t('youDidItBody', { lng, title: projects[project].title })}`)
+        .setColor(0xd797ff)
+        .setTimestamp(Date.now());
+      await interaction.channel?.send({ embeds: [completeEmbed], allowedMentions: generateAllowedMentions([[], []]) });
+    }
+  }
+
   const publishEmbed = new EmbedBuilder()
     .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
     .setTitle(`Episode ${nextEpisode.number}`)

@@ -64,5 +64,7 @@
   "updated": "Last updated {{- rel}}",
   "estimate": "Estimate",
   "notAdmin": "You must be an administrator to perform this action!",
-  "projectCreationHint": "I created project `{{nickname}}` for you.\nDo remember to add staff/positions, though."
+  "projectCreationHint": "I created project `{{nickname}}` for you.\nDo remember to add staff/positions, though.",
+  "youDidItTitle": "You did it!",
+  "youDidItBody": "**{{title}}** is complete.\nGreat job to everyone involved!"
 }
