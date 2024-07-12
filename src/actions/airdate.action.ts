@@ -8,7 +8,14 @@ export const AirDate = async (anidb: string, airTime: string | undefined, episod
   const cid = process.env.ANIDB_API_CLIENT_NAME;
   const baseUrl = `http://api.anidb.net:9001/httpapi?client=${cid}&clientver=1&protover=1&request=anime&aid=${anidb}`;
 
-  const response = await fetch(baseUrl);
+  let response: Response = new Response();
+
+  try {
+    response = await fetch(baseUrl);
+  } catch (err) {
+    return t('anidbApiError', { lng });
+  }
+
   if (!response.ok) return t('anidbApiError', { lng });
   let resptext = await response.text();
   if (!resptext) return t('anidbResponseEmpty', { lng });
