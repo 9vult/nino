@@ -9,7 +9,7 @@ import { t } from "i18next";
 
 export const RemoveObserverCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
-  const { options, guildId, locale: lng } = interaction;
+  const { options, guildId, user, locale: lng } = interaction;
   if (guildId == null) return;
 
   await interaction.deferReply();
@@ -17,7 +17,7 @@ export const RemoveObserverCmd = async (client: Client, db: Database, dbdata: Da
   const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!);
   const observingGuild = options.getString('guild')!;
 
-  let verification = await VerifyInteraction(dbdata, interaction, alias, true, true); // exclude admins
+  let verification = await VerifyInteraction(dbdata, interaction, alias, false, false);
   if (!verification) return;
   const { projects, project } = InteractionData(dbdata, interaction, alias);
 
@@ -25,6 +25,10 @@ export const RemoveObserverCmd = async (client: Client, db: Database, dbdata: Da
   for (let observerid in projects[project].observers) {
     const observer = projects[project].observers[observerid];
     if (observer.guildId == observingGuild) {
+      if (observer.managerid !== `${user.id}` && projects[project].owner !== `${user.id}`) {
+        return await fail(t('permissionDenied', { lng }), interaction);
+      }
+
       success = true;
       db.ref(`/Projects/`).child(`${guildId}`).child(`${project}`).child('observers').child(observerid).remove();
 

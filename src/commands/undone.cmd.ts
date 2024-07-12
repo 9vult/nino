@@ -134,7 +134,8 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
       const observer = projects[project].observers[observerid];
       if (!observer.updatesWebhook) continue;
       try {
-        fetch(observer.updatesWebhook, {
+        const url = new URL(observer.updatesWebhook);
+        fetch(url, {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({
@@ -145,7 +146,7 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
           })
         });
       } catch {
-        interaction.channel?.send(`Webhook ${observer.updatesWebhook} failed.`);
+        interaction.channel?.send(`Webhook ${observer.updatesWebhook} from ${observer.guildId} failed.`);
       }
     }
 }

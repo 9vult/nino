@@ -8,7 +8,7 @@ import { t } from "i18next";
 
 export const AddObserverCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
-  const { options, guildId, locale: lng } = interaction;
+  const { options, guildId, user, locale: lng } = interaction;
   if (guildId == null) return;
 
   await interaction.deferReply();
@@ -18,12 +18,13 @@ export const AddObserverCmd = async (client: Client, db: Database, dbdata: Datab
   const updatesWH: string | null = options.getString('updates');
   const relesesWH: string | null = options.getString('releases');
 
-  let verification = await VerifyInteraction(dbdata, interaction, alias, true, true); // exclude admins
+  let verification = await VerifyInteraction(dbdata, interaction, alias, false, false);
   if (!verification) return;
+
   const { project } = InteractionData(dbdata, interaction, alias);
 
   db.ref(`/Projects/`).child(`${guildId}`).child(`${project}`).child('observers')
-    .push({ guildId: observingGuild, updatesWebhook: updatesWH, releasesWebhook: relesesWH });
+    .push({ guildId: observingGuild, updatesWebhook: updatesWH, releasesWebhook: relesesWH, managerid: `${user.id}` });
 
   const ref = db.ref(`/Observers`).child(`${observingGuild}`);
   if (dbdata.observers 
@@ -44,5 +45,7 @@ export const AddObserverCmd = async (client: Client, db: Database, dbdata: Datab
     .setTitle(t('projectModificationTitle', { lng }))
     .setDescription(t('addObserver', { lng, observingGuild, project }))
     .setColor(0xd797ff);
-  await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
+  
+  (await interaction.editReply("OK")).delete(); // Remove any webhook URLs from the log
+  await interaction.channel?.send({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

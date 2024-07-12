@@ -44,6 +44,7 @@ export type Task = {
 
 export type Observer = {
   guildId: string,
+  managerid: string,
   updatesWebhook: string | undefined,
   releasesWebhook: string | undefined
 };

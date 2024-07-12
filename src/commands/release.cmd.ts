@@ -51,7 +51,8 @@ export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseD
     const observer = projects[project].observers[observerid];
     if (!observer.releasesWebhook) continue;
     try {
-      fetch(observer.releasesWebhook, {
+      const url = new URL(observer.releasesWebhook);
+      fetch(url, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
@@ -61,7 +62,7 @@ export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseD
         })
       });
     } catch {
-      interaction.channel?.send(`Webhook ${observer.releasesWebhook} failed.`);
+      interaction.channel?.send(`Webhook ${observer.releasesWebhook} from ${observer.guildId} failed.`);
     }
   }
 }
