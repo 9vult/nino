@@ -1,40 +1,44 @@
-import { ChatInputCommandInteraction, Client, EmbedBuilder } from "discord.js";
+import { ChatInputCommandInteraction, Client, EmbedBuilder, GuildMember, PermissionsBitField } from "discord.js";
 import { generateAllowedMentions } from "../actions/generateAllowedMentions.action";
-import { DatabaseData } from "../misc/types";
+import { DatabaseData, ObservedProject } from "../misc/types";
 import { fail } from "../actions/fail.action";
 import { Database } from "@firebase/database-types";
 import { GetAlias } from "../actions/getalias.action";
-import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 import { t } from "i18next";
 
 export const RemoveObserverCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
-  const { options, guildId, user, locale: lng } = interaction;
-  if (guildId == null) return;
+  const { options, member, guildId: observingGuildId, user, locale: lng } = interaction;
+  if (observingGuildId == null) return;
 
   await interaction.deferReply();
 
-  const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!);
-  const observingGuild = options.getString('guild')!;
+  if (!(member as GuildMember)?.permissions.has(PermissionsBitField.Flags.Administrator)) {
+    return fail(t('notAdmin', { lng }), interaction);
+  }
 
-  let verification = await VerifyInteraction(dbdata, interaction, alias, false, false);
-  if (!verification) return;
-  const { projects, project } = InteractionData(dbdata, interaction, alias);
+  const originGuildId = options.getString('guild')!;
+  const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!, originGuildId);
+
+  if (originGuildId == null || !(originGuildId in dbdata.guilds))
+    return await fail(t('noSuchGuild', { lng, guildId: originGuildId }), interaction);
+ 
+  let projects = dbdata.guilds[originGuildId];
+    if (!alias || !(alias in projects))
+      return await fail(t('noSuchProject', { lng }), interaction);
+
+  const project = alias;
 
   let success = false;
   for (let observerid in projects[project].observers) {
     const observer = projects[project].observers[observerid];
-    if (observer.guildId == observingGuild) {
-      if (observer.managerid !== `${user.id}` && projects[project].owner !== `${user.id}`) {
-        return await fail(t('permissionDenied', { lng }), interaction);
-      }
-
+    if (observer.guildId == observingGuildId) {
       success = true;
-      db.ref(`/Projects/`).child(`${guildId}`).child(`${project}`).child('observers').child(observerid).remove();
+      db.ref(`/Projects/`).child(`${originGuildId}`).child(`${project}`).child('observers').child(observerid).remove();
 
-      const ref = db.ref(`/Observers`).child(`${observingGuild}`);
-      let data: {[key:string]:string[]} = {};
-      data[guildId] = dbdata.observers[observingGuild][guildId].filter(o => o !== project);
+      const ref = db.ref(`/Observers`).child(`${observingGuildId}`);
+      let data: {[key:string]:ObservedProject[]} = {};
+      data[originGuildId] = dbdata.observers[observingGuildId][originGuildId].filter(o => o.name !== project);
       ref.update(data);
     }
   }
@@ -43,7 +47,7 @@ export const RemoveObserverCmd = async (client: Client, db: Database, dbdata: Da
 
   const embed = new EmbedBuilder()
     .setTitle(t('projectModificationTitle', { lng }))
-    .setDescription(t('removeObserver', { lng, observingGuild, project }))
+    .setDescription(t('removeObserver', { lng, originGuildId, project }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

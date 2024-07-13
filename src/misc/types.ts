@@ -49,6 +49,11 @@ export type Observer = {
   releasesWebhook: string | undefined
 };
 
+export type ObservedProject = {
+  name: string,
+  blame: boolean
+};
+
 export type ObserverAliasResult = {
   guildId: string | undefined,
   project: string | undefined
@@ -65,7 +70,7 @@ export type Configuration = {
 
 export type DatabaseData = {
   guilds: {[key:string]: {[key:string]: Project}},
-  observers: {[key:string]: {[key:string]: string[]}},
+  observers: {[key:string]: {[key:string]: ObservedProject[]}},
   configuration: {[key:string]: Configuration},
   i18n: any
 };

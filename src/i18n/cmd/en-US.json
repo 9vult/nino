@@ -87,11 +87,11 @@
     },
     "addobserver": {
       "name": "addobserver",
-      "description": "Add a server to observe this project"
+      "description": "Observe a project on another server"
     },
     "removeobserver": {
       "name": "removeobserver",
-      "description": "Remove a server observing this project"
+      "description": "Observe a project on another server"
     },
     "addadmin": {
       "name": "addadmin",
@@ -218,6 +218,10 @@
     "embedtype": {
       "name": "embed_type",
       "description": "Embed type"
+    },
+    "blame": {
+      "name": "blame",
+      "description": "Populate /blame with this project"
     }
   }
 }

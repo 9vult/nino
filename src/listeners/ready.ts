@@ -592,23 +592,29 @@ export default (client: Client, dbdata: DatabaseData): void => {
 
     const addObserverCmd = new SlashCommandBuilder()
       .setName('addobserver')
-      .setDescription('Add a server to observe this project')
+      .setDescription('Observe a project on another server')
       .setNameLocalizations(GetNames(d, 'commands', 'addobserver'))
       .setDescriptionLocalizations(GetDescs(d, 'commands', 'addobserver'))
-      .addStringOption(o =>
-        o.setName('project')
-          .setDescription('Project name')
-          .setNameLocalizations(GetNames(d, 'options', 'project'))
-          .setDescriptionLocalizations(GetDescs(d, 'options', 'project'))
-          .setRequired(true)
-          .setAutocomplete(true)
-      )
       .addStringOption(o =>
         o.setName('guild')
           .setDescription('Guild ID')
           .setNameLocalizations(GetNames(d, 'options', 'guild'))
           .setDescriptionLocalizations(GetDescs(d, 'options', 'guild'))
           .setRequired(true)
+      )
+      .addStringOption(o =>
+        o.setName('project')
+          .setDescription('Project name')
+          .setNameLocalizations(GetNames(d, 'options', 'project'))
+          .setDescriptionLocalizations(GetDescs(d, 'options', 'project'))
+          .setRequired(true)
+      )
+      .addBooleanOption(o =>
+        o.setName('blame')
+        .setDescription('Populate /blame with this project')
+        .setNameLocalizations(GetNames(d, 'options', 'blame'))
+        .setDescriptionLocalizations(GetDescs(d, 'options', 'blame'))
+        .setRequired(true)
       )
       .addStringOption(o =>
         o.setName('updates')
@@ -627,22 +633,21 @@ export default (client: Client, dbdata: DatabaseData): void => {
 
     const removeObserverCmd = new SlashCommandBuilder()
       .setName('removeobserver')
-      .setDescription('Remove a server observing this project')
+      .setDescription('Observe a project on another server')
       .setNameLocalizations(GetNames(d, 'commands', 'removeobserver'))
       .setDescriptionLocalizations(GetDescs(d, 'commands', 'removeobserver'))
-      .addStringOption(o =>
-        o.setName('project')
-          .setDescription('Project name')
-          .setNameLocalizations(GetNames(d, 'options', 'project'))
-          .setDescriptionLocalizations(GetDescs(d, 'options', 'project'))
-          .setRequired(true)
-          .setAutocomplete(true)
-      )
       .addStringOption(o =>
         o.setName('guild')
           .setDescription('Guild ID')
           .setNameLocalizations(GetNames(d, 'options', 'guild'))
           .setDescriptionLocalizations(GetDescs(d, 'options', 'guild'))
+          .setRequired(true)
+      )
+      .addStringOption(o =>
+        o.setName('project')
+          .setDescription('Project name')
+          .setNameLocalizations(GetNames(d, 'options', 'project'))
+          .setDescriptionLocalizations(GetDescs(d, 'options', 'project'))
           .setRequired(true)
       );
 

@@ -154,23 +154,24 @@ Remove an alias from the project.
 
 ### addobserver
 
-Permit another server to "observe" the project. All aliases for the project will be shown as options in the `/blame` autocomplete list in the observer server. Additionally, webhooks can be assigned, allowing for updates and releases to be distributed in many servers. **Note: webhook messages will not include role pings.**
+Observe a project from another server. Server administrators can use this command. **Note: webhook messages will not include role pings.**
 
 | Parameter | Required | Type | Description |
 |-----------|----------|------|-------------|
-| project | yes | string | Project nickname |
-| guild | yes | string | ID of the guild observing the project |
+| guild | yes | string | ID of the guild you want to observe |
+| project | yes | string | Nickname of the project you want to observe |
+| blame | yes | boolean | Whether to populate `/blame` with this project's aliases |
 | updates | no | string<URL> | Webhook URL for project updates |
 | releases | no | string<URL> | Webhook URL for project releases |
 
 ### removeobserver
 
-Remove an observer server.
+Remove an observed project. Server administrators can use this command.
 
 | Parameter | Required | Type | Description |
 |-----------|----------|------|-------------|
-| project | yes | string | Project nickname |
 | guild | yes | string | ID of the guild to remove |
+| project | yes | string | Project nickname |
 
 ### addadmin
 

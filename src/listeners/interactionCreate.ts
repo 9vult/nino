@@ -135,18 +135,36 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
         case 'project': {
           if (guildId === null || (!(guildId in dbdata.guilds) && !(guildId in dbdata.observers))) break;
           let aliases: string[] = [];
-          const guilds = (commandName === 'blame' && guildId in dbdata.observers) 
-            ? [guildId, ...Object.keys(dbdata.observers[guildId])] : [guildId];
-          for (let curGuildId of guilds) {
-            if (!(curGuildId in dbdata.guilds)) continue;
-            let projects = dbdata.guilds[curGuildId];
+
+          // own guild
+          if ((guildId in dbdata.guilds)) {
+            let projects = dbdata.guilds[guildId];
             const newAliases = Object.values(projects).reduce((acc, cur) => {
               acc.push(cur.nickname);
               if (cur.aliases) acc.push(...cur.aliases);
               return acc;
-            }, [] as string[])
+            }, [] as string[]);
             aliases = [...aliases, ...newAliases];
           }
+
+          // Observing guilds
+          if (commandName === 'blame' && guildId in dbdata.observers) {
+            const guilds = Object.keys(dbdata.observers[guildId]);
+            for (let curGuildId of guilds) {
+              if (!(curGuildId in dbdata.guilds)) continue;
+
+              let observedProjects = (dbdata.observers[guildId][curGuildId]).filter((p) => p.blame).map(p => p.name);
+              let projects = Object.values(dbdata.guilds[curGuildId]).filter(p => observedProjects.includes(p.nickname));
+
+              const newAliases = Object.values(projects).reduce((acc, cur) => {
+                acc.push(cur.nickname);
+                if (cur.aliases) acc.push(...cur.aliases);
+                return acc;
+              }, [] as string[]);
+              aliases = [...aliases, ...newAliases];
+            }
+          }
+          
           choices = aliases.filter(choice => choice.startsWith(focusedOption.value));
           await interaction.respond(choices.map(choice => ({ name: choice, value: choice })).slice(0, 25));
           return;
