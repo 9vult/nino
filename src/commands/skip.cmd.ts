@@ -101,4 +101,25 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
   const publishChannel = client.channels.cache.get(projects[project].updateChannel);
   if (publishChannel?.isTextBased)
     (publishChannel as TextChannel).send({ embeds: [publishEmbed] })
+
+  if (!projects[project].observers) return; // Stop here if there's no observers
+    for (let observerid in projects[project].observers) {
+      const observer = projects[project].observers[observerid];
+      if (!observer.updatesWebhook) continue;
+      try {
+        const postUrl = new URL(observer.updatesWebhook);
+          fetch(postUrl, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            username: 'Nino',
+            avatar_url: 'https://i.imgur.com/PWtteaY.png',
+            content: '',
+            embeds: [publishEmbed.toJSON()]
+          })
+        });
+      } catch {
+        interaction.channel?.send(`Webhook ${observer.updatesWebhook} from ${observer.guildId} failed.`);
+      }
+    }
 }

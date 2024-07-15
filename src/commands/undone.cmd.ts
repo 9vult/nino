@@ -134,8 +134,8 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
       const observer = projects[project].observers[observerid];
       if (!observer.updatesWebhook) continue;
       try {
-        const url = new URL(observer.updatesWebhook);
-        fetch(url, {
+        const postUrl = new URL(observer.updatesWebhook);
+        fetch(postUrl, {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({
