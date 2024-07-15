@@ -99,8 +99,11 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
     .setDescription(status)
     .setTimestamp(Date.now());
   const publishChannel = client.channels.cache.get(projects[project].updateChannel);
-  if (publishChannel?.isTextBased)
+
+  if (publishChannel?.isTextBased) {
     (publishChannel as TextChannel).send({ embeds: [publishEmbed] })
+    .catch(err => console.error(err));
+  }
 
   if (!projects[project].observers) return; // Stop here if there's no observers
     for (let observerid in projects[project].observers) {

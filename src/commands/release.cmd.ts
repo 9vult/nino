@@ -39,12 +39,16 @@ export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseD
 
   const publishBody = `**${projects[project].title} - ${type} ${publishNumber}**\n${publishRole}${url}`;
   const publishChannel = client.channels.cache.get(projects[project].releaseChannel);
-  if (publishChannel?.isTextBased)
+
+  if (publishChannel?.isTextBased) {
     (publishChannel as TextChannel).send(publishBody)
     .then((msg) => {
       if (msg.channel.type === ChannelType.GuildAnnouncement)
-        msg.crosspost().catch(console.error);
-    });
+      msg.crosspost().catch(console.error);
+    })
+    .catch(err => console.error(err));
+  }
+
 
   if (!projects[project].observers) return; // Stop here if there's no observers
   for (let observerid in projects[project].observers) {
