@@ -3,225 +3,225 @@
   "commands": {
     "help": {
       "name": "help",
-      "description": "Nino Help"
+      "description": "Ohjeita Ninon käyttöön"
     },
     "about": {
       "name": "about",
-      "description": "About Nino"
+      "description": "Tietoa Ninosta"
     },
     "newproject": {
       "name": "newproject",
-      "description": "Create a new project"
+      "description": "Luo uusi projekti"
     },
     "addstaff": {
       "name": "addstaff",
-      "description": "Add staff to a project"
+      "description": "Lisää projektiin pääasiallinen tekijärooli"
     },
     "removestaff": {
       "name": "removestaff",
-      "description": "Remove staff from a project"
+      "description": "Poista projektista pääasiallinen tekijärooli"
     },
     "setweight": {
       "name": "setweight",
-      "description": "Set the weight of a Key Staff position"
+      "description": "Aseta pääasiallisen tekijäroolin paino (pienempi = korkeammalla)"
     },
     "swapstaff": {
       "name": "swapstaff",
-      "description": "Swap staff into a project"
+      "description": "Vaihda projektin pääasiallisia tekijöitä"
     },
     "addadditionalstaff": {
       "name": "addadditionalstaff",
-      "description": "Add additional staff to an episode"
+      "description": "Lisää jaksolle ylimääräinen tekijärooli"
     },
     "removeadditionalstaff": {
       "name": "removeadditionalstaff",
-      "description": "Remove additional staff from an episode"
+      "description": "Poista jaksolta ylimääräinen tekijärooli"
     },
     "swapadditionalstaff": {
       "name": "swapadditionalstaff",
-      "description": "Swap additional staff into an episode"
+      "description": "Vaihda jakson ylimääräisiä tekijöitä"
     },
     "transferownership": {
       "name": "transferownership",
-      "description": "Transfer project ownership to someone else"
+      "description": "Siirrä projektin omistajuus toiselle käyttäjälle"
     },
     "deleteproject": {
       "name": "deleteproject",
-      "description": "Delete a project"
+      "description": "Poista projekti"
     },
     "editproject": {
       "name": "editproject",
-      "description": "Edit a project"
+      "description": "Muokkaa projektia"
     },
     "addepisode": {
       "name": "addepisode",
-      "description": "Add an episode"
+      "description": "Lisää jakso"
     },
     "removeepisode": {
       "name": "removeepisode",
-      "description": "Remove an episode"
+      "description": "Poista jakso"
     },
     "addalias": {
       "name": "addalias",
-      "description": "Add an alias"
+      "description": "Lisää projektille lisänimi"
     },
     "removealias": {
       "name": "removealias",
-      "description": "Remove an alias"
+      "description": "Poista projektilta lisänimi"
     },
     "done": {
       "name": "done",
-      "description": "Mark a position as done"
+      "description": "Merkitse rooli valmiiksi"
     },
     "undone": {
       "name": "undone",
-      "description": "Mark a position as not done"
+      "description": "Merkitse rooli keskeneräiseksi"
     },
     "skip": {
       "name": "skip",
-      "description": "Skip a position"
+      "description": "Merkitse rooli ohitetuksi"
     },
     "blame": {
       "name": "blame",
-      "description": "Check the status of a project"
+      "description": "Tarkista projektin tilanne"
     },
     "addobserver": {
       "name": "addobserver",
-      "description": "Observe a project on another server"
+      "description": "Seuraa toisen killan projektia"
     },
     "removeobserver": {
       "name": "removeobserver",
-      "description": "Observe a project on another server"
+      "description": "Lakkaa seuraamasta toisen killan projektia"
     },
     "addadmin": {
       "name": "addadmin",
-      "description": "Add an administrator to this project"
+      "description": "Lisää projektiin hallinnoija"
     },
     "removeadmin": {
       "name": "removeadmin",
-      "description": "Remove an administrator from this project"
+      "description": "Poista projektista hallinnoija"
     },
     "release": {
       "name": "release",
-      "description": "Release!"
+      "description": "Julkaise jakso!"
     },
     "roster": {
       "name": "roster",
-      "description": "See who's working on an episode"
+      "description": "Tarkista jakson tekijät"
     },
     "configuration": {
       "name": "configuration",
-      "description": "Guild-level configuration"
+      "description": "Kiltakohtaiset asetukset"
     },
     "progress_display": {
       "name": "progress_display",
-      "description": "Select a progress embed type"
+      "description": "Valitse tilannepäivitysten näyttötyyli"
     }
   },
   "options": {
     "nickname": {
       "name": "nickname",
-      "description": "Project nickname"
+      "description": "Projektin lyhyt nimi"
     },
     "title": {
       "name": "title",
-      "description": "Full series title"
+      "description": "Sarjan koko nimi"
     },
     "projecttype": {
       "name": "projecttype",
-      "description": "Project type"
+      "description": "Projektin tyyppi"
     },
     "length": {
       "name": "length",
-      "description": "Number of episodes"
+      "description": "Jaksojen määrä"
     },
     "poster": {
       "name": "poster",
-      "description": "Poster image URL"
+      "description": "Julistekuvan osoite"
     },
     "updatechannel": {
       "name": "updatechannel",
-      "description": "Channel to post updates to"
+      "description": "Kanava tilannepäivityksille"
     },
     "releasechannel": {
       "name": "releasechannel",
-      "description": "Channel to post releases to"
+      "description": "Kanava julkaisuille"
     },
     "project": {
       "name": "project",
-      "description": "Project nickname"
+      "description": "Projektin lyhyt nimi"
     },
     "member": {
       "name": "member",
-      "description": "Staff member"
+      "description": "Tekijän käyttäjä"
     },
     "abbreviation": {
       "name": "abbreviation",
-      "description": "Position shorthand"
+      "description": "Roolin lyhenne"
     },
     "name": {
       "name": "name",
-      "description": "Full position name"
+      "description": "Roolin koko nimi"
     },
     "weight": {
       "name": "weight",
-      "description": "Weight"
+      "description": "Painoarvo"
     },
     "episode": {
       "name": "episode",
-      "description": "Episode number"
+      "description": "Jakson numero"
     },
     "option": {
       "name": "option",
-      "description": "Option to change"
+      "description": "Muutettava asetus"
     },
     "newvalue": {
       "name": "newvalue",
-      "description": "New value"
+      "description": "Uusi arvo"
     },
     "alias": {
       "name": "alias",
-      "description": "Alias"
+      "description": "Lisänimi"
     },
     "explain": {
       "name": "explain",
-      "description": "Explain what any of this even means"
+      "description": "Selitä roolien merkitykset"
     },
     "guild": {
       "name": "guild",
-      "description": "Guild ID"
+      "description": "Killan ID"
     },
     "updates": {
       "name": "updates",
-      "description": "Webhook URL for updates"
+      "description": "Tilannepäivityksille käytettävän webhookin osoite"
     },
     "releases": {
       "name": "releases",
-      "description": "Webhook URL for releases"
+      "description": "Julkaisuille käytettävän webhookin osoite"
     },
     "type": {
       "name": "type",
-      "description": "Type of release"
+      "description": "Julkaisun tyyppi"
     },
     "number": {
       "name": "number",
-      "description": "What is being released? [Number or Range]"
+      "description": "Mikä/mitkä julkaistaan? [numero tai väli]"
     },
     "url": {
       "name": "url",
-      "description": "Release URL"
+      "description": "Osoite julkaisulle"
     },
     "role": {
       "name": "role",
-      "description": "Role to ping"
+      "description": "Pingattava rooli"
     },
     "embedtype": {
       "name": "embed_type",
-      "description": "Embed type"
+      "description": "Upotteen tyyppi"
     },
     "blame": {
       "name": "blame",
-      "description": "Populate /blame with this project"
+      "description": "Näytä projekti /blame:n ehdotuksissa"
     }
   }
 }
