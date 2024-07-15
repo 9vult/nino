@@ -215,6 +215,10 @@
       "name": "role",
       "description": "Role to ping"
     },
+    "observerrole": {
+      "name": "role",
+      "description": "Role to ping for releases"
+    },
     "embedtype": {
       "name": "embed_type",
       "description": "Embed type"

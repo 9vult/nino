@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, Client, EmbedBuilder, GuildMember, PermissionsBitField } from "discord.js";
+import { ChatInputCommandInteraction, Client, EmbedBuilder, GuildMember, PermissionsBitField, Role } from "discord.js";
 import { generateAllowedMentions } from "../actions/generateAllowedMentions.action";
 import { DatabaseData, ObservedProject } from "../misc/types";
 import { Database } from "@firebase/database-types";
@@ -21,6 +21,7 @@ export const AddObserverCmd = async (client: Client, db: Database, dbdata: Datab
   const blame = options.getBoolean('blame')!;
   const updatesWH: string | null = options.getString('updates');
   const relesesWH: string | null = options.getString('releases');
+  const releaseRole: string | null | undefined = options.getRole('role')?.id;
   const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!, originGuildId);
 
   if (!blame && !updatesWH && !relesesWH) {
@@ -38,7 +39,7 @@ export const AddObserverCmd = async (client: Client, db: Database, dbdata: Datab
   const project = alias;
 
   db.ref(`/Projects/`).child(`${originGuildId}`).child(`${project}`).child('observers')
-    .push({ guildId: observingGuildId, updatesWebhook: updatesWH, releasesWebhook: relesesWH, managerid: `${user.id}` });
+    .push({ guildId: observingGuildId, updatesWebhook: updatesWH, releasesWebhook: relesesWH, managerid: user.id, releaseRole });
 
   const nameAndBlame: ObservedProject = { name: project, blame };
   const ref = db.ref(`/Observers`).child(`${observingGuildId}`);

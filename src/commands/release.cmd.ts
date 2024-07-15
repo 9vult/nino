@@ -50,6 +50,9 @@ export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseD
   for (let observerid in projects[project].observers) {
     const observer = projects[project].observers[observerid];
     if (!observer.releasesWebhook) continue;
+
+    let observerPublishRole = observer.releaseRole ? `<@&${observer.releaseRole}> ` : '';
+
     try {
       const postUrl = new URL(observer.releasesWebhook);
       fetch(postUrl, {
@@ -58,7 +61,7 @@ export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseD
         body: JSON.stringify({
           username: 'Nino',
           avatar_url: 'https://i.imgur.com/PWtteaY.png',
-          content: `**${projects[project].title} - ${type} ${publishNumber}**\n${url}`,
+          content: `**${projects[project].title} - ${type} ${publishNumber}**\n${observerPublishRole}${url}`,
         })
       });
     } catch {

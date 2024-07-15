@@ -629,7 +629,15 @@ export default (client: Client, dbdata: DatabaseData): void => {
           .setNameLocalizations(GetNames(d, 'options', 'releases'))
           .setDescriptionLocalizations(GetDescs(d, 'options', 'releases'))
           .setRequired(false)
+      )
+      .addRoleOption(o =>
+        o.setName('role')
+          .setDescription('Role to ping for releases')
+          .setNameLocalizations(GetNames(d, 'options', 'observerrole'))
+          .setDescriptionLocalizations(GetDescs(d, 'options', 'observerrole'))
+          .setRequired(false)
       );
+
 
     const removeObserverCmd = new SlashCommandBuilder()
       .setName('removeobserver')
