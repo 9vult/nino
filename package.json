@@ -10,6 +10,7 @@
   "author": "9volt",
   "license": "ISC",
   "dependencies": {
+    "app-root-path": "^3.1.0",
     "discord.js": "^14.13.0",
     "dotenv": "^16.0.3",
     "fast-xml-parser": "^4.3.6",

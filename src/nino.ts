@@ -8,6 +8,7 @@ import interactionCreate from "./listeners/interactionCreate";
 import ready from "./listeners/ready";
 import { DatabaseData, Project } from "./misc/types";
 import { InitI18Next, LoadCmdI18Ns } from "./actions/i18n.action";
+import { resolve } from "path";
 
 require('dotenv').config();
 var admin = require('firebase-admin');
