@@ -303,7 +303,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
 
   if (publishChannel?.isTextBased) {
     (publishChannel as TextChannel).send({ embeds: [publishEmbed] })
-    .catch(err => console.error(err));
+    .catch(err => console.error(`[Done]: "${err.message}" from guild ${guildId}, project ${projects[project].nickname}`));
   }
 
   if (!projects[project].observers) return; // Stop here if there's no observers

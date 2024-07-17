@@ -8,7 +8,7 @@ import { t } from "i18next";
 
 export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
-  const { options, locale: lng } = interaction;
+  const { guildId, options, locale: lng } = interaction;
 
   await interaction.deferReply();
 
@@ -46,7 +46,7 @@ export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseD
       if (msg.channel.type === ChannelType.GuildAnnouncement)
       msg.crosspost().catch(console.error);
     })
-    .catch(err => console.error(err));
+    .catch(err => console.error(`[Release]: "${err.message}" from guild ${guildId}, project ${projects[project].nickname}`));
   }
 
 

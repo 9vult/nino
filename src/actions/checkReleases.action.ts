@@ -33,7 +33,7 @@ export const CheckReleases = async (client: Client, db: Database, dbdata: Databa
           const publishChannel = client.channels.cache.get(projobj.airReminderChannel!);
           if (publishChannel?.isTextBased) {
             (publishChannel as TextChannel).send({ content: role, embeds: [embed] })
-            .catch(err => console.error(err));
+            .catch(err => console.error(`[CheckReleases]: "${err.message}" from guild ${guildId}, project ${projobj.nickname}`));
           }
         }
       }

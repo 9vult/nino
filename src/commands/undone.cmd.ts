@@ -129,7 +129,7 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
 
   if (publishChannel?.isTextBased) {
     (publishChannel as TextChannel).send({ embeds: [publishEmbed] })
-    .catch(err => console.error(err));
+    .catch(err => console.error(`[Undone]: "${err.message}" from guild ${guildId}, project ${projects[project].nickname}`));
   }
 
   if (!projects[project].observers) return; // Stop here if there's no observers
