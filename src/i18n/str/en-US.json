@@ -65,7 +65,7 @@
   "updated": "Last updated {{- rel}}",
   "estimate": "Estimate",
   "notAdmin": "You must be an administrator to perform this action!",
-  "projectCreationHint": "I created project `{{nickname}}` for you.\nDo remember to add staff/positions, though.",
+  "projectCreationHint": "I created project `{{nickname}}` for you. You may want to consider the following:\n1. `/addstaff` to add positions\n2. `/setweight` to re-order positions\n3. `/editproject`: `AniDB` & `AirTime24h` to set airing date/times, and `/airreminder enable` to get airing notifications.",
   "youDidItTitle": "You did it!",
   "youDidItBody": "**{{title}}** is complete.\nGreat job to everyone involved!"
 }
