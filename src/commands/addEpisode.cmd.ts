@@ -28,7 +28,8 @@ export const AddEpisodeCmd = async (client: Client, db: Database, dbdata: Databa
     done: false,
     additionalStaff: [],
     tasks: [],
-    updated: 0
+    updated: 0,
+    airReminderPosted: false
   });
   
   for (let pos in projects[project].keyStaff) {

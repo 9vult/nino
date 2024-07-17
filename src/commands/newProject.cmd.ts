@@ -42,7 +42,10 @@ export const NewProjectCmd = async (client: Client, db: Database, dbdata: Databa
     updateChannel,
     releaseChannel,
     observers: [],
-    administrators: []
+    administrators: [],
+    airReminderEnabled: false,
+    airReminderRole: '',
+    airReminderChannel: ''
   };
   ref.set(newProj);
 
@@ -53,7 +56,8 @@ export const NewProjectCmd = async (client: Client, db: Database, dbdata: Databa
       done: false,
       additionalStaff: [],
       tasks: [],
-      updated: 0
+      updated: 0,
+      airReminderPosted: false
     });
   }
 

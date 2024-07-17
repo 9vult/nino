@@ -15,7 +15,10 @@ export interface Project {
   updateChannel: string,
   releaseChannel: string,
   observers: Observer[],
-  administrators: string[]
+  administrators: string[],
+  airReminderEnabled: boolean,
+  airReminderRole: string | '',
+  airReminderChannel: string | ''
 };
 
 export interface Episode {
@@ -23,7 +26,8 @@ export interface Episode {
   done: boolean,
   additionalStaff: Staff[],
   tasks: Task[],
-  updated: number | undefined
+  updated: number | undefined,
+  airReminderPosted: boolean
 };
 
 export interface Staff {

@@ -31,6 +31,7 @@ import { RosterCmd } from "../commands/roster.cmd";
 import { ConfigurationCmd } from "../commands/configuration.cmd";
 import { AddAdminCmd } from "../commands/addAdmin.cmd";
 import { RemoveAdminCmd } from "../commands/removeAdmin.cmd";
+import { AirReminderCmd } from "../commands/airReminder.cmd";
 
 export default (client: Client, db: Database, dbdata: DatabaseData): void => {
   client.on('interactionCreate', async (interaction) => {
@@ -121,6 +122,9 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
         break;
       case 'configuration':
         await ConfigurationCmd(client, db, dbdata, cmdInteraction);
+        break;
+      case 'airreminder':
+        await AirReminderCmd(client, db, dbdata, cmdInteraction);
         break;
     }
   });

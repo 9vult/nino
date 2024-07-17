@@ -3,7 +3,7 @@ import { DatabaseData } from "../misc/types";
 import { t } from "i18next";
 import { AniDBCache } from "./anidbcache.action";
 
-export const AirDate = async (anidb: string, airTime: string | undefined, episodeNumber: number, dbdata: DatabaseData, lng: string) => {
+export const AirDate = async (anidb: string, airTime: string | undefined, episodeNumber: number, dbdata: DatabaseData, lng: string, utcOnly = false) => {
   if (!airTime) airTime = '00:00';
 
   const cid = process.env.ANIDB_API_CLIENT_NAME;
@@ -25,7 +25,10 @@ export const AirDate = async (anidb: string, airTime: string | undefined, episod
     if (airDate) {
       let date = new Date(airDate);
       let future = (date > new Date());
-      const utc = Math.floor(date.getTime() / 1000);
+      const utc = Math.floor(date.getTime() / 1000); // seconds
+      
+      if (utcOnly) return date.getTime(); // milliseconds
+
       // return `${future ? 'Airs' : 'Aired'} on <t:${utc}:D> (<t:${utc}:R>)`;
       return future 
         ? t('airdateFuture', { lng, date: `<t:${utc}:D>`, rel: `<t:${utc}:R>` })

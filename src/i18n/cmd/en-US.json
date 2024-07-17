@@ -91,7 +91,7 @@
     },
     "removeobserver": {
       "name": "removeobserver",
-      "description": "Observe a project on another server"
+      "description": "Stop observing a project on another server"
     },
     "addadmin": {
       "name": "addadmin",
@@ -116,6 +116,18 @@
     "progress_display": {
       "name": "progress_display",
       "description": "Select a progress embed type"
+    },
+    "airreminder": {
+      "name": "airreminder",
+      "description": "Enable or disable airing reminders"
+    },
+    "enable": {
+      "name": "enable",
+      "description": "Enable airing reminders"
+    },
+    "disable": {
+      "name": "disable",
+      "description": "Disable airing reminders"
     }
   },
   "options": {

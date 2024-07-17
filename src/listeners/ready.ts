@@ -771,6 +771,54 @@ export default (client: Client, dbdata: DatabaseData): void => {
         )
       );
 
+    const airReminderCmd = new SlashCommandBuilder()
+      .setName('airreminder')
+      .setDescription('Enable or disable airing reminders')
+      .setNameLocalizations(GetNames(d, 'commands', 'airreminder'))
+      .setDescriptionLocalizations(GetDescs(d, 'commands', 'airreminder'))
+      .addSubcommand(s => 
+        s.setName('enable')
+          .setDescription('Enable airing reminders')
+          .setNameLocalizations(GetNames(d, 'commands', 'enable'))
+          .setDescriptionLocalizations(GetDescs(d, 'commands', 'enable'))
+          .addStringOption(o =>
+            o.setName('project')
+              .setDescription('Project nickname')
+              .setNameLocalizations(GetNames(d, 'options', 'project'))
+              .setDescriptionLocalizations(GetDescs(d, 'options', 'project'))
+              .setRequired(true)
+              .setAutocomplete(true)
+          )
+          .addChannelOption(o =>
+            o.setName('updatechannel')
+              .setDescription('Channel to post updates to')
+              .setNameLocalizations(GetNames(d, 'options', 'updatechannel'))
+              .setDescriptionLocalizations(GetDescs(d, 'options', 'updatechannel'))
+              .setRequired(true)
+          )
+          .addRoleOption(o =>
+            o.setName('role')
+              .setDescription('Role to ping')
+              .setNameLocalizations(GetNames(d, 'options', 'role'))
+              .setDescriptionLocalizations(GetDescs(d, 'options', 'role'))
+              .setRequired(false)
+          )
+      )
+      .addSubcommand(s => 
+        s.setName('disable')
+          .setDescription('Disable airing reminders')
+          .setNameLocalizations(GetNames(d, 'commands', 'disable'))
+          .setDescriptionLocalizations(GetDescs(d, 'commands', 'disable'))
+          .addStringOption(o =>
+            o.setName('project')
+              .setDescription('Project nickname')
+              .setNameLocalizations(GetNames(d, 'options', 'project'))
+              .setDescriptionLocalizations(GetDescs(d, 'options', 'project'))
+              .setRequired(true)
+              .setAutocomplete(true)
+          )
+      );
+
     client.application.commands.create(helpCmd);
     client.application.commands.create(aboutCmd);
     client.application.commands.create(newProjectCmd);
@@ -799,6 +847,7 @@ export default (client: Client, dbdata: DatabaseData): void => {
     client.application.commands.create(addAdminCmd);
     client.application.commands.create(removeAdminCmd);
     client.application.commands.create(configurationCmd);
+    client.application.commands.create(airReminderCmd);
 
     console.log('Nino is ready to go!');
   });

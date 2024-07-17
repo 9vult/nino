@@ -6,15 +6,15 @@
 import { Client, GatewayIntentBits } from "discord.js";
 import interactionCreate from "./listeners/interactionCreate";
 import ready from "./listeners/ready";
-import { DatabaseData, Project } from "./misc/types";
+import { DatabaseData } from "./misc/types";
 import { InitI18Next, LoadCmdI18Ns } from "./actions/i18n.action";
-import { resolve } from "path";
+import { CheckReleases } from "./actions/checkReleases.action";
 
 require('dotenv').config();
 var admin = require('firebase-admin');
 var firebase = require('./firebase.json');
 
-export const VERSION = "3.4.0";
+export const VERSION = "3.5.0";
 
 admin.initializeApp({
   credential: admin.credential.cert(firebase),
@@ -52,5 +52,10 @@ InitI18Next();
 // Set up listeners
 ready(client, dbdata);
 interactionCreate(client, db, dbdata);
+
+// Set up air checker
+const FIVE_MINUTES = 5 * 60 * 1000;
+const THIRTY_SECONDS = 30 * 1000;
+setInterval(CheckReleases, FIVE_MINUTES, client, db, dbdata);
 
 client.login(process.env.TOKEN);
