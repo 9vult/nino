@@ -68,7 +68,8 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
   else 
     status = EntriesToStatusString(entries);
 
-  if (explain) status += `\n\nAliases: ${projects[project].aliases.toString()}`;
+  if (explain && projects[project].aliases && projects[project].aliases.length > 0)
+    status += `\n\nAliases: ${projects[project].aliases.toString()}`;
   else status += '\n';
 
   if (projects[project].anidb && episode != null && !started)
