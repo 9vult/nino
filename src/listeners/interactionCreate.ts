@@ -32,6 +32,7 @@ import { ConfigurationCmd } from "../commands/configuration.cmd";
 import { AddAdminCmd } from "../commands/addAdmin.cmd";
 import { RemoveAdminCmd } from "../commands/removeAdmin.cmd";
 import { AirReminderCmd } from "../commands/airReminder.cmd";
+import { BulkCmd } from "../commands/bulk.cmd";
 
 export default (client: Client, db: Database, dbdata: DatabaseData): void => {
   client.on('interactionCreate', async (interaction) => {
@@ -126,6 +127,9 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
       case 'airreminder':
         await AirReminderCmd(client, db, dbdata, cmdInteraction);
         break;
+      case 'bulk':
+        await BulkCmd(client, db, dbdata, cmdInteraction);
+        break;
     }
   });
 
@@ -173,7 +177,9 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
           await interaction.respond(choices.map(choice => ({ name: choice, value: choice })).slice(0, 25));
           return;
         }
-        case 'episode': {
+        case 'episode':
+        case 'start_episode':
+        case 'end_episode': {
           let projectName = await GetAlias(db, dbdata, interaction, options.getString('project')!);
           if (guildId === null || projectName === null || projectName === '') break;
           if (!projectName || !(projectName in dbdata.guilds[guildId])) return;

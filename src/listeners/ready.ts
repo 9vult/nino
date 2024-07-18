@@ -819,6 +819,56 @@ export default (client: Client, dbdata: DatabaseData): void => {
           )
       );
 
+    const bulkCmd = new SlashCommandBuilder()
+      .setName('bulk')
+      .setDescription('Do a lot of episodes all at once!')
+      .setNameLocalizations(GetNames(d, 'commands', 'bulk'))
+      .setDescriptionLocalizations(GetDescs(d, 'commands', 'bulk'))
+      .addStringOption(o =>
+        o.setName('project')
+          .setDescription('Project nickname')
+          .setNameLocalizations(GetNames(d, 'options', 'project'))
+          .setDescriptionLocalizations(GetDescs(d, 'options', 'project'))
+          .setRequired(true)
+          .setAutocomplete(true)
+      )
+      .addStringOption(o =>
+        o.setName('action')
+          .setDescription('Action to perform')
+          .setNameLocalizations(GetNames(d, 'options', 'action'))
+          .setDescriptionLocalizations(GetDescs(d, 'options', 'action'))
+          .setRequired(true)
+          .addChoices(
+            { name: 'Done', value: 'Done' },
+            { name: 'Undone', value: 'Undone' },
+            { name: 'Skip', value: 'Skip' }
+          )
+      )
+      .addStringOption(o =>
+        o.setName('abbreviation')
+          .setDescription('Position shorthand')
+          .setNameLocalizations(GetNames(d, 'options', 'abbreviation'))
+          .setDescriptionLocalizations(GetDescs(d, 'options', 'abbreviation'))
+          .setRequired(true)
+          .setAutocomplete(true)
+      )
+      .addNumberOption(o =>
+        o.setName('start_episode')
+          .setDescription('Episode number to start at')
+          .setNameLocalizations(GetNames(d, 'options', 'start_episode'))
+          .setDescriptionLocalizations(GetDescs(d, 'options', 'start_episode'))
+          .setRequired(true)
+          .setAutocomplete(true)
+      )
+      .addNumberOption(o =>
+        o.setName('end_episode')
+          .setDescription('Episode number to end at (inclusive)')
+          .setNameLocalizations(GetNames(d, 'options', 'end_episode'))
+          .setDescriptionLocalizations(GetDescs(d, 'options', 'end_episode'))
+          .setRequired(true)
+          .setAutocomplete(true)
+      );
+
     client.application.commands.create(helpCmd);
     client.application.commands.create(aboutCmd);
     client.application.commands.create(newProjectCmd);
@@ -848,6 +898,7 @@ export default (client: Client, dbdata: DatabaseData): void => {
     client.application.commands.create(removeAdminCmd);
     client.application.commands.create(configurationCmd);
     client.application.commands.create(airReminderCmd);
+    client.application.commands.create(bulkCmd);
 
     console.log('Nino is ready to go!');
   });

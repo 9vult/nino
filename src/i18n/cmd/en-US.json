@@ -128,6 +128,10 @@
     "disable": {
       "name": "disable",
       "description": "Disable airing reminders"
+    },
+    "bulk": {
+      "name": "bulk",
+      "description": "Do a lot of episodes all at once!"
     }
   },
   "options": {
@@ -238,6 +242,18 @@
     "blame": {
       "name": "blame",
       "description": "Populate /blame with this project"
+    },
+    "action": {
+      "name": "action",
+      "description": "Action to perform"
+    },
+    "start_episode": {
+      "name": "start_episode",
+      "description": "Episode number to start at"
+    },
+    "end_episode": {
+      "name": "end_episode",
+      "description": "Episode number to end at (inclusive)"
     }
   }
 }

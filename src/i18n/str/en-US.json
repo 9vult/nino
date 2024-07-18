@@ -36,6 +36,8 @@
   "skipped": "(Skipped)",
   "taskSkippedTitle": "Task Skipped",
   "taskSkippedBody": "**{{taskName}}** for episode {{episode, number}} has been skipped.\nIf you wish to do it for realsies, `/undone` it first.",
+  "bulkBody": "I see you've been busy.\n**{{taskName}}** for episodes {{start_episode, number}} through {{end_episode, number}} have been updated.",
+  "invalidEpisodeRange": "Invalid episode range",
   "airTimeFail": "Air time must be a 24-hour HH:MM time, ex: 16:30",
   "projectEdited": "I updated `{{project}}` for you.",
   "configurationEdited": "Your settings have been saved!",

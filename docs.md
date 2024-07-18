@@ -301,6 +301,18 @@ Release! Accessible by project owner.
 | url | yes | string<URL> | Url linking to the release |
 | role | no | role | Role to be pinged (Does not affect observer servers) |
 
+### bulk
+
+Action a task in bulk. Accessible by assigned user and project owner.
+
+| Parameter | Required | Type | Description |
+|-----------|----------|------|-------------|
+| project | yes | string | Project nickname |
+| action | choose | string | Action to perform |
+| abbreviation | yes | string | Shorthand for the position (ex: TM) |
+| start_episode | yes | number | Starting episode |
+| end_episode | yes | number | Ending episode (inclusive) |
+
 ### blame
 
 Check the status of a project or episode. Accessible by everyone.
