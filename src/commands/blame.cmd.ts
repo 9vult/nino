@@ -68,10 +68,13 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
   else 
     status = EntriesToStatusString(entries);
 
+  if (explain) status += `\n\nAliases: ${projects[project].aliases.toString()}`;
+  else status += '\n';
+
   if (projects[project].anidb && episode != null && !started)
-    status += `\n\n${await AirDate(projects[project].anidb, projects[project].airTime, episode, dbdata, lng)}`;
+    status += `\n${await AirDate(projects[project].anidb, projects[project].airTime, episode, dbdata, lng)}`;
   else if (updateTime !== 0)
-    status += `\n\n${t('updated', { lng, rel: `<t:${updateTime}:R>` })}`;
+    status += `\n${t('updated', { lng, rel: `<t:${updateTime}:R>` })}`;
 
   const embed = new EmbedBuilder()
     .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
