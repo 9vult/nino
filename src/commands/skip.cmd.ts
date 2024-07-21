@@ -33,8 +33,8 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
     if (staffObj.role.abbreviation === abbreviation && (
       staffObj.id === user.id || 
       projects[project].owner === user.id || 
-      (projects[project].administrators && projects[project].administrators.includes(user.id)) ||
-      (dbdata.configuration[guildId!] && dbdata.configuration[guildId!].administrators && dbdata.configuration[guildId!].administrators.includes(user.id))
+      projects[project].administrators?.includes(user.id) ||
+      dbdata.configuration[guildId!]?.administrators?.includes(user.id)
     )) {
       isValidUser = true;
       taskName = staffObj.role.title;
@@ -65,8 +65,8 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
           if (addStaffObj.role.abbreviation === abbreviation && (
             addStaffObj.id === user.id ||
             projects[project].owner === user.id ||
-            (projects[project].administrators && projects[project].administrators.includes(user.id)) ||
-            (dbdata.configuration[guildId!] && dbdata.configuration[guildId!].administrators && dbdata.configuration[guildId!].administrators.includes(user.id))
+            projects[project].administrators?.includes(user.id) ||
+            dbdata.configuration[guildId!]?.administrators?.includes(user.id)
           )) {
             status = `:fast_forward: **${addStaffObj.role.title}** ${t('skipped', { lng })}\n` + status;
             taskName = addStaffObj.role.title;

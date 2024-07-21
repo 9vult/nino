@@ -42,7 +42,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   if (!verification) return;
   const { projects, project } = InteractionData(dbdata, interaction, alias);
 
-  let extended = dbdata.configuration && dbdata.configuration[guildId!] && dbdata.configuration[guildId!].progressDisplay && dbdata.configuration[guildId!].progressDisplay == 'Extended';
+  let extended = dbdata.configuration[guildId!]?.progressDisplay == 'Extended';
 
   // Find selected episode or current working episode
   let success = false;
@@ -93,8 +93,8 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
     if (staffObj.role.abbreviation === abbreviation && (
         staffObj.id === user.id || 
         projects[project].owner === user.id || 
-        (projects[project].administrators && projects[project].administrators.includes(user.id)) ||
-        (dbdata.configuration[guildId!] && dbdata.configuration[guildId!].administrators && dbdata.configuration[guildId!].administrators.includes(user.id))
+        projects[project]?.administrators?.includes(user.id) ||
+        dbdata.configuration[guildId!]?.administrators?.includes(user.id)
     )) {
       isValidUser = true;
       taskName = staffObj.role.title;
@@ -107,8 +107,8 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
       if (addStaffObj.role.abbreviation === abbreviation && (
           addStaffObj.id === user.id ||
           projects[project].owner === user.id ||
-          (projects[project].administrators && projects[project].administrators.includes(user.id)) ||
-          (dbdata.configuration[guildId!] && dbdata.configuration[guildId!].administrators && dbdata.configuration[guildId!].administrators.includes(user.id))
+          projects[project].administrators?.includes(user.id) ||
+          dbdata.configuration[guildId!]?.administrators?.includes(user.id)
       )) {
         localStatus = `✅ **${addStaffObj.role.title}**\n`;
         taskName = addStaffObj.role.title;

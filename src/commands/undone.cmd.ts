@@ -32,15 +32,15 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
   let localEntries = GenerateEntries(dbdata, guildId!, project, episode);
   let publicEntries = GenerateEntries(dbdata, guildId!, project, episode);
 
-  let extended = dbdata.configuration && dbdata.configuration[guildId!] && dbdata.configuration[guildId!].progressDisplay && dbdata.configuration[guildId!].progressDisplay == 'Extended';
+  let extended = dbdata.configuration[guildId!]?.progressDisplay == 'Extended';
 
   for (let staff in projects[project].keyStaff) {
     let staffObj = projects[project].keyStaff[staff];
     if (staffObj.role.abbreviation === abbreviation && (
       staffObj.id === user.id || 
       projects[project].owner === user.id || 
-      (projects[project].administrators && projects[project].administrators.includes(user.id)) ||
-      (dbdata.configuration[guildId!] && dbdata.configuration[guildId!].administrators && dbdata.configuration[guildId!].administrators.includes(user.id))
+      projects[project].administrators?.includes(user.id) ||
+      dbdata.configuration[guildId!]?.administrators?.includes(user.id)
     )) {
       isValidUser = true;
       taskName = staffObj.role.title;
@@ -93,8 +93,8 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
           if (addStaffObj.role.abbreviation === abbreviation && (
               addStaffObj.id === user.id ||
               projects[project].owner === user.id ||
-              (projects[project].administrators && projects[project].administrators.includes(user.id)) ||
-              (dbdata.configuration[guildId!] && dbdata.configuration[guildId!].administrators && dbdata.configuration[guildId!].administrators.includes(user.id))
+              projects[project].administrators?.includes(user.id) ||
+              dbdata.configuration[guildId!]?.administrators?.includes(user.id)
           )) {
             localStatus = `❌ **${addStaffObj.role.title}**\n` + localStatus;
             publicStatus = `❌ **${addStaffObj.role.title}**\n` + publicStatus;

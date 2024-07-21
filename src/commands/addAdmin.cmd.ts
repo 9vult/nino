@@ -25,7 +25,7 @@ export const AddAdminCmd = async (client: Client, db: Database, dbdata: Database
         let staff = (options.getMember('member')! as GuildMember).id;
 
         let ref = db.ref(`/Configuration/${guildId}`);
-        if (dbdata.configuration[guildId] && dbdata.configuration[guildId].administrators)
+        if (dbdata.configuration[guildId]?.administrators)
           ref.update({ administrators: [...dbdata.configuration[guildId].administrators, staff] });
         else
           ref.update({ administrators: [staff] });

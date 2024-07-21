@@ -25,7 +25,7 @@ export const RemoveAdminCmd = async (client: Client, db: Database, dbdata: Datab
       let staff = (options.getMember('member')! as GuildMember).id;
       
       let ref = db.ref(`/Configuration/${guildId}`);
-      if (dbdata.configuration[guildId] && dbdata.configuration[guildId].administrators)
+      if (dbdata.configuration[guildId]?.administrators)
         ref.update({ administrators: dbdata.configuration[guildId].administrators.filter(a => a !== staff) });
 
       let staffMention = `<@${staff}>`;
