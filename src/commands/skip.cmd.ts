@@ -14,7 +14,7 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
   await interaction.deferReply();
 
   const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!);
-  const episode = options.getNumber('episode')!;
+  const selectedEpisode = options.getNumber('episode')!;
   const abbreviation = options.getString('abbreviation')!.toUpperCase();
 
   let epvalue;
@@ -26,50 +26,53 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
 
   let verification = await VerifyInteraction(dbdata, interaction, alias, false);
   if (!verification) return;
-  const { projects, project } = InteractionData(dbdata, interaction, alias);
+  const { projects, project: projectName } = InteractionData(dbdata, interaction, alias);
 
-  for (let staff in projects[project].keyStaff) {
-    let staffObj = projects[project].keyStaff[staff];
-    if (staffObj.role.abbreviation === abbreviation && (
-      staffObj.id === user.id || 
-      projects[project].owner === user.id || 
-      projects[project].administrators?.includes(user.id) ||
+  const project = projects[projectName];
+
+  for (let keyStaffId in project.keyStaff) {
+    let keyStaff = project.keyStaff[keyStaffId];
+    if (keyStaff.role.abbreviation === abbreviation && (
+      keyStaff.id === user.id || 
+      project.owner === user.id || 
+      project.administrators?.includes(user.id) ||
       dbdata.configuration[guildId!]?.administrators?.includes(user.id)
     )) {
       isValidUser = true;
-      taskName = staffObj.role.title;
-      status = `:fast_forward: **${staffObj.role.title}** ${t('skipped', { lng })}\n`;
+      taskName = keyStaff.role.title;
+      status = `:fast_forward: **${keyStaff.role.title}** ${t('skipped', { lng })}\n`;
     }
   }
 
-  for (let ep in projects[project].episodes) {
-    if (projects[project].episodes[ep].number == episode) {
-      epvalue = ep;
-      for (let task in projects[project].episodes[ep].tasks) {
-        let taskObj = projects[project].episodes[ep].tasks[task];
-        if (taskObj.abbreviation === abbreviation) {
-          taskvalue = task;
-          if (taskObj.done)
+  for (let epId in project.episodes) {
+    const episode = project.episodes[epId];
+    if (episode.number == selectedEpisode) {
+      epvalue = epId;
+      for (let taskId in episode.tasks) {
+        let task = episode.tasks[taskId];
+        if (task.abbreviation === abbreviation) {
+          taskvalue = taskId;
+          if (task.done)
             return fail(t('taskAlreadyDone', { lng, abbreviation }), interaction);
         }
-        else if (!taskObj.done) episodeDone = false;
+        else if (!task.done) episodeDone = false;
         // Status string
-        if (taskObj.abbreviation === abbreviation) status += `__~~${abbreviation}~~__ `;
-        else if (taskObj.done) status += `~~${taskObj.abbreviation}~~ `;
-        else status += `**${taskObj.abbreviation}** `;
+        if (task.abbreviation === abbreviation) status += `__~~${abbreviation}~~__ `;
+        else if (task.done) status += `~~${task.abbreviation}~~ `;
+        else status += `**${task.abbreviation}** `;
       }
       if (taskvalue == undefined) return fail(t('noSuchTask', { lng, abbreviation }), interaction);
       if (!isValidUser) { // Not key staff
-        for (let addStaff in projects[project].episodes[ep].additionalStaff) {
-          let addStaffObj = projects[project].episodes[ep].additionalStaff[addStaff];
-          if (addStaffObj.role.abbreviation === abbreviation && (
-            addStaffObj.id === user.id ||
-            projects[project].owner === user.id ||
-            projects[project].administrators?.includes(user.id) ||
+        for (let addStaffId in episode.additionalStaff) {
+          let addStaff = episode.additionalStaff[addStaffId];
+          if (addStaff.role.abbreviation === abbreviation && (
+            addStaff.id === user.id ||
+            project.owner === user.id ||
+            project.administrators?.includes(user.id) ||
             dbdata.configuration[guildId!]?.administrators?.includes(user.id)
           )) {
-            status = `:fast_forward: **${addStaffObj.role.title}** ${t('skipped', { lng })}\n` + status;
-            taskName = addStaffObj.role.title;
+            status = `:fast_forward: **${addStaff.role.title}** ${t('skipped', { lng })}\n` + status;
+            taskName = addStaff.role.title;
             isValidUser = true;
           }
         }
@@ -80,44 +83,44 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
   if (!isValidUser)
     return fail(t('permissionDenied', { lng }), interaction);
   if (taskvalue != undefined) {
-    db.ref(`/Projects/${guildId}/${project}/episodes/${epvalue}/tasks/${taskvalue}`).update({
+    db.ref(`/Projects/${guildId}/${projectName}/episodes/${epvalue}/tasks/${taskvalue}`).update({
       abbreviation, done: true
     });
     const utc = Math.floor(new Date().getTime() / 1000);
-    db.ref(`/Projects/${guildId}/${project}/episodes/${epvalue!}`).update({
+    db.ref(`/Projects/${guildId}/${projectName}/episodes/${epvalue!}`).update({
       updated: utc
     });
   }
 
-  const episodeDoneText = episodeDone ? `\n${t('episodeDone', { lng, episode })}` : '';
+  const episodeDoneText = episodeDone ? `\n${t('episodeDone', { lng, episode: selectedEpisode })}` : '';
   const replyEmbed = new EmbedBuilder()
-    .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
+    .setAuthor({ name: `${project.title} (${project.type})` })
     .setTitle(`:fast_forward: ${t('taskSkippedTitle', { lng })}`)
-    .setDescription(`${t('taskSkippedBody', { lng, taskName, episode })}${episodeDoneText}`)
+    .setDescription(`${t('taskSkippedBody', { lng, taskName, episode: selectedEpisode })}${episodeDoneText}`)
     .setColor(0xd797ff)
     .setTimestamp(Date.now());
   await interaction.editReply({ embeds: [replyEmbed], allowedMentions: generateAllowedMentions([[], []]) });
 
   if (episodeDone) {
-    db.ref(`/Projects/${guildId}/${project}/episodes/${epvalue}`).update({ done: true });
+    db.ref(`/Projects/${guildId}/${projectName}/episodes/${epvalue}`).update({ done: true });
   }
 
   const publishEmbed = new EmbedBuilder()
-    .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
-    .setTitle(`Episode ${episode}`)
-    .setThumbnail(projects[project].poster)
+    .setAuthor({ name: `${project.title} (${project.type})` })
+    .setTitle(`Episode ${selectedEpisode}`)
+    .setThumbnail(project.poster)
     .setDescription(status)
     .setTimestamp(Date.now());
-  const publishChannel = client.channels.cache.get(projects[project].updateChannel);
+  const publishChannel = client.channels.cache.get(project.updateChannel);
 
   if (publishChannel?.isTextBased) {
     (publishChannel as TextChannel).send({ embeds: [publishEmbed] })
-    .catch(err => console.error(`[Skip]: "${err.message}" from guild ${guildId}, project ${projects[project].nickname}`));
+    .catch(err => console.error(`[Skip]: "${err.message}" from guild ${guildId}, project ${project.nickname}`));
   }
 
-  if (!projects[project].observers) return; // Stop here if there's no observers
-    for (let observerid in projects[project].observers) {
-      const observer = projects[project].observers[observerid];
+  if (!project.observers) return; // Stop here if there's no observers
+    for (let observerid in project.observers) {
+      const observer = project.observers[observerid];
       if (!observer.updatesWebhook) continue;
       try {
         const postUrl = new URL(observer.updatesWebhook);

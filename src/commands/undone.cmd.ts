@@ -15,70 +15,73 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
   await interaction.deferReply();
 
   const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!);
-  const episode = options.getNumber('episode')!;
+  const selectedEpisode = options.getNumber('episode')!;
   const abbreviation = options.getString('abbreviation')!.toUpperCase();
 
-  let epvalue;
+  let episodeId;
   let taskvalue;
   let taskName;
   let isValidUser = false;
 
   let verification = await VerifyInteraction(dbdata, interaction, alias, false);
   if (!verification) return;
-  const { projects, project } = InteractionData(dbdata, interaction, alias);
+  const { projects, project: projectName } = InteractionData(dbdata, interaction, alias);
 
   let localStatus = '';
   let publicStatus = '';
-  let localEntries = GenerateEntries(dbdata, guildId!, project, episode);
-  let publicEntries = GenerateEntries(dbdata, guildId!, project, episode);
+  let localEntries = GenerateEntries(dbdata, guildId!, projectName, selectedEpisode);
+  let publicEntries = GenerateEntries(dbdata, guildId!, projectName, selectedEpisode);
 
   let extended = dbdata.configuration[guildId!]?.progressDisplay == 'Extended';
 
-  for (let staff in projects[project].keyStaff) {
-    let staffObj = projects[project].keyStaff[staff];
-    if (staffObj.role.abbreviation === abbreviation && (
-      staffObj.id === user.id || 
-      projects[project].owner === user.id || 
-      projects[project].administrators?.includes(user.id) ||
+  let project = projects[projectName];
+
+  for (let keyStaffId in project.keyStaff) {
+    let keyStaff = project.keyStaff[keyStaffId];
+    if (keyStaff.role.abbreviation === abbreviation && (
+      keyStaff.id === user.id || 
+      project.owner === user.id || 
+      project.administrators?.includes(user.id) ||
       dbdata.configuration[guildId!]?.administrators?.includes(user.id)
     )) {
       isValidUser = true;
-      taskName = staffObj.role.title;
-      localStatus = `❌ **${staffObj.role.title}**\n`;
+      taskName = keyStaff.role.title;
+      localStatus = `❌ **${keyStaff.role.title}**\n`;
     }
   }
 
-  for (let ep in projects[project].episodes) {
-    if (projects[project].episodes[ep].number == episode) {
-      epvalue = ep;
+  for (let epId in project.episodes) {
+    const episode = project.episodes[epId];
+    if (episode.number == selectedEpisode) {
+      episodeId = epId;
 
       let map: {[key:string]:string} = {};
       if (extended) {
-        publicEntries = GenerateEntries(dbdata, guildId!, project, projects[project].episodes[ep].number);
-        if (projects[project].keyStaff) Object.values(projects[project].keyStaff).forEach(ks => { map[ks.role.abbreviation] = ks.role.title; });
-        if (projects[project].episodes[ep].additionalStaff)
-          Object.values(projects[project].episodes[ep].additionalStaff).forEach(as => { map[as.role.abbreviation] = as.role.title });
+        publicEntries = GenerateEntries(dbdata, guildId!, projectName, episode.number);
+        if (project.keyStaff) Object.values(project.keyStaff).forEach(ks => { map[ks.role.abbreviation] = ks.role.title; });
+        if (episode.additionalStaff)
+          Object.values(episode.additionalStaff).forEach(as => { map[as.role.abbreviation] = as.role.title });
       }
 
-      for (let task in projects[project].episodes[ep].tasks) {
-        let taskObj = projects[project].episodes[ep].tasks[task];
-        if (taskObj.abbreviation === abbreviation) {
-          taskvalue = task;
-          if (!taskObj.done)
+      for (let taskId in episode.tasks) {
+        let task = episode.tasks[taskId];
+        if (task.abbreviation === abbreviation) {
+          taskvalue = taskId;
+          if (!task.done)
             return fail(t('taskNotDone', { lng, abbreviation }), interaction);
         }
         // Status string
         let stat = '';
-        if (taskObj.abbreviation === abbreviation) stat = `__${abbreviation}__`;
-        else if (taskObj.done) stat = `~~${taskObj.abbreviation}~~`;
-        else stat = `**${taskObj.abbreviation}**`;
+        if (task.abbreviation === abbreviation) stat = `__${abbreviation}__`;
+        else if (task.done) stat = `~~${task.abbreviation}~~`;
+        else stat = `**${task.abbreviation}**`;
 
-        localEntries[taskObj.abbreviation].status = stat;
+        localEntries[task.abbreviation].status = stat;
 
         if (extended) {
-          let title = (taskObj.abbreviation in map) ? map[taskObj.abbreviation] : 'Unknown';
-          let suffix = taskObj.abbreviation == abbreviation ? ' (incomplete)' : taskObj.done ? ' *(done)*' : ''
-          publicEntries![taskObj.abbreviation].status = `${stat}: ${title}${suffix}`;
+          let title = (task.abbreviation in map) ? map[task.abbreviation] : 'Unknown';
+          let suffix = task.abbreviation == abbreviation ? ' (incomplete)' : task.done ? ' *(done)*' : ''
+          publicEntries![task.abbreviation].status = `${stat}: ${title}${suffix}`;
         }
       }
 
@@ -88,17 +91,17 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
 
       if (taskvalue == undefined) return fail(t('noSuchTask', { lng, abbreviation }), interaction);
       if (!isValidUser) { // Not key staff
-        for (let addStaff in projects[project].episodes[ep].additionalStaff) {
-          let addStaffObj = projects[project].episodes[ep].additionalStaff[addStaff];
-          if (addStaffObj.role.abbreviation === abbreviation && (
-              addStaffObj.id === user.id ||
-              projects[project].owner === user.id ||
-              projects[project].administrators?.includes(user.id) ||
+        for (let addStaffId in episode.additionalStaff) {
+          let addStaff = episode.additionalStaff[addStaffId];
+          if (addStaff.role.abbreviation === abbreviation && (
+              addStaff.id === user.id ||
+              project.owner === user.id ||
+              project.administrators?.includes(user.id) ||
               dbdata.configuration[guildId!]?.administrators?.includes(user.id)
           )) {
-            localStatus = `❌ **${addStaffObj.role.title}**\n` + localStatus;
-            publicStatus = `❌ **${addStaffObj.role.title}**\n` + publicStatus;
-            taskName = addStaffObj.role.title;
+            localStatus = `❌ **${addStaff.role.title}**\n` + localStatus;
+            publicStatus = `❌ **${addStaff.role.title}**\n` + publicStatus;
+            taskName = addStaff.role.title;
             isValidUser = true;
           }
         }
@@ -110,41 +113,41 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
     return fail(t('permissionDenied', { lng }), interaction);
 
   if (taskvalue != undefined) {
-    db.ref(`/Projects/${guildId}/${project}/episodes/${epvalue}/tasks/${taskvalue}`).update({
+    db.ref(`/Projects/${guildId}/${projectName}/episodes/${episodeId}/tasks/${taskvalue}`).update({
       abbreviation, done: false
     });
     const utc = Math.floor(new Date().getTime() / 1000);
-    db.ref(`/Projects/${guildId}/${project}/episodes/${epvalue!}`).update({
+    db.ref(`/Projects/${guildId}/${projectName}/episodes/${episodeId!}`).update({
       updated: utc
     });
   }
 
-  db.ref(`/Projects/${guildId}/${project}/episodes/${epvalue}`).update({ done: false });
+  db.ref(`/Projects/${guildId}/${projectName}/episodes/${episodeId}`).update({ done: false });
 
   const embed = new EmbedBuilder()
-    .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
+    .setAuthor({ name: `${project.title} (${project.type})` })
     .setTitle(`❌ ${t('taskIncompleteTitle', { lng })}`)
-    .setDescription(t('taskIncompleteBody', { lng, taskName, episode }))
+    .setDescription(t('taskIncompleteBody', { lng, taskName, episode: selectedEpisode }))
     .setColor(0xd797ff)
     .setTimestamp(Date.now());
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 
   const publishEmbed = new EmbedBuilder()
-    .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
-    .setTitle(`Episode ${episode}`)
-    .setThumbnail(projects[project].poster)
+    .setAuthor({ name: `${project.title} (${project.type})` })
+    .setTitle(`Episode ${selectedEpisode}`)
+    .setThumbnail(project.poster)
     .setDescription(!extended ? localStatus : publicStatus)
     .setTimestamp(Date.now());
-  const publishChannel = client.channels.cache.get(projects[project].updateChannel);
+  const publishChannel = client.channels.cache.get(project.updateChannel);
 
   if (publishChannel?.isTextBased) {
     (publishChannel as TextChannel).send({ embeds: [publishEmbed] })
-    .catch(err => console.error(`[Undone]: "${err.message}" from guild ${guildId}, project ${projects[project].nickname}`));
+    .catch(err => console.error(`[Undone]: "${err.message}" from guild ${guildId}, project ${project.nickname}`));
   }
 
-  if (!projects[project].observers) return; // Stop here if there's no observers
-    for (let observerid in projects[project].observers) {
-      const observer = projects[project].observers[observerid];
+  if (!project.observers) return; // Stop here if there's no observers
+    for (let observerid in project.observers) {
+      const observer = project.observers[observerid];
       if (!observer.updatesWebhook) continue;
       try {
         const postUrl = new URL(observer.updatesWebhook);

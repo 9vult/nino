@@ -28,27 +28,29 @@ export const BulkCmd = async (client: Client, db: Database, dbdata: DatabaseData
 
   let verification = await VerifyInteraction(dbdata, interaction, alias, false);
   if (!verification) return;
-  const { projects, project } = InteractionData(dbdata, interaction, alias);
+  const { projects, project: projectName } = InteractionData(dbdata, interaction, alias);
 
   if (start_episode > end_episode || start_episode == end_episode)
     return fail(t('invalidEpisodeRange', { lng }), interaction);
 
-  for (let staff in projects[project].keyStaff) {
-    let staffObj = projects[project].keyStaff[staff];
-    if (staffObj.role.abbreviation === abbreviation && (staffObj.id === user.id || projects[project].owner === user.id)) {
+  const project = projects[projectName];
+
+  for (let keyStaffId in project.keyStaff) {
+    let keyStaff = project.keyStaff[keyStaffId];
+    if (keyStaff.role.abbreviation === abbreviation && (keyStaff.id === user.id || project.owner === user.id)) {
       isValidUser = true;
-      taskName = staffObj.role.title;
+      taskName = keyStaff.role.title;
       switch (action) {
         case 'Done':
-          status = `✅ **${staffObj.role.title}**`;
+          status = `✅ **${keyStaff.role.title}**`;
           header = `✅ ${t('taskCompleteTitle', { lng })}`;
           break;
         case 'Undone':
-          status = `❌ **${staffObj.role.title}**`;
+          status = `❌ **${keyStaff.role.title}**`;
           header = `❌ ${t('taskIncompleteTitle', { lng })}`;
           break;
         case 'Skip':
-          status = `:fast_forward: **${staffObj.role.title}**`;
+          status = `:fast_forward: **${keyStaff.role.title}**`;
           header = `:fast_forward: ${t('taskSkippedTitle', { lng })}`;
           break;
       }
@@ -57,28 +59,28 @@ export const BulkCmd = async (client: Client, db: Database, dbdata: DatabaseData
 
   const SET_VALUE = !(action === 'Undone');
 
-  for (let ep in projects[project].episodes) {
-    const epobj = projects[project].episodes[ep];
-    if (epobj.number >= start_episode && epobj.number <= end_episode) {
+  for (let epId in project.episodes) {
+    const episode = project.episodes[epId];
+    if (episode.number >= start_episode && episode.number <= end_episode) {
 
-      for (let task in epobj.tasks) {
-        let taskObj = epobj.tasks[task];
-        if (taskObj.abbreviation === abbreviation) {
-          taskvalue = task;
-          db.ref(`/Projects/${guildId}/${project}/episodes/${ep}/tasks/${taskvalue}`).update({
+      for (let taskId in episode.tasks) {
+        let task = episode.tasks[taskId];
+        if (task.abbreviation === abbreviation) {
+          taskvalue = taskId;
+          db.ref(`/Projects/${guildId}/${projectName}/episodes/${epId}/tasks/${taskvalue}`).update({
             abbreviation, done: SET_VALUE
           });
           const utc = Math.floor(new Date().getTime() / 1000);
-          db.ref(`/Projects/${guildId}/${project}/episodes/${ep}`).update({
+          db.ref(`/Projects/${guildId}/${projectName}/episodes/${epId}`).update({
             updated: utc
           });
         }
-        else if ((SET_VALUE && !taskObj.done) || !SET_VALUE) episodeDone = false;
+        else if ((SET_VALUE && !task.done) || !SET_VALUE) episodeDone = false;
       }
 
       if (taskvalue == undefined) return fail(t('noSuchTask', { lng, abbreviation }), interaction);
       
-      db.ref(`/Projects/${guildId}/${project}/episodes/${ep}`).update({ done: episodeDone });
+      db.ref(`/Projects/${guildId}/${projectName}/episodes/${epId}`).update({ done: episodeDone });
     }
   }
 
@@ -86,7 +88,7 @@ export const BulkCmd = async (client: Client, db: Database, dbdata: DatabaseData
     return fail(t('permissionDenied', { lng }), interaction);
 
   const embed = new EmbedBuilder()
-    .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
+    .setAuthor({ name: `${project.title} (${project.type})` })
     .setTitle(header)
     .setDescription(t('bulkBody', { lng, taskName, start_episode, end_episode }))
     .setColor(0xd797ff)
@@ -94,21 +96,21 @@ export const BulkCmd = async (client: Client, db: Database, dbdata: DatabaseData
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 
   const publishEmbed = new EmbedBuilder()
-    .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
+    .setAuthor({ name: `${project.title} (${project.type})` })
     .setTitle(`Episodes ${start_episode} — ${end_episode}`)
-    .setThumbnail(projects[project].poster)
+    .setThumbnail(project.poster)
     .setDescription(status)
     .setTimestamp(Date.now());
-  const publishChannel = client.channels.cache.get(projects[project].updateChannel);
+  const publishChannel = client.channels.cache.get(project.updateChannel);
 
   if (publishChannel?.isTextBased) {
     (publishChannel as TextChannel).send({ embeds: [publishEmbed] })
-    .catch(err => console.error(`[Bulk]: "${err.message}" from guild ${guildId}, project ${projects[project].nickname}`));
+    .catch(err => console.error(`[Bulk]: "${err.message}" from guild ${guildId}, project ${project.nickname}`));
   }
 
-  if (!projects[project].observers) return; // Stop here if there's no observers
-    for (let observerid in projects[project].observers) {
-      const observer = projects[project].observers[observerid];
+  if (!project.observers) return; // Stop here if there's no observers
+    for (let observerId in project.observers) {
+      const observer = project.observers[observerId];
       if (!observer.updatesWebhook) continue;
       try {
         const postUrl = new URL(observer.updatesWebhook);
