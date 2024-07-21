@@ -70,7 +70,8 @@ export type WeightedStatusEntry = {
 };
 
 export type Configuration = {
-  progressDisplay: string | undefined
+  progressDisplay: string | undefined,
+  administrators: string[]
 };
 
 export type DatabaseData = {

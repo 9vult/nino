@@ -30,7 +30,12 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
 
   for (let staff in projects[project].keyStaff) {
     let staffObj = projects[project].keyStaff[staff];
-    if (staffObj.role.abbreviation === abbreviation && (staffObj.id === user.id || projects[project].owner === user.id)) {
+    if (staffObj.role.abbreviation === abbreviation && (
+      staffObj.id === user.id || 
+      projects[project].owner === user.id || 
+      (projects[project].administrators && projects[project].administrators.includes(user.id)) ||
+      (dbdata.configuration[guildId!] && dbdata.configuration[guildId!].administrators && dbdata.configuration[guildId!].administrators.includes(user.id))
+    )) {
       isValidUser = true;
       taskName = staffObj.role.title;
       status = `:fast_forward: **${staffObj.role.title}** ${t('skipped', { lng })}\n`;
@@ -57,7 +62,12 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
       if (!isValidUser) { // Not key staff
         for (let addStaff in projects[project].episodes[ep].additionalStaff) {
           let addStaffObj = projects[project].episodes[ep].additionalStaff[addStaff];
-          if (addStaffObj.role.abbreviation === abbreviation && (addStaffObj.id === user.id || projects[project].owner === user.id)) {
+          if (addStaffObj.role.abbreviation === abbreviation && (
+            addStaffObj.id === user.id ||
+            projects[project].owner === user.id ||
+            (projects[project].administrators && projects[project].administrators.includes(user.id)) ||
+            (dbdata.configuration[guildId!] && dbdata.configuration[guildId!].administrators && dbdata.configuration[guildId!].administrators.includes(user.id))
+          )) {
             status = `:fast_forward: **${addStaffObj.role.title}** ${t('skipped', { lng })}\n` + status;
             taskName = addStaffObj.role.title;
             isValidUser = true;

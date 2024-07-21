@@ -15,7 +15,8 @@ export const VerifyInteraction = async (dbdata: DatabaseData, interaction: ChatI
   
   if (!checkOwner) return true;
   
-  const isAdmin = projects[project].administrators && projects[project].administrators.includes(user!.id);
+  const isAdmin = (projects[project].administrators && projects[project].administrators.includes(user!.id))
+    || (dbdata.configuration[guildId] && dbdata.configuration[guildId].administrators && dbdata.configuration[guildId].administrators.includes(user!.id));
   const isOwner = projects[project].owner == user!.id;
   
   // Only owner allowed

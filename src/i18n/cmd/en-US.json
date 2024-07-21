@@ -101,6 +101,14 @@
       "name": "removeadmin",
       "description": "Remove an administrator from this project"
     },
+    "guild_admin": {
+      "name": "guild_admin",
+      "description": "Guild-wide administrator"
+    },
+    "project_admin": {
+      "name": "project_admin",
+      "description": "Project administrator"
+    },
     "release": {
       "name": "release",
       "description": "Release!"

@@ -90,7 +90,12 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   // Verify the user has permission to proceed
   for (let staff in projects[project].keyStaff) {
     let staffObj = projects[project].keyStaff[staff];
-    if (staffObj.role.abbreviation === abbreviation && (staffObj.id === user.id || projects[project].owner === user.id || projects[project].administrators.includes(user.id))) {
+    if (staffObj.role.abbreviation === abbreviation && (
+        staffObj.id === user.id || 
+        projects[project].owner === user.id || 
+        (projects[project].administrators && projects[project].administrators.includes(user.id)) ||
+        (dbdata.configuration[guildId!] && dbdata.configuration[guildId!].administrators && dbdata.configuration[guildId!].administrators.includes(user.id))
+    )) {
       isValidUser = true;
       taskName = staffObj.role.title;
       localStatus = `✅ **${staffObj.role.title}**\n`;
@@ -99,7 +104,12 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   if (!isValidUser) { // Not key staff
     for (let addStaff in workingEpisode.additionalStaff) {
       let addStaffObj = workingEpisode.additionalStaff[addStaff];
-      if (addStaffObj.role.abbreviation === abbreviation && (addStaffObj.id === user.id || projects[project].owner === user.id || projects[project].administrators.includes(user.id))) {
+      if (addStaffObj.role.abbreviation === abbreviation && (
+          addStaffObj.id === user.id ||
+          projects[project].owner === user.id ||
+          (projects[project].administrators && projects[project].administrators.includes(user.id)) ||
+          (dbdata.configuration[guildId!] && dbdata.configuration[guildId!].administrators && dbdata.configuration[guildId!].administrators.includes(user.id))
+      )) {
         localStatus = `✅ **${addStaffObj.role.title}**\n`;
         taskName = addStaffObj.role.title;
         isValidUser = true;
