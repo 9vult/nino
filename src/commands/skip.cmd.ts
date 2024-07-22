@@ -66,8 +66,8 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
         else stat = `**${task.abbreviation}** `;
 
         localEntries[task.abbreviation].status = stat;
-        status += EntriesToStatusString(localEntries);
       }
+      status += EntriesToStatusString(localEntries);
       if (taskvalue == undefined) return fail(t('noSuchTask', { lng, abbreviation }), interaction);
       if (!isValidUser) { // Not key staff
         for (let addStaffId in episode.additionalStaff) {
