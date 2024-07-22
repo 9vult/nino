@@ -274,14 +274,12 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   const episodeDoneText = episodeDone ? `\n${t('episodeDone', { lng, episode: nextEpisode.number })}` : '';
   
   const succinctBody = `${t('taskCompleteBody', { lng, taskName, episode: nextEpisode.number })}${episodeDoneText}`
-  const verboseBody = `${t('taskCompleteBody', { lng, taskName, episode: nextEpisode.number })}\n${EntriesToStatusString(localEntries)}${episodeDoneText}`;
-  const succinctTitle = `✅ ${t('taskCompleteTitle', { lng })}`;
-  const verboseTitle = `✅ Episode ${nextEpisode.number}`;
+  const verboseBody = `${t('taskCompleteBody', { lng, taskName, episode: nextEpisode.number })}\n\n${EntriesToStatusString(localEntries)}${episodeDoneText}`;
   const useVerbose = dbdata.configuration[guildId!]?.doneDisplay === 'Verbose';
 
   const replyEmbed = new EmbedBuilder()
     .setAuthor({ name: `${project.title} (${project.type})` })
-    .setTitle(useVerbose ? verboseTitle : succinctTitle)
+    .setTitle(`✅ ${t('taskCompleteTitle', { lng })}`)
     .setDescription(useVerbose ? verboseBody : succinctBody)
     .setColor(0xd797ff)
     .setTimestamp(Date.now());

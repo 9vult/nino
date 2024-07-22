@@ -102,14 +102,12 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
   const episodeDoneText = episodeDone ? `\n${t('episodeDone', { lng, episode: selectedEpisode })}` : '';
 
   const succinctBody = `${t('taskSkippedBody', { lng, taskName, episode: selectedEpisode })}${episodeDoneText}`
-  const verboseBody = `${t('taskSkippedBody', { lng, taskName, episode: selectedEpisode })}\n${EntriesToStatusString(localEntries)}${episodeDoneText}`;
-  const succinctTitle = `:fast_forward: ${t('taskSkippedTitle', { lng })}`;
-  const verboseTitle = `:fast_forward: Episode ${selectedEpisode}`;
+  const verboseBody = `${t('taskSkippedBody', { lng, taskName, episode: selectedEpisode })}\n\n${EntriesToStatusString(localEntries)}${episodeDoneText}`;
   const useVerbose = dbdata.configuration[guildId!]?.doneDisplay === 'Verbose';
 
   const replyEmbed = new EmbedBuilder()
     .setAuthor({ name: `${project.title} (${project.type})` })
-    .setTitle(useVerbose ? verboseTitle : succinctTitle)
+    .setTitle(`:fast_forward: ${t('taskSkippedTitle', { lng })}`)
     .setDescription(useVerbose ? verboseBody : succinctBody)
     .setColor(0xd797ff)
     .setTimestamp(Date.now());

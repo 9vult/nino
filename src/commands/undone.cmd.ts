@@ -125,14 +125,12 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
   db.ref(`/Projects/${guildId}/${projectName}/episodes/${episodeId}`).update({ done: false });
 
   const succinctBody = `${t('taskIncompleteBody', { lng, taskName, episode: selectedEpisode })}`
-  const verboseBody = `${succinctBody}\n${EntriesToStatusString(localEntries)}`;
-  const succinctTitle = `❌ ${t('taskIncompleteTitle', { lng })}`;
-  const verboseTitle = `❌ Episode ${selectedEpisode}`;
+  const verboseBody = `${succinctBody}\n\n${EntriesToStatusString(localEntries)}`;
   const useVerbose = dbdata.configuration[guildId!]?.doneDisplay === 'Verbose';
 
   const embed = new EmbedBuilder()
     .setAuthor({ name: `${project.title} (${project.type})` })
-    .setTitle(useVerbose ? verboseTitle : succinctTitle)
+    .setTitle(`❌ ${t('taskIncompleteTitle', { lng })}`)
     .setDescription(useVerbose ? verboseBody : succinctBody)
     .setColor(0xd797ff)
     .setTimestamp(Date.now());
