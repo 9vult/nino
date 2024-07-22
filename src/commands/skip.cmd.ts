@@ -5,6 +5,7 @@ import { Database } from "@firebase/database-types";
 import { fail } from "../actions/fail.action";
 import { GetAlias } from "../actions/getalias.action";
 import { InteractionData, VerifyInteraction } from "../actions/verify.action";
+import { EntriesToStatusString, GenerateEntries } from "../actions/generateEntries.action";
 import { t } from "i18next";
 
 export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
@@ -23,10 +24,12 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
   let isValidUser = false;
   let status = '';
   let episodeDone = true;
-
+  
   let verification = await VerifyInteraction(dbdata, interaction, alias, false);
   if (!verification) return;
   const { projects, project: projectName } = InteractionData(dbdata, interaction, alias);
+ 
+  let localEntries = GenerateEntries(dbdata, guildId!, projectName, selectedEpisode);
 
   const project = projects[projectName];
 
@@ -57,9 +60,13 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
         }
         else if (!task.done) episodeDone = false;
         // Status string
-        if (task.abbreviation === abbreviation) status += `__~~${abbreviation}~~__ `;
-        else if (task.done) status += `~~${task.abbreviation}~~ `;
-        else status += `**${task.abbreviation}** `;
+        let stat;
+        if (task.abbreviation === abbreviation) stat = `__~~${abbreviation}~~__ `;
+        else if (task.done) stat = `~~${task.abbreviation}~~ `;
+        else stat = `**${task.abbreviation}** `;
+
+        localEntries[task.abbreviation].status = stat;
+        status += EntriesToStatusString(localEntries);
       }
       if (taskvalue == undefined) return fail(t('noSuchTask', { lng, abbreviation }), interaction);
       if (!isValidUser) { // Not key staff
@@ -93,10 +100,17 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
   }
 
   const episodeDoneText = episodeDone ? `\n${t('episodeDone', { lng, episode: selectedEpisode })}` : '';
+
+  const succinctBody = `${t('taskSkippedBody', { lng, taskName, episode: selectedEpisode })}${episodeDoneText}`
+  const verboseBody = `${t('taskSkippedBody', { lng, taskName, episode: selectedEpisode })}\n${EntriesToStatusString(localEntries)}${episodeDoneText}`;
+  const succinctTitle = `:fast_forward: ${t('taskSkippedTitle', { lng })}`;
+  const verboseTitle = `:fast_forward: Episode ${selectedEpisode}`;
+  const useVerbose = dbdata.configuration[guildId!]?.doneDisplay === 'Verbose';
+
   const replyEmbed = new EmbedBuilder()
     .setAuthor({ name: `${project.title} (${project.type})` })
-    .setTitle(`:fast_forward: ${t('taskSkippedTitle', { lng })}`)
-    .setDescription(`${t('taskSkippedBody', { lng, taskName, episode: selectedEpisode })}${episodeDoneText}`)
+    .setTitle(useVerbose ? verboseTitle : succinctTitle)
+    .setDescription(useVerbose ? verboseBody : succinctBody)
     .setColor(0xd797ff)
     .setTimestamp(Date.now());
   await interaction.editReply({ embeds: [replyEmbed], allowedMentions: generateAllowedMentions([[], []]) });

@@ -24,8 +24,8 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   let isValidUser = false;
   let isAdditionalStaff = false;
   let episodeDone = true;
-  let localEntries: { [key: string]: WeightedStatusEntry };
-  let publicEntries: { [key: string]: WeightedStatusEntry };
+  let localEntries: { [key: string]: WeightedStatusEntry } = {};
+  let publicEntries: { [key: string]: WeightedStatusEntry } = {};
 
   let workingEpisode: Episode | undefined;
   let workingEpisodeTask: Task | undefined;
@@ -272,10 +272,17 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   }
 
   const episodeDoneText = episodeDone ? `\n${t('episodeDone', { lng, episode: nextEpisode.number })}` : '';
+  
+  const succinctBody = `${t('taskCompleteBody', { lng, taskName, episode: nextEpisode.number })}${episodeDoneText}`
+  const verboseBody = `${t('taskCompleteBody', { lng, taskName, episode: nextEpisode.number })}\n${EntriesToStatusString(localEntries)}${episodeDoneText}`;
+  const succinctTitle = `✅ ${t('taskCompleteTitle', { lng })}`;
+  const verboseTitle = `✅ Episode ${nextEpisode.number}`;
+  const useVerbose = dbdata.configuration[guildId!]?.doneDisplay === 'Verbose';
+
   const replyEmbed = new EmbedBuilder()
     .setAuthor({ name: `${project.title} (${project.type})` })
-    .setTitle(`✅ ${t('taskCompleteTitle', { lng })}`)
-    .setDescription(`${t('taskCompleteBody', { lng, taskName, episode: nextEpisode.number })}${episodeDoneText}`)
+    .setTitle(useVerbose ? verboseTitle : succinctTitle)
+    .setDescription(useVerbose ? verboseBody : succinctBody)
     .setColor(0xd797ff)
     .setTimestamp(Date.now());
   if (!replied)

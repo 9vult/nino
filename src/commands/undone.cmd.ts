@@ -124,10 +124,16 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
 
   db.ref(`/Projects/${guildId}/${projectName}/episodes/${episodeId}`).update({ done: false });
 
+  const succinctBody = `${t('taskIncompleteBody', { lng, taskName, episode: selectedEpisode })}`
+  const verboseBody = `${succinctBody}\n${EntriesToStatusString(localEntries)}`;
+  const succinctTitle = `❌ ${t('taskIncompleteTitle', { lng })}`;
+  const verboseTitle = `❌ Episode ${selectedEpisode}`;
+  const useVerbose = dbdata.configuration[guildId!]?.doneDisplay === 'Verbose';
+
   const embed = new EmbedBuilder()
     .setAuthor({ name: `${project.title} (${project.type})` })
-    .setTitle(`❌ ${t('taskIncompleteTitle', { lng })}`)
-    .setDescription(t('taskIncompleteBody', { lng, taskName, episode: selectedEpisode }))
+    .setTitle(useVerbose ? verboseTitle : succinctTitle)
+    .setDescription(useVerbose ? verboseBody : succinctBody)
     .setColor(0xd797ff)
     .setTimestamp(Date.now());
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });

@@ -807,6 +807,23 @@ export default (client: Client, dbdata: DatabaseData): void => {
               { name: 'Extended', value: 'Extended' }
             )
         )
+      )
+      .addSubcommand(s => 
+        s.setName('done_display')
+        .setDescription('Select a done/undone/skip reply embed type')
+        .setNameLocalizations(GetNames(d, 'commands', 'done_display'))
+        .setDescriptionLocalizations(GetDescs(d, 'commands', 'done_display'))
+        .addStringOption(o =>
+          o.setName('embed_type')
+            .setDescription('Embed type')
+            .setNameLocalizations(GetNames(d, 'options', 'embed_type'))
+            .setDescriptionLocalizations(GetDescs(d, 'options', 'embed_type'))
+            .setRequired(true)
+            .addChoices(
+              { name: 'Succinct', value: 'Succinct' },
+              { name: 'Verbose', value: 'Verbose' }
+            )
+        )
       );
 
     const airReminderCmd = new SlashCommandBuilder()

@@ -25,8 +25,12 @@ export const ConfigurationCmd = async (client: Client, db: Database, dbdata: Dat
 
   switch (subcommand) {
     case 'progress_display':
-      const newValue = options.getString('embed_type')!;
-      ref.update({ progressDisplay: newValue });
+      const progressDisplay = options.getString('embed_type')!;
+      ref.update({ progressDisplay });
+      break;
+    case 'done_display':
+      const doneDisplay = options.getString('embed_type')!;
+      ref.update({ doneDisplay });
       break;
   }
 

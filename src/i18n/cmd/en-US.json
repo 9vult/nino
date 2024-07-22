@@ -125,6 +125,10 @@
       "name": "progress_display",
       "description": "Select a progress embed type"
     },
+    "done_display": {
+      "name": "done_display",
+      "description": "Select a done/undone/skip reply embed type"
+    },
     "airreminder": {
       "name": "airreminder",
       "description": "Enable or disable airing reminders"
