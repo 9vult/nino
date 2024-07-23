@@ -6,6 +6,7 @@ import { fail } from "../actions/fail.action";
 import { GetAlias } from "../actions/getalias.action";
 import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 import { t } from "i18next";
+import { getKeyStaff } from "../actions/getters";
 
 export const SwapStaffCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -19,20 +20,16 @@ export const SwapStaffCmd = async (client: Client, db: Database, dbdata: Databas
 
   let verification = await VerifyInteraction(dbdata, interaction, alias);
   if (!verification) return;
-  const { projects, project } = InteractionData(dbdata, interaction, alias);
 
-  var found;
-  for (let keystaff in projects[project].keyStaff) {
-    let staffObj = projects[project].keyStaff[keystaff];
-    if (staffObj.role.abbreviation === abbreviation) {
-      found = keystaff;
-      db.ref(`/Projects/${guildId}/${project}`).child("keyStaff").child(found).update({ id: staff });
-      break;
-    }
-  }
+  const { projects, project: projectName } = InteractionData(dbdata, interaction, alias);
+  let project = projects[projectName];
 
-  if (found == undefined)
+  let { id: keyStaffId } = getKeyStaff(project, abbreviation);
+  if (keyStaffId) {
+    db.ref(`/Projects/${guildId}/${projectName}`).child("keyStaff").child(keyStaffId).update({ id: staff });
+  } else {
     return fail(t('error.noSuchTask', { lng, abbreviation }), interaction);
+  }
 
   const staffMention = `<@${staff}>`;
   const embed = new EmbedBuilder()

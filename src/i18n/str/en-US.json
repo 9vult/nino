@@ -25,6 +25,7 @@
   "error.incorrectAirTimeFormat": "Air time must be a 24-hour HH:MM time, ex: 16:30",
   "error.invalidTimeRange": "Invalid episode range",
   "error.noRoster": "There are no key staff assigned to that project.",
+  "error.noSuchEpisode": "Episode {{episodeNumber, number}} does not exist.",
   "error.noSuchGuild": "Guild {{guildId}} does not exist.",
   "error.noSuchObserver": "That observer does not exist!",
   "error.noSuchProject": "That project does not exist!",
