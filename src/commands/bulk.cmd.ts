@@ -7,6 +7,7 @@ import { GetAlias } from "../actions/getalias.action";
 import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 import { t } from "i18next";
 import { getKeyStaff } from "../actions/getters";
+import { AlertError } from "../actions/alertError";
 
 export const BulkCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -106,7 +107,7 @@ export const BulkCmd = async (client: Client, db: Database, dbdata: DatabaseData
 
   if (publishChannel?.isTextBased) {
     (publishChannel as TextChannel).send({ embeds: [publishEmbed] })
-    .catch(err => console.error(`[Bulk]: "${err.message}" from guild ${guildId}, project ${project.nickname}`));
+    .catch(err => AlertError(client, err, guildId!, project.nickname, 'Bulk'));
   }
 
   if (!project.observers) return; // Stop here if there's no observers

@@ -7,6 +7,7 @@ import { GetAlias } from "../actions/getalias.action";
 import { EntriesToStatusString, GenerateEntries } from "../actions/generateEntries.action";
 import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 import { t } from "i18next";
+import { AlertError } from "../actions/alertError";
 
 export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -319,7 +320,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
 
   if (publishChannel?.isTextBased) {
     (publishChannel as TextChannel).send({ embeds: [publishEmbed] })
-    .catch(err => console.error(`[Done]: "${err.message}" from guild ${guildId}, project ${project.nickname}`));
+    .catch(err => AlertError(client, err, guildId!, project.nickname, 'Done'));
   }
 
   if (!project.observers) return; // Stop here if there's no observers
