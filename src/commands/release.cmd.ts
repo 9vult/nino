@@ -55,7 +55,7 @@ export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseD
     const observer = projects[project].observers[observerid];
     if (!observer.releasesWebhook) continue;
 
-    let observerPublishRole = observer.releaseRole ? `<@&${observer.releaseRole}> ` : '';
+    let observerPublishRole = (observer.releaseRole && observer.releaseRole != '') ? `<@&${observer.releaseRole}> ` : '';
 
     try {
       const postUrl = new URL(observer.releasesWebhook);
