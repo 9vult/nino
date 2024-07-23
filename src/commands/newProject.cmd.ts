@@ -22,6 +22,7 @@ export const NewProjectCmd = async (client: Client, db: Database, dbdata: Databa
   const type = options.getString('projecttype')!;
   const length = options.getNumber('length')!;
   const poster = options.getString('poster')!;
+  const isPrivate = options.getBoolean('private')!;
   const updateChannel = options.getChannel('updatechannel')!.id;
   const releaseChannel = options.getChannel('releasechannel')!.id;
 
@@ -45,7 +46,8 @@ export const NewProjectCmd = async (client: Client, db: Database, dbdata: Databa
     administrators: [],
     airReminderEnabled: false,
     airReminderRole: '',
-    airReminderChannel: ''
+    airReminderChannel: '',
+    isPrivate
   };
   ref.set(newProj);
 

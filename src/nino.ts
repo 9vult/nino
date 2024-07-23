@@ -14,7 +14,7 @@ require('dotenv').config();
 var admin = require('firebase-admin');
 var firebase = require('./firebase.json');
 
-export const VERSION = "3.7.1";
+export const VERSION = "3.8.0";
 export const OWNER = process.env.OWNER;
 
 admin.initializeApp({

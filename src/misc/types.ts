@@ -18,7 +18,8 @@ export interface Project {
   administrators: string[],
   airReminderEnabled: boolean,
   airReminderRole: string | '',
-  airReminderChannel: string | ''
+  airReminderChannel: string | '',
+  isPrivate: boolean
 };
 
 export interface Episode {

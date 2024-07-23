@@ -33,6 +33,7 @@ import { AddAdminCmd } from "../commands/addAdmin.cmd";
 import { RemoveAdminCmd } from "../commands/removeAdmin.cmd";
 import { AirReminderCmd } from "../commands/airReminder.cmd";
 import { BulkCmd } from "../commands/bulk.cmd";
+import { getAllPrivilegedIds } from "../actions/getters";
 
 export default (client: Client, db: Database, dbdata: DatabaseData): void => {
   client.on('interactionCreate', async (interaction) => {
@@ -135,7 +136,7 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
 
   client.on('interactionCreate', async (interaction: BaseInteraction) => {
     if (!interaction.isAutocomplete()) return;
-    const { options, guildId, commandName } = interaction as AutocompleteInteraction;
+    const { options, guildId, commandName, user } = interaction as AutocompleteInteraction;
     let focusedOption = options.getFocused(true);
     let choices;
     try {
@@ -146,8 +147,13 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
 
           // own guild
           if ((guildId in dbdata.guilds)) {
-            let projects = dbdata.guilds[guildId];
-            const newAliases = Object.values(projects).reduce((acc, cur) => {
+            let projects = Object.values(dbdata.guilds[guildId]);
+            projects = projects.filter((p) => {
+              if (!p.isPrivate) return true;
+              let privilegedIds = getAllPrivilegedIds(p, dbdata.configuration[guildId!]?.administrators ?? []);
+              return privilegedIds.includes(user.id);
+            });
+            const newAliases = projects.reduce((acc, cur) => {
               acc.push(cur.nickname);
               if (cur.aliases) acc.push(...cur.aliases);
               return acc;
@@ -163,8 +169,14 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
 
               let observedProjects = (dbdata.observers[guildId][curGuildId]).filter((p) => p.blame).map(p => p.name);
               let projects = Object.values(dbdata.guilds[curGuildId]).filter(p => observedProjects.includes(p.nickname));
+              
+              projects = projects.filter((p) => {
+                if (!p.isPrivate) return true;
+                let privilegedIds = getAllPrivilegedIds(p, dbdata.configuration[guildId!]?.administrators ?? []);
+                return privilegedIds.includes(user.id);
+              });
 
-              const newAliases = Object.values(projects).reduce((acc, cur) => {
+              const newAliases = projects.reduce((acc, cur) => {
                 acc.push(cur.nickname);
                 if (cur.aliases) acc.push(...cur.aliases);
                 return acc;

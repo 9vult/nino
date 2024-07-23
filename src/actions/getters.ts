@@ -111,3 +111,41 @@ export const getBlameableEpisode = (project: Project, episodeNumber: number | nu
     episode: undefined
   };
 }
+
+/**
+ * Get a list of all privileged IDs for a project (they can see private projects)
+ * @param project Project to get the privileged IDs of
+ * @returns List of privileged IDs
+ */
+export const getAllPrivilegedIds = (project: Project, guildAdmins: string[]) => {
+  const ids: string[] = [];
+
+  // Owner
+  ids.push(project.owner);
+
+  // Project admins
+  for (let admin of (project.administrators ?? [])) {
+    ids.push(admin);
+  }
+
+  // Guild admins
+  for (let admin of guildAdmins) {
+    ids.push(admin);
+  }
+
+  // Key Staff members
+  for (let id in project.keyStaff) {
+    const keyStaff = project.keyStaff[id];
+    ids.push(keyStaff.id);
+  }
+
+  // Additional Staff members
+  for (let id in project.episodes) {
+    const episode = project.episodes[id];
+    for (let id in episode.additionalStaff) {
+      const addStaff = episode.additionalStaff[id];
+      ids.push(addStaff.id);
+    }
+  }
+  return ids;
+}

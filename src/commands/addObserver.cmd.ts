@@ -5,6 +5,7 @@ import { Database } from "@firebase/database-types";
 import { GetAlias } from "../actions/getalias.action";
 import { fail } from "../actions/fail.action";
 import { t } from "i18next";
+import { getAllPrivilegedIds } from "../actions/getters";
 
 export const AddObserverCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -33,17 +34,21 @@ export const AddObserverCmd = async (client: Client, db: Database, dbdata: Datab
     return await fail(t('error.noSuchGuild', { lng, guildId: originGuildId }), interaction);
  
   let projects = dbdata.guilds[originGuildId];
-    if (!alias || !(alias in projects))
+  if (!alias || !(alias in projects))
+    return await fail(t('error.noSuchProject', { lng }), interaction);
+
+  if (projects[alias].isPrivate) {
+    let privilegedIds = getAllPrivilegedIds(projects[alias], dbdata.configuration[originGuildId!]?.administrators ?? []);
+    if (!privilegedIds.includes(user.id))
       return await fail(t('error.noSuchProject', { lng }), interaction);
+  }
 
-  const project = alias;
+  const projectName = alias;
 
-  db.ref(`/Projects/`).child(`${originGuildId}`).child(`${project}`).child('observers')
+  db.ref(`/Projects/`).child(`${originGuildId}`).child(`${projectName}`).child('observers')
     .push({ guildId: observingGuildId, updatesWebhook: updatesWH, releasesWebhook: relesesWH, managerid: user.id, releaseRole });
-  
-  
 
-  const nameAndBlame: ObservedProject = { name: project, blame };
+  const nameAndBlame: ObservedProject = { name: projectName, blame };
   const ref = db.ref(`/Observers`).child(`${observingGuildId}`);
   if (dbdata.observers 
       && dbdata.observers[observingGuildId] 
@@ -61,7 +66,7 @@ export const AddObserverCmd = async (client: Client, db: Database, dbdata: Datab
 
   const embed = new EmbedBuilder()
     .setTitle(t('title.projectModification', { lng }))
-    .setDescription(t('observer.added', { lng, originGuildId, project }))
+    .setDescription(t('observer.added', { lng, originGuildId, project: projectName }))
     .setColor(0xd797ff);
   
   (await interaction.editReply("OK")).delete(); // Remove any webhook URLs from the log

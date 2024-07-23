@@ -65,6 +65,13 @@ export default (client: Client, dbdata: DatabaseData): void => {
           .setDescriptionLocalizations(GetDescs(d, 'options', 'poster'))
           .setRequired(true)
       )
+      .addBooleanOption(o =>
+        o.setName('private')
+          .setDescription('Is this project private?')
+          .setNameLocalizations(GetNames(d, 'options', 'private'))
+          .setDescriptionLocalizations(GetDescs(d, 'options', 'private'))
+          .setRequired(true)
+      )
       .addChannelOption(o =>
         o.setName('updatechannel')
           .setDescription('Channel to post updates to')
@@ -355,6 +362,7 @@ export default (client: Client, dbdata: DatabaseData): void => {
             { name: 'Poster', value: 'Poster' },
             { name: 'AniDB', value: 'AniDB' },
             { name: 'AirTime24h', value: 'AirTime24h' },
+            { name: 'IsPrivate', value: 'IsPrivate' },
             { name: 'UpdateChannelID', value: 'UpdateChannel' },
             { name: 'ReleaseChannelID', value: 'ReleaseChannel' }
           )

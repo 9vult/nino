@@ -23,6 +23,7 @@
   "error.doneFailureGeneric": "Your task is complete for all episodes, or the specified episode could not be found.",
   "error.generic": "An Error Occured.",
   "error.incorrectAirTimeFormat": "Air time must be a 24-hour HH:MM time, ex: 16:30",
+  "error.incorrectBooleanFormat": "This value is a boolean and must be either 'true', 'false', 'yes', or 'no'",
   "error.invalidTimeRange": "Invalid episode range",
   "error.noRoster": "There are no key staff assigned to that project.",
   "error.noSuchEpisode": "Episode {{episodeNumber, number}} does not exist.",

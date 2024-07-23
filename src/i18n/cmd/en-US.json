@@ -167,6 +167,10 @@
       "name": "poster",
       "description": "Poster image URL"
     },
+    "private": {
+      "name": "private",
+      "description": "Is this project private?"
+    },
     "updatechannel": {
       "name": "updatechannel",
       "description": "Channel to post updates to"

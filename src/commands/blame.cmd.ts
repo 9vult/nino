@@ -8,11 +8,11 @@ import { GetObserverAlias } from "../actions/getalias.action";
 import { AirDate } from "../actions/airdate.action";
 import { EntriesToStatusString, GenerateEntries } from "../actions/generateEntries.action";
 import { t } from "i18next";
-import { getBlameableEpisode } from "../actions/getters";
+import { getAllPrivilegedIds, getBlameableEpisode } from "../actions/getters";
 
 export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
-  const { options, locale: lng } = interaction;
+  const { options, user, locale: lng } = interaction;
   
   await interaction.deferReply();
   
@@ -31,6 +31,12 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
     return fail(t('error.noSuchProject', { lng }), interaction);
 
   let project = projects[projectName];
+
+  if (project.isPrivate) {
+    let privilegedIds = getAllPrivilegedIds(project, dbdata.configuration[guildId!]?.administrators ?? []);
+    if (!privilegedIds.includes(user.id))
+      return fail(t('error.noSuchProject', { lng }), interaction);
+  }
 
   let status = '';
   let entries: {[key:string]:WeightedStatusEntry} = {};

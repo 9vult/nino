@@ -40,6 +40,7 @@ Set up a new project. This command is only accessible by server administrators.
 | type | yes | choose | Type of project. Choose between TV, Movie, and BD |
 | length | yes | number | Number of episodes. Generally, 1 for movies |
 | poster | yes | string<URL> | Poster image URL (used in embeds) |
+| private | yes | boolean | Is this project private? ([See below note](#a-note-on-private-projects-and-privileged-users)) |
 | updatechannel | yes | channel | Channel to post progress updates in |
 | releasechannel | yes | channel | Channel to post releases in |
 
@@ -235,6 +236,7 @@ Options:
 | AirTime24h | time | 24-hour air time (Japan time) of episodes (ex: `16:30`) |
 | UpdateChannelID | string | ID of channel to post updates in |
 | ReleaseChannelID | string | ID of channel to post releases in |
+| IsPrivate | string<boolean> | Is this project private? ([See below note](#a-note-on-private-projects-and-privileged-users)) |
 
 ### configuration
 
@@ -248,6 +250,15 @@ Options:
 |--------|-------------|
 | Normal | Progress display will use abbreviations |
 | Extended | Progress display will mimic [/done with the `explain` toggle enabled](#done)  |
+
+#### done_display
+
+Options:
+
+| Option | Description |
+|--------|-------------|
+| Succinct | Default replies to progress commands |
+| Verbose | Include status line |
 
 ## Commands - Progress
 
@@ -341,3 +352,26 @@ Displays some simple help.
 ### about
 
 Displays some information about Nino.
+
+## A Note on Private Projects and Privileged Users
+
+For the case of Private Projects, a privileged user is any of the following:
+ - Project owner
+ - Project-scope administrators
+ - Guild-scope administrators
+ - Key Staff
+ - Additional Staff
+
+| Item                    | Public              | Privileged         | Non-Privileged     |
+|-------------------------|---------------------|--------------------|--------------------|
+| Show in Autocomplete    | :heavy_check_mark:  | :heavy_check_mark: | :x:                |
+| `/blame`                | :heavy_check_mark:  | :heavy_check_mark: | :x:                |
+| See Public Updates\*    | :heavy_check_mark:  | :heavy_check_mark: | :heavy_check_mark: |
+| See Public Releases\*   | :heavy_check_mark:  | :heavy_check_mark: | :heavy_check_mark: |
+| Add New Observer        | :heavy_check_mark:  | :heavy_check_mark: | :x:                |
+| Observer Autocomplete   | :heavy_check_mark:  | :heavy_check_mark: | :x:                |
+| Observer `/blame`       | :heavy_check_mark:  | :heavy_check_mark: | :x:                |
+| Observer Updates        | :heavy_check_mark:  | :heavy_check_mark: | :heavy_check_mark: |
+| Observer Releases       | :heavy_check_mark:  | :heavy_check_mark: | :heavy_check_mark: |
+
+\* "Public Updates" and "Public Releases" refer to a publicly accessible `updatechannel` or `releasechannel`.

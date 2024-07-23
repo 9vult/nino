@@ -59,7 +59,7 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
 
     // Status string
     let stat;
-    if (task.abbreviation === abbreviation) stat = `__~~${abbreviation}~~__ `;
+    if (task.abbreviation === abbreviation) stat = `__${abbreviation}__ `;
     else if (task.done) stat = `~~${task.abbreviation}~~ `;
     else stat = `**${task.abbreviation}** `;
 
@@ -90,6 +90,7 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
     db.ref(`/Projects/${guildId}/${projectName}/episodes/${episodeId}/tasks/${taskvalue}`).update({
       abbreviation, done: false
     });
+    db.ref(`/Projects/${guildId}/${projectName}/episodes/${episodeId}`).update({ done: false });
     const utc = Math.floor(new Date().getTime() / 1000);
     db.ref(`/Projects/${guildId}/${projectName}/episodes/${episodeId!}`).update({
       updated: utc

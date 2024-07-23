@@ -45,6 +45,14 @@ export const EditProjectCmd = async (client: Client, db: Database, dbdata: Datab
       if (!isTime) return fail(t('error.incorrectAirTimeFormat', { lng }), interaction);
       ref.update({ airTime: newValue });
       break;
+    case 'IsPrivate':
+      if (!(newValue.toLowerCase() == 'true') && !(newValue.toLowerCase() == 'false')
+        && !(newValue.toLowerCase() == 'yes') && !(newValue.toLowerCase() == 'no')) {
+          return fail(t('error.incorrectBooleanFormat', { lng }), interaction);
+      }
+      let truthy = (newValue.toLowerCase() == 'true') || (newValue.toLowerCase() == 'yes');
+      ref.update({ isPrivate: truthy });
+      break;
   }
 
   const embed = new EmbedBuilder()
