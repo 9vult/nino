@@ -19,6 +19,7 @@ export interface Project {
   airReminderEnabled: boolean,
   airReminderRole: string | '',
   airReminderChannel: string | '',
+  motd: string,
   isPrivate: boolean
 };
 

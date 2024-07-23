@@ -47,6 +47,7 @@ export const NewProjectCmd = async (client: Client, db: Database, dbdata: Databa
     airReminderEnabled: false,
     airReminderRole: '',
     airReminderChannel: '',
+    motd: '',
     isPrivate
   };
   ref.set(newProj);

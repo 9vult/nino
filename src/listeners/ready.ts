@@ -360,6 +360,7 @@ export default (client: Client, dbdata: DatabaseData): void => {
           .addChoices(
             { name: 'Title', value: 'Title' },
             { name: 'Poster', value: 'Poster' },
+            { name: 'MOTD', value: 'MOTD' },
             { name: 'AniDB', value: 'AniDB' },
             { name: 'AirTime24h', value: 'AirTime24h' },
             { name: 'IsPrivate', value: 'IsPrivate' },

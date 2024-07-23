@@ -83,6 +83,8 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
   else if (updateTime !== 0)
     status += `\n${t('episode.lastUpdated', { lng, rel: `<t:${updateTime}:R>` })}`;
 
+  if (project.motd) status = `${project.motd}\n${status}`;
+
   const lock = project.isPrivate ? '🔒 ' : '';
 
   const embed = new EmbedBuilder()

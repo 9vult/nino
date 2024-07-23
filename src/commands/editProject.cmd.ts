@@ -24,12 +24,21 @@ export const EditProjectCmd = async (client: Client, db: Database, dbdata: Datab
 
   const ref = db.ref(`/Projects/`).child(`${guildId}`).child(`${project}`);
 
+  let helperText = '';
+
   switch (option) {
     case 'Title':
       ref.update({ title: newValue });
       break;
     case 'Poster':
       ref.update({ poster: newValue });
+      break;
+    case 'MOTD':
+      if (newValue == '-')
+        ref.update({ motd: '' });
+      else
+        ref.update({ motd: newValue });
+      helperText = t('project.edited.motdHelp', { lng })
       break;
     case 'UpdateChannel':
       ref.update({ updateChannel: newValue });
@@ -55,9 +64,11 @@ export const EditProjectCmd = async (client: Client, db: Database, dbdata: Datab
       break;
   }
 
+  const description = helperText ? `${t('project.edited', { lng, project })}\n${helperText}` : t('project.edited', { lng, project });
+
   const embed = new EmbedBuilder()
     .setTitle(t('title.projectModification', { lng }))
-    .setDescription(t('project.edited', { lng, project }))
+    .setDescription(description)
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }
