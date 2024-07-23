@@ -83,8 +83,10 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
   else if (updateTime !== 0)
     status += `\n${t('episode.lastUpdated', { lng, rel: `<t:${updateTime}:R>` })}`;
 
+  const lock = project.isPrivate ? '🔒 ' : '';
+
   const embed = new EmbedBuilder()
-    .setAuthor({ name: `${project.title} (${project.type})` })
+    .setAuthor({ name: `${lock}${project.title} (${project.type})` })
     .setTitle(t('title.blamedEpisode', { lng, episode: episodeNumber }))
     .setThumbnail(project.poster)
     .setDescription(status)

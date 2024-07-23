@@ -101,8 +101,10 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
   const verboseBody = `${succinctBody}\n\n${EntriesToStatusString(localEntries)}`;
   const useVerbose = dbdata.configuration[guildId!]?.doneDisplay === 'Verbose';
 
+  const lock = project.isPrivate ? '🔒 ' : '';
+
   const replyEmbed = new EmbedBuilder()
-    .setAuthor({ name: `${project.title} (${project.type})` })
+    .setAuthor({ name: `${lock}${project.title} (${project.type})` })
     .setTitle(`❌ ${t('title.taskIncomplete', { lng })}`)
     .setDescription(useVerbose ? verboseBody : succinctBody)
     .setColor(0xd797ff)

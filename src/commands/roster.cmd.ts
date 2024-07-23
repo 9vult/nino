@@ -61,8 +61,10 @@ export const RosterCmd = async (client: Client, db: Database, dbdata: DatabaseDa
 
   status = EntriesToStatusString(entries, '\n');
 
+  const lock = projects[project].isPrivate ? '🔒 ' : '';
+
   const embed = new EmbedBuilder()
-    .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
+    .setAuthor({ name: `${lock}${projects[project].title} (${projects[project].type})` })
     .setTitle(t('title.blamedEpisode', { lng, episode }))
     .setThumbnail(projects[project].poster)
     .setDescription(status)

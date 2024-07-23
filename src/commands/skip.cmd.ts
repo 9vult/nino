@@ -103,8 +103,10 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
   const verboseBody = `${t('progress.skipped', { lng, taskName, episode: selectedEpisode })}\n\n${EntriesToStatusString(localEntries)}${episodeDoneText}`;
   const useVerbose = dbdata.configuration[guildId!]?.doneDisplay === 'Verbose';
 
+  const lock = project.isPrivate ? '🔒 ' : '';
+
   const replyEmbed = new EmbedBuilder()
-    .setAuthor({ name: `${project.title} (${project.type})` })
+    .setAuthor({ name: `${lock}${project.title} (${project.type})` })
     .setTitle(`:fast_forward: ${t('title.taskSkipped', { lng })}`)
     .setDescription(useVerbose ? verboseBody : succinctBody)
     .setColor(0xd797ff)

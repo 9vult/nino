@@ -45,9 +45,11 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
 
   let extended = dbdata.configuration[guildId!]?.progressDisplay == 'Extended';
 
-  // Find selected episode or current working episode
   let success = false;
   const project = projects[projectName];
+  const lock = project.isPrivate ? '🔒 ' : '';
+  
+  // Find selected episode or current working episode
   for (let epId in project.episodes) {
     let episode = project.episodes[epId];
     if ((selectedEpisode != null && episode.number == selectedEpisode) || (selectedEpisode == null && episode.done == false)) {
@@ -194,7 +196,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
       .setLabel(t('progress.done.inTheDust.dontDoIt.button', { lng }))
       .setStyle(ButtonStyle.Secondary);
     const replyEmbed = new EmbedBuilder()
-      .setAuthor({ name: `${project.title} (${project.type})` })
+      .setAuthor({ name: `${lock}${project.title} (${project.type})` })
       .setTitle(`❓ ${t('progress.done.inTheDust.question', { lng })}`)
       .setDescription(msgBody)
       .setColor(0xd797ff)
@@ -258,7 +260,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
       editBody = t('progress.done.inTheDust.timeout', { lng });
     }
     const editedEmbed = new EmbedBuilder()
-      .setAuthor({ name: `${project.title} (${project.type})` })
+      .setAuthor({ name: `${lock}${project.title} (${project.type})` })
       .setTitle(`❓ ${t('progress.done.inTheDust.question', { lng })}`)
       .setDescription(editBody ?? 'i18n failed')
       .setColor(0xd797ff)
@@ -279,7 +281,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   const useVerbose = dbdata.configuration[guildId!]?.doneDisplay === 'Verbose';
 
   const replyEmbed = new EmbedBuilder()
-    .setAuthor({ name: `${project.title} (${project.type})` })
+    .setAuthor({ name: `${lock}${project.title} (${project.type})` })
     .setTitle(`✅ ${t('title.taskComplete', { lng })}`)
     .setDescription(useVerbose ? verboseBody : succinctBody)
     .setColor(0xd797ff)
