@@ -41,8 +41,8 @@ export const AddEpisodeCmd = async (client: Client, db: Database, dbdata: Databa
   }
 
   const embed = new EmbedBuilder()
-    .setTitle(t('projectModificationTitle', { lng }))
-    .setDescription(t('addEpisode', { lng, number, project }))
+    .setTitle(t('title.projectModification', { lng }))
+    .setDescription(t('episode.added', { lng, number, project }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

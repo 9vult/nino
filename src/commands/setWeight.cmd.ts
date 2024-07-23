@@ -29,11 +29,11 @@ export const SetWeightCmd = async (client: Client, db: Database, dbdata: Databas
     }
 
 if (!success)
-  return fail(t('noSuchTask', { lng, abbreviation }), interaction);
+  return fail(t('error.noSuchTask', { lng, abbreviation }), interaction);
 
   const embed = new EmbedBuilder()
-    .setTitle(t('projectModificationTitle', { lng }))
-    .setDescription(t('setWeight', { lng, abbreviation, weight }))
+    .setTitle(t('title.projectModification', { lng }))
+    .setDescription(t('keyStaff.weight.updated', { lng, abbreviation, weight }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

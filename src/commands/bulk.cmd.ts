@@ -6,6 +6,8 @@ import { fail } from "../actions/fail.action";
 import { GetAlias } from "../actions/getalias.action";
 import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 import { t } from "i18next";
+import { getKeyStaff } from "../actions/getters";
+import { AlertError } from "../actions/alertError";
 
 export const BulkCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -31,29 +33,29 @@ export const BulkCmd = async (client: Client, db: Database, dbdata: DatabaseData
   const { projects, project: projectName } = InteractionData(dbdata, interaction, alias);
 
   if (start_episode > end_episode || start_episode == end_episode)
-    return fail(t('invalidEpisodeRange', { lng }), interaction);
+    return fail(t('error.invalidTimeRange', { lng }), interaction);
 
   const project = projects[projectName];
 
-  for (let keyStaffId in project.keyStaff) {
-    let keyStaff = project.keyStaff[keyStaffId];
-    if (keyStaff.role.abbreviation === abbreviation && (keyStaff.id === user.id || project.owner === user.id)) {
-      isValidUser = true;
-      taskName = keyStaff.role.title;
-      switch (action) {
-        case 'Done':
-          status = `✅ **${keyStaff.role.title}**`;
-          header = `✅ ${t('taskCompleteTitle', { lng })}`;
-          break;
-        case 'Undone':
-          status = `❌ **${keyStaff.role.title}**`;
-          header = `❌ ${t('taskIncompleteTitle', { lng })}`;
-          break;
-        case 'Skip':
-          status = `:fast_forward: **${keyStaff.role.title}**`;
-          header = `:fast_forward: ${t('taskSkippedTitle', { lng })}`;
-          break;
-      }
+  let { keyStaff } = getKeyStaff(project, abbreviation);
+  if (!keyStaff) return fail(t('error.noSuchTask', { lng, abbreviation }), interaction);
+
+  if (keyStaff.id === user.id || project.owner === user.id) {
+    isValidUser = true;
+    taskName = keyStaff.role.title;
+    switch (action) {
+      case 'Done':
+        status = `✅ **${keyStaff.role.title}**`;
+        header = `✅ ${t('title.taskComplete', { lng })}`;
+        break;
+      case 'Undone':
+        status = `❌ **${keyStaff.role.title}**`;
+        header = `❌ ${t('title.taskIncomplete', { lng })}`;
+        break;
+      case 'Skip':
+        status = `:fast_forward: **${keyStaff.role.title}**`;
+        header = `:fast_forward: ${t('title.taskSkipped', { lng })}`;
+        break;
     }
   }
 
@@ -78,19 +80,19 @@ export const BulkCmd = async (client: Client, db: Database, dbdata: DatabaseData
         else if ((SET_VALUE && !task.done) || !SET_VALUE) episodeDone = false;
       }
 
-      if (taskvalue == undefined) return fail(t('noSuchTask', { lng, abbreviation }), interaction);
+      if (taskvalue == undefined) return fail(t('error.noSuchTask', { lng, abbreviation }), interaction);
       
       db.ref(`/Projects/${guildId}/${projectName}/episodes/${epId}`).update({ done: episodeDone });
     }
   }
 
   if (!isValidUser)
-    return fail(t('permissionDenied', { lng }), interaction);
+    return fail(t('error.permissionDenied', { lng }), interaction);
 
   const embed = new EmbedBuilder()
     .setAuthor({ name: `${project.title} (${project.type})` })
     .setTitle(header)
-    .setDescription(t('bulkBody', { lng, taskName, start_episode, end_episode }))
+    .setDescription(t('progress.bulk', { lng, taskName, start_episode, end_episode }))
     .setColor(0xd797ff)
     .setTimestamp(Date.now());
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
@@ -105,7 +107,7 @@ export const BulkCmd = async (client: Client, db: Database, dbdata: DatabaseData
 
   if (publishChannel?.isTextBased) {
     (publishChannel as TextChannel).send({ embeds: [publishEmbed] })
-    .catch(err => console.error(`[Bulk]: "${err.message}" from guild ${guildId}, project ${project.nickname}`));
+    .catch(err => AlertError(client, err, guildId!, project.nickname, 'Bulk'));
   }
 
   if (!project.observers) return; // Stop here if there's no observers

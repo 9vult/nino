@@ -7,6 +7,7 @@ import { fail } from "../actions/fail.action";
 import { GetAlias } from "../actions/getalias.action";
 import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 import { t } from "i18next";
+import { getAdditionalStaff, getEpisode, getTask } from "../actions/getters";
 
 export const RemoveAdditionalStaffCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -15,37 +16,33 @@ export const RemoveAdditionalStaffCmd = async (client: Client, db: Database, dbd
   await interaction.deferReply();
 
   const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!);
-  const episode = options.getNumber('episode')!;
+  const episodeNumber = options.getNumber('episode')!;
   const abbreviation = options.getString('abbreviation')!.toUpperCase();
 
-  let epvalue;
   let verification = await VerifyInteraction(dbdata, interaction, alias);
   if (!verification) return;
-  const { projects, project } = InteractionData(dbdata, interaction, alias);
 
-  let success = false;
-  for (let ep in projects[project].episodes)
-    if (projects[project].episodes[ep].number == episode) {
-      epvalue = ep;
-      for (let pos in projects[project].episodes[ep].additionalStaff) {
-        if (projects[project].episodes[ep].additionalStaff[pos].role.abbreviation == abbreviation) {
-          success = true;
-          db.ref(`/Projects/${guildId}/${project}/episodes/${epvalue}/additionalStaff`).child(pos).remove();
-        }
-      }
-      if (success) {
-        for (let task in projects[project].episodes[ep].tasks) {
-          if (projects[project].episodes[ep].tasks[task].abbreviation == abbreviation)
-            db.ref(`/Projects/${guildId}/${project}/episodes/${epvalue}/tasks`).child(task).remove();
-        }
-      }
-    }
-  if (!success)
-    return fail(t('noSuchTask', { lng, abbreviation }), interaction);
+  const { projects, project: projectName } = InteractionData(dbdata, interaction, alias);
+  let project = projects[projectName];
+  
+  const { id: episodeId, episode } = getEpisode(project, episodeNumber);
+  if (!episode) return fail(t('error.noSuchEpisode', { lng, episodeNumber }), interaction);
+  
+  let { id: addStaffId } = getAdditionalStaff(episode, abbreviation);
+  if (addStaffId) {
+    db.ref(`/Projects/${guildId}/${projectName}/episodes/${episodeId}/additionalStaff`).child(addStaffId).remove();
+    
+    let { id: taskId } = getTask(episode, abbreviation);
+    if (taskId) // idk why this would be undefined but here's a check!
+      db.ref(`/Projects/${guildId}/${projectName}/episodes/${episodeId}/tasks`).child(taskId).remove();
+    
+  } else {
+    return fail(t('error.noSuchTask', { lng, abbreviation }), interaction);
+  }
 
   const embed = new EmbedBuilder()
-    .setTitle(t('projectModificationTitle', { lng }))
-    .setDescription(t('additionalStaffRemoved', { lng, abbreviation, episode }))
+    .setTitle(t('title.projectModification', { lng }))
+    .setDescription(t('additionalStaff.removed', { lng, abbreviation, episode: episodeNumber }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

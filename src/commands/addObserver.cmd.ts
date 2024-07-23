@@ -14,7 +14,7 @@ export const AddObserverCmd = async (client: Client, db: Database, dbdata: Datab
   await interaction.deferReply();
 
   if (!(member as GuildMember)?.permissions.has(PermissionsBitField.Flags.Administrator)) {
-    return fail(t('notAdmin', { lng }), interaction);
+    return fail(t('error.notPrivileged', { lng }), interaction);
   }
 
   const originGuildId = options.getString('guild')!;
@@ -26,15 +26,15 @@ export const AddObserverCmd = async (client: Client, db: Database, dbdata: Datab
 
   if (!blame && updatesWH == '' && relesesWH == '') {
     // no-op condition
-    return await fail(t('observerNoOp', { lng }), interaction);
+    return await fail(t('error.observerNoOp', { lng }), interaction);
   }
 
   if (originGuildId == null || !(originGuildId in dbdata.guilds))
-    return await fail(t('noSuchGuild', { lng, guildId: originGuildId }), interaction);
+    return await fail(t('error.noSuchGuild', { lng, guildId: originGuildId }), interaction);
  
   let projects = dbdata.guilds[originGuildId];
     if (!alias || !(alias in projects))
-      return await fail(t('noSuchProject', { lng }), interaction);
+      return await fail(t('error.noSuchProject', { lng }), interaction);
 
   const project = alias;
 
@@ -60,8 +60,8 @@ export const AddObserverCmd = async (client: Client, db: Database, dbdata: Datab
   }
 
   const embed = new EmbedBuilder()
-    .setTitle(t('projectModificationTitle', { lng }))
-    .setDescription(t('addObserver', { lng, originGuildId, project }))
+    .setTitle(t('title.projectModification', { lng }))
+    .setDescription(t('observer.added', { lng, originGuildId, project }))
     .setColor(0xd797ff);
   
   (await interaction.editReply("OK")).delete(); // Remove any webhook URLs from the log

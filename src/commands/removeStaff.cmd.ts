@@ -6,6 +6,7 @@ import { fail } from "../actions/fail.action";
 import { GetAlias } from "../actions/getalias.action";
 import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 import { t } from "i18next";
+import { getKeyStaff, getTask } from "../actions/getters";
 
 export const RemoveStaffCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -18,30 +19,27 @@ export const RemoveStaffCmd = async (client: Client, db: Database, dbdata: Datab
 
   let verification = await VerifyInteraction(dbdata, interaction, alias);
   if (!verification) return;
-  const { projects, project } = InteractionData(dbdata, interaction, alias);
 
-  let success = false;
-  for (let pos in projects[project].keyStaff)
-    if (projects[project].keyStaff[pos].role.abbreviation == abbreviation) {
-      success = true;
-      db.ref(`/Projects/${guildId}/${project}`).child("keyStaff").child(pos).remove();
+  const { projects, project: projectName } = InteractionData(dbdata, interaction, alias);
+  let project = projects[projectName];
+
+  let { id: keyStaffId } = getKeyStaff(project, abbreviation);
+  if (keyStaffId) {
+    db.ref(`/Projects/${guildId}/${projectName}`).child("keyStaff").child(keyStaffId).remove();
+
+    for (let episodeId in project.episodes) {
+      let episode = project.episodes[episodeId];
+      let { id: taskId } = getTask(episode, abbreviation);
+      if (taskId) // idk why this would be undefined but here's a check!
+        db.ref(`/Projects/${guildId}/${projectName}/episodes/${episodeId}/tasks`).child(taskId).remove();
     }
-
-if (!success)
-  return fail(t('noSuchTask', { lng, abbreviation }), interaction);
-
-
-  const episodes = projects[project].episodes;
-  for (let key in episodes) {
-    for (let task in episodes[key].tasks) {
-      if (episodes[key].tasks[task].abbreviation == abbreviation)
-        db.ref(`/Projects/${guildId}/${project}/episodes/${key}/tasks`).child(task).remove();
-    }
+  } else {
+    return fail(t('error.noSuchTask', { lng, abbreviation }), interaction);
   }
 
   const embed = new EmbedBuilder()
-    .setTitle(t('projectModificationTitle', { lng }))
-    .setDescription(t('removeStaff',  { lng, abbreviation }))
+    .setTitle(t('title.projectModification', { lng }))
+    .setDescription(t('keyStaff.removed',  { lng, abbreviation }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

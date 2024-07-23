@@ -7,6 +7,7 @@ import { fail } from "../actions/fail.action";
 import { GetAlias } from "../actions/getalias.action";
 import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 import { t } from "i18next";
+import { getAdditionalStaff, getEpisode } from "../actions/getters";
 
 export const AddAdditionalStaffCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -15,26 +16,24 @@ export const AddAdditionalStaffCmd = async (client: Client, db: Database, dbdata
   await interaction.deferReply();
 
   const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!);
-  const episode = options.getNumber('episode')!;
+  const episodeNumber = options.getNumber('episode')!;
   const staff = (options.getMember('member')! as GuildMember).id;
   const abbreviation = options.getString('abbreviation')!.toUpperCase();
   const title = options.getString('name')!;
 
-  let epvalue;
   let verification = await VerifyInteraction(dbdata, interaction, alias);
   if (!verification) return;
-  const { projects, project } = InteractionData(dbdata, interaction, alias);
+  const { projects, project: projectName } = InteractionData(dbdata, interaction, alias);
   
+  let project = projects[projectName];
+  const { id: episodeId, episode } = getEpisode(project, episodeNumber);
+  if (!episode) return fail(t('error.noSuchEpisode', { lng, episodeNumber }), interaction);
+  
+  let { addStaff } = getAdditionalStaff(episode, abbreviation);
+  if (addStaff) return fail(t('error.positionExists', { lng }), interaction);
 
-  for (let ep in projects[project].episodes)
-    if (projects[project].episodes[ep].number == episode) {
-      epvalue = ep;
-      for (let pos in projects[project].episodes[ep].additionalStaff)
-        if (projects[project].episodes[ep].additionalStaff[pos].role.abbreviation == abbreviation)
-          return fail(t('positionExists', { lng }), interaction);
-    }
 
-  db.ref(`/Projects/${guildId}/${project}/episodes/${epvalue}`).child("additionalStaff").push({
+  db.ref(`/Projects/${guildId}/${projectName}/episodes/${episodeId}`).child("additionalStaff").push({
     id: staff,
     role: {
       abbreviation,
@@ -42,14 +41,14 @@ export const AddAdditionalStaffCmd = async (client: Client, db: Database, dbdata
     }
   });
 
-  db.ref(`/Projects/${guildId}/${project}/episodes/${epvalue}`).child("tasks").push({
+  db.ref(`/Projects/${guildId}/${projectName}/episodes/${episodeId}`).child("tasks").push({
     abbreviation, done: false
   });
   
   const staffMention = `<@${staff}>`;
   const embed = new EmbedBuilder()
-    .setTitle(t('projectCreationTitle', { lng }))
-    .setDescription(t('addAdditionalStaff', { lng, staff: staffMention, abbreviation, episode }))
+    .setTitle(t('title.projectCreation', { lng }))
+    .setDescription(t('additionalStaff.added', { lng, staff: staffMention, abbreviation, episode: episodeNumber }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

@@ -41,12 +41,12 @@ export const AniDBCache = async (anidbId: string, lng: string) => {
   try {
     response = await fetch(baseUrl);
   } catch (err) {
-    return t('anidbApiError', { lng });
+    return t('error.anidb.apiError', { lng });
   }
 
-  if (!response.ok) return t('anidbApiError', { lng });
+  if (!response.ok) return t('error.anidb.apiError', { lng });
   let resptext = await response.text();
-  if (!resptext) return t('anidbResponseEmpty', { lng });
+  if (!resptext) return t('error.anidb.responseEmpty', { lng });
 
   // Write
   try {

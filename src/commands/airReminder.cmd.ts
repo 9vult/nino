@@ -34,8 +34,8 @@ export const AirReminderCmd = async (client: Client, db: Database, dbdata: Datab
   }
 
   const embed = new EmbedBuilder()
-    .setTitle(t('projectModificationTitle', { lng }))
-    .setDescription(t('configurationEdited', { lng }))
+    .setTitle(t('title.projectModification', { lng }))
+    .setDescription(t('guildConfiguration.saved', { lng }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

@@ -6,6 +6,7 @@ import { fail } from "../actions/fail.action";
 import { GetAlias } from "../actions/getalias.action";
 import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 import { t } from "i18next";
+import { getAdditionalStaff, getEpisode } from "../actions/getters";
 
 export const SwapAdditionalStaffCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -14,32 +15,30 @@ export const SwapAdditionalStaffCmd = async (client: Client, db: Database, dbdat
   await interaction.deferReply();
 
   const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!);
-  const episode = options.getNumber('episode')!;
+  const episodeNumber = options.getNumber('episode')!;
   const staff = (options.getMember('member')! as GuildMember).id;
   const abbreviation = options.getString('abbreviation')!.toUpperCase();
 
   let verification = await VerifyInteraction(dbdata, interaction, alias);
   if (!verification) return;
-  const { projects, project } = InteractionData(dbdata, interaction, alias);
 
-  var found;
-  for (let ep in projects[project].episodes)
-    if (projects[project].episodes[ep].number == episode) {
-      for (let pos in projects[project].episodes[ep].additionalStaff)
-        if (projects[project].episodes[ep].additionalStaff[pos].role.abbreviation == abbreviation) {
-          found = pos;
-          db.ref(`/Projects/${guildId}/${project}/episodes/${ep}`).child("additionalStaff").child(pos).update({ id: staff });
-          break;
-        }
-    }
-
-  if (found == undefined)
-    return fail(t('noSuchTask', { lng, abbreviation }), interaction);
+  const { projects, project: projectName } = InteractionData(dbdata, interaction, alias);
+  let project = projects[projectName];
+  
+  const { id: episodeId, episode } = getEpisode(project, episodeNumber);
+  if (!episode) return fail(t('error.noSuchEpisode', { lng, episodeNumber }), interaction);
+  
+  let { id: addStaffId } = getAdditionalStaff(episode, abbreviation);
+  if (addStaffId) {
+    db.ref(`/Projects/${guildId}/${projectName}/episodes/${episodeId}`).child("additionalStaff").child(addStaffId).update({ id: staff });
+  } else {
+    return fail(t('error.noSuchTask', { lng, abbreviation }), interaction);
+  }
 
   const staffMention = `<@${staff}>`;
   const embed = new EmbedBuilder()
-    .setTitle(t('projectModificationTitle', { lng }))
-    .setDescription(t('swapAdditionalStaff', { lng, staff: staffMention, abbreviation, episode }))
+    .setTitle(t('title.projectModification', { lng }))
+    .setDescription(t('additionalStaff.swapped', { lng, staff: staffMention, abbreviation, episode: episodeNumber }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

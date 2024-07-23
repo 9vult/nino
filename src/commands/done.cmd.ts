@@ -7,6 +7,7 @@ import { GetAlias } from "../actions/getalias.action";
 import { EntriesToStatusString, GenerateEntries } from "../actions/generateEntries.action";
 import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 import { t } from "i18next";
+import { AlertError } from "../actions/alertError";
 
 export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -76,7 +77,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
     if (success) break;
   }
   if (!success || !nextEpisode || !workingEpisode)
-    return fail(t('doneFailure', { lng }), interaction);
+    return fail(t('error.doneFailureGeneric', { lng }), interaction);
 
   // Get the status of the task at the working episode
   for (let taskId in workingEpisode.tasks) {
@@ -120,7 +121,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   }
 
   if (!isValidUser)
-    return fail(t('permissionDenied', { lng }), interaction);
+    return fail(t('error.permissionDenied', { lng }), interaction);
 
   // User is valid (yippee!) so proceed
   // OPTION ONE
@@ -143,7 +144,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
       let taskObj = workingEpisode.tasks[task];
       if (taskObj.abbreviation === abbreviation) {
         if (taskObj.done)
-          return fail(t('taskAlreadyDone', {lng, abbreviation}), interaction);
+          return fail(t('error.progress.taskAlreadyDone', {lng, abbreviation}), interaction);
       }
       else if (!taskObj.done) episodeDone = false;
       // Status string
@@ -177,24 +178,24 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   // Episode number is UNSPECIFIED, Working Episode != Next Episode *BUT* they are Additional Staff (FAIL)
   if ((!postable && selectedEpisode != null && workingEpisodeTask?.done)
     || (!postable && isAdditionalStaff && selectedEpisode == null && workingEpisode != nextEpisode)) {
-    return fail(t('taskAlreadyDone', {lng, abbreviation}), interaction);
+    return fail(t('error.progress.taskAlreadyDone', {lng, abbreviation}), interaction);
   }
 
   // OPTION FIVE
   // Episode number is UNSPECIFIED, Working Episode != Next Episode (NOT ADDITIONAL STAFF)
   if (!postable && selectedEpisode == null && workingEpisode != nextEpisode) {
-    const msgBody = t('inTheDust', { lng, currentEpisode: workingEpisode.number, taskName, nextEpisode: nextEpisode.number });
+    const msgBody = t('progress.done.inTheDust', { lng, currentEpisode: workingEpisode.number, taskName, nextEpisode: nextEpisode.number });
     const proceed = new ButtonBuilder()
       .setCustomId('ninodoneproceed')
-      .setLabel(t('proceed', { lng }))
+      .setLabel(t('progress.done.inTheDust.doItNow.button', { lng }))
       .setStyle(ButtonStyle.Danger);
     const cancel = new ButtonBuilder()
       .setCustomId('ninodonecancel')
-      .setLabel(t('cancel', { lng }))
+      .setLabel(t('progress.done.inTheDust.dontDoIt.button', { lng }))
       .setStyle(ButtonStyle.Secondary);
     const replyEmbed = new EmbedBuilder()
       .setAuthor({ name: `${project.title} (${project.type})` })
-      .setTitle(`❓ ${t('choice', { lng })}`)
+      .setTitle(`❓ ${t('progress.done.inTheDust.question', { lng })}`)
       .setDescription(msgBody)
       .setColor(0xd797ff)
       .setTimestamp(Date.now());
@@ -209,12 +210,12 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
     try {
       const confirmation = await btnResponse.awaitMessageComponent({ filter: collectorFilter, time: 60_000 });
       if (confirmation.customId === 'ninodonecancel') {
-        editBody = t('dontDoIt', { lng });
+        editBody = t('progress.done.inTheDust.dontDoIt', { lng });
       }
       else if (confirmation.customId === 'ninodoneproceed') {
         replied = true;
         let diff = Math.ceil(nextEpisode.number - workingEpisode.number);
-        editBody = t('doItNow', { lng, taskName, count: diff });
+        editBody = t('progress.done.inTheDust.doItNow', { lng, taskName, count: diff });
 
         localEntries = GenerateEntries(dbdata, guildId!, projectName, nextEpisode.number);
         
@@ -254,11 +255,11 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
         postable = true;
       }
     } catch (e) {
-      editBody = t('noResponse', { lng });
+      editBody = t('progress.done.inTheDust.timeout', { lng });
     }
     const editedEmbed = new EmbedBuilder()
       .setAuthor({ name: `${project.title} (${project.type})` })
-      .setTitle(`❓ ${t('choice', { lng })}`)
+      .setTitle(`❓ ${t('progress.done.inTheDust.question', { lng })}`)
       .setDescription(editBody ?? 'i18n failed')
       .setColor(0xd797ff)
       .setTimestamp(Date.now());
@@ -271,15 +272,15 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
     db.ref(`/Projects/${guildId}/${projectName}/episodes/${nextEpisodeKey!}`).update({ done: true });
   }
 
-  const episodeDoneText = episodeDone ? `\n${t('episodeDone', { lng, episode: nextEpisode.number })}` : '';
+  const episodeDoneText = episodeDone ? `\n${t('progress.episodeComplete', { lng, episode: nextEpisode.number })}` : '';
   
-  const succinctBody = `${t('taskCompleteBody', { lng, taskName, episode: nextEpisode.number })}${episodeDoneText}`
-  const verboseBody = `${t('taskCompleteBody', { lng, taskName, episode: nextEpisode.number })}\n\n${EntriesToStatusString(localEntries)}${episodeDoneText}`;
+  const succinctBody = `${t('progress.done', { lng, taskName, episode: nextEpisode.number })}${episodeDoneText}`
+  const verboseBody = `${t('progress.done', { lng, taskName, episode: nextEpisode.number })}\n\n${EntriesToStatusString(localEntries)}${episodeDoneText}`;
   const useVerbose = dbdata.configuration[guildId!]?.doneDisplay === 'Verbose';
 
   const replyEmbed = new EmbedBuilder()
     .setAuthor({ name: `${project.title} (${project.type})` })
-    .setTitle(`✅ ${t('taskCompleteTitle', { lng })}`)
+    .setTitle(`✅ ${t('title.taskComplete', { lng })}`)
     .setDescription(useVerbose ? verboseBody : succinctBody)
     .setColor(0xd797ff)
     .setTimestamp(Date.now());
@@ -301,8 +302,8 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
     if (projectComplete) {
       db.ref(`/Projects/${guildId}/${projectName}`).update({ done: true });
       const completeEmbed = new EmbedBuilder()
-        .setTitle(`${t('youDidItTitle', { lng })}`)
-        .setDescription(`${t('youDidItBody', { lng, title: project.title })}`)
+        .setTitle(`${t('title.youDidIt', { lng })}`)
+        .setDescription(`${t('progress.projectComplete', { lng, title: project.title })}`)
         .setColor(0xd797ff)
         .setTimestamp(Date.now());
       await interaction.channel?.send({ embeds: [completeEmbed], allowedMentions: generateAllowedMentions([[], []]) });
@@ -319,7 +320,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
 
   if (publishChannel?.isTextBased) {
     (publishChannel as TextChannel).send({ embeds: [publishEmbed] })
-    .catch(err => console.error(`[Done]: "${err.message}" from guild ${guildId}, project ${project.nickname}`));
+    .catch(err => AlertError(client, err, guildId!, project.nickname, 'Done'));
   }
 
   if (!project.observers) return; // Stop here if there's no observers

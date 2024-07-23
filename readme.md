@@ -25,6 +25,7 @@ Create a `.env` file in the project root and add the following to it:
  - `TOKEN=[yourtoken]`
  - `DATABASE_URL=[databaseurl]`
  - `ANIDB_API_CLIENT_NAME=[yourclientname]`
+ - `OWNER=[yourdiscorduserid]`
 
 Then, place your `firebase.json` in the `/src/` folder.
 

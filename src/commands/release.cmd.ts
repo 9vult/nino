@@ -5,6 +5,7 @@ import { Database } from "@firebase/database-types";
 import { GetAlias } from "../actions/getalias.action";
 import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 import { t } from "i18next";
+import { AlertError } from "../actions/alertError";
 
 export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -27,18 +28,20 @@ export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseD
 
   let verification = await VerifyInteraction(dbdata, interaction, alias);
   if (!verification) return;
-  const { projects, project } = InteractionData(dbdata, interaction, alias);
+  const { projects, project: projectName } = InteractionData(dbdata, interaction, alias);
+
+  const project = projects[projectName];
 
   const replyEmbed = new EmbedBuilder()
-    .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
-    .setTitle(t('episodeReleasedTitle', { lng }))
-    .setDescription(t('episodeReleasedBody', { lng, title: projects[project].title, type, publishNumber }))
+    .setAuthor({ name: `${project.title} (${project.type})` })
+    .setTitle(t('title.episodeReleased', { lng }))
+    .setDescription(t('progress.released', { lng, title: project.title, type, publishNumber }))
     .setColor(0xd797ff)
     .setTimestamp(Date.now());
   await interaction.editReply({ embeds: [replyEmbed], allowedMentions: generateAllowedMentions([[], []]) });
 
-  const publishBody = `**${projects[project].title} - ${type} ${publishNumber}**\n${publishRole}${url}`;
-  const publishChannel = client.channels.cache.get(projects[project].releaseChannel);
+  const publishBody = `**${project.title} - ${type} ${publishNumber}**\n${publishRole}${url}`;
+  const publishChannel = client.channels.cache.get(project.releaseChannel);
 
   if (publishChannel?.isTextBased) {
     (publishChannel as TextChannel).send(publishBody)
@@ -46,13 +49,13 @@ export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseD
       if (msg.channel.type === ChannelType.GuildAnnouncement)
       msg.crosspost().catch(console.error);
     })
-    .catch(err => console.error(`[Release]: "${err.message}" from guild ${guildId}, project ${projects[project].nickname}`));
+    .catch(err => AlertError(client, err, guildId!, project.nickname, 'Release'));
   }
 
 
-  if (!projects[project].observers) return; // Stop here if there's no observers
-  for (let observerid in projects[project].observers) {
-    const observer = projects[project].observers[observerid];
+  if (!project.observers) return; // Stop here if there's no observers
+  for (let observerid in project.observers) {
+    const observer = project.observers[observerid];
     if (!observer.releasesWebhook) continue;
 
     let observerPublishRole = (observer.releaseRole && observer.releaseRole != '') ? `<@&${observer.releaseRole}> ` : '';
@@ -65,7 +68,7 @@ export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseD
         body: JSON.stringify({
           username: 'Nino',
           avatar_url: 'https://i.imgur.com/PWtteaY.png',
-          content: `**${projects[project].title} - ${type} ${publishNumber}**\n${observerPublishRole}${url}`,
+          content: `**${project.title} - ${type} ${publishNumber}**\n${observerPublishRole}${url}`,
         })
       });
     } catch {

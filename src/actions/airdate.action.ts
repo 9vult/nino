@@ -14,7 +14,7 @@ export const AirDate = async (anidb: string, airTime: string | undefined, episod
   
   let parser = new XMLParser();
   let xml = parser.parse(resptext);
-  if (Object.keys(xml)[0] == 'error') return t('anidbError', { lng });
+  if (Object.keys(xml)[0] == 'error') return t('error.anidb.generic', { lng });
 
   const episodes = xml.anime.episodes.episode;
   const desiredEpisode = episodes.find((ep: any) => ep.epno == episodeNumber);
@@ -31,8 +31,8 @@ export const AirDate = async (anidb: string, airTime: string | undefined, episod
 
       // return `${future ? 'Airs' : 'Aired'} on <t:${utc}:D> (<t:${utc}:R>)`;
       return future 
-        ? t('airdateFuture', { lng, date: `<t:${utc}:D>`, rel: `<t:${utc}:R>` })
-        : t('airdatePast', { lng, date: `<t:${utc}:D>`, rel: `<t:${utc}:R>` });
+        ? t('airDate.future', { lng, date: `<t:${utc}:D>`, rel: `<t:${utc}:R>` })
+        : t('airDate.past', { lng, date: `<t:${utc}:D>`, rel: `<t:${utc}:R>` });
     }
   }
 
@@ -45,11 +45,11 @@ export const AirDate = async (anidb: string, airTime: string | undefined, episod
     date.setDate(date.getDate() + (7 * (episodeNumber - 1)));
     let future = (date > new Date());
     const utc = Math.floor(date.getTime() / 1000);
-    return `${t('estimate', { lng })}: `
+    return `${t('airDate.estimated', { lng })}: `
       + future 
-        ? t('airdateFuture', { lng, date: `<t:${utc}:D>`, rel: `<t:${utc}:R>` })
-        : t('airdatePast', { lng, date: `<t:${utc}:D>`, rel: `<t:${utc}:R>` });
+        ? t('airDate.future', { lng, date: `<t:${utc}:D>`, rel: `<t:${utc}:R>` })
+        : t('airDate.past', { lng, date: `<t:${utc}:D>`, rel: `<t:${utc}:R>` });
   }
 
-  return t('anidbNotSpecified', { lng });
+  return t('error.anidb.notSpecified', { lng });
 }

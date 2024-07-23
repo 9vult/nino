@@ -24,8 +24,8 @@ export const RemoveAliasCmd = async (client: Client, db: Database, dbdata: Datab
   ref.update({ aliases: projects[project].aliases.filter(a => a !== alias) });
 
   const embed = new EmbedBuilder()
-    .setTitle(t('projectModificationTitle', { lng }))
-    .setDescription(t('aliasRemoved', { lng, alias, project }))
+    .setTitle(t('title.projectModification', { lng }))
+    .setDescription(t('alias.removedAlias', { lng, alias, project }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }
