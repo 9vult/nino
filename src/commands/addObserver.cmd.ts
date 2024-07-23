@@ -19,12 +19,12 @@ export const AddObserverCmd = async (client: Client, db: Database, dbdata: Datab
 
   const originGuildId = options.getString('guild')!;
   const blame = options.getBoolean('blame')!;
-  const updatesWH: string | null = options.getString('updates');
-  const relesesWH: string | null = options.getString('releases');
-  const releaseRole: string | null | undefined = options.getRole('role')?.id;
+  const updatesWH: string = options.getString('updates') ?? '';
+  const relesesWH: string = options.getString('releases') ?? '';
+  const releaseRole: string = options.getRole('role')?.id ?? '';
   const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!, originGuildId);
 
-  if (!blame && !updatesWH && !relesesWH) {
+  if (!blame && updatesWH == '' && relesesWH == '') {
     // no-op condition
     return await fail(t('observerNoOp', { lng }), interaction);
   }
@@ -40,6 +40,8 @@ export const AddObserverCmd = async (client: Client, db: Database, dbdata: Datab
 
   db.ref(`/Projects/`).child(`${originGuildId}`).child(`${project}`).child('observers')
     .push({ guildId: observingGuildId, updatesWebhook: updatesWH, releasesWebhook: relesesWH, managerid: user.id, releaseRole });
+  
+  
 
   const nameAndBlame: ObservedProject = { name: project, blame };
   const ref = db.ref(`/Observers`).child(`${observingGuildId}`);
