@@ -20,7 +20,7 @@ export const AddAdminCmd = async (client: Client, db: Database, dbdata: Database
     case 'guild_admin':
       {
         if (!(member as GuildMember)?.permissions.has(PermissionsBitField.Flags.Administrator)) {
-          return fail(t('notAdmin', { lng }), interaction);
+          return fail(t('error.notPrivileged', { lng }), interaction);
         }
         let staff = (options.getMember('member')! as GuildMember).id;
 
@@ -32,8 +32,8 @@ export const AddAdminCmd = async (client: Client, db: Database, dbdata: Database
 
         let staffMention = `<@${staff}>`;
         let embed = new EmbedBuilder()
-          .setTitle(t('projectModificationTitle', { lng }))
-          .setDescription(t('addAdminGuild', { lng, staff: staffMention }))
+          .setTitle(t('title.projectModification', { lng }))
+          .setDescription(t('admin.guild.added', { lng, staff: staffMention }))
           .setColor(0xd797ff);
         await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
         break;
@@ -57,8 +57,8 @@ export const AddAdminCmd = async (client: Client, db: Database, dbdata: Database
 
       let staffMention = `<@${staff}>`;
       let embed = new EmbedBuilder()
-        .setTitle(t('projectModificationTitle', { lng }))
-        .setDescription(t('addAdmin', { lng, staff: staffMention, project }))
+        .setTitle(t('title.projectModification', { lng }))
+        .setDescription(t('admin.project.added', { lng, staff: staffMention, project }))
         .setColor(0xd797ff);
       await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
       break;

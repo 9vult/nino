@@ -68,7 +68,7 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
         if (task.abbreviation === abbreviation) {
           taskvalue = taskId;
           if (!task.done)
-            return fail(t('taskNotDone', { lng, abbreviation }), interaction);
+            return fail(t('error.progress.taskNotDone', { lng, abbreviation }), interaction);
         }
         // Status string
         let stat = '';
@@ -89,7 +89,7 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
       if (extended) publicStatus += EntriesToStatusString(publicEntries!, '\n');
       localStatus += EntriesToStatusString(localEntries);
 
-      if (taskvalue == undefined) return fail(t('noSuchTask', { lng, abbreviation }), interaction);
+      if (taskvalue == undefined) return fail(t('error.noSuchTask', { lng, abbreviation }), interaction);
       if (!isValidUser) { // Not key staff
         for (let addStaffId in episode.additionalStaff) {
           let addStaff = episode.additionalStaff[addStaffId];
@@ -110,7 +110,7 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
   }
 
   if (!isValidUser)
-    return fail(t('permissionDenied', { lng }), interaction);
+    return fail(t('error.permissionDenied', { lng }), interaction);
 
   if (taskvalue != undefined) {
     db.ref(`/Projects/${guildId}/${projectName}/episodes/${episodeId}/tasks/${taskvalue}`).update({
@@ -124,13 +124,13 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
 
   db.ref(`/Projects/${guildId}/${projectName}/episodes/${episodeId}`).update({ done: false });
 
-  const succinctBody = `${t('taskIncompleteBody', { lng, taskName, episode: selectedEpisode })}`
+  const succinctBody = `${t('progress.undone', { lng, taskName, episode: selectedEpisode })}`
   const verboseBody = `${succinctBody}\n\n${EntriesToStatusString(localEntries)}`;
   const useVerbose = dbdata.configuration[guildId!]?.doneDisplay === 'Verbose';
 
   const embed = new EmbedBuilder()
     .setAuthor({ name: `${project.title} (${project.type})` })
-    .setTitle(`❌ ${t('taskIncompleteTitle', { lng })}`)
+    .setTitle(`❌ ${t('title.taskIncomplete', { lng })}`)
     .setDescription(useVerbose ? verboseBody : succinctBody)
     .setColor(0xd797ff)
     .setTimestamp(Date.now());

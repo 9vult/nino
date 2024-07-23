@@ -13,7 +13,7 @@ export const NewProjectCmd = async (client: Client, db: Database, dbdata: Databa
   await interaction.deferReply();
 
   if (!(member as GuildMember)?.permissions.has(PermissionsBitField.Flags.Administrator)) {
-    return fail(t('notAdmin', { lng }), interaction);
+    return fail(t('error.notPrivileged', { lng }), interaction);
   }
 
   const nickname = options.getString('nickname')!;
@@ -62,8 +62,8 @@ export const NewProjectCmd = async (client: Client, db: Database, dbdata: Databa
   }
 
   const embed = new EmbedBuilder()
-    .setTitle(t('projectCreationTitle', { lng }))
-    .setDescription(t('projectCreationHint', { lng, nickname }))
+    .setTitle(t('title.projectCreation', { lng }))
+    .setDescription(t('project.created', { lng, nickname }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

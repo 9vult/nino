@@ -21,8 +21,8 @@ export const DeleteProjectCmd = async (client: Client, db: Database, dbdata: Dat
   db.ref(`/Projects/${guildId}/${project}`).remove();
 
   const embed = new EmbedBuilder()
-    .setTitle(t('projectDeletionTitle', { lng }))
-    .setDescription(t('deleteProject', { lng, project }))
+    .setTitle(t('title.projectDeletion', { lng }))
+    .setDescription(t('project.deleted', { lng, project }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

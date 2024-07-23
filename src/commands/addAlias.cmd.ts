@@ -23,7 +23,7 @@ export const AddAliasCmd = async (client: Client, db: Database, dbdata: Database
 
   let aliasProj = await GetAlias(db, dbdata, interaction, alias);
   if (aliasProj)
-    return fail(t('aliasInUse', { lng, aliasproj: aliasProj }), interaction);
+    return fail(t('error.alias.inUse', { lng, aliasproj: aliasProj }), interaction);
 
   const ref = db.ref(`/Projects/`).child(`${guildId}`).child(`${project}`);
   if (projects[project].aliases)
@@ -32,8 +32,8 @@ export const AddAliasCmd = async (client: Client, db: Database, dbdata: Database
     ref.update({ aliases: [alias] });
 
   const embed = new EmbedBuilder()
-    .setTitle(t('projectModificationTitle', { lng }))
-    .setDescription(t('aliasAdded', { lng, alias, project }))
+    .setTitle(t('title.projectModification', { lng }))
+    .setDescription(t('alias.addedAlias', { lng, alias, project }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

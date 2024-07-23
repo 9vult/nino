@@ -31,8 +31,8 @@ export const RemoveEpisodeCmd = async (client: Client, db: Database, dbdata: Dat
   }
 
   const embed = new EmbedBuilder()
-    .setTitle(t('projectModificationTitle', { lng }))
-    .setDescription(t('removeEpisode', { lng, number, project }))
+    .setTitle(t('title.projectModification', { lng }))
+    .setDescription(t('episode.removed', { lng, number, project }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

@@ -24,7 +24,7 @@ export const AddStaffCmd = async (client: Client, db: Database, dbdata: Database
 
   for (let pos in projects[project].keyStaff)
     if (projects[project].keyStaff[pos].role.abbreviation == abbreviation)
-      return fail(t('positionExists', { lng }), interaction);
+      return fail(t('error.positionExists', { lng }), interaction);
 
   db.ref(`/Projects/${guildId}/${project}`).child("keyStaff").push({
     id: staff,
@@ -43,8 +43,8 @@ export const AddStaffCmd = async (client: Client, db: Database, dbdata: Database
 
   const staffMention = `<@${staff}>`;
   const embed = new EmbedBuilder()
-    .setTitle(t('projectCreationTitle', { lng }))
-    .setDescription(t('addStaff', { lng, staff: staffMention, abbreviation }))
+    .setTitle(t('title.projectCreation', { lng }))
+    .setDescription(t('keyStaff.added', { lng, staff: staffMention, abbreviation }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

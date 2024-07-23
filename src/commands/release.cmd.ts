@@ -31,8 +31,8 @@ export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseD
 
   const replyEmbed = new EmbedBuilder()
     .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
-    .setTitle(t('episodeReleasedTitle', { lng }))
-    .setDescription(t('episodeReleasedBody', { lng, title: projects[project].title, type, publishNumber }))
+    .setTitle(t('title.episodeReleased', { lng }))
+    .setDescription(t('progress.released', { lng, title: projects[project].title, type, publishNumber }))
     .setColor(0xd797ff)
     .setTimestamp(Date.now());
   await interaction.editReply({ embeds: [replyEmbed], allowedMentions: generateAllowedMentions([[], []]) });

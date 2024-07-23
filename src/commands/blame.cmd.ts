@@ -23,11 +23,11 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
 
   let epvalue;
   if (selGuildId == null || !(selGuildId in dbdata.guilds))
-    return fail(t('noSuchProject', { lng }), interaction);
+    return fail(t('error.noSuchProject', { lng }), interaction);
 
   let projects = dbdata.guilds[selGuildId];
   if (!project || !(project in projects))
-    return fail(t('noSuchProject', { lng }), interaction);
+    return fail(t('error.noSuchProject', { lng }), interaction);
 
   let status = '';
   let entries: {[key:string]:WeightedStatusEntry} = {};
@@ -61,7 +61,7 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
   }
 
   if (!success)
-    return fail(t('blameFailure', { lng }), interaction);
+    return fail(t('error.blameFailureGeneric', { lng }), interaction);
 
   if (explain != null && explain == true)
     status = EntriesToStatusString(entries, '\n');
@@ -75,11 +75,11 @@ export const BlameCmd = async (client: Client, db: Database, dbdata: DatabaseDat
   if (projects[project].anidb && episode != null && !started)
     status += `\n${await AirDate(projects[project].anidb, projects[project].airTime, episode, dbdata, lng)}`;
   else if (updateTime !== 0)
-    status += `\n${t('updated', { lng, rel: `<t:${updateTime}:R>` })}`;
+    status += `\n${t('episode.lastUpdated', { lng, rel: `<t:${updateTime}:R>` })}`;
 
   const embed = new EmbedBuilder()
     .setAuthor({ name: `${projects[project].title} (${projects[project].type})` })
-    .setTitle(t('blame', { lng, episode }))
+    .setTitle(t('title.blamedEpisode', { lng, episode }))
     .setThumbnail(projects[project].poster)
     .setDescription(status)
     .setColor(0xd797ff)

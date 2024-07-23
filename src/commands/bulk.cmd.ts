@@ -31,7 +31,7 @@ export const BulkCmd = async (client: Client, db: Database, dbdata: DatabaseData
   const { projects, project: projectName } = InteractionData(dbdata, interaction, alias);
 
   if (start_episode > end_episode || start_episode == end_episode)
-    return fail(t('invalidEpisodeRange', { lng }), interaction);
+    return fail(t('error.invalidTimeRange', { lng }), interaction);
 
   const project = projects[projectName];
 
@@ -43,15 +43,15 @@ export const BulkCmd = async (client: Client, db: Database, dbdata: DatabaseData
       switch (action) {
         case 'Done':
           status = `✅ **${keyStaff.role.title}**`;
-          header = `✅ ${t('taskCompleteTitle', { lng })}`;
+          header = `✅ ${t('title.taskComplete', { lng })}`;
           break;
         case 'Undone':
           status = `❌ **${keyStaff.role.title}**`;
-          header = `❌ ${t('taskIncompleteTitle', { lng })}`;
+          header = `❌ ${t('title.taskIncomplete', { lng })}`;
           break;
         case 'Skip':
           status = `:fast_forward: **${keyStaff.role.title}**`;
-          header = `:fast_forward: ${t('taskSkippedTitle', { lng })}`;
+          header = `:fast_forward: ${t('title.taskSkipped', { lng })}`;
           break;
       }
     }
@@ -78,19 +78,19 @@ export const BulkCmd = async (client: Client, db: Database, dbdata: DatabaseData
         else if ((SET_VALUE && !task.done) || !SET_VALUE) episodeDone = false;
       }
 
-      if (taskvalue == undefined) return fail(t('noSuchTask', { lng, abbreviation }), interaction);
+      if (taskvalue == undefined) return fail(t('error.noSuchTask', { lng, abbreviation }), interaction);
       
       db.ref(`/Projects/${guildId}/${projectName}/episodes/${epId}`).update({ done: episodeDone });
     }
   }
 
   if (!isValidUser)
-    return fail(t('permissionDenied', { lng }), interaction);
+    return fail(t('error.permissionDenied', { lng }), interaction);
 
   const embed = new EmbedBuilder()
     .setAuthor({ name: `${project.title} (${project.type})` })
     .setTitle(header)
-    .setDescription(t('bulkBody', { lng, taskName, start_episode, end_episode }))
+    .setDescription(t('progress.bulk', { lng, taskName, start_episode, end_episode }))
     .setColor(0xd797ff)
     .setTimestamp(Date.now());
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });

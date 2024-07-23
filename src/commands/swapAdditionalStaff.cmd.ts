@@ -34,12 +34,12 @@ export const SwapAdditionalStaffCmd = async (client: Client, db: Database, dbdat
     }
 
   if (found == undefined)
-    return fail(t('noSuchTask', { lng, abbreviation }), interaction);
+    return fail(t('error.noSuchTask', { lng, abbreviation }), interaction);
 
   const staffMention = `<@${staff}>`;
   const embed = new EmbedBuilder()
-    .setTitle(t('projectModificationTitle', { lng }))
-    .setDescription(t('swapAdditionalStaff', { lng, staff: staffMention, abbreviation, episode }))
+    .setTitle(t('title.projectModification', { lng }))
+    .setDescription(t('additionalStaff.swapped', { lng, staff: staffMention, abbreviation, episode }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

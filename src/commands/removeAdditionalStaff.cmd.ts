@@ -41,11 +41,11 @@ export const RemoveAdditionalStaffCmd = async (client: Client, db: Database, dbd
       }
     }
   if (!success)
-    return fail(t('noSuchTask', { lng, abbreviation }), interaction);
+    return fail(t('error.noSuchTask', { lng, abbreviation }), interaction);
 
   const embed = new EmbedBuilder()
-    .setTitle(t('projectModificationTitle', { lng }))
-    .setDescription(t('additionalStaffRemoved', { lng, abbreviation, episode }))
+    .setTitle(t('title.projectModification', { lng }))
+    .setDescription(t('additionalStaff.removed', { lng, abbreviation, episode }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

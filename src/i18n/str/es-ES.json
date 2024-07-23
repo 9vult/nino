@@ -1,14 +1,14 @@
 {
-  "noSuchGuild": "El gremio {{guildId}} no existe.",
-  "noSuchProject": "¡Ese proyecto no existe!",
-  "blameFailure": "Ese proyecto está terminado, o el episodio solicitado no existe.",
-  "blame": "Episodio {{episode, number}}",
-  "anidbApiError": "Se desconoce la fecha de emisión: Error de la API AniDB",
-  "anidbResponseEmpty": "Se desconoce la fecha de emisión: La respuesta de AniDB estaba vacía",
-  "anidbError": "Se desconoce la fecha de emisión: Error AniDB",
-  "anidbNotSpecified": "Se desconoce la fecha de emisión: El anime no aparece en AniDB",
-  "airdateFuture": "Se emite el {{- date}} ({{- rel}})",
-  "airdatePast": "Emitido el {{- date}} ({{- rel}})",
-  "updated": "Última actualización: {{- rel}}",
-  "estimate": "Estimación"
+  "error.noSuchGuild": "El gremio {{guildId}} no existe.",
+  "error.noSuchProject": "¡Ese proyecto no existe!",
+  "error.blameFailureGeneric": "Ese proyecto está terminado, o el episodio solicitado no existe.",
+  "title.blamedEpisode": "Episodio {{episode, number}}",
+  "error.anidb.apiError": "Se desconoce la fecha de emisión: Error de la API AniDB",
+  "error.anidb.responseEmpty": "Se desconoce la fecha de emisión: La respuesta de AniDB estaba vacía",
+  "error.anidb.generic": "Se desconoce la fecha de emisión: Error AniDB",
+  "error.anidb.notSpecified": "Se desconoce la fecha de emisión: El anime no aparece en AniDB",
+  "airDate.future": "Se emite el {{- date}} ({{- rel}})",
+  "airDate.past": "Emitido el {{- date}} ({{- rel}})",
+  "episode.lastUpdated": "Última actualización: {{- rel}}",
+  "airDate.estimated": "Estimación"
 }

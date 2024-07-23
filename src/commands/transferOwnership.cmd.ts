@@ -25,8 +25,8 @@ export const TransferOwnershipCmd = async (client: Client, db: Database, dbdata:
 
   const staffMention = `<@${staff}>`;
   const embed = new EmbedBuilder()
-    .setTitle(t('projectModificationTitle', { lng }))
-    .setDescription(t('transferOwnership', { lng, staff: staffMention, project }))
+    .setTitle(t('title.projectModification', { lng }))
+    .setDescription(t('project.owner.transferred', { lng, staff: staffMention, project }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

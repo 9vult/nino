@@ -6,12 +6,12 @@ import { t } from "i18next";
 export const VerifyInteraction = async (dbdata: DatabaseData, interaction: ChatInputCommandInteraction, project: string | undefined, checkOwner: boolean = true, excludeAdmins: boolean = false) => {
   const { user, guildId, locale: lng } = interaction;
   if (guildId == null || !(guildId in dbdata.guilds))
-    return await fail(t('noSuchGuild', { lng, guildId }), interaction);
+    return await fail(t('error.noSuchGuild', { lng, guildId }), interaction);
 
   let projects = dbdata.guilds[guildId];
 
   if (!project || !(project in projects))
-    return await fail(t('noSuchProject', { lng }), interaction);
+    return await fail(t('error.noSuchProject', { lng }), interaction);
   
   if (!checkOwner) return true;
   
@@ -21,10 +21,10 @@ export const VerifyInteraction = async (dbdata: DatabaseData, interaction: ChatI
   
   // Only owner allowed
   if (excludeAdmins && !isOwner)
-    return await fail(t('permissionDenied', { lng }), interaction);
+    return await fail(t('error.permissionDenied', { lng }), interaction);
   // Owner and admins allowed
   if (!isAdmin && !isOwner)
-    return await fail(t('permissionDenied', { lng }), interaction);
+    return await fail(t('error.permissionDenied', { lng }), interaction);
 
   return true;
 }

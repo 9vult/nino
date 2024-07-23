@@ -43,7 +43,7 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
     )) {
       isValidUser = true;
       taskName = keyStaff.role.title;
-      status = `:fast_forward: **${keyStaff.role.title}** ${t('skipped', { lng })}\n`;
+      status = `:fast_forward: **${keyStaff.role.title}** ${t('progress.skipped.appendage', { lng })}\n`;
     }
   }
 
@@ -56,7 +56,7 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
         if (task.abbreviation === abbreviation) {
           taskvalue = taskId;
           if (task.done)
-            return fail(t('taskAlreadyDone', { lng, abbreviation }), interaction);
+            return fail(t('error.progress.taskAlreadyDone', { lng, abbreviation }), interaction);
         }
         else if (!task.done) episodeDone = false;
         // Status string
@@ -68,7 +68,7 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
         localEntries[task.abbreviation].status = stat;
       }
       status += EntriesToStatusString(localEntries);
-      if (taskvalue == undefined) return fail(t('noSuchTask', { lng, abbreviation }), interaction);
+      if (taskvalue == undefined) return fail(t('error.noSuchTask', { lng, abbreviation }), interaction);
       if (!isValidUser) { // Not key staff
         for (let addStaffId in episode.additionalStaff) {
           let addStaff = episode.additionalStaff[addStaffId];
@@ -78,7 +78,7 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
             project.administrators?.includes(user.id) ||
             dbdata.configuration[guildId!]?.administrators?.includes(user.id)
           )) {
-            status = `:fast_forward: **${addStaff.role.title}** ${t('skipped', { lng })}\n` + status;
+            status = `:fast_forward: **${addStaff.role.title}** ${t('progress.skipped.appendage', { lng })}\n` + status;
             taskName = addStaff.role.title;
             isValidUser = true;
           }
@@ -88,7 +88,7 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
   }
 
   if (!isValidUser)
-    return fail(t('permissionDenied', { lng }), interaction);
+    return fail(t('error.permissionDenied', { lng }), interaction);
   if (taskvalue != undefined) {
     db.ref(`/Projects/${guildId}/${projectName}/episodes/${epvalue}/tasks/${taskvalue}`).update({
       abbreviation, done: true
@@ -99,15 +99,15 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
     });
   }
 
-  const episodeDoneText = episodeDone ? `\n${t('episodeDone', { lng, episode: selectedEpisode })}` : '';
+  const episodeDoneText = episodeDone ? `\n${t('progress.episodeComplete', { lng, episode: selectedEpisode })}` : '';
 
-  const succinctBody = `${t('taskSkippedBody', { lng, taskName, episode: selectedEpisode })}${episodeDoneText}`
-  const verboseBody = `${t('taskSkippedBody', { lng, taskName, episode: selectedEpisode })}\n\n${EntriesToStatusString(localEntries)}${episodeDoneText}`;
+  const succinctBody = `${t('progress.skipped', { lng, taskName, episode: selectedEpisode })}${episodeDoneText}`
+  const verboseBody = `${t('progress.skipped', { lng, taskName, episode: selectedEpisode })}\n\n${EntriesToStatusString(localEntries)}${episodeDoneText}`;
   const useVerbose = dbdata.configuration[guildId!]?.doneDisplay === 'Verbose';
 
   const replyEmbed = new EmbedBuilder()
     .setAuthor({ name: `${project.title} (${project.type})` })
-    .setTitle(`:fast_forward: ${t('taskSkippedTitle', { lng })}`)
+    .setTitle(`:fast_forward: ${t('title.taskSkipped', { lng })}`)
     .setDescription(useVerbose ? verboseBody : succinctBody)
     .setColor(0xd797ff)
     .setTimestamp(Date.now());

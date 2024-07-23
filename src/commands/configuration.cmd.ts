@@ -15,7 +15,7 @@ export const ConfigurationCmd = async (client: Client, db: Database, dbdata: Dat
   await interaction.deferReply();
 
   if (!(member as GuildMember)?.permissions.has(PermissionsBitField.Flags.Administrator)) {
-    return fail(t('notAdmin', { lng }), interaction);
+    return fail(t('error.notPrivileged', { lng }), interaction);
   }
 
   const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!);
@@ -35,8 +35,8 @@ export const ConfigurationCmd = async (client: Client, db: Database, dbdata: Dat
   }
 
   const embed = new EmbedBuilder()
-    .setTitle(t('configurationTitle', { lng }))
-    .setDescription(t('configurationEdited', { lng }))
+    .setTitle(t('title.guildConfiguration', { lng }))
+    .setDescription(t('guildConfiguration.saved', { lng }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

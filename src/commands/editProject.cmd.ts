@@ -42,14 +42,14 @@ export const EditProjectCmd = async (client: Client, db: Database, dbdata: Datab
       break;
     case 'AirTime24h':
       const isTime = /^([0-9]{2}):([0-9]{2})$/.test(newValue);
-      if (!isTime) return fail(t('airTimeFail', { lng }), interaction);
+      if (!isTime) return fail(t('error.incorrectAirTimeFormat', { lng }), interaction);
       ref.update({ airTime: newValue });
       break;
   }
 
   const embed = new EmbedBuilder()
-    .setTitle(t('projectModificationTitle', { lng }))
-    .setDescription(t('projectEdited', { lng, project }))
+    .setTitle(t('title.projectModification', { lng }))
+    .setDescription(t('project.edited', { lng, project }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }
