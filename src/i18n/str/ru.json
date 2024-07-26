@@ -47,7 +47,7 @@
   "progress.done.inTheDust.question": "Что мне следует сделать?",
   "progress.done.inTheDust.timeout": "Я прождала целую минуту, но так и не услышала, чего ты хочешь!",
   "progress.episodeComplete": "Кстати, на этом серия {{episode, number}} заершена!",
-  "progress.released": "Славная работа. **{{title}} {{type}} {{publishNumber}}** выходит в свет!",
+  "progress.released": "Славная работа. **{{title}} {{type}}{{publishNumber}}** выходит в свет!",
   "progress.skipped": "**{{taskName}}** серии {{episode, number}} пропускаем.\nЕсли всё ж решишь сделать, то сначала запусти `/undone`.",
   "progress.skipped.appendage": "(пропускается)",
   "progress.undone": "**{{taskName}}** серии {{episode, number}} всё-таки, значит, ещё надо доделать.",

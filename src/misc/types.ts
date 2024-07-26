@@ -74,7 +74,8 @@ export type WeightedStatusEntry = {
 export type Configuration = {
   progressDisplay: string | undefined,
   doneDisplay: string | undefined,
-  administrators: string[]
+  administrators: string[],
+  releasePrefix: string | undefined
 };
 
 export type DatabaseData = {

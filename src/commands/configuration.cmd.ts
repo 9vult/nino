@@ -23,6 +23,8 @@ export const ConfigurationCmd = async (client: Client, db: Database, dbdata: Dat
 
   const ref = db.ref(`/Configuration/`).child(`${guildId}`);
 
+  let helperText = '';
+
   switch (subcommand) {
     case 'progress_display':
       const progressDisplay = options.getString('embed_type')!;
@@ -32,11 +34,21 @@ export const ConfigurationCmd = async (client: Client, db: Database, dbdata: Dat
       const doneDisplay = options.getString('embed_type')!;
       ref.update({ doneDisplay });
       break;
+    case 'release_prefix':
+      const releasePrefix = options.getString('newvalue')!;
+      if (releasePrefix == '-')
+        ref.update({ releasePrefix: '' });
+      else
+        ref.update({ releasePrefix: releasePrefix });
+      helperText = t('project.edited.motdHelp', { lng })
+      break;
   }
+
+  const description = helperText ? `${t('guildConfiguration.saved', { lng })}\n${helperText}` : t('guildConfiguration.saved', { lng });
 
   const embed = new EmbedBuilder()
     .setTitle(t('title.guildConfiguration', { lng }))
-    .setDescription(t('guildConfiguration.saved', { lng }))
+    .setDescription(description)
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
 }

@@ -14,10 +14,13 @@ export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseD
   await interaction.deferReply();
 
   const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!);
-  const type = options.getString('type')!;
+  let type = options.getString('type')!;
   let number = options.getString('number')!;
   const url: string | null = options.getString('url');
   const role = options.getRole('role');
+
+  if (type == 'Custom') type = '';
+  else type = `${type} `;
 
   if (!isNaN(Number(number))) {
     number = `${Number(number)}`;
@@ -40,7 +43,9 @@ export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseD
     .setTimestamp(Date.now());
   await interaction.editReply({ embeds: [replyEmbed], allowedMentions: generateAllowedMentions([[], []]) });
 
-  const publishBody = `**${project.title} - ${type} ${publishNumber}**\n${publishRole}${url}`;
+  const prefix = dbdata.configuration[guildId!]?.releasePrefix ? `${dbdata.configuration[guildId!]?.releasePrefix} ` : '';
+
+  const publishBody = `${prefix}**${project.title} - ${type}${publishNumber}**\n${publishRole}${url}`;
   const publishChannel = client.channels.cache.get(project.releaseChannel);
 
   if (publishChannel?.isTextBased) {
@@ -68,7 +73,7 @@ export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseD
         body: JSON.stringify({
           username: 'Nino',
           avatar_url: 'https://i.imgur.com/PWtteaY.png',
-          content: `**${project.title} - ${type} ${publishNumber}**\n${observerPublishRole}${url}`,
+          content: `${prefix}**${project.title} - ${type}${publishNumber}**\n${observerPublishRole}${url}`,
         })
       });
     } catch {

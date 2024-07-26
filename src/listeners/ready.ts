@@ -770,7 +770,8 @@ export default (client: Client, dbdata: DatabaseData): void => {
           .addChoices(
             { name: 'Episode', value: 'Episode' },
             { name: 'Volume', value: 'Volume' },
-            { name: 'Batch', value: 'Batch' }
+            { name: 'Batch', value: 'Batch' },
+            { name: 'Custom', value: 'Custom' }
           )
       )
       .addStringOption(o =>
@@ -832,6 +833,19 @@ export default (client: Client, dbdata: DatabaseData): void => {
               { name: 'Succinct', value: 'Succinct' },
               { name: 'Verbose', value: 'Verbose' }
             )
+        )
+      )
+      .addSubcommand(s => 
+        s.setName('release_prefix')
+        .setDescription('Specify a prefix for releases')
+        .setNameLocalizations(GetNames(d, 'commands', 'release_prefix'))
+        .setDescriptionLocalizations(GetDescs(d, 'commands', 'release_prefix'))
+        .addStringOption(o =>
+          o.setName('newvalue')
+            .setDescription('New value')
+            .setNameLocalizations(GetNames(d, 'options', 'newvalue'))
+            .setDescriptionLocalizations(GetDescs(d, 'options', 'newvalue'))
+            .setRequired(true)
         )
       );
 
