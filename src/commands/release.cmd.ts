@@ -27,7 +27,7 @@ export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseD
   }
   
   let publishNumber = type !== 'Batch' ? number : `(${number})`;
-  let publishRole = role !== null ? `<@&${role.id}> ` : '';
+  let publishRole = role !== null ? ( role.name == "@everyone" ? `@everyone ` : `<@&${role.id}> ` ) : '';
 
   let verification = await VerifyInteraction(dbdata, interaction, alias);
   if (!verification) return;
@@ -63,7 +63,9 @@ export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseD
     const observer = project.observers[observerid];
     if (!observer.releasesWebhook) continue;
 
-    let observerPublishRole = (observer.releaseRole && observer.releaseRole != '') ? `<@&${observer.releaseRole}> ` : '';
+    let observerPublishRole = (observer.releaseRole && observer.releaseRole != '')
+      ? ( observer.releaseRole == "@everyone" ? `@everyone ` : `<@&${observer.releaseRole}> ` )
+      : '';
 
     try {
       const postUrl = new URL(observer.releasesWebhook);

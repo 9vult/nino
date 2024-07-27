@@ -25,7 +25,7 @@ export const AirReminderCmd = async (client: Client, db: Database, dbdata: Datab
     case 'enable':
       const channelId = options.getChannel('updatechannel')!.id;
       const role = options.getRole('role');
-      const roleId = role ? role.id : '';
+      const roleId = role ? (role.name == "@everyone" ? "@everyone" : role.id) : '';
       db.ref(`/Projects/${guildId}/${project}`).update({ airReminderEnabled: true, airReminderChannel: channelId, airReminderRole: roleId });
       break;
     case 'disable':

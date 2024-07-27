@@ -23,7 +23,9 @@ export const CheckReleases = async (client: Client, db: Database, dbdata: Databa
           // Mark in db
           db.ref(`/Projects/${guildId}/${projectid}/episodes`).child(episodeid).update({ airReminderPosted: true });
           // Send notification
-          const role = projobj.airReminderRole && projobj.airReminderRole !== '' ? `<@&${projobj.airReminderRole}>` : '';
+          const role = projobj.airReminderRole && projobj.airReminderRole !== ''
+            ? (projobj.airReminderRole == "@everyone" ? "@everyone" : `<@&${projobj.airReminderRole}>`)
+            : '';
           const embed = new EmbedBuilder()
             .setAuthor({ name: `${projobj.title} (${projobj.type})` })
             .setTitle(`Episode ${epobj.number} has aired!`)

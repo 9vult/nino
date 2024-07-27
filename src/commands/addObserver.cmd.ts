@@ -22,7 +22,7 @@ export const AddObserverCmd = async (client: Client, db: Database, dbdata: Datab
   const blame = options.getBoolean('blame')!;
   const updatesWH: string = options.getString('updates') ?? '';
   const relesesWH: string = options.getString('releases') ?? '';
-  const releaseRole: string = options.getRole('role')?.id ?? '';
+  const releaseRole: string = options.getRole('role') ? (options.getRole('role')!.name == '@everyone' ? "@everyone" : options.getRole('role')!.id) : '';
   const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!, originGuildId);
 
   if (!blame && updatesWH == '' && relesesWH == '') {
