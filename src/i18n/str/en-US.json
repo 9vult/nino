@@ -25,6 +25,8 @@
   "error.incorrectAirTimeFormat": "Air time must be a 24-hour HH:MM time, ex: 16:30",
   "error.incorrectBooleanFormat": "This value is a boolean and must be either 'true', 'false', 'yes', or 'no'",
   "error.invalidTimeRange": "Invalid episode range",
+  "error.missingChannelPerms": "I do not have sufficient permissions for {{- channel}}!\nPlease ensure I have `VIEW_CHANNEL`, `SEND_MESSAGES`, and `EMBED_LINKS` permissions in that channel!",
+  "error.missingChannelPermsRelease": "I do not have sufficient permissions for {{- channel}}!\nPlease ensure I have `VIEW_CHANNEL`, `SEND_MESSAGES`, `MENTION_EVERYONE`, and `EMBED_LINKS` permissions in that channel!",
   "error.noRoster": "There are no key staff assigned to that project.",
   "error.noSuchChannel": "I could not find a channel with that ID. If possible, use the channel _ID_, not the channel name.",
   "error.noSuchEpisode": "Episode {{episodeNumber, number}} does not exist.",

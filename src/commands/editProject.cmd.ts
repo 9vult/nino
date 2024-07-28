@@ -7,6 +7,8 @@ import { GetAlias } from "../actions/getalias.action";
 import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 import { t } from "i18next";
 import { CheckChannelExists } from "../actions/checkChannelExists.action";
+import { CheckChannelPerms } from "../actions/checkChannelPerms.action";
+import { info } from "../actions/info.action";
 
 export const EditProjectCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -44,11 +46,13 @@ export const EditProjectCmd = async (client: Client, db: Database, dbdata: Datab
     case 'UpdateChannel':
       newValue = newValue.replace('<#', '').replace('>', '').trim();
       if (!CheckChannelExists(client, newValue)) return fail(t('error.noSuchChannel', { lng }), interaction);
+      if (!CheckChannelPerms(client, newValue)) info(t('error.missingChannelPerms', { lng, channel: `<#${newValue}>` }), interaction);
       ref.update({ updateChannel: newValue });
       break;
     case 'ReleaseChannel':
       newValue = newValue.replace('<#', '').replace('>', '').trim();
       if (!CheckChannelExists(client, newValue)) return fail(t('error.noSuchChannel', { lng }), interaction);
+      if (!CheckChannelPerms(client, newValue, true)) info(t('error.missingChannelPermsRelease', { lng, channel: `<#${newValue}>` }), interaction);
       ref.update({ releaseChannel: newValue });
       break;
     case 'AniDB':

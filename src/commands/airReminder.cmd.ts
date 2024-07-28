@@ -6,6 +6,8 @@ import { Database } from "@firebase/database-types";
 import { GetAlias } from "../actions/getalias.action";
 import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 import { t } from "i18next";
+import { CheckChannelPerms } from "../actions/checkChannelPerms.action";
+import { info } from "../actions/info.action";
 
 export const AirReminderCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -26,6 +28,8 @@ export const AirReminderCmd = async (client: Client, db: Database, dbdata: Datab
       const channelId = options.getChannel('updatechannel')!.id;
       const role = options.getRole('role');
       const roleId = role ? (role.name == "@everyone" ? "@everyone" : role.id) : '';
+      if (!CheckChannelPerms(client, channelId)) info(t('error.missingChannelPerms', { lng, channel: `<#${channelId}>` }), interaction);
+
       db.ref(`/Projects/${guildId}/${project}`).update({ airReminderEnabled: true, airReminderChannel: channelId, airReminderRole: roleId });
       break;
     case 'disable':

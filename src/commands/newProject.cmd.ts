@@ -4,6 +4,8 @@ import { DatabaseData, Project } from "../misc/types";
 import { fail } from "../actions/fail.action";
 import { Database } from "@firebase/database-types";
 import { t } from "i18next";
+import { CheckChannelPerms } from "../actions/checkChannelPerms.action";
+import { info } from "../actions/info.action";
 
 export const NewProjectCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -25,6 +27,9 @@ export const NewProjectCmd = async (client: Client, db: Database, dbdata: Databa
   const isPrivate = options.getBoolean('private')!;
   const updateChannel = options.getChannel('updatechannel')!.id;
   const releaseChannel = options.getChannel('releasechannel')!.id;
+
+  if (!CheckChannelPerms(client, updateChannel)) info(t('error.missingChannelPerms', { lng, channel: `<#${updateChannel}>` }), interaction);
+  if (!CheckChannelPerms(client, releaseChannel, true)) info(t('error.missingChannelPermsRelease', { lng, channel: `<#${releaseChannel}>` }), interaction);
 
   const ref = db.ref(`/Projects/`).child(`${guildId}`).child(`${nickname}`);
   const newProj: Project = {
