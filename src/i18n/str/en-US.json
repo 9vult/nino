@@ -26,6 +26,7 @@
   "error.incorrectBooleanFormat": "This value is a boolean and must be either 'true', 'false', 'yes', or 'no'",
   "error.invalidTimeRange": "Invalid episode range",
   "error.noRoster": "There are no key staff assigned to that project.",
+  "error.noSuchChannel": "I could not find a channel with that ID. If possible, use the channel _ID_, not the channel name.",
   "error.noSuchEpisode": "Episode {{episodeNumber, number}} does not exist.",
   "error.noSuchGuild": "Guild {{guildId}} does not exist.",
   "error.noSuchObserver": "That observer does not exist!",

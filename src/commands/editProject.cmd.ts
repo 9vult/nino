@@ -6,6 +6,7 @@ import { Database } from "@firebase/database-types";
 import { GetAlias } from "../actions/getalias.action";
 import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 import { t } from "i18next";
+import { CheckChannelExists } from "../actions/checkChannelExists.action";
 
 export const EditProjectCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -16,7 +17,7 @@ export const EditProjectCmd = async (client: Client, db: Database, dbdata: Datab
 
   const alias = await GetAlias(db, dbdata, interaction, options.getString('project')!);
   const option = options.getString('option')!;
-  const newValue = options.getString('newvalue')!;
+  let newValue = options.getString('newvalue')!;
 
   let verification = await VerifyInteraction(dbdata, interaction, alias);
   if (!verification) return;
@@ -41,9 +42,13 @@ export const EditProjectCmd = async (client: Client, db: Database, dbdata: Datab
       helperText = t('project.edited.motdHelp', { lng })
       break;
     case 'UpdateChannel':
+      newValue = newValue.replace('<#', '').replace('>', '').trim();
+      if (!CheckChannelExists(client, newValue)) return fail(t('error.noSuchChannel', { lng }), interaction);
       ref.update({ updateChannel: newValue });
       break;
     case 'ReleaseChannel':
+      newValue = newValue.replace('<#', '').replace('>', '').trim();
+      if (!CheckChannelExists(client, newValue)) return fail(t('error.noSuchChannel', { lng }), interaction);
       ref.update({ releaseChannel: newValue });
       break;
     case 'AniDB':
