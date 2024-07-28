@@ -6,7 +6,7 @@ export const CheckChannelPerms = (client: Client, channelId: string, releaseChan
   channel = (channel as TextChannel)
 
   if (releaseChannel)
-    return channel.permissionsFor(client.user!.id)?.has([ "ViewChannel", "SendMessages", "MentionEveryone", "EmbedLinks" ]);
+    return channel.permissionsFor(client.user!.id)?.has([ "ViewChannel", "SendMessages", "MentionEveryone", "EmbedLinks", "ManageMessages" ]);
   else
     return channel.permissionsFor(client.user!.id)?.has([ "ViewChannel", "SendMessages", "EmbedLinks" ]);
 }
