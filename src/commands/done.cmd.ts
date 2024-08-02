@@ -48,7 +48,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   let success = false;
   const project = projects[projectName];
   const lock = project.isPrivate ? '🔒 ' : '';
-  
+
   // Find selected episode or current working episode
   for (let epId in project.episodes) {
     let episode = project.episodes[epId];
@@ -63,7 +63,8 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
         success = true;
         break;
       }
-    }
+    } else continue;
+
     // See if the task is done at this episode
     for (let taskId in episode.tasks) {
       let task = episode.tasks[taskId];
