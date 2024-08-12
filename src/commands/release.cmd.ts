@@ -6,6 +6,7 @@ import { GetAlias } from "../actions/getalias.action";
 import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 import { t } from "i18next";
 import { AlertError } from "../actions/alertError";
+import { nonce } from "../actions/nonce";
 
 export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -49,7 +50,7 @@ export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseD
   const publishChannel = client.channels.cache.get(project.releaseChannel);
 
   if (publishChannel?.isTextBased) {
-    (publishChannel as TextChannel).send(publishBody)
+    (publishChannel as TextChannel).send({ content: publishBody, ...nonce() })
     .then((msg) => {
       if (msg.channel.type === ChannelType.GuildAnnouncement)
       msg.crosspost().catch(console.error);
@@ -79,7 +80,10 @@ export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseD
         })
       });
     } catch {
-      interaction.channel?.send(`Webhook ${observer.releasesWebhook} from ${observer.guildId} failed.`);
+      interaction.channel?.send({
+        content: `Webhook ${observer.releasesWebhook} from ${observer.guildId} failed.`,
+        ...nonce()
+      });
     }
   }
 }

@@ -6,6 +6,7 @@ import { GetAlias } from "../actions/getalias.action";
 import { fail } from "../actions/fail.action";
 import { t } from "i18next";
 import { getAllPrivilegedIds } from "../actions/getters";
+import { nonce } from "../actions/nonce";
 
 export const AddObserverCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -70,5 +71,5 @@ export const AddObserverCmd = async (client: Client, db: Database, dbdata: Datab
     .setColor(0xd797ff);
   
   (await interaction.editReply("OK")).delete(); // Remove any webhook URLs from the log
-  await interaction.channel?.send({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
+  await interaction.channel?.send({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]), ...nonce() });
 }
