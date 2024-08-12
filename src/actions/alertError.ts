@@ -1,5 +1,6 @@
 import { Client, EmbedBuilder } from "discord.js";
 import { OWNER } from "../nino";
+import { nonce } from "./nonce";
 
 export const AlertError = async (client: Client, err: Error, guild: string, project: string, location: string) => {
   const message = `[${location}]: "${err.message}" from guild \`${guild}\`, project \`${project}\``;
@@ -10,5 +11,5 @@ export const AlertError = async (client: Client, err: Error, guild: string, proj
     .setTitle(`${err.message}`)
     .setDescription(err.stack ?? 'No stacktrace')
     .setColor(0xd797ff);
-  if (OWNER) await client.users.send(OWNER, { content: message, embeds: [ embed ] });
+  if (OWNER) await client.users.send(OWNER, { content: message, embeds: [ embed ], ...nonce() });
 }

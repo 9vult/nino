@@ -3,6 +3,7 @@ import { DatabaseData } from "../misc/types";
 import { AirDate } from "./airdate.action";
 import { Client, EmbedBuilder, TextChannel } from "discord.js";
 import { AlertError } from "./alertError";
+import { nonce } from "./nonce";
 
 export const CheckReleases = async (client: Client, db: Database, dbdata: DatabaseData) => {
   for (let guildId in dbdata.guilds) {
@@ -35,7 +36,7 @@ export const CheckReleases = async (client: Client, db: Database, dbdata: Databa
           
           const publishChannel = client.channels.cache.get(projobj.airReminderChannel!);
           if (publishChannel?.isTextBased) {
-            (publishChannel as TextChannel).send({ content: role, embeds: [embed] })
+            (publishChannel as TextChannel).send({ content: role, embeds: [embed], ...nonce() })
             .catch(err => AlertError(client, err, guildId, projobj.nickname, 'CheckReleases'));
           }
         }

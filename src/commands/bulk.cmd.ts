@@ -8,6 +8,7 @@ import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 import { t } from "i18next";
 import { getKeyStaff } from "../actions/getters";
 import { AlertError } from "../actions/alertError";
+import { nonce } from "../actions/nonce";
 
 export const BulkCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -106,7 +107,7 @@ export const BulkCmd = async (client: Client, db: Database, dbdata: DatabaseData
   const publishChannel = client.channels.cache.get(project.updateChannel);
 
   if (publishChannel?.isTextBased) {
-    (publishChannel as TextChannel).send({ embeds: [publishEmbed] })
+    (publishChannel as TextChannel).send({ embeds: [publishEmbed], ...nonce() })
     .catch(err => AlertError(client, err, guildId!, project.nickname, 'Bulk'));
   }
 
@@ -127,7 +128,10 @@ export const BulkCmd = async (client: Client, db: Database, dbdata: DatabaseData
           })
         });
       } catch {
-        interaction.channel?.send(`Webhook ${observer.updatesWebhook} from ${observer.guildId} failed.`);
+        interaction.channel?.send({
+          content: `Webhook ${observer.updatesWebhook} from ${observer.guildId} failed.`,
+          ...nonce()
+        });
       }
     }
 }

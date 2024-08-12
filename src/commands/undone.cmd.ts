@@ -9,6 +9,7 @@ import { EntriesToStatusString, GenerateEntries } from "../actions/generateEntri
 import { t } from "i18next";
 import { getAdditionalStaff, getEpisode, getKeyStaff, getTask } from "../actions/getters";
 import { AlertError } from "../actions/alertError";
+import { nonce } from "../actions/nonce";
 
 export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -120,7 +121,7 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
   const publishChannel = client.channels.cache.get(project.updateChannel);
 
   if (publishChannel?.isTextBased) {
-    (publishChannel as TextChannel).send({ embeds: [publishEmbed] })
+    (publishChannel as TextChannel).send({ embeds: [publishEmbed], ...nonce() })
     .catch(err => AlertError(client, err, guildId!, project.nickname, 'Undone'));
   }
 
@@ -141,7 +142,10 @@ export const UndoneCmd = async (client: Client, db: Database, dbdata: DatabaseDa
         })
       });
     } catch {
-      interaction.channel?.send(`Webhook ${observer.updatesWebhook} from ${observer.guildId} failed.`);
+      interaction.channel?.send({
+        content: `Webhook ${observer.updatesWebhook} from ${observer.guildId} failed.`,
+        ...nonce()
+      });
     }
   }
 }
