@@ -13,7 +13,7 @@ export const AlertError = async (client: Client, err: Error, guild: string, proj
     .setColor(0xd797ff);
   if (OWNER) await client.users.send(OWNER, { content: message, embeds: [ embed ], ...nonce() }).catch();
 
-  await client.users.send(projectOwner, { content: message, embeds: [ embed ], ...nonce() })
+  await client.users.send(projectOwner, { content: message, ...nonce() })
     // If the DM fails (blocked??)
     .catch(async (err: Error) => {
       const failureMessage = `[AlertError]: Could not send DM to \`${projectOwner}\`: ${err.message}`;
