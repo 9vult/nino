@@ -128,7 +128,7 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
 
   if (publishChannel?.isTextBased) {
     (publishChannel as TextChannel).send({ embeds: [publishEmbed], ...nonce() })
-    .catch(err => AlertError(client, err, guildId!, project.nickname, 'Skip'));
+    .catch(err => AlertError(client, err, guildId!, project.nickname, project.owner, 'Skip'));
   }
 
   if (!project.observers) return; // Stop here if there's no observers

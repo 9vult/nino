@@ -55,7 +55,7 @@ export const ReleaseCmd = async (client: Client, db: Database, dbdata: DatabaseD
       if (msg.channel.type === ChannelType.GuildAnnouncement)
       msg.crosspost().catch(console.error);
     })
-    .catch(err => AlertError(client, err, guildId!, project.nickname, 'Release'));
+    .catch(err => AlertError(client, err, guildId!, project.nickname, project.owner, 'Release'));
   }
 
 

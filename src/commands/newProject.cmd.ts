@@ -28,8 +28,8 @@ export const NewProjectCmd = async (client: Client, db: Database, dbdata: Databa
   const updateChannel = options.getChannel('updatechannel')!.id;
   const releaseChannel = options.getChannel('releasechannel')!.id;
 
-  if (!CheckChannelPerms(client, updateChannel)) info(t('error.missingChannelPerms', { lng, channel: `<#${updateChannel}>` }), interaction);
-  if (!CheckChannelPerms(client, releaseChannel, true)) info(t('error.missingChannelPermsRelease', { lng, channel: `<#${releaseChannel}>` }), interaction);
+  if (!CheckChannelPerms(client, updateChannel)) info(t('error.missingChannelPerms', { lng, channel: `<#${updateChannel}>` }), interaction, client);
+  if (!CheckChannelPerms(client, releaseChannel, true)) info(t('error.missingChannelPermsRelease', { lng, channel: `<#${releaseChannel}>` }), interaction, client);
 
   const ref = db.ref(`/Projects/`).child(`${guildId}`).child(`${nickname}`);
   const newProj: Project = {

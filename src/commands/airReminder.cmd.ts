@@ -28,7 +28,7 @@ export const AirReminderCmd = async (client: Client, db: Database, dbdata: Datab
       const channelId = options.getChannel('updatechannel')!.id;
       const role = options.getRole('role');
       const roleId = role ? (role.name == "@everyone" ? "@everyone" : role.id) : '';
-      if (!CheckChannelPerms(client, channelId)) info(t('error.missingChannelPerms', { lng, channel: `<#${channelId}>` }), interaction);
+      if (!CheckChannelPerms(client, channelId)) info(t('error.missingChannelPerms', { lng, channel: `<#${channelId}>` }), interaction, client);
 
       db.ref(`/Projects/${guildId}/${project}`).update({ airReminderEnabled: true, airReminderChannel: channelId, airReminderRole: roleId });
       break;
