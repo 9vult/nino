@@ -48,6 +48,11 @@ export type Task = {
   done: boolean
 };
 
+export type EpisodeLink = {
+  id: string,
+  episode: Episode
+};
+
 export type Observer = {
   guildId: string,
   managerid: string,

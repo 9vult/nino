@@ -9,6 +9,7 @@ import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 import { t } from "i18next";
 import { AlertError } from "../actions/alertError";
 import { nonce } from "../actions/nonce";
+import { getOrderedEpisodes } from "../actions/getters";
 
 export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -51,8 +52,10 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   const lock = project.isPrivate ? '🔒 ' : '';
 
   // Find selected episode or current working episode
-  for (let epId in project.episodes) {
-    let episode = project.episodes[epId];
+  let episodes = getOrderedEpisodes(project);
+  for (let link of episodes) {
+    let epId = link.id;
+    let episode = link.episode;
     if ((selectedEpisode != null && episode.number == selectedEpisode) || (selectedEpisode == null && episode.done == false)) {
       if (!workingEpisode) {
         workingEpisode = episode;  // Only assign the first undone episode

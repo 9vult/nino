@@ -1,4 +1,4 @@
-import { Episode, Project } from "../misc/types";
+import { Episode, EpisodeLink, Project } from "../misc/types";
 
 /**
  * Get an episode from a project
@@ -97,12 +97,13 @@ export const getTask = (episode: Episode, abbreviation: string) => {
 export const getBlameableEpisode = (project: Project, episodeNumber: number | null) => {
   if (episodeNumber) return getEpisode(project, episodeNumber);
 
-  for (let id in project.episodes) {
-    const episode = project.episodes[id];
-    if (!episode.done) {
+  let episodes = getOrderedEpisodes(project);
+
+  for (let link of episodes) {
+    if (!link.episode.done) {
       return {
-        id,
-        episode
+        id: link.id,
+        episode: link.episode
       };
     }
   }
@@ -110,6 +111,17 @@ export const getBlameableEpisode = (project: Project, episodeNumber: number | nu
     id: undefined,
     episode: undefined
   };
+}
+
+export const getOrderedEpisodes = (project: Project) => {
+  let sorted: EpisodeLink[] = [];
+
+  for (let epId in project.episodes) {
+    sorted.push({ id: epId, episode: project.episodes[epId] });
+  }
+
+  sorted.sort((a, b) => a.episode.number - b.episode.number);
+  return sorted;
 }
 
 /**
