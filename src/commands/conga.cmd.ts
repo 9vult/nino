@@ -6,7 +6,7 @@ import { Database } from "@firebase/database-types";
 import { GetAlias } from "../actions/getalias.action";
 import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 import { t } from "i18next";
-import { isCongaParticipant } from "../actions/getters";
+import { getKeyStaff, isCongaParticipant } from "../actions/getters";
 
 export const CongaCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -30,9 +30,10 @@ export const CongaCmd = async (client: Client, db: Database, dbdata: DatabaseDat
       const current = options.getString('abbreviation')!.toUpperCase();
       const next = options.getString('next')!.toUpperCase();
       
-      if (isCongaParticipant(project, current)) {
-        return fail(t('error.conga.alreadyExists', { lng }), interaction);
-      }
+      if (isCongaParticipant(project, current)) return fail(t('error.conga.alreadyExists', { lng }), interaction);
+      if (!getKeyStaff(project, current).id) return fail(t('error.noSuchTask', { lng, abbreviation: current }), interaction);
+      if (!getKeyStaff(project, next).id) return fail(t('error.noSuchTask', { lng, abbreviation: next }), interaction);
+
       db.ref(`/Projects/`).child(`${guildId}`).child(`${projectName}`).child('conga').push({ current, next });
 
       message = t('conga.added', { lng, current, next });
