@@ -897,6 +897,64 @@ export default (client: Client, dbdata: DatabaseData): void => {
           )
       );
 
+    const congaCmd = new SlashCommandBuilder()
+      .setName('conga')
+      .setDescription('Create a Conga line of Key Staff')
+      .setNameLocalizations(GetNames(d, 'commands', 'conga'))
+      .setDescriptionLocalizations(GetDescs(d, 'commands', 'conga'))
+      .addSubcommand(s => 
+        s.setName('add')
+          .setDescription('Add a link to the Conga line')
+          .setNameLocalizations(GetNames(d, 'commands', 'conga.add'))
+          .setDescriptionLocalizations(GetDescs(d, 'commands', 'conga.add'))
+          .addStringOption(o =>
+            o.setName('project')
+              .setDescription('Project nickname')
+              .setNameLocalizations(GetNames(d, 'options', 'project'))
+              .setDescriptionLocalizations(GetDescs(d, 'options', 'project'))
+              .setRequired(true)
+              .setAutocomplete(true)
+          )
+          .addStringOption(o =>
+            o.setName('abbreviation')
+              .setDescription('Position shorthand')
+              .setNameLocalizations(GetNames(d, 'options', 'abbreviation'))
+              .setDescriptionLocalizations(GetDescs(d, 'options', 'abbreviation'))
+              .setRequired(true)
+              .setAutocomplete(true)
+          )
+          .addStringOption(o =>
+            o.setName('next')
+              .setDescription('Position to ping')
+              .setNameLocalizations(GetNames(d, 'options', 'conga.next'))
+              .setDescriptionLocalizations(GetDescs(d, 'options', 'conga.next'))
+              .setRequired(true)
+              .setAutocomplete(true)
+          )
+      )
+      .addSubcommand(s => 
+        s.setName('remove')
+          .setDescription('Remove a link from the Conga line')
+          .setNameLocalizations(GetNames(d, 'commands', 'conga.remove'))
+          .setDescriptionLocalizations(GetDescs(d, 'commands', 'conga.remove'))
+          .addStringOption(o =>
+            o.setName('project')
+              .setDescription('Project nickname')
+              .setNameLocalizations(GetNames(d, 'options', 'project'))
+              .setDescriptionLocalizations(GetDescs(d, 'options', 'project'))
+              .setRequired(true)
+              .setAutocomplete(true)
+          )
+          .addStringOption(o =>
+            o.setName('abbreviation')
+              .setDescription('Position shorthand')
+              .setNameLocalizations(GetNames(d, 'options', 'abbreviation'))
+              .setDescriptionLocalizations(GetDescs(d, 'options', 'abbreviation'))
+              .setRequired(true)
+              .setAutocomplete(true)
+          )
+      );
+
     const bulkCmd = new SlashCommandBuilder()
       .setName('bulk')
       .setDescription('Do a lot of episodes all at once!')
@@ -977,6 +1035,7 @@ export default (client: Client, dbdata: DatabaseData): void => {
     client.application.commands.create(configurationCmd);
     client.application.commands.create(airReminderCmd);
     client.application.commands.create(bulkCmd);
+    client.application.commands.create(congaCmd);
 
     console.log('Nino is ready to go!');
   });

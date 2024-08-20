@@ -8,6 +8,7 @@ export interface Project {
   poster: string,
   type: 'TV' | 'Movie' | 'BD' | string,
   keyStaff: Staff[],
+  conga: CongaParticipant[],
   episodes: Episode[],
   done: boolean,
   anidb: string,
@@ -74,6 +75,11 @@ export type ObserverAliasResult = {
 export type WeightedStatusEntry = {
   status: string,
   weight: number
+};
+
+export type CongaParticipant = {
+  current: string,
+  next: string
 };
 
 export type Configuration = {

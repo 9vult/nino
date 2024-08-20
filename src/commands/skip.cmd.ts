@@ -7,7 +7,7 @@ import { GetAlias } from "../actions/getalias.action";
 import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 import { EntriesToStatusString, GenerateEntries } from "../actions/generateEntries.action";
 import { t } from "i18next";
-import { getAdditionalStaff, getEpisode, getKeyStaff, getTask } from "../actions/getters";
+import { getAdditionalStaff, getCongaNext, getEpisode, getKeyStaff, getTask, isCongaParticipant } from "../actions/getters";
 import { AlertError } from "../actions/alertError";
 import { nonce } from "../actions/nonce";
 
@@ -30,10 +30,10 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
   let verification = await VerifyInteraction(dbdata, interaction, alias, false);
   if (!verification) return;
   const { projects, project: projectName } = InteractionData(dbdata, interaction, alias);
-
+  const project = projects[projectName];
   let localEntries = GenerateEntries(dbdata, guildId!, projectName, selectedEpisode);
 
-  const project = projects[projectName];
+  const congaParticipant = isCongaParticipant(project, abbreviation);
 
   let { keyStaff } = getKeyStaff(project, abbreviation);
 
@@ -129,6 +129,20 @@ export const SkipCmd = async (client: Client, db: Database, dbdata: DatabaseData
   if (publishChannel?.isTextBased) {
     (publishChannel as TextChannel).send({ embeds: [publishEmbed], ...nonce() })
     .catch(err => AlertError(client, err, guildId!, project.nickname, project.owner, 'Skip'));
+  }
+
+  // Check if someone needs to be pinged
+  if (congaParticipant) {
+    const nextAbbreviation = getCongaNext(project, abbreviation)!;
+    const nextTask = getKeyStaff(project, nextAbbreviation);
+    if (nextTask.id) {
+      const staff = `<@${nextTask.keyStaff.id}>`;
+      const role = nextTask.keyStaff.role.title;
+      const episode = selectedEpisode;
+      const alertContent = t('progress.done.conga', { lng, staff, role, episode });
+
+      await interaction.followUp({ content: alertContent });
+    }
   }
 
   if (!project.observers) return; // Stop here if there's no observers

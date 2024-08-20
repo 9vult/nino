@@ -343,6 +343,27 @@ Check who is assigned to what for an episode. Accessible by Key Staff.
 | project | yes | string | Project nickname |
 | episode | yes | number | Episode number |
 
+### conga
+
+#### add
+
+Add a link to the project's Conga line. When the Current task is completed, the Next task will be pinged.
+
+| Parameter | Required | Type | Description |
+|-----------|----------|------|-------------|
+| project | yes | string | Project nickname |
+| abbreviation | yes | string | Current task abbreviation |
+| next | yes | string | Next task abbreviation |
+
+#### remove
+
+Remove a link from the project's Conga line.
+
+| Parameter | Required | Type | Description |
+|-----------|----------|------|-------------|
+| project | yes | string | Project nickname |
+| abbreviation | yes | string | Current task abbreviation |
+
 ## Commands - Other
 
 ### help

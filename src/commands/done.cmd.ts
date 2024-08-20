@@ -9,7 +9,7 @@ import { InteractionData, VerifyInteraction } from "../actions/verify.action";
 import { t } from "i18next";
 import { AlertError } from "../actions/alertError";
 import { nonce } from "../actions/nonce";
-import { getOrderedEpisodes } from "../actions/getters";
+import { getCongaNext, getKeyStaff, getOrderedEpisodes, isCongaParticipant } from "../actions/getters";
 
 export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData, interaction: ChatInputCommandInteraction) => {
   if (!interaction.isCommand()) return;
@@ -50,6 +50,8 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   let success = false;
   const project = projects[projectName];
   const lock = project.isPrivate ? '🔒 ' : '';
+
+  const congaParticipant = isCongaParticipant(project, abbreviation);
 
   // Find selected episode or current working episode
   let episodes = getOrderedEpisodes(project);
@@ -228,7 +230,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
         
         let map: {[key:string]:string} = {};
         if (extended) {
-          publicEntries = GenerateEntries(dbdata, guildId!, projectName, workingEpisode.number);
+          publicEntries = GenerateEntries(dbdata, guildId!, projectName, nextEpisode.number);
           if (project.keyStaff) Object.values(project.keyStaff).forEach(ks => { map[ks.role.abbreviation] = ks.role.title; });
           if (nextEpisode.additionalStaff) Object.values(nextEpisode.additionalStaff).forEach(as => { map[as.role.abbreviation] = as.role.title });
         }
@@ -328,6 +330,20 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
   if (publishChannel?.isTextBased) {
     (publishChannel as TextChannel).send({ embeds: [publishEmbed], ...nonce() })
     .catch(err => AlertError(client, err, guildId!, project.nickname, project.owner, 'Done'));
+  }
+
+  // Check if someone needs to be pinged
+  if (congaParticipant) {
+    const nextAbbreviation = getCongaNext(project, abbreviation)!;
+    const nextTask = getKeyStaff(project, nextAbbreviation);
+    if (nextTask.id) {
+      const staff = `<@${nextTask.keyStaff.id}>`;
+      const role = nextTask.keyStaff.role.title;
+      const episode = workingEpisode.number;
+      const alertContent = t('progress.done.conga', { lng, staff, role, episode });
+
+      await interaction.followUp({ content: alertContent });
+    }
   }
 
   if (!project.observers) return; // Stop here if there's no observers

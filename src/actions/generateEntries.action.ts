@@ -1,4 +1,5 @@
 import { DatabaseData, WeightedStatusEntry } from "../misc/types";
+import { getEpisode } from "./getters";
 
 export const GenerateEntries = (dbdata: DatabaseData, guildId: string, project: string, episode: number) => {
   let projects = dbdata.guilds[guildId];
@@ -13,20 +14,17 @@ export const GenerateEntries = (dbdata: DatabaseData, guildId: string, project: 
     });
   }
 
-  for (let ep in projects[project].episodes) {
-    if (projects[project].episodes[ep].number == episode) {
-      let projObj = projects[project].episodes[ep];
-      if (projObj.additionalStaff) {
-        Object.values(projObj.additionalStaff).forEach(as => { 
-          entries[as.role.abbreviation] = {
-            status: '',
-            weight: Number.POSITIVE_INFINITY
-          };
-        });
-      }
-      break;
-    }
+  const episodeObj = getEpisode(projects[project], episode);
+
+  if (episodeObj.episode?.additionalStaff) {
+    Object.values(episodeObj.episode.additionalStaff).forEach(as => { 
+      entries[as.role.abbreviation] = {
+        status: '',
+        weight: Number.POSITIVE_INFINITY
+      };
+    });
   }
+ 
   return entries;
 }
 

@@ -41,6 +41,7 @@ export const NewProjectCmd = async (client: Client, db: Database, dbdata: Databa
     poster,
     type,
     keyStaff: [],
+    conga: [],
     episodes: [],
     done: false,
     anidb: '', // TODO

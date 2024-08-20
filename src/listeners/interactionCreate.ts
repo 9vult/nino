@@ -34,6 +34,7 @@ import { RemoveAdminCmd } from "../commands/removeAdmin.cmd";
 import { AirReminderCmd } from "../commands/airReminder.cmd";
 import { BulkCmd } from "../commands/bulk.cmd";
 import { getAllPrivilegedIds } from "../actions/getters";
+import { CongaCmd } from "../commands/conga.cmd";
 
 export default (client: Client, db: Database, dbdata: DatabaseData): void => {
   client.on('interactionCreate', async (interaction) => {
@@ -131,6 +132,9 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
       case 'bulk':
         await BulkCmd(client, db, dbdata, cmdInteraction);
         break;
+      case 'conga':
+        await CongaCmd(client, db, dbdata, cmdInteraction);
+        break;
     }
   });
 
@@ -205,7 +209,8 @@ export default (client: Client, db: Database, dbdata: DatabaseData): void => {
           await interaction.respond(choices.slice(0, 25));
           return;
         }
-        case 'abbreviation': {
+        case 'abbreviation':
+        case 'next': {
           let projectName = await GetAlias(db, dbdata, interaction, options.getString('project')!);
           let episode = options.getNumber('episode');
           if (guildId === null || projectName === null || projectName === '') break;

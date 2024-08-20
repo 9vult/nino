@@ -113,6 +113,11 @@ export const getBlameableEpisode = (project: Project, episodeNumber: number | nu
   };
 }
 
+/**
+ * Gets all episodes in numerical order
+ * @param project Project to get episodes for
+ * @returns List of ordered EpisodeLinks
+ */
 export const getOrderedEpisodes = (project: Project) => {
   let sorted: EpisodeLink[] = [];
 
@@ -160,4 +165,40 @@ export const getAllPrivilegedIds = (project: Project, guildAdmins: string[]) => 
     }
   }
   return ids;
+}
+
+/**
+ * Check if a task is part of the project's Conga line
+ * @param project Project to check
+ * @param abbreviation task to check
+ * @returns True if the task is part of this project's Conga line
+ */
+export const isCongaParticipant = (project: Project, abbreviation: string) => {
+  if (!project.conga) return false;
+
+  for (let id in project.conga) {
+    let participant = project.conga[id];
+    if (participant.current == abbreviation) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Get the next task in the Conga line
+ * @param project Project to check
+ * @param abbreviation Task to check
+ * @returns Next task in the Conga line, or undefined
+ */
+export const getCongaNext = (project: Project, abbreviation: string) => {
+  if (!project.conga) return undefined;
+
+  for (let id in project.conga) {
+    let participant = project.conga[id];
+    if (participant.current == abbreviation) {
+      return participant.next;
+    }
+  }
+  return undefined;
 }
