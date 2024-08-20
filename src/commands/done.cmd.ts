@@ -339,7 +339,7 @@ export const DoneCmd = async (client: Client, db: Database, dbdata: DatabaseData
     if (nextTask.id) {
       const staff = `<@${nextTask.keyStaff.id}>`;
       const role = nextTask.keyStaff.role.title;
-      const episode = workingEpisode.number;
+      const episode = nextEpisode.number;
       const alertContent = t('progress.done.conga', { lng, staff, role, episode });
 
       await interaction.followUp({ content: alertContent });
