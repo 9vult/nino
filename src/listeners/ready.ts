@@ -953,6 +953,20 @@ export default (client: Client, dbdata: DatabaseData): void => {
               .setRequired(true)
               .setAutocomplete(true)
           )
+      )
+      .addSubcommand(s => 
+        s.setName('list')
+          .setDescription('List Conga participants')
+          .setNameLocalizations(GetNames(d, 'commands', 'conga.remove'))
+          .setDescriptionLocalizations(GetDescs(d, 'commands', 'conga.remove'))
+          .addStringOption(o =>
+            o.setName('project')
+              .setDescription('Project nickname')
+              .setNameLocalizations(GetNames(d, 'options', 'project'))
+              .setDescriptionLocalizations(GetDescs(d, 'options', 'project'))
+              .setRequired(true)
+              .setAutocomplete(true)
+          )
       );
 
     const bulkCmd = new SlashCommandBuilder()

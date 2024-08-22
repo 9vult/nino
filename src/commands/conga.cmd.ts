@@ -23,6 +23,7 @@ export const CongaCmd = async (client: Client, db: Database, dbdata: DatabaseDat
   const { projects, project: projectName } = InteractionData(dbdata, interaction, alias);
   const project = projects[projectName];
 
+  let header = '';
   let message = '';
 
   switch (subcommand) {
@@ -37,11 +38,11 @@ export const CongaCmd = async (client: Client, db: Database, dbdata: DatabaseDat
       db.ref(`/Projects/`).child(`${guildId}`).child(`${projectName}`).child('conga').push({ current, next });
 
       message = t('conga.added', { lng, current, next });
+      header = t('title.projectModification', { lng });
       break;
 
     case 'remove':
       const abbreviation = options.getString('abbreviation')!.toUpperCase();
-
       let success = false;
 
       if (project.conga) {
@@ -57,11 +58,26 @@ export const CongaCmd = async (client: Client, db: Database, dbdata: DatabaseDat
       if (!success) return fail(t('error.noSuchConga', { lng }), interaction);
 
       message = t('conga.removed', { lng, current: abbreviation });
+      header = t('title.projectModification', { lng });
+      break;
+
+    case 'list':
+      if (!project.conga) {
+        message = t('conga.empty', { lng });
+      } else {
+        let list = '';
+        for (let id in project.conga) {
+          const participant = project.conga[id];
+          list = list + `${participant.current} → ${participant.next}\n`;
+        }
+        message = list.trim();
+      }
+      header = t('title.congaList', { lng });
       break;
   }
 
   const embed = new EmbedBuilder()
-    .setTitle(t('title.projectModification', { lng }))
+    .setTitle(header)
     .setDescription(message)
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
