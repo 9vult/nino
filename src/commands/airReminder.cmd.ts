@@ -23,12 +23,15 @@ export const AirReminderCmd = async (client: Client, db: Database, dbdata: Datab
   if (!verification) return;
   const { project } = InteractionData(dbdata, interaction, alias);
 
+  let missingChannelPerms = false;
+  let channelId = '';
+
   switch (subcommand) {
     case 'enable':
-      const channelId = options.getChannel('updatechannel')!.id;
+      channelId = options.getChannel('updatechannel')!.id;
       const role = options.getRole('role');
       const roleId = role ? (role.name == "@everyone" ? "@everyone" : role.id) : '';
-      if (!CheckChannelPerms(client, channelId)) info(t('error.missingChannelPerms', { lng, channel: `<#${channelId}>` }), interaction, client);
+      if (!CheckChannelPerms(client, channelId)) missingChannelPerms = true;
 
       db.ref(`/Projects/${guildId}/${project}`).update({ airReminderEnabled: true, airReminderChannel: channelId, airReminderRole: roleId });
       break;
@@ -42,4 +45,6 @@ export const AirReminderCmd = async (client: Client, db: Database, dbdata: Datab
     .setDescription(t('guildConfiguration.saved', { lng }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
+
+  if (missingChannelPerms) info(t('error.missingChannelPerms', { lng, channel: `<#${channelId}>` }), interaction, client);
 }

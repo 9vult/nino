@@ -9,7 +9,7 @@ export const info = async (faildesc: string, interaction: ChatInputCommandIntera
     .setTitle(`Info.`)
     .setDescription(faildesc)
     .setColor(0xd797ff);
-  await interaction.channel?.send({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]), ...nonce() })
+  await interaction.followUp({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]), ...nonce() })
 
   // Fallback: Alert user of error and pass along message in DMs
   .catch(async (err) => {

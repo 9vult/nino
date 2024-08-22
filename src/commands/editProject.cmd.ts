@@ -27,6 +27,9 @@ export const EditProjectCmd = async (client: Client, db: Database, dbdata: Datab
 
   const ref = db.ref(`/Projects/`).child(`${guildId}`).child(`${project}`);
 
+  let missingChannelPerms = false;
+  let missingChannelPermsRelease = false;
+
   let helperText = '';
 
   switch (option) {
@@ -46,13 +49,13 @@ export const EditProjectCmd = async (client: Client, db: Database, dbdata: Datab
     case 'UpdateChannel':
       newValue = newValue.replace('<#', '').replace('>', '').trim();
       if (!CheckChannelExists(client, newValue)) return fail(t('error.noSuchChannel', { lng }), interaction);
-      if (!CheckChannelPerms(client, newValue)) info(t('error.missingChannelPerms', { lng, channel: `<#${newValue}>` }), interaction, client);
+      if (!CheckChannelPerms(client, newValue)) missingChannelPerms = true;
       ref.update({ updateChannel: newValue });
       break;
     case 'ReleaseChannel':
       newValue = newValue.replace('<#', '').replace('>', '').trim();
       if (!CheckChannelExists(client, newValue)) return fail(t('error.noSuchChannel', { lng }), interaction);
-      if (!CheckChannelPerms(client, newValue, true)) info(t('error.missingChannelPermsRelease', { lng, channel: `<#${newValue}>` }), interaction, client);
+      if (!CheckChannelPerms(client, newValue, true)) missingChannelPermsRelease = true;
       ref.update({ releaseChannel: newValue });
       break;
     case 'AniDB':
@@ -80,4 +83,7 @@ export const EditProjectCmd = async (client: Client, db: Database, dbdata: Datab
     .setDescription(description)
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
+
+  if (missingChannelPerms) info(t('error.missingChannelPerms', { lng, channel: `<#${newValue}>` }), interaction, client);
+  if (missingChannelPermsRelease) info(t('error.missingChannelPermsRelease', { lng, channel: `<#${newValue}>` }), interaction, client);
 }

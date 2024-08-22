@@ -28,9 +28,6 @@ export const NewProjectCmd = async (client: Client, db: Database, dbdata: Databa
   const updateChannel = options.getChannel('updatechannel')!.id;
   const releaseChannel = options.getChannel('releasechannel')!.id;
 
-  if (!CheckChannelPerms(client, updateChannel)) info(t('error.missingChannelPerms', { lng, channel: `<#${updateChannel}>` }), interaction, client);
-  if (!CheckChannelPerms(client, releaseChannel, true)) info(t('error.missingChannelPermsRelease', { lng, channel: `<#${releaseChannel}>` }), interaction, client);
-
   const ref = db.ref(`/Projects/`).child(`${guildId}`).child(`${nickname}`);
   const newProj: Project = {
     nickname,
@@ -75,4 +72,7 @@ export const NewProjectCmd = async (client: Client, db: Database, dbdata: Databa
     .setDescription(t('project.created', { lng, nickname }))
     .setColor(0xd797ff);
   await interaction.editReply({ embeds: [embed], allowedMentions: generateAllowedMentions([[], []]) });
+
+  if (!CheckChannelPerms(client, updateChannel)) info(t('error.missingChannelPerms', { lng, channel: `<#${updateChannel}>` }), interaction, client);
+  if (!CheckChannelPerms(client, releaseChannel, true)) info(t('error.missingChannelPermsRelease', { lng, channel: `<#${releaseChannel}>` }), interaction, client);
 }
