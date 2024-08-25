@@ -8,6 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.12.0" />
+    <PackageReference Include="dotenv.net" Version="3.2.0" />
+    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.42.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Localizer\Localizer.csproj" />
   </ItemGroup>
 

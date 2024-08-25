@@ -38,6 +38,8 @@ namespace Localizer
             if (target == null) throw new LocalizationException($"No suitable singular match found for {key}.");
 
             var parts = StringParser.Parse(target);
+
+            if (args.Length == 0) return target;
             foreach (var part in parts)
             {
                 int index = part.Index - 1; // parts are 1-indexed
