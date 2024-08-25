@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace Localizer
 {
     /// <summary>
-    /// Definition of a localization table
+    /// Definition of a localization table for strings
     /// </summary>
-    internal class Localization
+    internal class StringLocalization
     {
         /// <summary>
         /// Locale code ("en-US", etc)
