@@ -1,0 +1,19 @@
+{
+	"locale": "ru",
+	"pluralDefinitions": {
+		"one": "x % 10 = 1 AND x % 100 <> 11",
+		"few": "(x % 10 >= 2 AND x % 10 <= 4) AND (x % 100 < 12 OR x % 100 > 14)",
+		"many": "x % 10 = 0 OR (x % 10 >= 5 AND x % 10 <= 9) OR (x % 100 >= 11 AND x % 100 <= 14)"
+	},
+	"singular": {
+		
+	},
+	"plural": {
+		"progress.done.inTheDust.doItNow": {
+			"few": "Хорошо, отмечу.\n{{taskName|1}} теперь на {{count|2}} серии впереди.",
+			"many": "Хорошо, отмечу.\n{{taskName|1}} теперь на {{count|2}} серий впереди.",
+			"one": "Хорошо, отмечу.\n{{taskName|1}} теперь на {{count|2}} серию впереди.",
+			"other": "Хорошо, отмечу.\n{{taskName|1}} теперь на {{count|2}} серии впереди."
+		}
+	}
+}
