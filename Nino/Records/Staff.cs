@@ -9,7 +9,7 @@ namespace Nino.Records
     internal record Staff
     {
         public required string Id;
-        public required string UserId;
+        public required ulong UserId;
         public required Role Role;
     }
 }

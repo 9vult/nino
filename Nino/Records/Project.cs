@@ -9,24 +9,24 @@ namespace Nino.Records
     internal record Project
     {
         public required string Id;
-        public required string GuildId;
-        public required string Title;
+        public required ulong GuildId;
         public required string Nickname;
-        public required string OwnerId;
+        public required string Title;
+        public required ulong OwnerId;
         public required string[] AdministratorIds;
         public required Staff[] KeyStaff;
-        public required string Type;
+        public required ProjectType Type;
         public required string PosterUri;
-        public required string UpdateChannelId;
-        public required string ReleaseChannelId;
+        public required ulong UpdateChannelId;
+        public required ulong ReleaseChannelId;
         public required bool IsPrivate;
-        public CongaParticipant[]? CongaParticipants;
-        public string[]? Aliases;
+        public required CongaParticipant[] CongaParticipants;
+        public required string[] Aliases;
         public string? Motd;
         public string? AniDBId;
         public string? AirTime;
-        public string? AirReminderChannelId;
-        public string? AirReminderRoleId;
+        public ulong? AirReminderChannelId;
+        public ulong? AirReminderRoleId;
         public bool? AirReminderEnabled;
     }
 }

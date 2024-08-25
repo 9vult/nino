@@ -15,6 +15,9 @@ namespace Nino
         private static Container? _projectsContainer;
         private static Container? _episodesContainer;
 
+        public static Container? Projects => _projectsContainer;
+        public static Container? Episodes => _episodesContainer;
+
         public static async Task Setup(string endpointUri, string primaryKey, string databaseName)
         {
             _client = new(
