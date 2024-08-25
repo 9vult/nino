@@ -6,3 +6,6 @@ firebase.json
 *.sh
 .vscode
 .cache/*
+**/bin/
+**/obj/
+.vs/
