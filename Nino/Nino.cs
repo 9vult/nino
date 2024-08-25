@@ -1,5 +1,8 @@
-﻿using dotenv.net;
-using Localizer;
+﻿using Discord;
+using Discord.WebSocket;
+using dotenv.net;
+using Nino.Listeners;
+using NLog;
 using System.Text;
 using static Localizer.Localizer;
 
@@ -7,15 +10,39 @@ namespace Nino
 {
     public class Nino
     {
+        private static readonly DiscordSocketClient _client = new DiscordSocketClient();
+        private static readonly Logger log = LogManager.GetCurrentClassLogger();
+
+        public static DiscordSocketClient Client => _client;
+
         public static async Task Main()
         {
-            var env = DotEnv.Read();
             Console.OutputEncoding = Encoding.UTF8;
-            LoadLocalizations(new Uri(Directory.GetCurrentDirectory()));
+            Listener.SetupLogger();
 
-            await AzureHelper.Setup(env["AZURE_COSMOS_ENDPOINT"], env["AZURE_CLIENT_SECRET"], env["AZURE_COSMOS_DB_NAME"]);
+            // Read in environment variables
+            var env = DotEnv.Read();
+            if (!env.TryGetValue("AZURE_COSMOS_ENDPOINT", out var azureCosmosEndpoint)) throw new Exception("Missing env.AZURE_COSMOS_ENDPOINT!");
+            if (!env.TryGetValue("AZURE_CLIENT_SECRET", out var azureClientSecret)) throw new Exception("Missing env.AZURE_CLIENT_SECRET!");
+            if (!env.TryGetValue("AZURE_COSMOS_DB_NAME", out var azureCosmosName)) throw new Exception("Missing env.AZURE_COSMOS_DB_NAME!");
+            if (!env.TryGetValue("DISCORD_API_TOKEN", out var discordApiToken)) throw new Exception("Missing env.DISCORD_API_TOKEN!");
 
-            Console.WriteLine(T("test.example.singular2", "en-US"));
+            // Set up Azure database
+            await AzureHelper.Setup(azureCosmosEndpoint, azureClientSecret, azureCosmosName);
+
+            // Load localization files
+            LoadStringLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/str")));
+            LoadCommandLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/cmd")));
+
+            // Listen up
+            _client.Log += Listener.Log;
+            _client.Ready += Listener.Ready;
+            _client.SlashCommandExecuted += Listener.SlashCommandExecuted;
+
+            // Start the bot
+            await _client.LoginAsync(TokenType.Bot, discordApiToken);
+            await _client.StartAsync();
+            await Task.Delay(-1);
         }
     }
 }
