@@ -25,6 +25,9 @@ namespace Nino.Listeners
                 case KeyStaff.Name:
                     await KeyStaff.Handle(interaction);
                     break;
+                case AdditionalStaff.Name:
+                    await AdditionalStaff.Handle(interaction);
+                    break;
             }
         }
     }

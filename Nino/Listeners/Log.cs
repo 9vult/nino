@@ -23,7 +23,7 @@ namespace Nino.Listeners
         public static void SetupLogger()
         {
             var config = new LoggingConfiguration();
-            var consoleTarget = new ColoredConsoleTarget("console") { Layout = "${longdate} ${level} ${message}" };
+            var consoleTarget = new ColoredConsoleTarget("console") { Layout = "${longdate} [${level}] ${message}" };
 
             config.AddTarget(consoleTarget);
             config.AddRuleForAllLevels(consoleTarget);

@@ -15,10 +15,10 @@ using System.Collections;
 
 namespace Nino.Commands
 {
-    internal static partial class KeyStaff
+    internal static partial class AdditionalStaff
     {
 
-        public static async Task<bool> HandleAdd(SocketSlashCommand interaction, Project project)
+        public static async Task<bool> HandleAdd(SocketSlashCommand interaction, Episode episode)
         {
             var guild = Nino.Client.GetGuild(interaction.GuildId ?? 0);
             var lng = interaction.UserLocale;
@@ -31,7 +31,7 @@ namespace Nino.Commands
             var title = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "name")).Trim();
 
             // Check if position already exists
-            if (project.KeyStaff.Any(ks => ks.Role.Abbreviation == abbreviation))
+            if (episode.AdditionalStaff.Any(ks => ks.Role.Abbreviation == abbreviation))
                 return await Response.Fail(T("error.positionExists", lng), interaction);
 
             // All good!
@@ -52,27 +52,19 @@ namespace Nino.Commands
             };
 
             // Add to database
-            await AzureHelper.Projects!.PatchItemAsync<Project>(id: project.Id, partitionKey: AzureHelper.ProjectPartitionKey(project),
-                patchOperations: new[]
+            TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(episode));
+            batch.PatchItem(id: episode.Id, new[]
             {
-                PatchOperation.Add("/keyStaff/-", newStaff)
+                PatchOperation.Add("/additionalStaff/-", newStaff),
+                PatchOperation.Add("/tasks/-", newTask)
             });
-
-            TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(project));
-            foreach (Episode e in await Getters.GetEpisodes(project))
-            {
-                batch.PatchItem(id: e.Id, new[]
-                {
-                    PatchOperation.Add("/tasks/-", newTask)
-                });
-            }
             await batch.ExecuteAsync();
 
             // Send success embed
             var staffMention = $"<@{memberId}>";
             var embed = new EmbedBuilder()
                 .WithTitle(T("title.projectCreation", lng))
-                .WithDescription(T("keyStaff.added", lng, staffMention, abbreviation))
+                .WithDescription(T("additionalStaff.added", lng, staffMention, abbreviation, episode.Number))
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 

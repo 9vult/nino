@@ -87,7 +87,7 @@ namespace Nino.Commands
                         || Nino.Client.GetChannel(releaseChannelId) == null)
                         return await Response.Fail(T("error.noSuchChannel", lng), interaction);
                     operation = PatchOperation.Replace($"/releaseChannelId", releaseChannelId.ToString());
-                    if (!PermissionChecker.CheckPermissions(releaseChannelId))
+                    if (!PermissionChecker.CheckReleasePermissions(releaseChannelId))
                         await Response.Info(T("error.missingChannelPermsRelease", lng, $"<#{releaseChannelId}>"), interaction);
                     break;
 
