@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using dotenv.net;
 using Nino.Listeners;
+using Nino.Utilities;
 using NLog;
 using System.Text;
 using static Localizer.Localizer;
@@ -19,6 +20,8 @@ namespace Nino
         {
             Console.OutputEncoding = Encoding.UTF8;
             Listener.SetupLogger();
+
+            log.Info($"Starting Nino {Utils.VERSION}");
 
             // Read in environment variables
             var env = DotEnv.Read();
