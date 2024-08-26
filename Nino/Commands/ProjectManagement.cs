@@ -14,9 +14,6 @@ namespace Nino.Commands
 
         public static async Task<bool> Handle(SocketSlashCommand interaction)
         {
-            var guildId = interaction.GuildId ?? 0;
-            var guild = Nino.Client.GetGuild(guildId);
-
             var subcommand = interaction.Data.Options.First();
 
             switch (subcommand.Name)
@@ -29,6 +26,17 @@ namespace Nino.Commands
                     return await HandleDelete(interaction);
                 case "transferownership":
                     return await HandleTransferOwnership(interaction);
+                case "alias":
+                    var subsubcommand = subcommand.Options.First();
+                    switch (subsubcommand.Name)
+                    {
+                        case "add":
+                            return await HandleAliasAdd(interaction);
+                        case "remove":
+                            return await HandleAliasRemove(interaction);
+                    }
+                    log.Error($"Unknown ProjectManagement/Alias subcommand {subsubcommand.Name}");
+                    return false;
                 default:
                     log.Error($"Unknown ProjectManagement subcommand {subcommand.Name}");
                     return false;
@@ -188,6 +196,62 @@ namespace Nino.Commands
                     .WithDescriptionLocalizations(GetOptionDescriptions("member"))
                     .WithRequired(true)
                     .WithType(ApplicationCommandOptionType.User)
+                )
+            )
+            // Alias Management
+            .AddOption(new SlashCommandOptionBuilder()
+                .WithName("alias")
+                .WithDescription("Alternative nicknames for a project")
+                .WithNameLocalizations(GetCommandNames("project.alias"))
+                .WithDescriptionLocalizations(GetCommandDescriptions("project.alias"))
+                .WithType(ApplicationCommandOptionType.SubCommandGroup)
+                // Add Alias
+                .AddOption(new SlashCommandOptionBuilder()
+                    .WithName("add")
+                    .WithDescription("Add a new alias")
+                    .WithNameLocalizations(GetCommandNames("project.alias.add"))
+                    .WithDescriptionLocalizations(GetCommandDescriptions("project.alias.add"))
+                    .WithType(ApplicationCommandOptionType.SubCommand)
+                    .AddOption(new SlashCommandOptionBuilder()
+                        .WithName("project")
+                        .WithDescription("Project nickname")
+                        .WithNameLocalizations(GetOptionNames("project"))
+                        .WithDescriptionLocalizations(GetOptionDescriptions("project"))
+                        .WithRequired(true)
+                        .WithAutocomplete(true)
+                        .WithType(ApplicationCommandOptionType.String)
+                    ).AddOption(new SlashCommandOptionBuilder()
+                        .WithName("alias")
+                        .WithDescription("Alias")
+                        .WithNameLocalizations(GetOptionNames("alias"))
+                        .WithDescriptionLocalizations(GetOptionDescriptions("alias"))
+                        .WithRequired(true)
+                        .WithType(ApplicationCommandOptionType.String)
+                    )
+                )
+                // Remove Alias
+                .AddOption(new SlashCommandOptionBuilder()
+                    .WithName("remove")
+                    .WithDescription("remove an alias")
+                    .WithNameLocalizations(GetCommandNames("project.alias.remove"))
+                    .WithDescriptionLocalizations(GetCommandDescriptions("project.alias.remove"))
+                    .WithType(ApplicationCommandOptionType.SubCommand)
+                    .AddOption(new SlashCommandOptionBuilder()
+                        .WithName("project")
+                        .WithDescription("Project nickname")
+                        .WithNameLocalizations(GetOptionNames("project"))
+                        .WithDescriptionLocalizations(GetOptionDescriptions("project"))
+                        .WithRequired(true)
+                        .WithAutocomplete(true)
+                        .WithType(ApplicationCommandOptionType.String)
+                    ).AddOption(new SlashCommandOptionBuilder()
+                        .WithName("alias")
+                        .WithDescription("Alias")
+                        .WithNameLocalizations(GetOptionNames("alias"))
+                        .WithDescriptionLocalizations(GetOptionDescriptions("alias"))
+                        .WithRequired(true)
+                        .WithType(ApplicationCommandOptionType.String)
+                    )
                 )
             );
     }

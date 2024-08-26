@@ -29,6 +29,18 @@
       "name": "transferownership",
       "description": "Transfer project ownership to someone else"
     },
+    "project.alias": {
+      "name": "alias",
+      "description": "Alternative nicknames for a project"
+    },
+    "project.alias.add": {
+      "name": "add",
+      "description": "Add a new alias"
+    },
+    "project.alias.remove": {
+      "name": "remove",
+      "description": "Remove an alias"
+    },
     "keystaff": {
       "name": "keystaff",
       "description": "Key Staff for the whole project"
@@ -72,14 +84,6 @@
     "removeepisode": {
       "name": "removeepisode",
       "description": "Remove an episode"
-    },
-    "addalias": {
-      "name": "addalias",
-      "description": "Add an alias"
-    },
-    "removealias": {
-      "name": "removealias",
-      "description": "Remove an alias"
     },
     "done": {
       "name": "done",
