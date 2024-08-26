@@ -24,17 +24,19 @@ namespace Nino.Commands
             var member = guild.GetUser(interaction.User.Id);
             var lng = interaction.UserLocale;
 
+            var subcommand = interaction.Data.Options.First();
+
             log.Info("Beginning project creation");
 
             // Get inputs
-            var nickname = ((string)interaction.Data.Options.FirstOrDefault(o => o.Name == "nickname")!.Value).Trim();
-            var title = ((string)interaction.Data.Options.FirstOrDefault(o => o.Name == "title")!.Value).Trim();
-            var type = (ProjectType)Convert.ToInt32(interaction.Data.Options.FirstOrDefault(o => o.Name == "projecttype")!.Value);
-            var length = Convert.ToInt32(interaction.Data.Options.FirstOrDefault(o => o.Name == "length")!.Value);
-            var posterUri = ((string)interaction.Data.Options.FirstOrDefault(o => o.Name == "poster")!.Value).Trim();
-            var isPrivate = (bool)interaction.Data.Options.FirstOrDefault(o => o.Name == "private")!.Value;
-            var updateChannelId = ((SocketChannel)interaction.Data.Options.FirstOrDefault(o => o.Name == "updatechannel")!.Value).Id;
-            var releaseChannelId = ((SocketChannel)interaction.Data.Options.FirstOrDefault(o => o.Name == "releasechannel")!.Value).Id;
+            var nickname = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "nickname")!.Value).Trim();
+            var title = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "title")!.Value).Trim();
+            var type = (ProjectType)Convert.ToInt32(subcommand.Options.FirstOrDefault(o => o.Name == "projecttype")!.Value);
+            var length = Convert.ToInt32(subcommand.Options.FirstOrDefault(o => o.Name == "length")!.Value);
+            var posterUri = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "poster")!.Value).Trim();
+            var isPrivate = (bool)subcommand.Options.FirstOrDefault(o => o.Name == "private")!.Value;
+            var updateChannelId = ((SocketChannel)subcommand.Options.FirstOrDefault(o => o.Name == "updatechannel")!.Value).Id;
+            var releaseChannelId = ((SocketChannel)subcommand.Options.FirstOrDefault(o => o.Name == "releasechannel")!.Value).Id;
             var ownerId = interaction.User.Id;
 
             // Verify data

@@ -74,7 +74,7 @@
 		"progress.skipped.appendage": "(Skipped)",
 		"progress.undone": "So the episode {{episode|1}} **{{taskName|2}}** wasn't done, after all.",
 		"project.created": "I created project `{{nickname|1}}` for you. You may want to consider the following:\n1. `/addstaff` to add positions\n2. `/setweight to re-order positions\n3. `/editproject`: `AniDB` & `AirTime24h` to set airing date/times, and `/airreminder enable` to get airing notifications.",
-		"project.deleted": "Cleaned out the `{{project|1}}` project for you. 残念。",
+		"project.deleted": "Cleaned out the **{{project|1}}** project for you. 残念。",
 		"project.edited": "I updated `{{project|1}}` for you.",
 		"project.edited.motdHelp": "To reset this value, set a hyphen: `-`",
 		"project.owner.transferred": "Made {{staff|1}} owner of `{{project|2}}`. Good luck!",
