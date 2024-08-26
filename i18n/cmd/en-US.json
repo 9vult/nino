@@ -13,21 +13,25 @@
       "name": "newproject",
       "description": "Create a new project"
     },
-    "addstaff": {
-      "name": "addstaff",
-      "description": "Add staff to a project"
+    "keystaff": {
+      "name": "keystaff",
+      "description": "Key Staff for the whole project"
     },
-    "removestaff": {
-      "name": "removestaff",
-      "description": "Remove staff from a project"
+    "keystaff.add": {
+      "name": "add",
+      "description": "Add a new Key Staff to the whole project"
     },
-    "setweight": {
+    "keystaff.remove": {
+      "name": "remove",
+      "description": "Remove a Key Staff from the whole project"
+    },
+    "keystaff.swap": {
+      "name": "swap",
+      "description": "Swap a Key Staff for the whole project"
+    },
+    "keystaff.setweight": {
       "name": "setweight",
       "description": "Set the weight of a Key Staff position"
-    },
-    "swapstaff": {
-      "name": "swapstaff",
-      "description": "Swap staff into a project"
     },
     "addadditionalstaff": {
       "name": "addadditionalstaff",

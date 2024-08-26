@@ -8,7 +8,6 @@ namespace Nino.Records
 {
     internal record Task
     {
-        public required string Id;
         public required string Abbreviation;
         public required bool Done;
     }

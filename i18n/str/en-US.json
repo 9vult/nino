@@ -23,6 +23,7 @@
 		"episode.lastUpdated": "Last updated {{rel|1}}",
 		"episode.removed": "I removed episode {{number|1}} from `{{project|2}}` for you.",
 		"error.alias.inUse": "That alias is already in use in `{{aliasproj|1}}`.",
+		"error.alias.resolutionFailed": "Could not resolve alias {{alias|1}} to a project.",
 		"error.anidb.apiError": "Air date unknown: AniDB API error",
 		"error.anidb.generic": "Air date unknown: AniDB error",
 		"error.anidb.notSpecified": "Air date unknown: Not specified on AniDB",

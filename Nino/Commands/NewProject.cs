@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Nino.Actions;
+using Nino.Utilities;
 using Nino.Records;
 using NLog;
 using System;
@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using static Localizer.Localizer;
+using Microsoft.Azure.Cosmos;
 
 namespace Nino.Commands
 {
@@ -21,7 +22,8 @@ namespace Nino.Commands
 
         public static async Task<bool> Handle(SocketSlashCommand interaction)
         {
-            var guild = Nino.Client.GetGuild(interaction.GuildId ?? 0);
+            var guildId = interaction.GuildId ?? 0;
+            var guild = Nino.Client.GetGuild(guildId);
             var member = guild.GetUser(interaction.User.Id);
             var lng = interaction.UserLocale;
             if (!member.GuildPermissions.Administrator) return await Response.Fail(T("error.notPrivileged", lng), interaction);
@@ -29,11 +31,11 @@ namespace Nino.Commands
             log.Info("Beginning project creation");
 
             // Get inputs
-            var nickname = (string)interaction.Data.Options.FirstOrDefault(o => o.Name == "nickname")!.Value;
-            var title = (string)interaction.Data.Options.FirstOrDefault(o => o.Name == "title")!.Value;
+            var nickname = ((string)interaction.Data.Options.FirstOrDefault(o => o.Name == "nickname")!.Value).Trim();
+            var title = ((string)interaction.Data.Options.FirstOrDefault(o => o.Name == "title")!.Value).Trim();
             var type = (ProjectType)Convert.ToInt32(interaction.Data.Options.FirstOrDefault(o => o.Name == "projecttype")!.Value);
             var length = Convert.ToInt32(interaction.Data.Options.FirstOrDefault(o => o.Name == "length")!.Value);
-            var posterUri = (string)interaction.Data.Options.FirstOrDefault(o => o.Name == "poster")!.Value;
+            var posterUri = ((string)interaction.Data.Options.FirstOrDefault(o => o.Name == "poster")!.Value).Trim();
             var isPrivate = (bool)interaction.Data.Options.FirstOrDefault(o => o.Name == "private")!.Value;
             var updateChannelId = ((SocketChannel)interaction.Data.Options.FirstOrDefault(o => o.Name == "updatechannel")!.Value).Id;
             var releaseChannelId = ((SocketChannel)interaction.Data.Options.FirstOrDefault(o => o.Name == "releasechannel")!.Value).Id;
@@ -46,8 +48,8 @@ namespace Nino.Commands
 
             var projectData = new Project
             {
-                Id = $"{guild.Id}-{nickname}",
-                GuildId = guild.Id,
+                Id = $"{guildId}-{nickname}",
+                GuildId = guildId,
                 Nickname = nickname,
                 Title = title,
                 OwnerId = ownerId,
@@ -73,17 +75,21 @@ namespace Nino.Commands
                     Done = false,
                     ReminderPosted = false,
                     AdditionalStaff = [],
+                    Tasks = [],
                 });
             }
 
             // Add to database
             await AzureHelper.Projects!.UpsertItemAsync(projectData);
             log.Info($"[DB] Inserted project {projectData.Id}");
+
+            TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(projectData.Id));
             foreach (var episode in episodes)
             {
-                await AzureHelper.Episodes!.UpsertItemAsync(episode);
-                log.Info($"[DB] Inserted episode {episode.Id}");
+                batch.UpsertItem(episode);
             }
+            await batch.ExecuteAsync();
+            log.Info($"[DB] Inserted episodes for {projectData.Id}");
             log.Info("Project creation finished");
 
             // Send success embed
@@ -138,7 +144,7 @@ namespace Nino.Commands
                 .WithNameLocalizations(GetOptionNames("length"))
                 .WithDescriptionLocalizations(GetOptionDescriptions("length"))
                 .WithRequired(true)
-                .WithMinValue(0)
+                .WithMinValue(1)
                 .WithType(ApplicationCommandOptionType.Number)
             ).AddOption(new SlashCommandOptionBuilder()
                 .WithName("poster")

@@ -36,5 +36,20 @@ namespace Nino
             _projectsContainer = await _database.CreateContainerIfNotExistsAsync("Projects", "/guildId");
             _episodesContainer = await _database.CreateContainerIfNotExistsAsync("Episodes", "/projectId");
         }
+
+        public static PartitionKey ProjectPartitionKey(Records.Project project)
+        {
+            return new PartitionKey(project.SerializationGuildId);
+        }
+
+        public static PartitionKey EpisodePartitionKey(Records.Episode episode)
+        {
+            return new PartitionKey(episode.ProjectId);
+        }
+
+        public static PartitionKey EpisodePartitionKey(Records.Project project)
+        {
+            return new PartitionKey(project.Id);
+        }
     }
 }

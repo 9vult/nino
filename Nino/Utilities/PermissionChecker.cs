@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nino.Actions
+namespace Nino.Utilities
 {
     internal static class PermissionChecker
     {
