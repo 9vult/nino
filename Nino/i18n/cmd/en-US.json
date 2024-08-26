@@ -41,6 +41,18 @@
       "name": "remove",
       "description": "Remove an alias"
     },
+    "project.admin": {
+      "name": "admin",
+      "description": "Project-level administrators"
+    },
+    "project.admin.add": {
+      "name": "add",
+      "description": "Add an administrator to this project"
+    },
+    "project.admin.remove": {
+      "name": "remove",
+      "description": "Remove an administrator from this project"
+    },
     "keystaff": {
       "name": "keystaff",
       "description": "Key Staff for the whole project"
@@ -109,22 +121,6 @@
       "name": "removeobserver",
       "description": "Stop observing a project on another server"
     },
-    "addadmin": {
-      "name": "addadmin",
-      "description": "Add an administrator to this project"
-    },
-    "removeadmin": {
-      "name": "removeadmin",
-      "description": "Remove an administrator from this project"
-    },
-    "guild_admin": {
-      "name": "guild_admin",
-      "description": "Guild-wide administrator"
-    },
-    "project_admin": {
-      "name": "project_admin",
-      "description": "Project administrator"
-    },
     "release": {
       "name": "release",
       "description": "Release!"
@@ -133,9 +129,21 @@
       "name": "roster",
       "description": "See who's working on an episode"
     },
-    "configuration": {
+    "guild.configuration": {
       "name": "configuration",
-      "description": "Guild-level configuration"
+      "description": "Guild configuration"
+    },
+    "guild.admin": {
+      "name": "admin",
+      "description": "Manage guild-level administrators"
+    },
+    "guild.admin.add": {
+      "name": "add",
+      "description": "Add an administrator to this guild"
+    },
+    "guild.admin.remove": {
+      "name": "remove",
+      "description": "Remove an administrator from this guild"
     },
     "progress_display": {
       "name": "progress_display",

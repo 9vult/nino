@@ -37,6 +37,17 @@ namespace Nino.Commands
                     }
                     log.Error($"Unknown ProjectManagement/Alias subcommand {subsubcommand.Name}");
                     return false;
+                case "admin":
+                    subsubcommand = subcommand.Options.First();
+                    switch (subsubcommand.Name)
+                    {
+                        case "add":
+                            return await HandleAdminAdd(interaction);
+                        case "remove":
+                            return await HandleAdminRemove(interaction);
+                    }
+                    log.Error($"Unknown ProjectManagement/Admin subcommand {subsubcommand.Name}");
+                    return false;
                 default:
                     log.Error($"Unknown ProjectManagement subcommand {subcommand.Name}");
                     return false;
@@ -232,7 +243,7 @@ namespace Nino.Commands
                 // Remove Alias
                 .AddOption(new SlashCommandOptionBuilder()
                     .WithName("remove")
-                    .WithDescription("remove an alias")
+                    .WithDescription("Remove an alias")
                     .WithNameLocalizations(GetCommandNames("project.alias.remove"))
                     .WithDescriptionLocalizations(GetCommandDescriptions("project.alias.remove"))
                     .WithType(ApplicationCommandOptionType.SubCommand)
@@ -251,6 +262,62 @@ namespace Nino.Commands
                         .WithDescriptionLocalizations(GetOptionDescriptions("alias"))
                         .WithRequired(true)
                         .WithType(ApplicationCommandOptionType.String)
+                    )
+                )
+            )
+            // Project Admin Management
+            .AddOption(new SlashCommandOptionBuilder()
+                .WithName("admin")
+                .WithDescription("Project-level administrators")
+                .WithNameLocalizations(GetCommandNames("project.admin"))
+                .WithDescriptionLocalizations(GetCommandDescriptions("project.admin"))
+                .WithType(ApplicationCommandOptionType.SubCommandGroup)
+                // Add Admin
+                .AddOption(new SlashCommandOptionBuilder()
+                    .WithName("add")
+                    .WithDescription("Add an administrator to this project")
+                    .WithNameLocalizations(GetCommandNames("project.admin.add"))
+                    .WithDescriptionLocalizations(GetCommandDescriptions("project.admin.add"))
+                    .WithType(ApplicationCommandOptionType.SubCommand)
+                    .AddOption(new SlashCommandOptionBuilder()
+                        .WithName("project")
+                        .WithDescription("Project nickname")
+                        .WithNameLocalizations(GetOptionNames("project"))
+                        .WithDescriptionLocalizations(GetOptionDescriptions("project"))
+                        .WithRequired(true)
+                        .WithAutocomplete(true)
+                        .WithType(ApplicationCommandOptionType.String)
+                    ).AddOption(new SlashCommandOptionBuilder()
+                        .WithName("member")
+                        .WithDescription("Staff member")
+                        .WithNameLocalizations(GetOptionNames("member"))
+                        .WithDescriptionLocalizations(GetOptionDescriptions("member"))
+                        .WithRequired(true)
+                        .WithType(ApplicationCommandOptionType.User)
+                    )
+                )
+                // Remove Alias
+                .AddOption(new SlashCommandOptionBuilder()
+                    .WithName("remove")
+                    .WithDescription("Remove an administrator from this project")
+                    .WithNameLocalizations(GetCommandNames("project.admin.remove"))
+                    .WithDescriptionLocalizations(GetCommandDescriptions("project.admin.remove"))
+                    .WithType(ApplicationCommandOptionType.SubCommand)
+                    .AddOption(new SlashCommandOptionBuilder()
+                        .WithName("project")
+                        .WithDescription("Project nickname")
+                        .WithNameLocalizations(GetOptionNames("project"))
+                        .WithDescriptionLocalizations(GetOptionDescriptions("project"))
+                        .WithRequired(true)
+                        .WithAutocomplete(true)
+                        .WithType(ApplicationCommandOptionType.String)
+                    ).AddOption(new SlashCommandOptionBuilder()
+                        .WithName("member")
+                        .WithDescription("Staff member")
+                        .WithNameLocalizations(GetOptionNames("member"))
+                        .WithDescriptionLocalizations(GetOptionDescriptions("member"))
+                        .WithRequired(true)
+                        .WithType(ApplicationCommandOptionType.User)
                     )
                 )
             );
