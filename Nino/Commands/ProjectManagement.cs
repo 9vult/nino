@@ -25,9 +25,6 @@ namespace Nino.Commands
         {
             var guildId = interaction.GuildId ?? 0;
             var guild = Nino.Client.GetGuild(guildId);
-            var member = guild.GetUser(interaction.User.Id);
-            var lng = interaction.UserLocale;
-            if (!member.GuildPermissions.Administrator) return await Response.Fail(T("error.notPrivileged", lng), interaction);
 
             var subcommand = interaction.Data.Options.First();
 
