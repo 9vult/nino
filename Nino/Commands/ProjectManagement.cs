@@ -1,17 +1,8 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Nino.Utilities;
-using Nino.Records;
 using NLog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using static Localizer.Localizer;
-using Microsoft.Azure.Cosmos;
-using Nino.Records.Enums;
 
 namespace Nino.Commands
 {
