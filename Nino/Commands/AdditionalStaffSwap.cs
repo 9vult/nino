@@ -3,16 +3,14 @@ using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
 using Nino.Records;
 using Nino.Utilities;
-
 using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    internal static partial class KeyStaff
+    internal static partial class AdditionalStaff
     {
-        public static async Task<bool> HandleSwap(SocketSlashCommand interaction, Project project)
+        public static async Task<bool> HandleSwap(SocketSlashCommand interaction, Episode episode)
         {
-            var guild = Nino.Client.GetGuild(interaction.GuildId ?? 0);
             var lng = interaction.UserLocale;
 
             var subcommand = interaction.Data.Options.First();
@@ -22,29 +20,30 @@ namespace Nino.Commands
             var memberId = ((SocketGuildUser)subcommand.Options.FirstOrDefault(o => o.Name == "member")!.Value).Id;
 
             // Check if position exists
-            if (!project.KeyStaff.Any(ks => ks.Role.Abbreviation == abbreviation))
+            if (!episode.AdditionalStaff.Any(ks => ks.Role.Abbreviation == abbreviation))
                 return await Response.Fail(T("error.noSuchTask", lng), interaction);
 
             // Update user
-            var updatedStaff = project.KeyStaff.Single(k => k.Role.Abbreviation == abbreviation);
-            var ksIndex = Array.IndexOf(project.KeyStaff, updatedStaff);
+            var updatedStaff = episode.AdditionalStaff.Single(k => k.Role.Abbreviation == abbreviation);
+            var asIndex = Array.IndexOf(episode.AdditionalStaff, updatedStaff);
 
             updatedStaff.UserId = memberId;
 
             // Swap in database
-            await AzureHelper.Projects!.PatchItemAsync<Project>(id: project.Id, partitionKey: AzureHelper.ProjectPartitionKey(project),
-                patchOperations: new[]
+            TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(episode));
+            batch.PatchItem(id: episode.Id, new[]
             {
-                PatchOperation.Replace($"/keyStaff/{ksIndex}", updatedStaff)
+                PatchOperation.Replace($"/additionalStaff/{asIndex}", updatedStaff)
             });
+            await batch.ExecuteAsync();
 
-            log.Info($"Swapped {memberId} in to {project.Id} for {abbreviation}");
+            log.Info($"Swapped {memberId} in to {episode.Id} for {abbreviation}");
 
             // Send success embed
             var staffMention = $"<@{memberId}>";
             var embed = new EmbedBuilder()
-                .WithTitle(T("title.projectModification", lng))
-                .WithDescription(T("keyStaff.swapped", lng, staffMention, abbreviation))
+                .WithTitle(T("title.projectCreation", lng))
+                .WithDescription(T("additionalStaff.swapped", lng, staffMention, abbreviation, episode.Number))
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 

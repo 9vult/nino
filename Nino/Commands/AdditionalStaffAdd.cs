@@ -17,7 +17,6 @@ namespace Nino.Commands
 {
     internal static partial class AdditionalStaff
     {
-
         public static async Task<bool> HandleAdd(SocketSlashCommand interaction, Episode episode)
         {
             var lng = interaction.UserLocale;

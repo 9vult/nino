@@ -1,23 +1,14 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
-using Nino.Utilities;
 using Nino.Records;
-using NLog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+using Nino.Utilities;
 using static Localizer.Localizer;
-using System.Collections;
 
 namespace Nino.Commands
 {
     internal static partial class KeyStaff
     {
-
         public static async Task<bool> HandleAdd(SocketSlashCommand interaction, Project project)
         {
             var guild = Nino.Client.GetGuild(interaction.GuildId ?? 0);

@@ -10,7 +10,6 @@ namespace Nino.Commands
 {
     internal static partial class KeyStaff
     {
-
         public static async Task<bool> HandleRemove(SocketSlashCommand interaction, Project project)
         {
             var guild = Nino.Client.GetGuild(interaction.GuildId ?? 0);

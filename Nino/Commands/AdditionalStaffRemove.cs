@@ -9,7 +9,6 @@ namespace Nino.Commands
 {
     internal static partial class AdditionalStaff
     {
-
         public static async Task<bool> HandleRemove(SocketSlashCommand interaction, Episode episode)
         {
             var lng = interaction.UserLocale;
@@ -26,7 +25,7 @@ namespace Nino.Commands
             var asIndex = Array.IndexOf(episode.AdditionalStaff, episode.AdditionalStaff.Single(k => k.Role.Abbreviation == abbreviation));
             var taskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == abbreviation));
 
-            // Add to database
+            // Rewmove from database
             TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(episode));
             batch.PatchItem(id: episode.Id, new[]
             {

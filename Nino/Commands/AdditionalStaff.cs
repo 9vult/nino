@@ -42,7 +42,7 @@ namespace Nino.Commands
                 case "remove":
                     return await HandleRemove(interaction, episode);
                 case "swap":
-                    //return await HandleSwap(interaction, episode);
+                    return await HandleSwap(interaction, episode);
                 default:
                     log.Error($"Unknown AdditionalStaff subcommand {subcommand.Name}");
                     return false;
@@ -170,38 +170,6 @@ namespace Nino.Commands
                     .WithDescriptionLocalizations(GetOptionDescriptions("member"))
                     .WithRequired(true)
                     .WithType(ApplicationCommandOptionType.User)
-                )
-            )
-            // Set Weight
-            .AddOption(new SlashCommandOptionBuilder()
-                .WithName("setweight")
-                .WithDescription("Set the weight of a Key Staff position")
-                .WithNameLocalizations(GetCommandNames("keystaff.setweight"))
-                .WithDescriptionLocalizations(GetCommandDescriptions("keystaff.setweight"))
-                .WithType(ApplicationCommandOptionType.SubCommand)
-                .AddOption(new SlashCommandOptionBuilder()
-                    .WithName("project")
-                    .WithDescription("Project nickname")
-                    .WithNameLocalizations(GetOptionNames("project"))
-                    .WithDescriptionLocalizations(GetOptionDescriptions("project"))
-                    .WithRequired(true)
-                    .WithAutocomplete(true)
-                    .WithType(ApplicationCommandOptionType.String)
-                ).AddOption(new SlashCommandOptionBuilder()
-                    .WithName("abbreviation")
-                    .WithDescription("Position shorthand")
-                    .WithNameLocalizations(GetOptionNames("abbreviation"))
-                    .WithDescriptionLocalizations(GetOptionDescriptions("abbreviation"))
-                    .WithRequired(true)
-                    .WithType(ApplicationCommandOptionType.String)
-                )
-                .AddOption(new SlashCommandOptionBuilder()
-                    .WithName("weight")
-                    .WithDescription("Weight")
-                    .WithNameLocalizations(GetOptionNames("weight"))
-                    .WithDescriptionLocalizations(GetOptionDescriptions("weight"))
-                    .WithRequired(true)
-                    .WithType(ApplicationCommandOptionType.Number)
                 )
             );
     }
