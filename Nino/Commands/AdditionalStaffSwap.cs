@@ -21,7 +21,7 @@ namespace Nino.Commands
 
             // Check if position exists
             if (!episode.AdditionalStaff.Any(ks => ks.Role.Abbreviation == abbreviation))
-                return await Response.Fail(T("error.noSuchTask", lng), interaction);
+                return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
 
             // Update user
             var updatedStaff = episode.AdditionalStaff.Single(k => k.Role.Abbreviation == abbreviation);

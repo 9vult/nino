@@ -22,7 +22,7 @@ namespace Nino.Commands
 
             // Check if position exists
             if (!project.KeyStaff.Any(ks => ks.Role.Abbreviation == abbreviation))
-                return await Response.Fail(T("error.noSuchTask", lng), interaction);
+                return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
 
             // Remove from database
             var ksIndex = Array.IndexOf(project.KeyStaff, project.KeyStaff.Single(k => k.Role.Abbreviation == abbreviation));

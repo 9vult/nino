@@ -49,6 +49,19 @@ namespace Nino.Commands
                     }
                     log.Error($"Unknown ProjectManagement/Admin subcommand {subsubcommand.Name}");
                     return false;
+                case "conga":
+                    subsubcommand = subcommand.Options.First();
+                    switch (subsubcommand.Name)
+                    {
+                        case "add":
+                            return await HandleCongaAdd(interaction);
+                        case "remove":
+                            return await HandleCongaRemove(interaction);
+                        case "list":
+                            return await HandleCongaList(interaction);
+                    }
+                    log.Error($"Unknown ProjectManagement/Conga subcommand {subsubcommand.Name}");
+                    return false;
                 default:
                     log.Error($"Unknown ProjectManagement subcommand {subcommand.Name}");
                     return false;
@@ -72,6 +85,11 @@ namespace Nino.Commands
             .AddOption(AdminSubcommandGroup
                 .AddOption(AddAdminSubcommand)
                 .AddOption(RemoveAdminSubcommand)
+            )
+            .AddOption(CongaSubcommandGroup
+                .AddOption(AddCongaSubcommand)
+                .AddOption(RemoveCongaSubcommand)
+                .AddOption(ListCongaSubcommand)
             );
 
         private static SlashCommandOptionBuilder CreateSubcommand =>
@@ -263,5 +281,51 @@ namespace Nino.Commands
             .WithType(ApplicationCommandOptionType.SubCommand)
             .AddOption(CommonOptions.Project())
             .AddOption(CommonOptions.Member());
+
+        private static SlashCommandOptionBuilder CongaSubcommandGroup =>
+            new SlashCommandOptionBuilder()
+            .WithName("conga")
+            .WithDescription("A Conga line of Key Staff")
+            .WithNameLocalizations(GetCommandNames("project.conga"))
+            .WithDescriptionLocalizations(GetCommandDescriptions("project.conga"))
+            .WithType(ApplicationCommandOptionType.SubCommandGroup);
+
+        private static SlashCommandOptionBuilder AddCongaSubcommand =>
+            new SlashCommandOptionBuilder()
+            .WithName("add")
+            .WithDescription("Add a link to the Conga line")
+            .WithNameLocalizations(GetCommandNames("project.conga.add"))
+            .WithDescriptionLocalizations(GetCommandDescriptions("project.conga.add"))
+            .WithType(ApplicationCommandOptionType.SubCommand)
+            .AddOption(CommonOptions.Project())
+            .AddOption(CommonOptions.Abbreviation())
+            .AddOption(new SlashCommandOptionBuilder()
+                .WithName("next")
+                .WithDescription("Position to ping")
+                .WithNameLocalizations(GetOptionNames("conga.next"))
+                .WithDescriptionLocalizations(GetOptionDescriptions("conga.next"))
+                .WithRequired(true)
+                .WithAutocomplete(true)
+                .WithType(ApplicationCommandOptionType.String)
+            );
+
+        private static SlashCommandOptionBuilder RemoveCongaSubcommand =>
+            new SlashCommandOptionBuilder()
+            .WithName("remove")
+            .WithDescription("Remove a link from the Conga line")
+            .WithNameLocalizations(GetCommandNames("project.conga.remove"))
+            .WithDescriptionLocalizations(GetCommandDescriptions("project.conga.remove"))
+            .WithType(ApplicationCommandOptionType.SubCommand)
+            .AddOption(CommonOptions.Project())
+            .AddOption(CommonOptions.Abbreviation());
+
+        private static SlashCommandOptionBuilder ListCongaSubcommand =>
+            new SlashCommandOptionBuilder()
+            .WithName("list")
+            .WithDescription("List all the Conga line participants")
+            .WithNameLocalizations(GetCommandNames("project.conga.list"))
+            .WithDescriptionLocalizations(GetCommandDescriptions("project.conga.list"))
+            .WithType(ApplicationCommandOptionType.SubCommand)
+            .AddOption(CommonOptions.Project());
     }
 }

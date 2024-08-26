@@ -20,7 +20,7 @@ namespace Nino.Commands
 
             // Check if position exists
             if (!episode.AdditionalStaff.Any(ks => ks.Role.Abbreviation == abbreviation))
-                return await Response.Fail(T("error.noSuchTask", lng), interaction);
+                return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
 
             var asIndex = Array.IndexOf(episode.AdditionalStaff, episode.AdditionalStaff.Single(k => k.Role.Abbreviation == abbreviation));
             var taskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == abbreviation));

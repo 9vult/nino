@@ -23,7 +23,7 @@ namespace Nino.Commands
 
             // Check if position exists
             if (!project.KeyStaff.Any(ks => ks.Role.Abbreviation == abbreviation))
-                return await Response.Fail(T("error.noSuchTask", lng), interaction);
+                return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
 
             // Update user
             var updatedStaff = project.KeyStaff.Single(k => k.Role.Abbreviation == abbreviation);

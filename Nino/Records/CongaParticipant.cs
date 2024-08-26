@@ -8,7 +8,6 @@ namespace Nino.Records
 {
     internal record CongaParticipant
     {
-        public required string Id;
         public required string Current;
         public required string Next;
     }

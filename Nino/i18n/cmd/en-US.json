@@ -53,6 +53,22 @@
       "name": "remove",
       "description": "Remove an administrator from this project"
     },
+    "project.conga": {
+      "name": "conga",
+      "description": "A Conga line of Key Staff"
+    },
+    "project.conga.add": {
+      "name": "add",
+      "description": "Add a link to the Conga line"
+    },
+    "project.conga.remove": {
+      "name": "remove",
+      "description": "Remove a link from the Conga line"
+    },
+    "project.conga.list": {
+      "name": "list",
+      "description": "List all the Conga line participants"
+    },
     "keystaff": {
       "name": "keystaff",
       "description": "Key Staff for the whole project"
@@ -168,10 +184,6 @@
     "bulk": {
       "name": "bulk",
       "description": "Do a lot of episodes all at once!"
-    },
-    "conga": {
-      "name": "conga",
-      "description": "Create a Conga line of Key Staff"
     }
   },
   "options": {
@@ -298,14 +310,6 @@
     "end_episode": {
       "name": "end_episode",
       "description": "Episode number to end at (inclusive)"
-    },
-    "conga.add": {
-      "name": "add",
-      "description": "Add a link to the Conga line"
-    },
-    "conga.remove": {
-      "name": "remove",
-      "description": "Remove a link from the Conga line"
     },
     "conga.next": {
       "name": "next",
