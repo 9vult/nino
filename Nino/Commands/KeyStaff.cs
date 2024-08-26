@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Nino.Utilities;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -19,20 +20,31 @@ namespace Nino.Commands
 
         public static async Task<bool> Handle(SocketSlashCommand interaction)
         {
-            var subcommandName = interaction.Data.Options.First().Name;
+            var lng = interaction.UserLocale;
+            var subcommand = interaction.Data.Options.First();
 
-            switch (subcommandName)
+            var alias = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "project")!.Value).Trim();
+
+            // Verify project and user - Owner or Admin required
+            var project = await Utils.ResolveAlias(alias, interaction);
+            if (project == null)
+                return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+
+            if (!Utils.VerifyUser(interaction.User.Id, project))
+                return await Response.Fail(T("error.permissionDenied", lng), interaction);
+
+            switch (subcommand.Name)
             {
                 case "add":
-                    return await HandleAdd(interaction);
+                    return await HandleAdd(interaction, project);
                 case "remove":
-                    return await HandleRemove(interaction);
+                    return await HandleRemove(interaction, project);
                 case "swap":
-                    return await HandleSwap(interaction);
+                    return await HandleSwap(interaction, project);
                 case "setweight":
-                    return await HandleSetWeight(interaction);
+                    return await HandleSetWeight(interaction, project);
                 default:
-                    log.Error($"Unknown KeyStaff subcommand {subcommandName}");
+                    log.Error($"Unknown KeyStaff subcommand {subcommand.Name}");
                     return false;
             }
         }
