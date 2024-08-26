@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 using static Localizer.Localizer;
 using Microsoft.Azure.Cosmos;
+using Nino.Records.Enums;
 
 namespace Nino.Commands
 {

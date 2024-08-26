@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Nino.Records
+namespace Nino.Records.Enums
 {
     internal enum ProjectType
     {
