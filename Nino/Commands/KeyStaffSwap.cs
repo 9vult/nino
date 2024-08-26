@@ -45,6 +45,8 @@ namespace Nino.Commands
                 PatchOperation.Replace($"/keyStaff/{ksIndex}", updatedStaff)
             });
 
+            log.Info($"Swapped {memberId} in to {project.Id} for {abbreviation}");
+
             // Send success embed
             var staffMention = $"<@{memberId}>";
             var embed = new EmbedBuilder()

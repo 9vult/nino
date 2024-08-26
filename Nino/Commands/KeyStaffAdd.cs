@@ -68,6 +68,8 @@ namespace Nino.Commands
             }
             await batch.ExecuteAsync();
 
+            log.Info($"Added {memberId} to {project.Id} for {abbreviation}");
+
             // Send success embed
             var staffMention = $"<@{memberId}>";
             var embed = new EmbedBuilder()

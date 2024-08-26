@@ -20,7 +20,6 @@ namespace Nino.Commands
 
         public static async Task<bool> HandleAdd(SocketSlashCommand interaction, Episode episode)
         {
-            var guild = Nino.Client.GetGuild(interaction.GuildId ?? 0);
             var lng = interaction.UserLocale;
 
             var subcommand = interaction.Data.Options.First();
@@ -59,6 +58,8 @@ namespace Nino.Commands
                 PatchOperation.Add("/tasks/-", newTask)
             });
             await batch.ExecuteAsync();
+
+            log.Info($"Added {memberId} to {episode.Id} for {abbreviation}");
 
             // Send success embed
             var staffMention = $"<@{memberId}>";

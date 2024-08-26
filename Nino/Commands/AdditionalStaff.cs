@@ -2,11 +2,6 @@
 using Discord.WebSocket;
 using Nino.Utilities;
 using NLog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using static Localizer.Localizer;
 
@@ -45,7 +40,7 @@ namespace Nino.Commands
                 case "add":
                     return await HandleAdd(interaction, episode);
                 case "remove":
-                    //return await HandleRemove(interaction, episode);
+                    return await HandleRemove(interaction, episode);
                 case "swap":
                     //return await HandleSwap(interaction, episode);
                 default:
