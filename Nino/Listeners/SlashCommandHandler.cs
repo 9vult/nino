@@ -19,8 +19,8 @@ namespace Nino.Listeners
 
             switch (interaction.CommandName)
             {
-                case NewProject.Name:
-                    await NewProject.Handle(interaction);
+                case ProjectManagement.Name:
+                    await ProjectManagement.Handle(interaction);
                     break;
                 case KeyStaff.Name:
                     await KeyStaff.Handle(interaction);

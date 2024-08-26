@@ -9,9 +9,25 @@
       "name": "about",
       "description": "About Nino"
     },
-    "newproject": {
-      "name": "newproject",
+    "project": {
+      "name": "project",
+      "description": "Project management"
+    },
+    "project.create": {
+      "name": "create",
       "description": "Create a new project"
+    },
+    "project.edit": {
+      "name": "edit",
+      "description": "Edit a project"
+    },
+    "project.delete": {
+      "name": "delete",
+      "description": "Delete a project"
+    },
+    "project.transferownership": {
+      "name": "transferownership",
+      "description": "Transfer project ownership to someone else"
     },
     "keystaff": {
       "name": "keystaff",
@@ -33,29 +49,21 @@
       "name": "setweight",
       "description": "Set the weight of a Key Staff position"
     },
-    "addadditionalstaff": {
-      "name": "addadditionalstaff",
+    "additionalstaff": {
+      "name": "additionalstaff",
+      "description": "Additional staff for a single episode"
+    },
+    "additionalstaff.add": {
+      "name": "add",
       "description": "Add additional staff to an episode"
     },
-    "removeadditionalstaff": {
-      "name": "removeadditionalstaff",
+    "additionalstaff.remove": {
+      "name": "remove",
       "description": "Remove additional staff from an episode"
     },
-    "swapadditionalstaff": {
-      "name": "swapadditionalstaff",
+    "additionalstaff.swap": {
+      "name": "swap",
       "description": "Swap additional staff into an episode"
-    },
-    "transferownership": {
-      "name": "transferownership",
-      "description": "Transfer project ownership to someone else"
-    },
-    "deleteproject": {
-      "name": "deleteproject",
-      "description": "Delete a project"
-    },
-    "editproject": {
-      "name": "editproject",
-      "description": "Edit a project"
     },
     "addepisode": {
       "name": "addepisode",
@@ -293,6 +301,14 @@
     }
   },
   "choices": {
+    "editoption-title": "Title",
+    "editoption-poster": "Poster",
+    "editoption-motd": "MOTD",
+    "editoption-anidb": "AniDBId",
+    "editoption-airtime": "AirTime24h",
+    "editoption-private": "IsPrivate",
+    "editoption-updatechannel": "UpdateChannelID",
+    "editoption-releasechannel": "ReleaseChannelID",
     "projecttype-TV": "TV",
     "projecttype-Movie": "Movie",
     "projecttype-BD": "BD"

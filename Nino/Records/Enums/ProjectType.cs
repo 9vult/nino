@@ -17,17 +17,13 @@ namespace Nino.Records.Enums
     {
         public static string ToFriendlyString(this ProjectType type)
         {
-            switch (type)
+            return type switch
             {
-                case ProjectType.TV:
-                    return "TV";
-                case ProjectType.Movie:
-                    return "Movie";
-                case ProjectType.BD:
-                    return "BD";
-                default:
-                    return type.ToString();
-            }
+                ProjectType.TV => "TV",
+                ProjectType.Movie => "Movie",
+                ProjectType.BD => "BD",
+                _ => type.ToString(),
+            };
         }
     }
 }

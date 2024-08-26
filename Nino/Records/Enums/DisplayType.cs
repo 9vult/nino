@@ -18,19 +18,14 @@ namespace Nino.Records.Enums
     {
         public static string ToFriendlyString(this DisplayType type)
         {
-            switch (type)
+            return type switch
             {
-                case DisplayType.Normal:
-                    return "Normal";
-                case DisplayType.Extended:
-                    return "Extended";
-                case DisplayType.Succinct:
-                    return "Succinct";
-                case DisplayType.Verbose:
-                    return "Verbose";
-                default:
-                    return type.ToString();
-            }
+                DisplayType.Normal => "Normal",
+                DisplayType.Extended => "Extended",
+                DisplayType.Succinct => "Succinct",
+                DisplayType.Verbose => "Verbose",
+                _ => type.ToString(),
+            };
         }
     }
 }
