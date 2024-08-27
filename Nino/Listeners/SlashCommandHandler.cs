@@ -1,13 +1,5 @@
-﻿using Discord.Net;
-using Discord.WebSocket;
-using Newtonsoft.Json;
+﻿using Discord.WebSocket;
 using Nino.Commands;
-using NLog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Nino.Listeners
 {
@@ -27,6 +19,12 @@ namespace Nino.Listeners
                     break;
                 case AdditionalStaff.Name:
                     await AdditionalStaff.Handle(interaction);
+                    break;
+                case About.Name:
+                    await About.Handle(interaction);
+                    break;
+                case Help.Name:
+                    await Help.Handle(interaction);
                     break;
             }
         }

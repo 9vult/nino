@@ -69,6 +69,7 @@ namespace Nino.Commands
                 episodes.Add(new Episode
                 {
                     Id = $"{projectData.Id}-{i}",
+                    GuildId = guildId,
                     ProjectId = projectData.Id,
                     Number = i,
                     Done = false,
