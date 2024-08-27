@@ -49,9 +49,9 @@ namespace Nino.Commands
                     switch (subsubcommand.Name)
                     {
                         case "add":
-                            return await HandleSetDisplayUpdates(interaction, config);
+                            return await HandleAdminAdd(interaction, config);
                         case "remove":
-                            return await HandleSetDisplayProgress(interaction, config);
+                            return await HandleAdminRemove(interaction, config);
                     }
                     log.Error($"Unknown ServerManagement/Admin subcommand {subsubcommand.Name}");
                     return false;
