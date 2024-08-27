@@ -14,6 +14,9 @@ namespace Nino.Listeners
                 await Nino.Client.CreateGlobalApplicationCommandAsync(KeyStaff.Builder.Build());
                 await Nino.Client.CreateGlobalApplicationCommandAsync(AdditionalStaff.Builder.Build());
                 await Nino.Client.CreateGlobalApplicationCommandAsync(ServerManagement.Builder.Build());
+                await Nino.Client.CreateGlobalApplicationCommandAsync(About.Builder.Build());
+                await Nino.Client.CreateGlobalApplicationCommandAsync(Help.Builder.Build());
+
             }
             catch (HttpException e)
             {
