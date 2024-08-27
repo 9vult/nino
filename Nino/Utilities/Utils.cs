@@ -51,8 +51,10 @@ namespace Nino.Utilities
 
             if (!excludeAdmins)
             {
-                // TODO: Guild administrators
                 if (project.AdministratorIds.Any(a => a == userId))
+                    return true;
+
+                if (Cache.GetConfig(project.GuildId)?.AdministratorIds?.Any(a => a == userId) ?? false)
                     return true;
             }
 

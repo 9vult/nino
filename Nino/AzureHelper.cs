@@ -35,6 +35,27 @@ namespace Nino
         }
 
         /// <summary>
+        /// Query Configurations
+        /// </summary>
+        /// <typeparam name="T">Return type</typeparam>
+        /// <param name="sql">Query to run</param>
+        /// <returns>List of resulting objects</returns>
+        public static async Task<List<T>> QueryConfigurations<T>(QueryDefinition sql)
+        {
+            List<T> results = [];
+            using FeedIterator<T> feed = Configurations!.GetItemQueryIterator<T>(queryDefinition: sql);
+            while (feed.HasMoreResults)
+            {
+                FeedResponse<T> response = await feed.ReadNextAsync();
+                foreach (T p in response)
+                {
+                    results.Add(p);
+                }
+            }
+            return results;
+        }
+
+        /// <summary>
         /// Query Projects
         /// </summary>
         /// <typeparam name="T">Return type</typeparam>

@@ -8,18 +8,18 @@ namespace Nino.Utilities
     {
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
 
-        private static readonly Dictionary<ulong, CachedGuild> _guildCache = [];
+        private static readonly Dictionary<ulong, CachedConfig> _configCache = [];
         private static readonly Dictionary<ulong, List<CachedProject>> _projectCache = [];
         private static readonly Dictionary<string, List<CachedEpisode>> _episodeCache = [];
 
         /// <summary>
-        /// Get a cached guild
+        /// Get a cached config
         /// </summary>
         /// <param name="guildId">ID of the guild</param>
-        /// <returns>Cached guild</returns>
-        public static CachedGuild? GetGuild(ulong guildId)
+        /// <returns>Cached config</returns>
+        public static CachedConfig? GetConfig(ulong guildId)
         {
-            if (_guildCache.TryGetValue(guildId, out var cachedGuild)) 
+            if (_configCache.TryGetValue(guildId, out var cachedGuild)) 
                 return cachedGuild;
             return null;
         }
@@ -121,6 +121,22 @@ namespace Nino.Utilities
             log.Info($"Cache for project {projectId} successfully rebuilt");
         }
 
+        public static async System.Threading.Tasks.Task RebuildConfigCache()
+        {
+            log.Info($"Rebuilding config cache...");
+
+            var configSql = new QueryDefinition("SELECT c.id, c.guildId, c.administratorIds FROM c");
+            List<CachedConfig> configs = await AzureHelper.QueryConfigurations<CachedConfig>(configSql);
+
+            _configCache.Clear();
+            foreach (CachedConfig config in configs)
+            {
+                _configCache[config.GuildId] = config;
+            }
+
+            log.Info($"Config cache successfully rebuilt: {configs.Count} configurations");
+        }
+
         /// <summary>
         /// Build the cache
         /// </summary>
@@ -135,6 +151,8 @@ namespace Nino.Utilities
                 var guildId = ulong.Parse((string)item.guildId);
                 await RebuildCacheForGuild(guildId);
             }
+
+            await RebuildConfigCache();
 
             log.Info($"Cache successfully built for {_projectCache.Count} guilds");
         }
@@ -161,12 +179,13 @@ namespace Nino.Utilities
     }
 
     /// <summary>
-    /// Minimal guild info structure for caching purposes
+    /// Minimal config info structure for caching purposes
     /// </summary>
-    internal record CachedGuild
+    internal record CachedConfig
     {
-        public required ulong Id;
-        public required ulong[] Administrators;
+        public required string Id;
+        public required ulong GuildId;
+        public required ulong[] AdministratorIds;
     }
 
     /// <summary>
