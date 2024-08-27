@@ -38,9 +38,17 @@ namespace Nino.Listeners
         {
             var config = new LoggingConfiguration();
             var consoleTarget = new ColoredConsoleTarget("console") { Layout = "${longdate} [${level}] ${message}" };
+            var fileTarget = new FileTarget("logfile")
+            {
+                Layout = "${longdate} [${level}] ${message}",
+                FileName = Path.Combine("logs", $"{DateTime.Now:yyyy-MM-dd}.log")
+            };
 
             config.AddTarget(consoleTarget);
+            config.AddTarget(fileTarget);
             config.AddRuleForAllLevels(consoleTarget);
+            config.AddRuleForAllLevels(fileTarget);
+
             LogManager.Configuration = config;
         }
     }
