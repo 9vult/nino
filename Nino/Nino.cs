@@ -11,7 +11,7 @@ namespace Nino
 {
     public class Nino
     {
-        private static readonly DiscordSocketClient _client = new DiscordSocketClient();
+        private static readonly DiscordSocketClient _client = new();
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         public static DiscordSocketClient Client => _client;
@@ -32,15 +32,20 @@ namespace Nino
 
             // Set up Azure database
             await AzureHelper.Setup(azureCosmosEndpoint, azureClientSecret, azureCosmosName);
+            
+            // Build initial cache
+            await Cache.BuildCache();
 
             // Load localization files
             LoadStringLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/str")));
             LoadCommandLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/cmd")));
+            
 
             // Listen up
             _client.Log += Listener.Log;
             _client.Ready += Listener.Ready;
             _client.SlashCommandExecuted += Listener.SlashCommandExecuted;
+            _client.AutocompleteExecuted += Listener.AutocompleteExecuted;
 
             // Start the bot
             await _client.LoginAsync(TokenType.Bot, discordApiToken);

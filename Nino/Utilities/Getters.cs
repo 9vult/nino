@@ -1,19 +1,27 @@
 ﻿using Microsoft.Azure.Cosmos;
-using Microsoft.VisualBasic;
 using Nino.Records;
 using NLog;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Nino.Utilities
 {
     internal static class Getters
     {
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
+
+        public static List<string> GetFilteredAliases(ulong guildId, ulong userId, string query)
+        {
+            List<CachedProject> projects = [];
+
+            // Local guild projects
+            projects.AddRange(Cache.GetProjects(guildId));
+            // TODO: Observing guild projects
+
+            // Filter
+            var filtered = projects.Where(p => !p.IsPrivate || p.OwnerId == userId || p.AdministratorIds.Any(a => a == userId)).ToList();
+
+            return filtered.SelectMany(p => new[] { p.Nickname }.Concat(p.Aliases))
+                .Where(a => a.StartsWith(query, StringComparison.InvariantCultureIgnoreCase)).ToList();
+        }
 
         public static async Task<List<Episode>> GetEpisodes(Project project)
         {
@@ -42,6 +50,24 @@ namespace Nino.Utilities
             try
             {
                 var response = await AzureHelper.Episodes!.ReadItemAsync<Episode>(id: id, partitionKey: AzureHelper.EpisodePartitionKey(project));
+                return response?.Resource;
+            }
+            catch (CosmosException e) when (e.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+            catch (CosmosException e)
+            {
+                log.Error(e.Message);
+                return null;
+            }
+        }
+
+        public static async Task<Project?> GetProject(string projectId, ulong guildId)
+        {
+            try
+            {
+                var response = await AzureHelper.Projects!.ReadItemAsync<Project>(id: projectId, partitionKey: AzureHelper.ProjectPartitionKey(guildId));
                 return response?.Resource;
             }
             catch (CosmosException e) when (e.StatusCode == System.Net.HttpStatusCode.NotFound)

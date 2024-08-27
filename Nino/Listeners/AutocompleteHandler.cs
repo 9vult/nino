@@ -1,0 +1,88 @@
+﻿using Discord;
+using Discord.Interactions;
+using Discord.Net;
+using Discord.WebSocket;
+using Newtonsoft.Json;
+using Nino.Commands;
+using Nino.Utilities;
+using NLog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Nino.Listeners
+{
+    internal static partial class Listener
+    {
+        public static async Task AutocompleteExecuted(SocketAutocompleteInteraction interaction)
+        {
+            var commandName = interaction.Data.CommandName;
+            var focusedOption = interaction.Data.Current;
+            var guildId = interaction.GuildId ?? 0;
+            var userId = interaction.User.Id;
+
+            List<AutocompleteResult> choices = [];
+
+            switch (focusedOption.Name)
+            {
+                case "project":
+                    {
+                        if (guildId == 0) break; // return []
+                        var alias = ((string)focusedOption.Value).Trim();
+                        if (alias == null) break; // return []
+
+                        var matches = Getters.GetFilteredAliases(guildId, userId, focusedOption.Value.ToString() ?? "");
+                        choices.AddRange(matches.Select(m => new AutocompleteResult(m, m)));
+                    }
+                    break;
+
+                case "episode":
+                case "start_episode":
+                case "end_episode":
+                    {
+                        var alias = ((string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")?.Value)?.Trim();
+                        if (alias == null) break; // return []
+
+                        var cachedProject = Utils.ResolveCachedAlias(alias, interaction);
+                        if (cachedProject != null)
+                        {
+                            var cachedEpisodes = Cache.GetEpisodes(cachedProject.Id);
+                            choices.AddRange(cachedEpisodes.Select(e => new AutocompleteResult(e.Number.ToString(), e.Number)));
+                        }
+
+                        if (commandName == "blame")
+                        {
+                            // TODO: Add observing projects
+                        }
+                    }
+                    break;
+
+                case "abbreviation":
+                case "next":
+                    {
+                        var alias = ((string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")?.Value)?.Trim();
+                        var episodeInput = (decimal?)interaction.Data.Options.FirstOrDefault(o => o.Name == "episode")?.Value;
+                        if (alias == null) break; // return []
+
+                        var cachedProject = Utils.ResolveCachedAlias(alias, interaction);
+                        if (cachedProject == null) break; // return []
+                        var cachedEpisode = Cache.GetEpisodes(cachedProject.Id).FirstOrDefault(e => e.Number == episodeInput);
+                        if (cachedEpisode == null)
+                        {
+                            // Return list of key staff
+                            choices.AddRange(cachedProject.KeyStaffAbbreviations.Select(t => new AutocompleteResult(t, t)));
+                        }
+                        else
+                        {
+                            // Return list of episode tasks
+                            choices.AddRange(cachedEpisode.Tasks.Select(t => new AutocompleteResult(t.Abbreviation, t.Abbreviation)));
+                        }
+                    }
+                    break;
+            }
+            await interaction.RespondAsync(choices.Take(25));
+        }
+    }
+}

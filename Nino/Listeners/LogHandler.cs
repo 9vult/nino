@@ -1,12 +1,7 @@
 ﻿using Discord;
+using NLog;
 using NLog.Config;
 using NLog.Targets;
-using NLog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Nino.Listeners
 {
@@ -16,7 +11,26 @@ namespace Nino.Listeners
 
         public static Task Log(LogMessage msg)
         {
-            log.Debug(msg.ToString());
+            switch (msg.Severity)
+            {
+                case LogSeverity.Info:
+                    log.Info(msg.ToString());
+                    break;
+                case LogSeverity.Warning:
+                    log.Warn(msg.ToString());
+                    break;
+                case LogSeverity.Debug:
+                case LogSeverity.Verbose:
+                    log.Debug(msg.ToString());
+                    break;
+                case LogSeverity.Error:
+                case LogSeverity.Critical:
+                    log.Error(msg.ToString());
+                    break;
+                default:
+                    log.Info(msg.ToString());
+                    break;
+            }
             return Task.CompletedTask;
         }
 

@@ -1,40 +1,57 @@
 ﻿using Discord.WebSocket;
-using Microsoft.Azure.Cosmos;
 using Nino.Records;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Nino.Utilities
 {
     internal static class Utils
     {
-        public static async Task<Project?> ResolveAlias(string query, SocketSlashCommand interaction, ulong? observingGuildId = null)
+        /// <summary>
+        /// Resolve an alias to its project
+        /// </summary>
+        /// <param name="query">Alias to resolve</param>
+        /// <param name="interaction">Interaction requesting resolution</param>
+        /// <param name="observingGuildId">ID of the build being observed, if applicable</param>
+        /// <returns>Project the alias references to, or null</returns>
+        public static async Task<Project?> ResolveAlias(string query, SocketInteraction interaction, ulong? observingGuildId = null)
         {
-            var guildId = observingGuildId ?? interaction.GuildId;
+            var cachedProject = ResolveCachedAlias(query, interaction, observingGuildId);
 
-            var sql = new QueryDefinition("SELECT * from c WHERE c.guildId = @guildId AND c.nickname = @query OR ARRAY_CONTAINS(c.aliases, @query)")
-                .WithParameter("@query", query)
-                .WithParameter("@guildId", guildId.ToString());
-
-            using FeedIterator<Project> feed = AzureHelper.Projects!.GetItemQueryIterator<Project>(queryDefinition: sql);
-            if (feed.HasMoreResults)
-            {
-                FeedResponse<Project> response = await feed.ReadNextAsync();
-                return response.FirstOrDefault();
-            }
-            // No matches
-            return null;
+            if (cachedProject != null)
+                return await Getters.GetProject(cachedProject.Id, cachedProject.GuildId);
+            else
+                return null;
         }
 
+        /// <summary>
+        /// Resolve an alias to its cached project
+        /// </summary>
+        /// <param name="query">Alias to resolve</param>
+        /// <param name="interaction">Interaction requesting resolution</param>
+        /// <param name="observingGuildId">ID of the build being observed, if applicable</param>
+        /// <returns>CachedProject the alias references to, or null</returns>
+        public static CachedProject? ResolveCachedAlias(string query, SocketInteraction interaction, ulong? observingGuildId = null)
+        {
+            var guildId = observingGuildId ?? interaction.GuildId ?? 0;
+            var cache = Cache.GetProjects(guildId);
+            if (cache == null) return null;
+
+            return cache.Where(p => p.Nickname == query || p.Aliases.Any(a => a == query)).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Verify the given user has sufficient permissions to perform a task
+        /// </summary>
+        /// <param name="userId">ID of the user to check</param>
+        /// <param name="project">Project to verify against</param>
+        /// <param name="excludeAdmins">Should administrators be excluded?</param>
+        /// <returns>True if the user has sufficient permissions</returns>
         public static bool VerifyUser(ulong userId, Project project, bool excludeAdmins = false)
         {
             if (project.OwnerId == userId) return true;
 
             if (!excludeAdmins)
             {
+                // TODO: Guild administrators
                 if (project.AdministratorIds.Any(a => a == userId))
                     return true;
             }
@@ -42,6 +59,9 @@ namespace Nino.Utilities
             return false;
         }
 
+        /// <summary>
+        /// The current version of Nino
+        /// </summary>
         public static string VERSION
         {
             get

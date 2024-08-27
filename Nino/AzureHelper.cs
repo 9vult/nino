@@ -1,10 +1,4 @@
-﻿using Azure.Identity;
-using Microsoft.Azure.Cosmos;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Azure.Cosmos;
 
 namespace Nino
 {
@@ -41,6 +35,48 @@ namespace Nino
         }
 
         /// <summary>
+        /// Query Projects
+        /// </summary>
+        /// <typeparam name="T">Return type</typeparam>
+        /// <param name="sql">Query to run</param>
+        /// <returns>List of resulting objects</returns>
+        public static async Task<List<T>> QueryProjects<T>(QueryDefinition sql)
+        {
+            List<T> results = [];
+            using FeedIterator<T> feed = Projects!.GetItemQueryIterator<T>(queryDefinition: sql);
+            while (feed.HasMoreResults)
+            {
+                FeedResponse<T> response = await feed.ReadNextAsync();
+                foreach (T p in response)
+                {
+                    results.Add(p);
+                }
+            }
+            return results;
+        }
+
+        /// <summary>
+        /// Query Episodes
+        /// </summary>
+        /// <typeparam name="T">Return type</typeparam>
+        /// <param name="sql">Query to run</param>
+        /// <returns>List of resulting objects</returns>
+        public static async Task<List<T>> QueryEpisodes<T>(QueryDefinition sql)
+        {
+            List<T> results = [];
+            using FeedIterator<T> feed = Episodes!.GetItemQueryIterator<T>(queryDefinition: sql);
+            while (feed.HasMoreResults)
+            {
+                FeedResponse<T> response = await feed.ReadNextAsync();
+                foreach (T e in response)
+                {
+                    results.Add(e);
+                }
+            }
+            return results;
+        }
+
+        /// <summary>
         /// Partition Key for use when accessing Projects
         /// </summary>
         /// <param name="project">Project being accessed</param>
@@ -48,6 +84,16 @@ namespace Nino
         public static PartitionKey ProjectPartitionKey(Records.Project project)
         {
             return new PartitionKey(project.SerializationGuildId);
+        }
+
+        /// <summary>
+        /// Partition Key for use when accessing Projects
+        /// </summary>
+        /// <param name="guildId">Guild ID for the project being accessed</param>
+        /// <returns>Partition Key of the project's GuildId</returns>
+        public static PartitionKey ProjectPartitionKey(ulong guildId)
+        {
+            return new PartitionKey(guildId.ToString());
         }
 
         /// <summary>
