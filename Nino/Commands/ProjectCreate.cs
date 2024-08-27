@@ -1,17 +1,10 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Nino.Utilities;
-using Nino.Records;
-using NLog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using static Localizer.Localizer;
 using Microsoft.Azure.Cosmos;
+using Nino.Records;
 using Nino.Records.Enums;
+using Nino.Utilities;
+using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
@@ -30,7 +23,7 @@ namespace Nino.Commands
             // Get inputs
             var nickname = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "nickname")!.Value).Trim();
             var title = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "title")!.Value).Trim();
-            var type = (ProjectType)Convert.ToInt32(subcommand.Options.FirstOrDefault(o => o.Name == "projecttype")!.Value);
+            var type = (ProjectType)Convert.ToInt32(subcommand.Options.FirstOrDefault(o => o.Name == "type")!.Value);
             var length = Convert.ToInt32(subcommand.Options.FirstOrDefault(o => o.Name == "length")!.Value);
             var posterUri = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "poster")!.Value).Trim();
             var isPrivate = (bool)subcommand.Options.FirstOrDefault(o => o.Name == "private")!.Value;
@@ -55,6 +48,7 @@ namespace Nino.Commands
                 UpdateChannelId = updateChannelId,
                 ReleaseChannelId = releaseChannelId,
                 IsPrivate = isPrivate,
+                AirReminderEnabled = false,
                 AdministratorIds = [],
                 KeyStaff = [],
                 CongaParticipants = [],
@@ -79,7 +73,7 @@ namespace Nino.Commands
 
             log.Info($"Creating project {projectData.Id} for {projectData.OwnerId} with {episodes.Count} episodes");
 
-            // Add to database
+            // Add project and episodes to database
             await AzureHelper.Projects!.UpsertItemAsync(projectData);
 
             TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(projectData.Id));
@@ -88,6 +82,13 @@ namespace Nino.Commands
                 batch.UpsertItem(episode);
             }
             await batch.ExecuteAsync();
+
+            // Create configuration if the guild doesn't have one yet
+            if (await Getters.GetConfiguration(guildId) == null)
+            {
+                log.Info($"Creating default configuration for guild {guildId}");
+                await AzureHelper.Configurations!.UpsertItemAsync(Configuration.CreateDefault(guildId));
+            }
 
             // Send success embed
             var embed = new EmbedBuilder()

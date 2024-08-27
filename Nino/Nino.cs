@@ -38,8 +38,7 @@ namespace Nino
 
             // Load localization files
             LoadStringLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/str")));
-            LoadCommandLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/cmd")));
-            
+            LoadCommandLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/cmd")));            
 
             // Listen up
             _client.Log += Listener.Log;
@@ -50,6 +49,7 @@ namespace Nino
             // Start the bot
             await _client.LoginAsync(TokenType.Bot, discordApiToken);
             await _client.StartAsync();
+
             await Task.Delay(-1);
         }
     }

@@ -62,6 +62,17 @@ namespace Nino.Commands
                     }
                     log.Error($"Unknown ProjectManagement/Conga subcommand {subsubcommand.Name}");
                     return false;
+                case "airreminder":
+                    subsubcommand = subcommand.Options.First();
+                    switch (subsubcommand.Name)
+                    {
+                        case "enable":
+                            return await HandleAirReminderEnable(interaction);
+                        case "disable":
+                            return await HandleAirReminderDisable(interaction);
+                    }
+                    log.Error($"Unknown ProjectManagement/Admin subcommand {subsubcommand.Name}");
+                    return false;
                 default:
                     log.Error($"Unknown ProjectManagement subcommand {subcommand.Name}");
                     return false;
@@ -90,6 +101,9 @@ namespace Nino.Commands
                 .AddOption(AddCongaSubcommand)
                 .AddOption(RemoveCongaSubcommand)
                 .AddOption(ListCongaSubcommand)
+            ).AddOption(AirReminderSubcommandGroup
+                .AddOption(AirReminderEnableSubcommand)
+                .AddOption(AirReminderDisableSubcommand)
             );
 
         private static SlashCommandOptionBuilder CreateSubcommand =>
@@ -102,61 +116,61 @@ namespace Nino.Commands
             .AddOption(new SlashCommandOptionBuilder()
                 .WithName("nickname")
                 .WithDescription("Project nickname")
-                .WithNameLocalizations(GetOptionNames("nickname"))
-                .WithDescriptionLocalizations(GetOptionDescriptions("nickname"))
+                .WithNameLocalizations(GetOptionNames("project.create.nickname"))
+                .WithDescriptionLocalizations(GetOptionDescriptions("project.create.nickname"))
                 .WithRequired(true)
                 .WithType(ApplicationCommandOptionType.String)
             ).AddOption(new SlashCommandOptionBuilder()
                 .WithName("title")
                 .WithDescription("Full series title")
-                .WithNameLocalizations(GetOptionNames("title"))
-                .WithDescriptionLocalizations(GetOptionDescriptions("title"))
+                .WithNameLocalizations(GetOptionNames("project.create.title"))
+                .WithDescriptionLocalizations(GetOptionDescriptions("project.create.title"))
                 .WithRequired(true)
                 .WithType(ApplicationCommandOptionType.String)
             ).AddOption(new SlashCommandOptionBuilder()
-                .WithName("projecttype")
+                .WithName("type")
                 .WithDescription("Project type")
-                .WithNameLocalizations(GetOptionNames("projecttype"))
-                .WithDescriptionLocalizations(GetOptionDescriptions("projecttype"))
+                .WithNameLocalizations(GetOptionNames("project.create.type"))
+                .WithDescriptionLocalizations(GetOptionDescriptions("project.create.type"))
                 .WithRequired(true)
-                .AddChoice("TV", 0, GetChoiceNames("projecttype-TV"))
-                .AddChoice("Movie", 1, GetChoiceNames("projecttype-Movie"))
-                .AddChoice("BD", 2, GetChoiceNames("projecttype-BD"))
+                .AddChoice("TV", 0, GetChoiceNames("project.create.type.tv"))
+                .AddChoice("Movie", 1, GetChoiceNames("project.create.type.movie"))
+                .AddChoice("BD", 2, GetChoiceNames("project.create.type.bd"))
                 .WithType(ApplicationCommandOptionType.Number)
             ).AddOption(new SlashCommandOptionBuilder()
                 .WithName("length")
                 .WithDescription("Number of episodes")
-                .WithNameLocalizations(GetOptionNames("length"))
-                .WithDescriptionLocalizations(GetOptionDescriptions("length"))
+                .WithNameLocalizations(GetOptionNames("project.create.length"))
+                .WithDescriptionLocalizations(GetOptionDescriptions("project.create.length"))
                 .WithRequired(true)
                 .WithMinValue(1)
                 .WithType(ApplicationCommandOptionType.Number)
             ).AddOption(new SlashCommandOptionBuilder()
                 .WithName("poster")
                 .WithDescription("Poster image URL")
-                .WithNameLocalizations(GetOptionNames("poster"))
-                .WithDescriptionLocalizations(GetOptionDescriptions("poster"))
+                .WithNameLocalizations(GetOptionNames("project.create.poster"))
+                .WithDescriptionLocalizations(GetOptionDescriptions("project.create.poster"))
                 .WithRequired(true)
                 .WithType(ApplicationCommandOptionType.String)
             ).AddOption(new SlashCommandOptionBuilder()
                 .WithName("private")
                 .WithDescription("Is this project private?")
-                .WithNameLocalizations(GetOptionNames("private"))
-                .WithDescriptionLocalizations(GetOptionDescriptions("private"))
+                .WithNameLocalizations(GetOptionNames("project.create.private"))
+                .WithDescriptionLocalizations(GetOptionDescriptions("project.create.private"))
                 .WithRequired(true)
                 .WithType(ApplicationCommandOptionType.Boolean)
             ).AddOption(new SlashCommandOptionBuilder()
                 .WithName("updatechannel")
                 .WithDescription("Channel to post updates to")
-                .WithNameLocalizations(GetOptionNames("updatechannel"))
-                .WithDescriptionLocalizations(GetOptionDescriptions("updatechannel"))
+                .WithNameLocalizations(GetOptionNames("project.create.updatechannel"))
+                .WithDescriptionLocalizations(GetOptionDescriptions("project.create.updatechannel"))
                 .WithRequired(true)
                 .WithType(ApplicationCommandOptionType.Channel)
             ).AddOption(new SlashCommandOptionBuilder()
                 .WithName("releasechannel")
                 .WithDescription("Channel to post releases to")
-                .WithNameLocalizations(GetOptionNames("releasechannel"))
-                .WithDescriptionLocalizations(GetOptionDescriptions("releasechannel"))
+                .WithNameLocalizations(GetOptionNames("project.create.releasechannel"))
+                .WithDescriptionLocalizations(GetOptionDescriptions("project.create.releasechannel"))
                 .WithRequired(true)
                 .WithType(ApplicationCommandOptionType.Channel)
             );
@@ -172,17 +186,17 @@ namespace Nino.Commands
             .AddOption(new SlashCommandOptionBuilder()
                 .WithName("option")
                 .WithDescription("Option to change")
-                .WithNameLocalizations(GetOptionNames("option"))
-                .WithDescriptionLocalizations(GetOptionDescriptions("option"))
+                .WithNameLocalizations(GetOptionNames("project.edit.option"))
+                .WithDescriptionLocalizations(GetOptionDescriptions("project.edit.option"))
                 .WithRequired(true)
-                .AddChoice("Title", 0, GetChoiceNames("editoption-title"))
-                .AddChoice("Poster", 1, GetChoiceNames("editoption-poster"))
-                .AddChoice("MOTD", 2, GetChoiceNames("editoption-motd"))
-                .AddChoice("AniDBId", 3, GetChoiceNames("editoption-anidb"))
-                .AddChoice("AirTime24h", 4, GetChoiceNames("editoption-airtime"))
-                .AddChoice("IsPrivate", 5, GetChoiceNames("editoption-private"))
-                .AddChoice("UpdateChannelID", 6, GetChoiceNames("editoption-updatechannel"))
-                .AddChoice("ReleaseChannelID", 7, GetChoiceNames("editoption-releasechannel"))
+                .AddChoice("Title", 0, GetChoiceNames("project.edit.option.title"))
+                .AddChoice("Poster", 1, GetChoiceNames("project.edit.option.poster"))
+                .AddChoice("MOTD", 2, GetChoiceNames("project.edit.option.motd"))
+                .AddChoice("AniDBId", 3, GetChoiceNames("project.edit.option.anidb"))
+                .AddChoice("AirTime24h", 4, GetChoiceNames("project.edit.option.airtime"))
+                .AddChoice("IsPrivate", 5, GetChoiceNames("project.edit.option.private"))
+                .AddChoice("UpdateChannelID", 6, GetChoiceNames("project.edit.option.updatechannel"))
+                .AddChoice("ReleaseChannelID", 7, GetChoiceNames("project.edit.option.releasechannel"))
                 .WithType(ApplicationCommandOptionType.Number)
             ).AddOption(new SlashCommandOptionBuilder()
                 .WithName("newvalue")
@@ -327,5 +341,46 @@ namespace Nino.Commands
             .WithDescriptionLocalizations(GetCommandDescriptions("project.conga.list"))
             .WithType(ApplicationCommandOptionType.SubCommand)
             .AddOption(CommonOptions.Project());
+
+        private static SlashCommandOptionBuilder AirReminderSubcommandGroup =>
+            new SlashCommandOptionBuilder()
+            .WithName("airreminder")
+            .WithDescription("Enable or disable airing reminders")
+            .WithNameLocalizations(GetCommandNames("project.airreminder"))
+            .WithDescriptionLocalizations(GetCommandDescriptions("project.airreminder"))
+            .WithType(ApplicationCommandOptionType.SubCommandGroup);
+
+        private static SlashCommandOptionBuilder AirReminderEnableSubcommand =>
+            new SlashCommandOptionBuilder()
+            .WithName("enable")
+            .WithDescription("Enable airing reminders")
+            .WithNameLocalizations(GetCommandNames("project.airreminder.enable"))
+            .WithDescriptionLocalizations(GetCommandDescriptions("project.airreminder.enable"))
+            .WithType(ApplicationCommandOptionType.SubCommand)
+            .AddOption(CommonOptions.Project())
+            .AddOption(new SlashCommandOptionBuilder()
+                .WithName("channel")
+                .WithDescription("Channel to post reminders in")
+                .WithNameLocalizations(GetOptionNames("project.airreminder.channel"))
+                .WithDescriptionLocalizations(GetOptionDescriptions("project.airreminder.channel"))
+                .WithRequired(true)
+                .WithType(ApplicationCommandOptionType.Channel)
+            ).AddOption(new SlashCommandOptionBuilder()
+                .WithName("role")
+                .WithDescription("Role to ping for reminders")
+                .WithNameLocalizations(GetOptionNames("project.airreminder.role"))
+                .WithDescriptionLocalizations(GetOptionDescriptions("project.airreminder.role"))
+                .WithRequired(false)
+                .WithType(ApplicationCommandOptionType.Role)
+            );
+
+        private static SlashCommandOptionBuilder AirReminderDisableSubcommand =>
+           new SlashCommandOptionBuilder()
+           .WithName("disable")
+           .WithDescription("Disable airing reminders")
+           .WithNameLocalizations(GetCommandNames("project.airreminder.disable"))
+           .WithDescriptionLocalizations(GetCommandDescriptions("project.airreminder.disable"))
+           .WithType(ApplicationCommandOptionType.SubCommand)
+           .AddOption(CommonOptions.Project());
     }
 }

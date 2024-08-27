@@ -54,7 +54,7 @@ namespace Nino.Commands
                 case ProjectEditOption.MOTD:
                     var motd = newValue == "-" ? null : newValue;
                     operation = PatchOperation.Replace($"/motd", motd);
-                    helperText = T("project.edited.motdHelp", lng);
+                    helperText = T("info.resettable", lng);
                     break;
 
                 case ProjectEditOption.AniDBId:

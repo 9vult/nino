@@ -12,7 +12,7 @@ namespace Nino
 
         public static Container? Projects => _projectsContainer;
         public static Container? Episodes => _episodesContainer;
-        public static Container? Configuration => _configurationContainer;
+        public static Container? Configurations => _configurationContainer;
 
         public static async Task Setup(string endpointUri, string primaryKey, string databaseName)
         {
@@ -76,6 +76,8 @@ namespace Nino
             return results;
         }
 
+        #region Partition Keys
+
         /// <summary>
         /// Partition Key for use when accessing Projects
         /// </summary>
@@ -125,5 +127,17 @@ namespace Nino
         {
             return new PartitionKey(config.SerializationGuildId);
         }
+
+        /// <summary>
+        /// Partition Key for use when accessing Configurations
+        /// </summary>
+        /// <param name="guildId">Guild ID for the project being accessed</param>
+        /// <returns>Partition Key of the configuration's GuildId</returns>
+        public static PartitionKey ConfigurationPartitionKey(ulong guildId)
+        {
+            return new PartitionKey(guildId.ToString());
+        }
+
+#endregion Partition Keys
     }
 }

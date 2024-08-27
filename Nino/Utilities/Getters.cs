@@ -80,5 +80,23 @@ namespace Nino.Utilities
                 return null;
             }
         }
+
+        public static async Task<Configuration?> GetConfiguration(ulong guildId)
+        {
+            try
+            {
+                var response = await AzureHelper.Configurations!.ReadItemAsync<Configuration>(id: $"{guildId}-conf", partitionKey: AzureHelper.ConfigurationPartitionKey(guildId));
+                return response?.Resource;
+            }
+            catch (CosmosException e) when (e.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+            catch (CosmosException e)
+            {
+                log.Error(e.Message);
+                return null;
+            }
+        }
     }
 }

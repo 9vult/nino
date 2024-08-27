@@ -27,6 +27,9 @@ namespace Nino.Listeners
                 case AdditionalStaff.Name:
                     await AdditionalStaff.Handle(interaction);
                     break;
+                case ServerManagement.Name:
+                    await ServerManagement.Handle(interaction);
+                    break;
                 case About.Name:
                     await About.Handle(interaction);
                     break;

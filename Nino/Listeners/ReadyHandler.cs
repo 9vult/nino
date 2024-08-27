@@ -1,12 +1,6 @@
 ﻿using Discord.Net;
 using Newtonsoft.Json;
 using Nino.Commands;
-using NLog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Nino.Listeners
 {
@@ -19,6 +13,7 @@ namespace Nino.Listeners
                 await Nino.Client.CreateGlobalApplicationCommandAsync(ProjectManagement.Builder.Build());
                 await Nino.Client.CreateGlobalApplicationCommandAsync(KeyStaff.Builder.Build());
                 await Nino.Client.CreateGlobalApplicationCommandAsync(AdditionalStaff.Builder.Build());
+                await Nino.Client.CreateGlobalApplicationCommandAsync(ServerManagement.Builder.Build());
             }
             catch (HttpException e)
             {

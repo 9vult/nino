@@ -27,9 +27,9 @@ namespace Nino.Records
         public string? Motd;
         public string? AniDBId;
         public string? AirTime;
+        public required bool AirReminderEnabled;
         [JsonIgnore] public ulong? AirReminderChannelId;
         [JsonIgnore] public ulong? AirReminderRoleId;
-        public bool? AirReminderEnabled;
 
         //
         // Serialization stuff because azure doesn't support ulong
@@ -73,14 +73,14 @@ namespace Nino.Records
         [JsonProperty("AirReminderChannelId")]
         public string? SerializationAirReminderChannelId
         {
-            get => AirReminderChannelId.ToString();
+            get => AirReminderChannelId?.ToString();
             set => AirReminderChannelId = !string.IsNullOrEmpty(value) ? ulong.Parse(value) : null;
         }
 
         [JsonProperty("AirReminderRoleId")]
         public string? SerializationAirReminderRoleId
         {
-            get => AirReminderRoleId.ToString();
+            get => AirReminderRoleId?.ToString();
             set => AirReminderRoleId = !string.IsNullOrEmpty(value) ? ulong.Parse(value) : null;
         }
     }
