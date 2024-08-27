@@ -27,8 +27,6 @@ namespace Nino.Commands
 
             var subcommand = interaction.Data.Options.First();
 
-            log.Info("Beginning project creation");
-
             // Get inputs
             var nickname = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "nickname")!.Value).Trim();
             var title = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "title")!.Value).Trim();
@@ -79,9 +77,10 @@ namespace Nino.Commands
                 });
             }
 
+            log.Info($"Creating project {projectData.Id} for {projectData.OwnerId} with {episodes.Count} episodes");
+
             // Add to database
             await AzureHelper.Projects!.UpsertItemAsync(projectData);
-            log.Info($"[DB] Inserted project {projectData.Id}");
 
             TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(projectData.Id));
             foreach (var episode in episodes)
@@ -89,8 +88,6 @@ namespace Nino.Commands
                 batch.UpsertItem(episode);
             }
             await batch.ExecuteAsync();
-            log.Info($"[DB] Inserted episodes for {projectData.Id}");
-            log.Info("Project creation finished");
 
             // Send success embed
             var embed = new EmbedBuilder()
@@ -105,6 +102,7 @@ namespace Nino.Commands
             if (!PermissionChecker.CheckReleasePermissions(releaseChannelId))
                 await Response.Info(T("error.missingChannelPermsRelease", lng, $"<#{releaseChannelId}>"), interaction);
 
+            await Cache.RebuildCacheForGuild(interaction.GuildId ?? 0);
             return true;
         }
     }

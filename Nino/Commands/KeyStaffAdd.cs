@@ -69,6 +69,7 @@ namespace Nino.Commands
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 
+            await Cache.RebuildCacheForProject(project.Id);
             return true;
         }
     }

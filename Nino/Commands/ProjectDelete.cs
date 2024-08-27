@@ -31,12 +31,10 @@ namespace Nino.Commands
             if (!Utils.VerifyUser(interaction.User.Id, project, excludeAdmins: true))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
-            log.Info("Beginning project deletion");
+            log.Info($"Deleting project {project.Id}");
 
             // Remove from database
-
             await AzureHelper.Projects!.DeleteItemAsync<Project>(project.Id, partitionKey: AzureHelper.ProjectPartitionKey(project));
-            log.Info($"[DB] Deleted project {project.Id}");
 
             TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.Id));
             foreach (Episode e in await Getters.GetEpisodes(project))
@@ -44,8 +42,6 @@ namespace Nino.Commands
                 batch.DeleteItem(e.Id);
             }
             await batch.ExecuteAsync();
-            log.Info($"[DB] Deleted episodes for {project.Id}");
-            log.Info("Project deletion finished");
 
             // Send success embed
             var embed = new EmbedBuilder()
@@ -54,6 +50,7 @@ namespace Nino.Commands
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 
+            await Cache.RebuildCacheForGuild(interaction.GuildId ?? 0);
             return true;
         }
     }

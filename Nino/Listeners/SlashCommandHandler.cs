@@ -9,6 +9,13 @@ namespace Nino.Listeners
         {
             await interaction.DeferAsync();
 
+            var guildId = interaction.GuildId;
+            if (guildId == null)
+            {
+                await interaction.FollowupAsync("Nino commands must be run in a server!");
+                return;
+            }
+
             switch (interaction.CommandName)
             {
                 case ProjectManagement.Name:

@@ -38,6 +38,7 @@ namespace Nino.Commands
             var newValue = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "newvalue")!.Value)!.Trim();
 
             string helperText = string.Empty;
+            bool rebuildCache = false;
             PatchOperation operation;
 
             switch (option)
@@ -71,6 +72,7 @@ namespace Nino.Commands
                     if (!Bool().IsMatch(input))
                         return await Response.Fail(T("error.incorrectBooleanFormat", lng), interaction);
                     operation = PatchOperation.Replace($"/isPrivate", Truthy().IsMatch(input));
+                    rebuildCache = true;
                     break;
 
                 case ProjectEditOption.UpdateChannelID:
@@ -113,6 +115,9 @@ namespace Nino.Commands
                 .WithDescription(embedDescription)
                 .Build();
             await interaction.FollowupAsync(embed: embed);
+
+            if (rebuildCache)
+                await Cache.RebuildCacheForProject(project.Id);
 
             return true;
         }
