@@ -1,93 +1,9 @@
 {
   "locale": "en-US",
   "commands": {
-    "help": {
-      "name": "help",
-      "description": "Nino Help"
-    },
     "about": {
       "name": "about",
       "description": "About Nino"
-    },
-    "project": {
-      "name": "project",
-      "description": "Project management"
-    },
-    "project.create": {
-      "name": "create",
-      "description": "Create a new project"
-    },
-    "project.edit": {
-      "name": "edit",
-      "description": "Edit a project"
-    },
-    "project.delete": {
-      "name": "delete",
-      "description": "Delete a project"
-    },
-    "project.transferownership": {
-      "name": "transferownership",
-      "description": "Transfer project ownership to someone else"
-    },
-    "project.alias": {
-      "name": "alias",
-      "description": "Alternative nicknames for a project"
-    },
-    "project.alias.add": {
-      "name": "add",
-      "description": "Add a new alias"
-    },
-    "project.alias.remove": {
-      "name": "remove",
-      "description": "Remove an alias"
-    },
-    "project.admin": {
-      "name": "admin",
-      "description": "Project-level administrators"
-    },
-    "project.admin.add": {
-      "name": "add",
-      "description": "Add an administrator to this project"
-    },
-    "project.admin.remove": {
-      "name": "remove",
-      "description": "Remove an administrator from this project"
-    },
-    "project.conga": {
-      "name": "conga",
-      "description": "A Conga line of Key Staff"
-    },
-    "project.conga.add": {
-      "name": "add",
-      "description": "Add a link to the Conga line"
-    },
-    "project.conga.remove": {
-      "name": "remove",
-      "description": "Remove a link from the Conga line"
-    },
-    "project.conga.list": {
-      "name": "list",
-      "description": "List all the Conga line participants"
-    },
-    "keystaff": {
-      "name": "keystaff",
-      "description": "Key Staff for the whole project"
-    },
-    "keystaff.add": {
-      "name": "add",
-      "description": "Add a new Key Staff to the whole project"
-    },
-    "keystaff.remove": {
-      "name": "remove",
-      "description": "Remove a Key Staff from the whole project"
-    },
-    "keystaff.swap": {
-      "name": "swap",
-      "description": "Swap a Key Staff for the whole project"
-    },
-    "keystaff.setweight": {
-      "name": "setweight",
-      "description": "Set the weight of a Key Staff position"
     },
     "additionalstaff": {
       "name": "additionalstaff",
@@ -105,37 +21,137 @@
       "name": "swap",
       "description": "Swap additional staff into an episode"
     },
-    "addepisode": {
-      "name": "addepisode",
-      "description": "Add an episode"
+    "blame": {
+      "name": "blame",
+      "description": "Check the status of a project"
     },
-    "removeepisode": {
-      "name": "removeepisode",
-      "description": "Remove an episode"
+    "bulk": {
+      "name": "bulk",
+      "description": "Do a lot of episodes all at once!"
     },
     "done": {
       "name": "done",
       "description": "Mark a position as done"
     },
-    "undone": {
-      "name": "undone",
-      "description": "Mark a position as not done"
+    "episode": {
+      "name": "episode",
+      "description": "Episodes"
     },
-    "skip": {
-      "name": "skip",
-      "description": "Skip a position"
+    "episode.add": {
+      "name": "add",
+      "description": "Add an episode"
     },
-    "blame": {
-      "name": "blame",
-      "description": "Check the status of a project"
+    "episode.remove": {
+      "name": "remove",
+      "description": "Remove an episode"
     },
-    "addobserver": {
+    "help": {
+      "name": "help",
+      "description": "Nino Help"
+    },
+    "keystaff": {
+      "name": "keystaff",
+      "description": "Key Staff for the whole project"
+    },
+    "keystaff.add": {
+      "name": "add",
+      "description": "Add a new Key Staff to the whole project"
+    },
+    "keystaff.remove": {
+      "name": "remove",
+      "description": "Remove a Key Staff from the whole project"
+    },
+    "keystaff.setweight": {
+      "name": "setweight",
+      "description": "Set the weight of a Key Staff position"
+    },
+    "keystaff.swap": {
+      "name": "swap",
+      "description": "Swap a Key Staff for the whole project"
+    },
+    "observer": {
       "name": "addobserver",
-      "description": "Observe a project on another server"
+      "description": "Observe projects on another server"
     },
-    "removeobserver": {
-      "name": "removeobserver",
+    "observer.add": {
+      "name": "add",
+      "description": "Start observing a project on another server"
+    },
+    "observer.remove": {
+      "name": "remove",
       "description": "Stop observing a project on another server"
+    },
+    "project": {
+      "name": "project",
+      "description": "Project management"
+    },
+    "project.admin": {
+      "name": "admin",
+      "description": "Project-level administrators"
+    },
+    "project.admin.add": {
+      "name": "add",
+      "description": "Add an administrator to this project"
+    },
+    "project.admin.remove": {
+      "name": "remove",
+      "description": "Remove an administrator from this project"
+    },
+    "project.airreminder": {
+      "name": "airreminder",
+      "description": "Enable or disable airing reminders"
+    },
+    "project.airreminder.enable": {
+      "name": "enable",
+      "description": "Enable airing reminders"
+    },
+    "project.airreminder.disable": {
+      "name": "disable",
+      "description": "Disable airing reminders"
+    },
+    "project.alias": {
+      "name": "alias",
+      "description": "Alternative nicknames for a project"
+    },
+    "project.alias.add": {
+      "name": "add",
+      "description": "Add a new alias"
+    },
+    "project.alias.remove": {
+      "name": "remove",
+      "description": "Remove an alias"
+    },
+    "project.conga": {
+      "name": "conga",
+      "description": "A Conga line of Key Staff"
+    },
+    "project.conga.add": {
+      "name": "add",
+      "description": "Add a link to the Conga line"
+    },
+    "project.conga.list": {
+      "name": "list",
+      "description": "List all the Conga line participants"
+    },
+    "project.conga.remove": {
+      "name": "remove",
+      "description": "Remove a link from the Conga line"
+    },
+    "project.create": {
+      "name": "create",
+      "description": "Create a new project"
+    },
+    "project.delete": {
+      "name": "delete",
+      "description": "Delete a project"
+    },
+    "project.edit": {
+      "name": "edit",
+      "description": "Edit a project"
+    },
+    "project.transferownership": {
+      "name": "transferownership",
+      "description": "Transfer project ownership to someone else"
     },
     "release": {
       "name": "release",
@@ -145,188 +161,148 @@
       "name": "roster",
       "description": "See who's working on an episode"
     },
-    "guild.configuration": {
-      "name": "configuration",
-      "description": "Guild configuration"
+    "server": {
+      "name": "server",
+      "description": "Server-wide options"
     },
-    "guild.admin": {
+    "server.admin": {
       "name": "admin",
-      "description": "Manage guild-level administrators"
+      "description": "Server-level administrators"
     },
-    "guild.admin.add": {
+    "server.admin.add": {
       "name": "add",
-      "description": "Add an administrator to this guild"
+      "description": "Add an administrator to this server"
     },
-    "guild.admin.remove": {
+    "server.admin.remove": {
       "name": "remove",
-      "description": "Remove an administrator from this guild"
+      "description": "Remove an administrator from this server"
     },
-    "progress_display": {
-      "name": "progress_display",
-      "description": "Select a progress embed type"
+    "server.display": {
+      "name": "diaplay",
+      "description": "Control the look and features of displays"
     },
-    "done_display": {
-      "name": "done_display",
-      "description": "Select a done/undone/skip reply embed type"
+    "server.display.progress": {
+      "name": "progress",
+      "description": "Control how progress command responses should look"
     },
-    "airreminder": {
-      "name": "airreminder",
-      "description": "Enable or disable airing reminders"
+    "server.display.updates": {
+      "name": "updates",
+      "description": "Control how progress updates should look"
     },
-    "enable": {
-      "name": "enable",
-      "description": "Enable airing reminders"
+    "server.releaseprefix": {
+      "name": "releaseprefix",
+      "description": "Specify a prefix for releases"
     },
-    "disable": {
-      "name": "disable",
-      "description": "Disable airing reminders"
+    "skip": {
+      "name": "skip",
+      "description": "Skip a position"
     },
-    "bulk": {
-      "name": "bulk",
-      "description": "Do a lot of episodes all at once!"
+    "undone": {
+      "name": "undone",
+      "description": "Mark a position as not done"
     }
   },
   "options": {
-    "nickname": {
-      "name": "nickname",
-      "description": "Project nickname"
-    },
-    "title": {
-      "name": "title",
-      "description": "Full series title"
-    },
-    "projecttype": {
-      "name": "projecttype",
-      "description": "Project type"
-    },
-    "length": {
-      "name": "length",
-      "description": "Number of episodes"
-    },
-    "poster": {
-      "name": "poster",
-      "description": "Poster image URL"
-    },
-    "private": {
-      "name": "private",
-      "description": "Is this project private?"
-    },
-    "updatechannel": {
-      "name": "updatechannel",
-      "description": "Channel to post updates to"
-    },
-    "releasechannel": {
-      "name": "releasechannel",
-      "description": "Channel to post releases to"
-    },
-    "project": {
-      "name": "project",
-      "description": "Project nickname"
-    },
-    "member": {
-      "name": "member",
-      "description": "Staff member"
-    },
     "abbreviation": {
       "name": "abbreviation",
       "description": "Position shorthand"
-    },
-    "name": {
-      "name": "name",
-      "description": "Full position name"
-    },
-    "weight": {
-      "name": "weight",
-      "description": "Weight"
-    },
-    "episode": {
-      "name": "episode",
-      "description": "Episode number"
-    },
-    "option": {
-      "name": "option",
-      "description": "Option to change"
-    },
-    "newvalue": {
-      "name": "newvalue",
-      "description": "New value"
     },
     "alias": {
       "name": "alias",
       "description": "Alias"
     },
-    "explain": {
-      "name": "explain",
-      "description": "Explain what any of this even means"
-    },
-    "guild": {
-      "name": "guild",
-      "description": "Guild ID"
-    },
-    "updates": {
-      "name": "updates",
-      "description": "Webhook URL for updates"
-    },
-    "releases": {
-      "name": "releases",
-      "description": "Webhook URL for releases"
-    },
-    "type": {
-      "name": "type",
-      "description": "Type of release"
-    },
-    "number": {
-      "name": "number",
-      "description": "What is being released? [Number or Range]"
-    },
-    "url": {
-      "name": "url",
-      "description": "Release URL"
-    },
-    "role": {
-      "name": "role",
-      "description": "Role to ping"
-    },
-    "observerrole": {
-      "name": "role",
-      "description": "Role to ping for releases"
-    },
-    "embedtype": {
-      "name": "embed_type",
-      "description": "Embed type"
-    },
-    "blame": {
-      "name": "blame",
-      "description": "Populate /blame with this project"
-    },
-    "action": {
-      "name": "action",
-      "description": "Action to perform"
-    },
-    "start_episode": {
-      "name": "start_episode",
-      "description": "Episode number to start at"
-    },
-    "end_episode": {
-      "name": "end_episode",
-      "description": "Episode number to end at (inclusive)"
-    },
     "conga.next": {
       "name": "next",
       "description": "Position to ping"
+    },
+    "episode": {
+      "name": "episode",
+      "description": "Episode number"
+    },
+    "name": {
+      "name": "name",
+      "description": "Full position name"
+    },
+    "member": {
+      "name": "member",
+      "description": "Staff member"
+    },
+    "newvalue": {
+      "name": "newvalue",
+      "description": "New value"
+    },
+    "project": {
+      "name": "project",
+      "description": "Project nickname"
+    },
+    "project.airreminder.channel": {
+      "name": "channel",
+      "description": "Channel to post reminders in"
+    },
+    "project.airreminder.role": {
+      "name": "role",
+      "description": "Role to ping for reminders"
+    },
+    "project.create.length": {
+      "name": "length",
+      "description": "Number of episodes"
+    },
+    "project.create.nickname": {
+      "name": "nickname",
+      "description": "Project nickname"
+    },
+    "project.create.poster": {
+      "name": "poster",
+      "description": "Poster image URL"
+    },
+    "project.create.private": {
+      "name": "private",
+      "description": "Is this project private?"
+    },
+    "project.create.releasechannel": {
+      "name": "releasechannel",
+      "description": "Channel to post releases to"
+    },
+    "project.create.title": {
+      "name": "title",
+      "description": "Full series title"
+    },
+    "project.create.type": {
+      "name": "type",
+      "description": "Project type"
+    },
+    "project.create.updatechannel": {
+      "name": "updatechannel",
+      "description": "Channel to post updates to"
+    },
+    "project.edit.option": {
+      "name": "option",
+      "description": "Option to change"
+    },
+    "server.display.type": {
+      "name": "type",
+      "description": "Embed type"
+    },
+    "weight": {
+      "name": "weight",
+      "description": "Weight"
     }
   },
   "choices": {
-    "editoption-title": "Title",
-    "editoption-poster": "Poster",
-    "editoption-motd": "MOTD",
-    "editoption-anidb": "AniDBId",
-    "editoption-airtime": "AirTime24h",
-    "editoption-private": "IsPrivate",
-    "editoption-updatechannel": "UpdateChannelID",
-    "editoption-releasechannel": "ReleaseChannelID",
-    "projecttype-TV": "TV",
-    "projecttype-Movie": "Movie",
-    "projecttype-BD": "BD"
+    "project.edit.option.title": "Title",
+    "project.edit.option.poster": "Poster",
+    "project.edit.option.motd": "MOTD",
+    "project.edit.option.anidb": "AniDBId",
+    "project.edit.option.airtime": "AirTime24h",
+    "project.edit.option.private": "IsPrivate",
+    "project.edit.option.updatechannel": "UpdateChannelID",
+    "project.edit.option.releasechannel": "ReleaseChannelID",
+    "server.display.type.normal": "Normal",
+    "server.display.type.extended": "Extended",
+    "server.display.type.succinct": "Succinct",
+    "server.display.type.verbose": "Verbose",
+    "project.create.type.tv": "TV",
+    "project.create.type.movie": "Movie",
+    "project.create.type.bd": "BD"
   }
 }
