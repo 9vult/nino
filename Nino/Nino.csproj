@@ -23,10 +23,6 @@
     <ProjectReference Include="..\Localizer\Localizer.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Services\" />
-  </ItemGroup>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy &quot;$(ProjectDir)i18n\*.*&quot; &quot;$(TargetDir)i18n\&quot; /Y /I /E" />
   </Target>

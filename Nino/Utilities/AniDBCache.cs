@@ -9,6 +9,11 @@ namespace Nino.Utilities
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
         private const string CACHE = ".cache";
 
+        private static HttpClient _client = new(new HttpClientHandler()
+        {
+            AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate
+        });
+
         /// <summary>
         /// Get series data from the local cache or AniDB's API
         /// </summary>
@@ -44,8 +49,7 @@ namespace Nino.Utilities
 
             try
             {
-                using HttpClient client = new();
-                var response = await client.GetAsync(baseUrl);
+                var response = await _client.GetAsync(baseUrl);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     var content = await response.Content.ReadAsStringAsync();
