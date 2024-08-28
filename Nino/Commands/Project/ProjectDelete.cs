@@ -30,12 +30,20 @@ namespace Nino.Commands
             // Remove from database
             await AzureHelper.Projects!.DeleteItemAsync<Project>(project.Id, partitionKey: AzureHelper.ProjectPartitionKey(project));
 
-            TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.Id));
+            TransactionalBatch episodeBatch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.Id));
             foreach (Episode e in await Getters.GetEpisodes(project))
             {
-                batch.DeleteItem(e.Id);
+                episodeBatch.DeleteItem(e.Id);
             }
-            await batch.ExecuteAsync();
+            await episodeBatch.ExecuteAsync();
+
+            // Remove observers from database
+            TransactionalBatch observerBatch = AzureHelper.Observers!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.GuildId));
+            foreach (Records.Observer o in Cache.GetObservers(project.GuildId))
+            {
+                observerBatch.DeleteItem(o.Id);
+            }
+            await observerBatch.ExecuteAsync();
 
             // Send success embed
             var embed = new EmbedBuilder()
@@ -45,6 +53,7 @@ namespace Nino.Commands
             await interaction.FollowupAsync(embed: embed);
 
             await Cache.RebuildCacheForGuild(interaction.GuildId ?? 0);
+            await Cache.RebuildObserverCache();
             return true;
         }
     }
