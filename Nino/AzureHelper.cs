@@ -187,11 +187,31 @@ namespace Nino
         /// <summary>
         /// Partition Key for use when accessing Configurations
         /// </summary>
-        /// <param name="guildId">Guild ID for the project being accessed</param>
+        /// <param name="originGuildId">Guild ID for the project being accessed</param>
         /// <returns>Partition Key of the configuration's GuildId</returns>
         public static PartitionKey ConfigurationPartitionKey(ulong guildId)
         {
-            return new PartitionKey(guildId.ToString());
+            return new PartitionKey(originGuildId.ToString());
+        }
+
+        /// <summary>
+        /// Partition Key for use when accessing Observers
+        /// </summary>
+        /// <param name="observer">Observer being accessed</param>
+        /// <returns>Partition Key of the observer's OriginGuildId</returns>
+        public static PartitionKey ObserverPartitionKey(Records.Observer observer)
+        {
+            return new PartitionKey(observer.SerializationOriginGuildId);
+        }
+
+        /// <summary>
+        /// Partition Key for use when accessing Observers
+        /// </summary>
+        /// <param name="originGuildId">Origin Guild ID for the project being accessed</param>
+        /// <returns>Partition Key of the observer's OriginGuildId</returns>
+        public static PartitionKey ObserverPartitionKey(ulong originGuildId)
+        {
+            return new PartitionKey(originGuildId.ToString());
         }
 
 #endregion Partition Keys

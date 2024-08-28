@@ -33,9 +33,8 @@ namespace Nino.Commands
 
             var episodeId = $"{project.Id}-{episodeNumber}";
 
-            // Add to database
+            // Remove from database
             await AzureHelper.Episodes!.DeleteItemAsync<Episode>(episodeId, AzureHelper.EpisodePartitionKey(episode));
-
             log.Info($"Deleted episode {episodeNumber} from {project.Id}");
 
             // Send success embed
