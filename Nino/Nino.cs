@@ -29,6 +29,7 @@ namespace Nino
             if (!env.TryGetValue("AZURE_CLIENT_SECRET", out var azureClientSecret)) throw new Exception("Missing env.AZURE_CLIENT_SECRET!");
             if (!env.TryGetValue("AZURE_COSMOS_DB_NAME", out var azureCosmosName)) throw new Exception("Missing env.AZURE_COSMOS_DB_NAME!");
             if (!env.TryGetValue("DISCORD_API_TOKEN", out var discordApiToken)) throw new Exception("Missing env.DISCORD_API_TOKEN!");
+            if (!env.TryGetValue("ANIDB_API_CLIENT_NAME", out var aniDbClientName)) throw new Exception("Missing env.ANIDB_API_CLIENT_NAME!");
 
             // Set up Azure database
             await AzureHelper.Setup(azureCosmosEndpoint, azureClientSecret, azureCosmosName);
