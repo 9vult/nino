@@ -191,7 +191,7 @@ namespace Nino
         /// <returns>Partition Key of the configuration's GuildId</returns>
         public static PartitionKey ConfigurationPartitionKey(ulong guildId)
         {
-            return new PartitionKey(originGuildId.ToString());
+            return new PartitionKey(guildId.ToString());
         }
 
         /// <summary>

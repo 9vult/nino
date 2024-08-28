@@ -1,5 +1,4 @@
-﻿using dotenv.net;
-using NLog;
+﻿using NLog;
 using System.Text;
 
 namespace Nino.Utilities
@@ -21,7 +20,7 @@ namespace Nino.Utilities
         /// <returns>XML content or an error code</returns>
         public static async Task<string> Get(string anidbId)
         {
-            var clientId = DotEnv.Read()["ANIDB_API_CLIENT_NAME"];
+            var clientId = Nino.Config.AniDbApiClientName;
             var baseUrl = $"http://api.anidb.net:9001/httpapi?client={clientId}&clientver=1&protover=1&request=anime&aid={anidbId}";
 
             var filename = $"{anidbId}.xml";

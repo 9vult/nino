@@ -1,6 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using dotenv.net;
+using Microsoft.Extensions.Configuration;
 using Nino.Listeners;
 using Nino.Services;
 using Nino.Utilities;
@@ -14,8 +14,10 @@ namespace Nino
     {
         private static readonly DiscordSocketClient _client = new();
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
+        private static AppConfig? _config;
 
         public static DiscordSocketClient Client => _client;
+        public static AppConfig Config => _config!;
 
         public static async Task Main()
         {
@@ -25,15 +27,15 @@ namespace Nino
             log.Info($"Starting Nino {Utils.VERSION}");
 
             // Read in environment variables
-            var env = DotEnv.Read();
-            if (!env.TryGetValue("AZURE_COSMOS_ENDPOINT", out var azureCosmosEndpoint)) throw new Exception("Missing env.AZURE_COSMOS_ENDPOINT!");
-            if (!env.TryGetValue("AZURE_CLIENT_SECRET", out var azureClientSecret)) throw new Exception("Missing env.AZURE_CLIENT_SECRET!");
-            if (!env.TryGetValue("AZURE_COSMOS_DB_NAME", out var azureCosmosName)) throw new Exception("Missing env.AZURE_COSMOS_DB_NAME!");
-            if (!env.TryGetValue("DISCORD_API_TOKEN", out var discordApiToken)) throw new Exception("Missing env.DISCORD_API_TOKEN!");
-            if (!env.TryGetValue("ANIDB_API_CLIENT_NAME", out var aniDbClientName)) throw new Exception("Missing env.ANIDB_API_CLIENT_NAME!");
-
+            IConfigurationRoot configBuilder = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build();
+            _config = configBuilder.GetRequiredSection("Configuration").Get<AppConfig?>();
+            if (_config == null)
+                throw new Exception("Missing appsettings.json!");
+            
             // Set up Azure database
-            await AzureHelper.Setup(azureCosmosEndpoint, azureClientSecret, azureCosmosName);
+            await AzureHelper.Setup(_config.AzureCosmosEndpoint, _config.AzureClientSecret, _config.AzureCosmosDbName);
             
             // Build initial cache
             await Cache.BuildCache();
@@ -52,7 +54,7 @@ namespace Nino
             _client.AutocompleteExecuted += Listener.AutocompleteExecuted;
 
             // Start the bot
-            await _client.LoginAsync(TokenType.Bot, discordApiToken);
+            await _client.LoginAsync(TokenType.Bot, _config.DiscordApiToken);
             await _client.StartAsync();
 
             await Task.Delay(-1);
