@@ -7,7 +7,7 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    internal static partial class EpisodeManagement
+    internal static partial class Episodes
     {
         public const string Name = "episode";
 

@@ -1,9 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Nino.Records;
-using Nino.Records.Enums;
-using Nino.Utilities;
-using NLog;
 
 using static Localizer.Localizer;
 
@@ -11,24 +8,26 @@ namespace Nino.Commands
 {
     internal static partial class ServerManagement
     {
-        public static async Task<bool> HandleSetDisplayProgress(SocketSlashCommand interaction, Configuration config)
+        public static async Task<bool> HandleSetReleasePrefix(SocketSlashCommand interaction, Configuration config)
         {
             var lng = interaction.UserLocale;
-            var subcommand = interaction.Data.Options.First().Options.First();
+            var subcommand = interaction.Data.Options.First();
 
             // Get inputs
-            var type = (DisplayType)Convert.ToInt32(subcommand.Options.FirstOrDefault(o => o.Name == "type")!.Value);
+            var newValue = (string)subcommand.Options.FirstOrDefault(o => o.Name == "newvalue")!.Value;
+            var prefix = newValue == "-" ? null : newValue;
 
             // Apply change and upsert to database
-            config.ProgressDisplay = type;
+            config.ReleasePrefix = prefix;
+
 
             await AzureHelper.Configurations!.UpsertItemAsync(config);
-            log.Info($"Updated configuration for guild {config.GuildId}, set Progress Display to {type.ToFriendlyString()}");
+            log.Info($"Updated configuration for guild {config.GuildId}, set ReleasePrefix to {prefix ?? "(empty)"}");
 
             // Send success embed
             var embed = new EmbedBuilder()
                 .WithTitle(T("title.serverConfiguration", lng))
-                .WithDescription(T("server.configuration.saved", lng))
+                .WithDescription($"{T("server.configuration.saved", lng)}\n{T("info.resettable", lng)}")
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 

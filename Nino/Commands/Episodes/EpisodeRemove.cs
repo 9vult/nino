@@ -7,9 +7,9 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    internal static partial class EpisodeManagement
+    internal static partial class Episodes
     {
-        public static async Task<bool> HandleAdd(SocketSlashCommand interaction)
+        public static async Task<bool> HandleRemove(SocketSlashCommand interaction)
         {
             var lng = interaction.UserLocale;
             var subcommand = interaction.Data.Options.First();
@@ -24,35 +24,24 @@ namespace Nino.Commands
             if (!Utils.VerifyUser(interaction.User.Id, project))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
-            // Verify episode doesn't exist
+            // Verify episode exists
             var episodeNumber = Convert.ToDecimal(subcommand.Options.FirstOrDefault(o => o.Name == "episode")!.Value);
             var episode = await Getters.GetEpisode(project, episodeNumber);
 
-            if (episode != null)
-                return await Response.Fail(T("error.episode.alreadyExists", lng, episodeNumber), interaction);
+            if (episode == null)
+                return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
 
-            // Create episode
-            var newEpisode = new Episode
-            {
-                Id = $"{project.Id}-{episodeNumber}",
-                GuildId = project.GuildId,
-                ProjectId = project.Id,
-                Number = episodeNumber,
-                Done = false,
-                ReminderPosted = false,
-                AdditionalStaff = [],
-                Tasks = project.KeyStaff.Select(ks => new Records.Task { Abbreviation = ks.Role.Abbreviation, Done = false }).ToArray()
-            };
+            var episodeId = $"{project.Id}-{episodeNumber}";
 
             // Add to database
-            await AzureHelper.Episodes!.UpsertItemAsync(newEpisode);
+            await AzureHelper.Episodes!.DeleteItemAsync<Episode>(episodeId, AzureHelper.EpisodePartitionKey(episode));
 
-            log.Info($"Added episode {episodeNumber} to {project.Id}");
+            log.Info($"Deleted episode {episodeNumber} from {project.Id}");
 
             // Send success embed
             var embed = new EmbedBuilder()
                 .WithTitle(T("title.projectModification", lng))
-                .WithDescription(T("episode.added", lng, episodeNumber, project.Nickname))
+                .WithDescription(T("episode.removed", lng, episodeNumber, project.Nickname))
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 

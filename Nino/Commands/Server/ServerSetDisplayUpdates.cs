@@ -2,8 +2,6 @@
 using Discord.WebSocket;
 using Nino.Records;
 using Nino.Records.Enums;
-using Nino.Utilities;
-using NLog;
 
 using static Localizer.Localizer;
 

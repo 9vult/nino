@@ -3,12 +3,6 @@ using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
 using Nino.Records;
 using Nino.Utilities;
-using NLog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using static Localizer.Localizer;
 
