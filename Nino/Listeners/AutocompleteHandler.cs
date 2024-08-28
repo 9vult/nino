@@ -33,8 +33,9 @@ namespace Nino.Listeners
                         var alias = ((string)focusedOption.Value).Trim();
                         if (alias == null) break; // return []
 
-                        var matches = Getters.GetFilteredAliases(guildId, userId, focusedOption.Value.ToString() ?? "");
-                        choices.AddRange(matches.Select(m => new AutocompleteResult(m, m)));
+                        choices.AddRange(Getters.GetFilteredAliases(guildId, userId, (string)focusedOption.Value)
+                            .Select(m => new AutocompleteResult(m, m))
+                        );
                     }
                     break;
 
@@ -48,8 +49,11 @@ namespace Nino.Listeners
                         var cachedProject = Utils.ResolveCachedAlias(alias, interaction);
                         if (cachedProject != null)
                         {
-                            var cachedEpisodes = Cache.GetEpisodes(cachedProject.Id);
-                            choices.AddRange(cachedEpisodes.Select(e => new AutocompleteResult(e.Number.ToString(), e.Number)));
+                            
+                            choices.AddRange(Cache.GetEpisodes(cachedProject.Id)
+                                .Where(e => e.Number.ToString().StartsWith((string)focusedOption.Value))
+                                .Select(e => new AutocompleteResult(e.Number.ToString(), e.Number))
+                            );
                         }
 
                         if (commandName == "blame")
@@ -72,12 +76,18 @@ namespace Nino.Listeners
                         if (cachedEpisode == null)
                         {
                             // Return list of key staff
-                            choices.AddRange(cachedProject.KeyStaffAbbreviations.Select(t => new AutocompleteResult(t, t)));
+                            choices.AddRange(cachedProject.KeyStaffAbbreviations
+                                .Where(ks => ks.StartsWith((string)focusedOption.Value))
+                                .Select(t => new AutocompleteResult(t, t))
+                            );
                         }
                         else
                         {
                             // Return list of episode tasks
-                            choices.AddRange(cachedEpisode.Tasks.Select(t => new AutocompleteResult(t.Abbreviation, t.Abbreviation)));
+                            choices.AddRange(cachedEpisode.Tasks
+                                .Where(t => t.Abbreviation.StartsWith((string)focusedOption.Value))
+                                .Select(t => new AutocompleteResult(t.Abbreviation, t.Abbreviation))
+                            );
                         }
                     }
                     break;

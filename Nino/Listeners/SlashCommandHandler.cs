@@ -30,6 +30,9 @@ namespace Nino.Listeners
                 case ServerManagement.Name:
                     await ServerManagement.Handle(interaction);
                     break;
+                case EpisodeManagement.Name:
+                    await EpisodeManagement.Handle(interaction);
+                    break;
                 case About.Name:
                     await About.Handle(interaction);
                     break;
