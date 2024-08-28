@@ -33,6 +33,9 @@ namespace Nino.Listeners
                 case Episodes.Name:
                     await Episodes.Handle(interaction);
                     break;
+                case Observer.Name:
+                    await Observer.Handle(interaction);
+                    break;
                 case About.Name:
                     await About.Handle(interaction);
                     break;

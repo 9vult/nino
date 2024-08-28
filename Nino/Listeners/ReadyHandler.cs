@@ -15,6 +15,7 @@ namespace Nino.Listeners
                 await Nino.Client.CreateGlobalApplicationCommandAsync(AdditionalStaff.Builder.Build());
                 await Nino.Client.CreateGlobalApplicationCommandAsync(ServerManagement.Builder.Build());
                 await Nino.Client.CreateGlobalApplicationCommandAsync(Episodes.Builder.Build());
+                await Nino.Client.CreateGlobalApplicationCommandAsync(Observer.Builder.Build());
                 await Nino.Client.CreateGlobalApplicationCommandAsync(About.Builder.Build());
                 await Nino.Client.CreateGlobalApplicationCommandAsync(Help.Builder.Build());
             }

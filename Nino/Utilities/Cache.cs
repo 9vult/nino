@@ -12,60 +12,7 @@ namespace Nino.Utilities
         private static readonly Dictionary<ulong, List<Project>> _projectCache = [];
         private static readonly Dictionary<ulong, CachedConfig> _configCache = [];
         private static readonly Dictionary<string, List<CachedEpisode>> _episodeCache = [];
-
-        /// <summary>
-        /// Get a cached config
-        /// </summary>
-        /// <param name="guildId">ID of the guild</param>
-        /// <returns>Cached config</returns>
-        public static CachedConfig? GetConfig(ulong guildId)
-        {
-            if (_configCache.TryGetValue(guildId, out var cachedGuild))
-                return cachedGuild;
-            return null;
-        }
-
-        /// <summary>
-        /// Get a flattened list of all cached projects
-        /// </summary>
-        /// <returns>List of all projects</returns>
-        public static List<Project> GetProjects()
-        {
-            return _projectCache.Values.SelectMany(list => list).ToList();
-        }
-
-        /// <summary>
-        /// Get the cached projects for a guild
-        /// </summary>
-        /// <param name="guildId">ID of the guild</param>
-        /// <returns>The projects, or an empty list</returns>
-        public static List<Project> GetProjects(ulong guildId)
-        {
-            if (_projectCache.TryGetValue(guildId, out var projectCache))
-                return projectCache;
-            return [];
-        }
-
-        /// <summary>
-        /// Get a flattened list of all cached episodes
-        /// </summary>
-        /// <returns>List of all episodes</returns>
-        public static List<CachedEpisode> GetEpisodes()
-        {
-            return _episodeCache.Values.SelectMany(list => list).ToList();
-        }
-
-        /// <summary>
-        /// Get the cached episodes for a project
-        /// </summary>
-        /// <param name="projectId">ID of the project</param>
-        /// <returns>The episodes, or an empty list</returns>
-        public static List<CachedEpisode> GetEpisodes(string projectId)
-        {
-            if (_episodeCache.TryGetValue(projectId, out var episodeCache))
-                return episodeCache;
-            return [];
-        }
+        private static readonly Dictionary<ulong, List<Observer>> _observerCache = [];
 
         /// <summary>
         /// Rebuild the project and episode cache for a guild
@@ -140,6 +87,27 @@ namespace Nino.Utilities
             log.Info($"Config cache successfully rebuilt: {configs.Count} configurations");
         }
 
+        public static async System.Threading.Tasks.Task RebuildObserverCache()
+        {
+            log.Info($"Rebuilding observer cache...");
+
+            var configSql = new QueryDefinition("SELECT * FROM c");
+            List<Observer> allObservers = await AzureHelper.QueryObservers<Observer>(configSql);
+
+            _observerCache.Clear();
+            foreach (var observer in allObservers)
+            {
+                if (!_observerCache.TryGetValue(observer.OriginGuildId, out var guildObservers))
+                {
+                    guildObservers = [];
+                    _observerCache[observer.OriginGuildId] = guildObservers;
+                }
+                guildObservers.Add(observer);
+            }
+
+            log.Info($"Observer cache successfully rebuilt: {allObservers.Count} observers");
+        }
+
         /// <summary>
         /// Build the cache
         /// </summary>
@@ -156,9 +124,89 @@ namespace Nino.Utilities
             }
 
             await RebuildConfigCache();
+            await RebuildObserverCache();
 
             log.Info($"Cache successfully built for {_projectCache.Count} guilds");
         }
+
+        #region getters
+
+        /// <summary>
+        /// Get a cached config
+        /// </summary>
+        /// <param name="guildId">ID of the guild</param>
+        /// <returns>Cached config</returns>
+        public static CachedConfig? GetConfig(ulong guildId)
+        {
+            if (_configCache.TryGetValue(guildId, out var cachedGuild))
+                return cachedGuild;
+            return null;
+        }
+
+        /// <summary>
+        /// Get a flattened list of all cached projects
+        /// </summary>
+        /// <returns>List of all projects</returns>
+        public static List<Project> GetProjects()
+        {
+            return _projectCache.Values.SelectMany(list => list).ToList();
+        }
+
+        /// <summary>
+        /// Get the cached projects for a guild
+        /// </summary>
+        /// <param name="guildId">ID of the guild</param>
+        /// <returns>The projects, or an empty list</returns>
+        public static List<Project> GetProjects(ulong guildId)
+        {
+            if (_projectCache.TryGetValue(guildId, out var projectCache))
+                return projectCache;
+            return [];
+        }
+
+        /// <summary>
+        /// Get a flattened list of all cached episodes
+        /// </summary>
+        /// <returns>List of all episodes</returns>
+        public static List<CachedEpisode> GetEpisodes()
+        {
+            return _episodeCache.Values.SelectMany(list => list).ToList();
+        }
+
+        /// <summary>
+        /// Get the cached episodes for a project
+        /// </summary>
+        /// <param name="projectId">ID of the project</param>
+        /// <returns>The episodes, or an empty list</returns>
+        public static List<CachedEpisode> GetEpisodes(string projectId)
+        {
+            if (_episodeCache.TryGetValue(projectId, out var episodeCache))
+                return episodeCache;
+            return [];
+        }
+
+        /// <summary>
+        /// Get cached observers for an origin guild
+        /// </summary>
+        /// <param name="guildId">ID of the observers</param>
+        /// <returns>Cached observer</returns>
+        public static List<Observer> GetObservers(ulong guildId)
+        {
+            if (_observerCache.TryGetValue(guildId, out var cachedObservers))
+                return cachedObservers;
+            return [];
+        }
+
+        /// <summary>
+        /// Get a flattened list of all cached observers
+        /// </summary>
+        /// <returns>List of all observers</returns>
+        public static List<Observer> GetObservers()
+        {
+            return _observerCache.Values.SelectMany(list => list).ToList();
+        }
+
+        #endregion getters
     }
 
     /// <summary>

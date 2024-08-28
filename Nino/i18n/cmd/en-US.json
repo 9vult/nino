@@ -70,7 +70,7 @@
       "description": "Swap a Key Staff for the whole project"
     },
     "observer": {
-      "name": "addobserver",
+      "name": "observer",
       "description": "Observe projects on another server"
     },
     "observer.add": {
@@ -230,6 +230,26 @@
     "newvalue": {
       "name": "newvalue",
       "description": "New value"
+    },
+    "observer.blame": {
+      "name": "blame",
+      "description": "Should this project's aliases show up in /blame?"
+    },
+    "observer.progress": {
+      "name": "progress",
+      "description": "Webhook URL for progress updates"
+    },
+    "observer.releases": {
+      "name": "releases",
+      "description": "Webhook URL for releases"
+    },
+    "observer.role": {
+      "name": "role",
+      "description": "Role to ping for releases"
+    },
+    "observer.serverid": {
+      "name": "serverid",
+      "description": "ID of the server you want to observe"
     },
     "project": {
       "name": "project",

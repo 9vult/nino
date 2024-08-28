@@ -10,10 +10,12 @@ namespace Nino
         private static Container? _projectsContainer;
         private static Container? _episodesContainer;
         private static Container? _configurationContainer;
+        private static Container? _observersContainer;
 
         public static Container? Projects => _projectsContainer;
         public static Container? Episodes => _episodesContainer;
         public static Container? Configurations => _configurationContainer;
+        public static Container? Observers => _observersContainer;
 
         public static async Task Setup(string endpointUri, string primaryKey, string databaseName)
         {
@@ -33,6 +35,7 @@ namespace Nino
             _projectsContainer = await _database.CreateContainerIfNotExistsAsync("Projects", "/guildId");
             _episodesContainer = await _database.CreateContainerIfNotExistsAsync("Episodes", "/projectId");
             _configurationContainer = await _database.CreateContainerIfNotExistsAsync("Configuration", "/guildId");
+            _observersContainer = await _database.CreateContainerIfNotExistsAsync("Observers", "/originGuildId");
         }
 
         /// <summary>
@@ -87,6 +90,27 @@ namespace Nino
         {
             List<T> results = [];
             using FeedIterator<T> feed = Episodes!.GetItemQueryIterator<T>(queryDefinition: sql);
+            while (feed.HasMoreResults)
+            {
+                FeedResponse<T> response = await feed.ReadNextAsync();
+                foreach (T e in response)
+                {
+                    results.Add(e);
+                }
+            }
+            return results;
+        }
+
+        /// <summary>
+        /// Query Observers
+        /// </summary>
+        /// <typeparam name="T">Return type</typeparam>
+        /// <param name="sql">Query to run</param>
+        /// <returns>List of resulting objects</returns>
+        public static async Task<List<T>> QueryObservers<T>(QueryDefinition sql)
+        {
+            List<T> results = [];
+            using FeedIterator<T> feed = Observers!.GetItemQueryIterator<T>(queryDefinition: sql);
             while (feed.HasMoreResults)
             {
                 FeedResponse<T> response = await feed.ReadNextAsync();
