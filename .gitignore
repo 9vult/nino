@@ -9,3 +9,4 @@ firebase.json
 **/bin/
 **/obj/
 .vs/
+.DS_STORE

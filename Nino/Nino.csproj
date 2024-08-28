@@ -24,7 +24,10 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(ProjectDir)i18n\*.*&quot; &quot;$(TargetDir)i18n\&quot; /Y /I /E" />
+    <ItemGroup>
+        <LOCALIZATION Include="$(ProjectDir)i18n\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(LOCALIZATION)" DestinationFolder="$(TargetDir)\i18n\%(RecursiveDir)" SkipUnchangedFiles="true" />
   </Target>
 
 </Project>
