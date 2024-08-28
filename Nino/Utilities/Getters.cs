@@ -10,7 +10,7 @@ namespace Nino.Utilities
 
         public static List<string> GetFilteredAliases(ulong guildId, ulong userId, string query)
         {
-            List<CachedProject> projects = [];
+            List<Project> projects = [];
 
             // Local guild projects
             projects.AddRange(Cache.GetProjects(guildId));

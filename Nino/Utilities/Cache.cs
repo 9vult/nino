@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.Cosmos;
 using Nino.Records;
+using Nino.Records.Enums;
 using NLog;
 
 namespace Nino.Utilities
@@ -8,8 +9,8 @@ namespace Nino.Utilities
     {
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
 
+        private static readonly Dictionary<ulong, List<Project>> _projectCache = [];
         private static readonly Dictionary<ulong, CachedConfig> _configCache = [];
-        private static readonly Dictionary<ulong, List<CachedProject>> _projectCache = [];
         private static readonly Dictionary<string, List<CachedEpisode>> _episodeCache = [];
 
         /// <summary>
@@ -19,7 +20,7 @@ namespace Nino.Utilities
         /// <returns>Cached config</returns>
         public static CachedConfig? GetConfig(ulong guildId)
         {
-            if (_configCache.TryGetValue(guildId, out var cachedGuild)) 
+            if (_configCache.TryGetValue(guildId, out var cachedGuild))
                 return cachedGuild;
             return null;
         }
@@ -28,7 +29,7 @@ namespace Nino.Utilities
         /// Get a flattened list of all cached projects
         /// </summary>
         /// <returns>List of all projects</returns>
-        public static List<CachedProject> GetProjects()
+        public static List<Project> GetProjects()
         {
             return _projectCache.Values.SelectMany(list => list).ToList();
         }
@@ -38,7 +39,7 @@ namespace Nino.Utilities
         /// </summary>
         /// <param name="guildId">ID of the guild</param>
         /// <returns>The projects, or an empty list</returns>
-        public static List<CachedProject> GetProjects(ulong guildId)
+        public static List<Project> GetProjects(ulong guildId)
         {
             if (_projectCache.TryGetValue(guildId, out var projectCache))
                 return projectCache;
@@ -76,7 +77,7 @@ namespace Nino.Utilities
             var projectSql = new QueryDefinition("SELECT * FROM c WHERE c.guildId = @guildId")
                 .WithParameter("@guildId", guildId.ToString());
 
-            var episodeSql = new QueryDefinition("SELECT c.number, c.projectId, c.tasks FROM c WHERE c.guildId = @guildId")
+            var episodeSql = new QueryDefinition("SELECT * FROM c WHERE c.guildId = @guildId")
                 .WithParameter("@guildId", guildId.ToString());
 
             // Get data
@@ -84,13 +85,13 @@ namespace Nino.Utilities
             List<CachedEpisode> allEpisodes = await AzureHelper.QueryEpisodes<CachedEpisode>(episodeSql);
 
             // Transform data
-            List<CachedProject> cachedProjects = [];
+            List<Project> cachedProjects = [];
             foreach (var project in rawProjects)
             {
                 var episodes = allEpisodes.Where(e => e.ProjectId == project.Id).OrderBy(e => e.Number).ToList();
                 _episodeCache[project.Id] = episodes;
 
-                cachedProjects.Add(CreateCachedProject(project));
+                cachedProjects.Add(project);
             }
             _projectCache[guildId] = cachedProjects;
             log.Info($"Cache for guild {guildId} successfully rebuilt: {cachedProjects.Count} projects, {allEpisodes.Count} episodes");
@@ -107,7 +108,7 @@ namespace Nino.Utilities
             var projectSql = new QueryDefinition("SELECT * FROM c WHERE c.id = @projectId")
                 .WithParameter("@projectId", projectId.ToString());
 
-            var episodeSql = new QueryDefinition("SELECT c.number, c.projectId, c.tasks FROM c WHERE c.projectId = @projectId")
+            var episodeSql = new QueryDefinition("SELECT * FROM c WHERE c.projectId = @projectId")
                 .WithParameter("@projectId", projectId.ToString());
 
             // Get data
@@ -116,7 +117,7 @@ namespace Nino.Utilities
 
             // Transform data
             var idx = _projectCache[project.GuildId].FindIndex(p => p.Id == project.Id);
-            _projectCache[project.GuildId][idx] = CreateCachedProject(project);
+            _projectCache[project.GuildId][idx] = project;
 
             _episodeCache[project.Id] = episodes;
 
@@ -158,26 +159,6 @@ namespace Nino.Utilities
 
             log.Info($"Cache successfully built for {_projectCache.Count} guilds");
         }
-
-        /// <summary>
-        /// Get a cached project from a project
-        /// </summary>
-        /// <param name="project">Project to cache</param>
-        /// <returns>Cached version of the project</returns>
-        private static CachedProject CreateCachedProject(Project project)
-        {
-            return new CachedProject
-            {
-                Id = project.Id,
-                GuildId = project.GuildId,
-                Nickname = project.Nickname,
-                OwnerId = project.OwnerId,
-                Aliases = project.Aliases,
-                AdministratorIds = project.AdministratorIds,
-                KeyStaffAbbreviations = project.KeyStaff.Select(ks => ks.Role.Abbreviation).ToArray(),
-                IsPrivate = project.IsPrivate
-            };
-        }
     }
 
     /// <summary>
@@ -191,27 +172,15 @@ namespace Nino.Utilities
     }
 
     /// <summary>
-    /// Minimal project structure for caching purposes
-    /// </summary>
-    internal record CachedProject
-    {
-        public required string Id;
-        public required ulong GuildId;
-        public required string Nickname;
-        public required ulong OwnerId;
-        public required string[] Aliases;
-        public required ulong[] AdministratorIds;
-        public required string[] KeyStaffAbbreviations;
-        public required bool IsPrivate;
-    }
-
-    /// <summary>
     /// Minimal episode structure for caching purposes
     /// </summary>
     internal record CachedEpisode
     {
+        public required string Id;
         public required decimal Number;
         public required string ProjectId;
         public required Records.Task[] Tasks;
+        public required bool Done;
+        public required bool ReminderPosted;
     }
 }

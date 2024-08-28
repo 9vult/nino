@@ -36,7 +36,7 @@ namespace Nino.Commands
 
             // Populate data
 
-            var projectData = new Records.Project
+            var projectData = new Project
             {
                 Id = $"{guildId}-{nickname}",
                 GuildId = guildId,

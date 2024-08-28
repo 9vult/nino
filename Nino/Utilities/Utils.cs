@@ -29,7 +29,7 @@ namespace Nino.Utilities
         /// <param name="interaction">Interaction requesting resolution</param>
         /// <param name="observingGuildId">ID of the build being observed, if applicable</param>
         /// <returns>CachedProject the alias references to, or null</returns>
-        public static CachedProject? ResolveCachedAlias(string query, SocketInteraction interaction, ulong? observingGuildId = null)
+        public static Project? ResolveCachedAlias(string query, SocketInteraction interaction, ulong? observingGuildId = null)
         {
             var guildId = observingGuildId ?? interaction.GuildId ?? 0;
             var cache = Cache.GetProjects(guildId);

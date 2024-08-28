@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using dotenv.net;
 using Nino.Listeners;
+using Nino.Services;
 using Nino.Utilities;
 using NLog;
 using System.Text;
@@ -36,6 +37,9 @@ namespace Nino
             
             // Build initial cache
             await Cache.BuildCache();
+
+            // Start services
+            var reminderService = new ReleaseReminderService();
 
             // Load localization files
             LoadStringLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/str")));

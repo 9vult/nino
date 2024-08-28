@@ -51,6 +51,7 @@ namespace Nino.Commands
             if (!PermissionChecker.CheckPermissions(channelId))
                 await Response.Info(T("error.missingChannelPerms", lng, $"<#{channelId}>"), interaction);
 
+            await Cache.RebuildCacheForProject(project.Id);
             return true;
         }
 

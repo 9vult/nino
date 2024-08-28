@@ -1,16 +1,6 @@
 ﻿using Discord;
-using Discord.Interactions;
-using Discord.Net;
 using Discord.WebSocket;
-using Newtonsoft.Json;
-using Nino.Commands;
 using Nino.Utilities;
-using NLog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Nino.Listeners
 {
@@ -76,9 +66,9 @@ namespace Nino.Listeners
                         if (cachedEpisode == null)
                         {
                             // Return list of key staff
-                            choices.AddRange(cachedProject.KeyStaffAbbreviations
-                                .Where(ks => ks.StartsWith((string)focusedOption.Value))
-                                .Select(t => new AutocompleteResult(t, t))
+                            choices.AddRange(cachedProject.KeyStaff
+                                .Where(ks => ks.Role.Abbreviation.StartsWith((string)focusedOption.Value))
+                                .Select(t => new AutocompleteResult(t.Role.Abbreviation, t.Role.Abbreviation))
                             );
                         }
                         else

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.Cosmos;
+using Nino.Utilities;
 
 namespace Nino
 {
@@ -125,6 +126,16 @@ namespace Nino
         /// <param name="episode">Episode being accessed</param>
         /// <returns>Partition Key of the episode's ProjectId</returns>
         public static PartitionKey EpisodePartitionKey(Records.Episode episode)
+        {
+            return new PartitionKey(episode.ProjectId);
+        }
+
+        /// <summary>
+        /// Partition Key for use when accessing Episodes
+        /// </summary>
+        /// <param name="episode">Episode being accessed</param>
+        /// <returns>Partition Key of the episode's ProjectId</returns>
+        public static PartitionKey EpisodePartitionKey(CachedEpisode episode)
         {
             return new PartitionKey(episode.ProjectId);
         }
