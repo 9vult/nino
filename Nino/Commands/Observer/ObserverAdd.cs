@@ -17,10 +17,10 @@ namespace Nino.Commands
             // Get inputs
             var originGuildIdStr = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "serverid")).Trim();
             var alias = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "project")!.Value).Trim();
-            var blame = (bool)subcommand.Options.FirstOrDefault(o => o.Name == "done")!.Value;
+            var blame = (bool)subcommand.Options.FirstOrDefault(o => o.Name == "blame")!.Value;
             var updatesUrl = (string?)(subcommand.Options.FirstOrDefault(o => o.Name == "updates")?.Value);
             var releasesUrl = (string?)(subcommand.Options.FirstOrDefault(o => o.Name == "releases")?.Value);
-            var roleId = ((SocketRole?)subcommand.Options.FirstOrDefault(o => o.Name == "member")?.Value)?.Id;
+            var roleId = ((SocketRole?)subcommand.Options.FirstOrDefault(o => o.Name == "role")?.Value)?.Id;
 
             // Validate no-op condition
             if (!blame && updatesUrl == null && releasesUrl == null)
