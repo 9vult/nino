@@ -21,6 +21,7 @@ namespace Nino.Listeners
                     await Nino.Client.CreateGlobalApplicationCommandAsync(Episodes.Builder.Build());
                     await Nino.Client.CreateGlobalApplicationCommandAsync(Observer.Builder.Build());
                     await Nino.Client.CreateGlobalApplicationCommandAsync(Release.Builder.Build());
+                    await Nino.Client.CreateGlobalApplicationCommandAsync(Roster.Builder.Build());
                     await Nino.Client.CreateGlobalApplicationCommandAsync(About.Builder.Build());
                     await Nino.Client.CreateGlobalApplicationCommandAsync(Help.Builder.Build());
                     log.Info("Slash commands deployed");

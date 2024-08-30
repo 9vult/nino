@@ -39,6 +39,9 @@ namespace Nino.Listeners
                 case Release.Name:
                     await Release.Handle(interaction);
                     break;
+                case Roster.Name:
+                    await Roster.Handle(interaction);
+                    break;
                 case About.Name:
                     await About.Handle(interaction);
                     break;
