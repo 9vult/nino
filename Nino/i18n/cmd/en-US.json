@@ -211,6 +211,10 @@
       "name": "alias",
       "description": "Alias"
     },
+    "blame.explain": {
+      "name": "explain",
+      "description": "Explain what any of this means"
+    },
     "conga.next": {
       "name": "next",
       "description": "Position to ping"
