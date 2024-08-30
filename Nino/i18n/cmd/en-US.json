@@ -299,6 +299,22 @@
       "name": "option",
       "description": "Option to change"
     },
+    "release.type": {
+      "name": "type",
+      "description": "Type of release"
+    },
+    "release.number": {
+      "name": "number",
+      "description": "What is being released?"
+    },
+    "release.url": {
+      "name": "url",
+      "description": "Release URL(s)"
+    },
+    "release.role": {
+      "name": "role",
+      "description": "Role to ping"
+    },
     "server.display.type": {
       "name": "type",
       "description": "Embed type"
@@ -323,6 +339,10 @@
     "server.display.type.verbose": "Verbose",
     "project.create.type.tv": "TV",
     "project.create.type.movie": "Movie",
-    "project.create.type.bd": "BD"
+    "project.create.type.bd": "BD",
+    "release.type.episode": "Episode",
+    "release.type.volume": "Volume",
+    "release.type.batch": "Batch",
+    "release.type.custom": "Custom"
   }
 }

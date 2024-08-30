@@ -75,7 +75,7 @@ namespace Nino.Utilities
         {
             log.Info($"Rebuilding config cache...");
 
-            var configSql = new QueryDefinition("SELECT c.id, c.guildId, c.administratorIds FROM c");
+            var configSql = new QueryDefinition("SELECT c.id, c.guildId, c.releasePrefix, c.administratorIds FROM c");
             List<CachedConfig> configs = await AzureHelper.QueryConfigurations<CachedConfig>(configSql);
 
             _configCache.Clear();
@@ -217,6 +217,7 @@ namespace Nino.Utilities
         public required string Id;
         public required ulong GuildId;
         public required ulong[] AdministratorIds;
+        public string? ReleasePrefix;
     }
 
     /// <summary>
