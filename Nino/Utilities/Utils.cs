@@ -23,7 +23,7 @@ namespace Nino.Utilities
         }
 
         /// <summary>
-        /// Verify the given user has sufficient permissions to perform a task
+        /// Verify the given user has sufficient permissions to use a command
         /// </summary>
         /// <param name="userId">ID of the user to check</param>
         /// <param name="project">Project to verify against</param>
@@ -42,13 +42,33 @@ namespace Nino.Utilities
                 if (Cache.GetConfig(project.GuildId)?.AdministratorIds?.Any(a => a == userId) ?? false)
                     return true;
             }
-
             if (includeKeyStaff)
             {
                 if (project.KeyStaff.Any(ks => ks.UserId == userId))
                     return true;
             }
 
+            return false;
+        }
+
+        /// <summary>
+        /// Verify a user has sufficient permissions to make progress on a task
+        /// </summary>
+        /// <param name="userId">ID of the user to check</param>
+        /// <param name="project">Project to check</param>
+        /// <param name="episode">Episode to check</param>
+        /// <param name="abbreviation">Abbreviation to check</param>
+        /// <returns>True if the user has permission</returns>
+        public static bool VerifyTaskUser(ulong userId, Project project, Episode episode, string abbreviation)
+        {
+            if (project.OwnerId == userId)
+                return true;
+            if (project.AdministratorIds.Any(a => a == userId))
+                return true;
+            if (Cache.GetConfig(project.GuildId)?.AdministratorIds?.Any(a => a == userId) ?? false)
+                return true;
+            if (project.KeyStaff.Concat(episode.AdditionalStaff).Any(ks => ks.Role.Abbreviation == abbreviation && ks.UserId == userId))
+                return true;
             return false;
         }
 

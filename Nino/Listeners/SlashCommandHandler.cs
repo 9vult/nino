@@ -45,6 +45,9 @@ namespace Nino.Listeners
                 case Blame.Name:
                     await Blame.Handle(interaction);
                     break;
+                case Done.Name:
+                    await Done.Handle(interaction);
+                    break;
                 case About.Name:
                     await About.Handle(interaction);
                     break;

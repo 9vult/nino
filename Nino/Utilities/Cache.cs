@@ -10,7 +10,7 @@ namespace Nino.Utilities
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         private static readonly Dictionary<ulong, List<Project>> _projectCache = [];
-        private static readonly Dictionary<ulong, CachedConfig> _configCache = [];
+        private static readonly Dictionary<ulong, Configuration> _configCache = [];
         private static readonly Dictionary<string, List<CachedEpisode>> _episodeCache = [];
         private static readonly Dictionary<ulong, List<Observer>> _observerCache = [];
 
@@ -76,10 +76,10 @@ namespace Nino.Utilities
             log.Info($"Rebuilding config cache...");
 
             var configSql = new QueryDefinition("SELECT c.id, c.guildId, c.releasePrefix, c.administratorIds FROM c");
-            List<CachedConfig> configs = await AzureHelper.QueryConfigurations<CachedConfig>(configSql);
+            List<Configuration> configs = await AzureHelper.QueryConfigurations<Configuration>(configSql);
 
             _configCache.Clear();
-            foreach (CachedConfig config in configs)
+            foreach (var config in configs)
             {
                 _configCache[config.GuildId] = config;
             }
@@ -136,7 +136,7 @@ namespace Nino.Utilities
         /// </summary>
         /// <param name="guildId">ID of the guild</param>
         /// <returns>Cached config</returns>
-        public static CachedConfig? GetConfig(ulong guildId)
+        public static Configuration? GetConfig(ulong guildId)
         {
             if (_configCache.TryGetValue(guildId, out var cachedGuild))
                 return cachedGuild;
@@ -207,17 +207,6 @@ namespace Nino.Utilities
         }
 
         #endregion getters
-    }
-
-    /// <summary>
-    /// Minimal config info structure for caching purposes
-    /// </summary>
-    internal record CachedConfig
-    {
-        public required string Id;
-        public required ulong GuildId;
-        public required ulong[] AdministratorIds;
-        public string? ReleasePrefix;
     }
 
     /// <summary>

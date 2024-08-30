@@ -63,37 +63,7 @@ namespace Nino.Commands
             }
 
             // Publish to observers
-            var observers = Cache.GetObservers(project.GuildId).Where(o => o.ProjectId == project.Id);
-            if (observers.Any())
-            {
-                var httpClient = new HttpClient();
-                foreach (var observer in observers)
-                {
-                    if (string.IsNullOrEmpty(observer.ReleasesWebhook))
-                        continue;
-                    var observerRoleStr = observer.RoleId != null
-                        ? observer.RoleId == observer.GuildId ? "@everyone " : $"<@&{observer.RoleId}> "
-                        : "";
-                    var observerBody = releaseType != ReleaseType.Custom
-                        ? $"**{project.Title} - {releaseType.ToFriendlyString()} {releaseNumber}**\n{observerRoleStr}{releaseUrl}"
-                        : $"**{project.Title} - {releaseNumber}**\n{observerRoleStr}{releaseUrl}";
-                    try
-                    {
-                        var payload = new
-                        {
-                            username = "Nino",
-                            avatar_url = "https://i.imgur.com/PWtteaY.png",
-                            content = observerBody
-                        };
-                        var data = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
-                        await httpClient.PostAsync(observer.ReleasesWebhook, data);
-                    }
-                    catch (Exception e)
-                    {
-                        log.Error($"Releases webhook for observer {observer.Id} failed: {e}");
-                    }
-                }
-            }
+            await ObserverPublisher.PublishRelease(project, releaseType, releaseNumber, releaseUrl);
             
             // Send success embed
             var replyEmbed = new EmbedBuilder()
