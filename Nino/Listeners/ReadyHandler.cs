@@ -8,22 +8,28 @@ namespace Nino.Listeners
     {
         public static async Task Ready()
         {
-            try
+            // (Re)deploy slash commands if deploy-commands flag is set
+            if (Nino.CmdLineOptions.DeployCommands)
             {
-                await Nino.Client.CreateGlobalApplicationCommandAsync(ProjectManagement.Builder.Build());
-                await Nino.Client.CreateGlobalApplicationCommandAsync(KeyStaff.Builder.Build());
-                await Nino.Client.CreateGlobalApplicationCommandAsync(AdditionalStaff.Builder.Build());
-                await Nino.Client.CreateGlobalApplicationCommandAsync(ServerManagement.Builder.Build());
-                await Nino.Client.CreateGlobalApplicationCommandAsync(Episodes.Builder.Build());
-                await Nino.Client.CreateGlobalApplicationCommandAsync(Observer.Builder.Build());
-                await Nino.Client.CreateGlobalApplicationCommandAsync(Release.Builder.Build());
-                await Nino.Client.CreateGlobalApplicationCommandAsync(About.Builder.Build());
-                await Nino.Client.CreateGlobalApplicationCommandAsync(Help.Builder.Build());
-            }
-            catch (HttpException e)
-            {
-                var json = JsonConvert.SerializeObject(e.Errors, Formatting.Indented);
-                log.Error(json);
+                try
+                {
+                    log.Info("--deploy-commands is set. Deploying slash commands...");
+                    await Nino.Client.CreateGlobalApplicationCommandAsync(ProjectManagement.Builder.Build());
+                    await Nino.Client.CreateGlobalApplicationCommandAsync(KeyStaff.Builder.Build());
+                    await Nino.Client.CreateGlobalApplicationCommandAsync(AdditionalStaff.Builder.Build());
+                    await Nino.Client.CreateGlobalApplicationCommandAsync(ServerManagement.Builder.Build());
+                    await Nino.Client.CreateGlobalApplicationCommandAsync(Episodes.Builder.Build());
+                    await Nino.Client.CreateGlobalApplicationCommandAsync(Observer.Builder.Build());
+                    await Nino.Client.CreateGlobalApplicationCommandAsync(Release.Builder.Build());
+                    await Nino.Client.CreateGlobalApplicationCommandAsync(About.Builder.Build());
+                    await Nino.Client.CreateGlobalApplicationCommandAsync(Help.Builder.Build());
+                    log.Info("Slash commands deployed");
+                }
+                catch (HttpException e)
+                {
+                    var json = JsonConvert.SerializeObject(e.Errors, Formatting.Indented);
+                    log.Error(json);
+                }
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using CommandLine;
+using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Nino.Listeners;
@@ -13,16 +14,21 @@ namespace Nino
     public class Nino
     {
         private static readonly DiscordSocketClient _client = new();
+        private static readonly CmdLineOptions _cmdLineOptions = new();
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
         private static AppConfig? _config;
 
         public static DiscordSocketClient Client => _client;
         public static AppConfig Config => _config!;
+        public static CmdLineOptions CmdLineOptions => _cmdLineOptions;
 
-        public static async Task Main()
+        public static async Task Main(string[] args)
         {
             Console.OutputEncoding = Encoding.UTF8;
             Listener.SetupLogger();
+
+            // Read in command-line arguments
+            CommandLineParser.Default.ParseArguments(args, _cmdLineOptions);
 
             log.Info($"Starting Nino {Utils.VERSION}");
 
