@@ -36,7 +36,7 @@ namespace Nino.Listeners
                         var alias = ((string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")?.Value)?.Trim();
                         if (alias == null) break; // return []
 
-                        var cachedProject = Utils.ResolveCachedAlias(alias, interaction);
+                        var cachedProject = Utils.ResolveAlias(alias, interaction);
                         if (cachedProject != null)
                         {
                             
@@ -60,7 +60,7 @@ namespace Nino.Listeners
                         var episodeInput = (decimal?)interaction.Data.Options.FirstOrDefault(o => o.Name == "episode")?.Value;
                         if (alias == null) break; // return []
 
-                        var cachedProject = Utils.ResolveCachedAlias(alias, interaction);
+                        var cachedProject = Utils.ResolveAlias(alias, interaction);
                         if (cachedProject == null) break; // return []
                         var cachedEpisode = Cache.GetEpisodes(cachedProject.Id).FirstOrDefault(e => e.Number == episodeInput);
                         if (cachedEpisode == null)

@@ -19,7 +19,7 @@ namespace Nino.Commands
             var input = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "alias")!.Value).Trim();
 
             // Verify project and user - Owner or Admin required
-            var project = await Utils.ResolveAlias(alias, interaction);
+            var project = Utils.ResolveAlias(alias, interaction);
             if (project == null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
@@ -27,7 +27,7 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Validate alias doesn't exist
-            var preexistingProject = await Utils.ResolveAlias(input, interaction);
+            var preexistingProject = Utils.ResolveAlias(input, interaction);
             if (preexistingProject != null)
                 return await Response.Fail(T("error.alias.inUse", lng, preexistingProject.Nickname), interaction);
 

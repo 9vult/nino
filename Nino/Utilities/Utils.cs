@@ -12,30 +12,14 @@ namespace Nino.Utilities
         /// <param name="interaction">Interaction requesting resolution</param>
         /// <param name="observingGuildId">ID of the build being observed, if applicable</param>
         /// <returns>Project the alias references to, or null</returns>
-        public static async Task<Project?> ResolveAlias(string query, SocketInteraction interaction, ulong? observingGuildId = null)
-        {
-            var cachedProject = ResolveCachedAlias(query, interaction, observingGuildId);
-
-            if (cachedProject != null)
-                return await Getters.GetProject(cachedProject.Id, cachedProject.GuildId);
-            else
-                return null;
-        }
-
-        /// <summary>
-        /// Resolve an alias to its cached project
-        /// </summary>
-        /// <param name="query">Alias to resolve</param>
-        /// <param name="interaction">Interaction requesting resolution</param>
-        /// <param name="observingGuildId">ID of the build being observed, if applicable</param>
-        /// <returns>CachedProject the alias references to, or null</returns>
-        public static Project? ResolveCachedAlias(string query, SocketInteraction interaction, ulong? observingGuildId = null)
+        public static Project? ResolveAlias(string query, SocketInteraction interaction, ulong? observingGuildId = null)
         {
             var guildId = observingGuildId ?? interaction.GuildId ?? 0;
             var cache = Cache.GetProjects(guildId);
             if (cache == null) return null;
 
-            return cache.Where(p => p.Nickname == query || p.Aliases.Any(a => a == query)).FirstOrDefault();
+            return cache.Where(p => string.Equals(p.Nickname, query, StringComparison.InvariantCultureIgnoreCase) 
+                || p.Aliases.Any(a => string.Equals(a, query, StringComparison.InvariantCultureIgnoreCase))).FirstOrDefault();
         }
 
         /// <summary>
@@ -44,8 +28,9 @@ namespace Nino.Utilities
         /// <param name="userId">ID of the user to check</param>
         /// <param name="project">Project to verify against</param>
         /// <param name="excludeAdmins">Should administrators be excluded?</param>
+        /// <param name="includeKeyStaff">Should Key Staff be included?</param>
         /// <returns>True if the user has sufficient permissions</returns>
-        public static bool VerifyUser(ulong userId, Project project, bool excludeAdmins = false)
+        public static bool VerifyUser(ulong userId, Project project, bool excludeAdmins = false, bool includeKeyStaff = false)
         {
             if (project.OwnerId == userId) return true;
 
@@ -55,6 +40,12 @@ namespace Nino.Utilities
                     return true;
 
                 if (Cache.GetConfig(project.GuildId)?.AdministratorIds?.Any(a => a == userId) ?? false)
+                    return true;
+            }
+
+            if (includeKeyStaff)
+            {
+                if (project.KeyStaff.Any(ks => ks.UserId == userId))
                     return true;
             }
 

@@ -35,13 +35,13 @@ namespace Nino.Utilities
         /// Episode number input
         /// </summary>
         /// <param name="autocomplete">Is autocomplete enabled?</param>
-        public static SlashCommandOptionBuilder Episode(bool autocomplete = true) =>
+        public static SlashCommandOptionBuilder Episode(bool autocomplete = true, bool required = true) =>
             new SlashCommandOptionBuilder()
             .WithName("episode")
             .WithDescription("Episode number")
             .WithNameLocalizations(GetOptionNames("episode"))
             .WithDescriptionLocalizations(GetOptionDescriptions("episode"))
-            .WithRequired(true)
+            .WithRequired(required)
             .WithAutocomplete(autocomplete)
             .WithType(ApplicationCommandOptionType.Number);
 

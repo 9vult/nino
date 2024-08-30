@@ -26,7 +26,7 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.noSuchServer", lng), interaction);
 
             // Verify project and user access
-            var project = await Utils.ResolveAlias(alias, interaction, observingGuildId: originGuildId);
+            var project = Utils.ResolveAlias(alias, interaction, observingGuildId: originGuildId);
             if (project == null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 

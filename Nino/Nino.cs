@@ -51,7 +51,9 @@ namespace Nino
 
             // Load localization files
             LoadStringLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/str")));
-            LoadCommandLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/cmd")));            
+            LoadCommandLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/cmd")));  
+
+            CmdLineOptions.DeployCommands = false;          
 
             // Listen up
             _client.Log += Listener.Log;

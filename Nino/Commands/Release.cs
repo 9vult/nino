@@ -23,7 +23,7 @@ namespace Nino.Commands
             var alias = ((string)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")!.Value).Trim();
 
             // Verify project and user - Owner or Admin required
-            var project = await Utils.ResolveAlias(alias, interaction);
+            var project = Utils.ResolveAlias(alias, interaction);
             if (project == null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 

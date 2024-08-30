@@ -32,7 +32,8 @@ namespace Nino.Commands
                 Role = new Role
                 {
                     Abbreviation = abbreviation,
-                    Name = title
+                    Name = title,
+                    Weight = project.KeyStaff.Max(ks => ks.Role.Weight) ?? 0 + 1
                 }
             };
 
