@@ -1,19 +1,30 @@
 using Discord;
-using Discord.WebSocket;
+using Discord.Interactions;
+using Nino.Handlers;
 using Nino.Records.Enums;
 using Nino.Utilities;
+using NLog;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    internal static partial class Roster
+    public class Roster(InteractionHandler handler, InteractionService commands) : InteractionModuleBase<SocketInteractionContext>
     {
-        public const string Name = "roster";
+        public InteractionService Commands { get; private set; } = commands;
+        private readonly InteractionHandler _handler = handler;
+        private static readonly Logger log = LogManager.GetCurrentClassLogger();
 
-        public static async Task<bool> Handle(SocketSlashCommand interaction)
+        [SlashCommand("roster", "See who's working on an episode")]
+        public async Task<bool> Handle(
+            [Summary("project", "Project nickname")] string alias,
+            [Summary("episode", "Episode number")] decimal episodeNumber
+        )
         {
+            var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
-            var alias = ((string)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")!.Value).Trim();
+            
+            // Sanitize inputs
+            alias = alias.Trim();
             
             // Verify project and user - minimum Key Staff required
             var project = Utils.ResolveAlias(alias, interaction);
@@ -24,7 +35,6 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Verify episode
-            var episodeNumber = Convert.ToDecimal(interaction.Data.Options.FirstOrDefault(o => o.Name == "episode")!.Value);
             var episode = await Getters.GetEpisode(project, episodeNumber);
             if (episode == null)
                 return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
@@ -49,14 +59,5 @@ namespace Nino.Commands
 
             return true;
         }
-
-        public static SlashCommandBuilder Builder =>
-            new SlashCommandBuilder()
-            .WithName(Name)
-            .WithDescription("See who's working on an episode")
-            .WithNameLocalizations(GetCommandNames(Name))
-            .WithDescriptionLocalizations(GetCommandDescriptions(Name))
-            .AddOption(CommonOptions.Project())
-            .AddOption(CommonOptions.Episode());
     }
 }

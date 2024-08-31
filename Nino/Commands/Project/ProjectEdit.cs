@@ -26,7 +26,7 @@ namespace Nino.Commands
         )
         {
             var interaction = Context.Interaction;
-                var lng = interaction.UserLocale;
+            var lng = interaction.UserLocale;
 
             // Sanitize inputs
             alias = alias.Trim();

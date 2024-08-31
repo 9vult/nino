@@ -1,16 +1,21 @@
 ﻿using Discord;
-using Discord.WebSocket;
-
+using Discord.Interactions;
+using Nino.Handlers;
+using NLog;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    internal static partial class Help
+    public class Help(InteractionHandler handler, InteractionService commands) : InteractionModuleBase<SocketInteractionContext>
     {
-        public const string Name = "help";
-
-        public static async Task<bool> Handle(SocketSlashCommand interaction)
+        public InteractionService Commands { get; private set; } = commands;
+        private readonly InteractionHandler _handler = handler;
+        private static readonly Logger log = LogManager.GetCurrentClassLogger();
+        
+        [SlashCommand("help", "Nino Help")]
+        public async Task<bool> Handle()
         {
+            var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
 
             var embed = new EmbedBuilder()
@@ -21,12 +26,5 @@ namespace Nino.Commands
 
             return true;
         }
-
-        public static SlashCommandBuilder Builder =>
-            new SlashCommandBuilder()
-            .WithName(Name)
-            .WithDescription("Nino Help")
-            .WithNameLocalizations(GetCommandNames(Name))
-            .WithDescriptionLocalizations(GetCommandDescriptions(Name));
     }
 }

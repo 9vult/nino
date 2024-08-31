@@ -1,21 +1,28 @@
 using Discord;
-using Discord.WebSocket;
+using Discord.Interactions;
+using Nino.Handlers;
 using Nino.Records.Enums;
 using Nino.Utilities;
+using NLog;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    internal static partial class Blame
+    public class Blame(InteractionHandler handler, InteractionService commands) : InteractionModuleBase<SocketInteractionContext>
     {
-        public const string Name = "blame";
+        public InteractionService Commands { get; private set; } = commands;
+        private readonly InteractionHandler _handler = handler;
+        private static readonly Logger log = LogManager.GetCurrentClassLogger();
 
-        public static async Task<bool> Handle(SocketSlashCommand interaction)
+        public async Task<bool> Handle(
+            [Summary("project", "Project nickname")] string alias,
+            [Summary("episode", "Episode number")] decimal? episodeNumber = null,
+            [Summary("explain", "Explain what any of this means")] bool explain = false
+        )
         {
+            var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
-            var alias = ((string)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")!.Value).Trim();
-            var episodeValue = interaction.Data.Options.FirstOrDefault(o => o.Name == "episode")?.Value;
-            var explain = (bool?)interaction.Data.Options.FirstOrDefault(o => o.Name == "explain")?.Value ?? false;
+            alias = alias.Trim();
             
             // Verify project
             var project = Utils.ResolveAlias(alias, interaction);
@@ -25,12 +32,7 @@ namespace Nino.Commands
             var episodes = Cache.GetEpisodes(project.Id).OrderBy(e => e.Number);
 
             // Verify or find episode
-            decimal episodeNumber;
-            if (episodeValue != null)
-            {
-                episodeNumber = Convert.ToDecimal(episodeValue);
-            }
-            else
+            if (episodeNumber == null)
             {
                 var nextNumber = episodes.FirstOrDefault(e => !e.Done)?.Number ?? episodes.LastOrDefault()?.Number;
                 if (nextNumber == null)
@@ -38,7 +40,7 @@ namespace Nino.Commands
                 episodeNumber = (decimal)nextNumber;
             }
             
-            var episode = await Getters.GetEpisode(project, episodeNumber);
+            var episode = await Getters.GetEpisode(project, (decimal)episodeNumber);
             if (episode == null)
                 return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
 
@@ -61,22 +63,5 @@ namespace Nino.Commands
 
             return true;
         }
-
-        public static SlashCommandBuilder Builder =>
-            new SlashCommandBuilder()
-            .WithName(Name)
-            .WithDescription("Check the status of a project")
-            .WithNameLocalizations(GetCommandNames(Name))
-            .WithDescriptionLocalizations(GetCommandDescriptions(Name))
-            .AddOption(CommonOptions.Project())
-            .AddOption(CommonOptions.Episode(required: false))
-            .AddOption(new SlashCommandOptionBuilder()
-                .WithName("explain")
-                .WithDescription("Explain what any of this means")
-                .WithNameLocalizations(GetOptionNames("blame.explain"))
-                .WithDescriptionLocalizations(GetOptionDescriptions("blame.explain"))
-                .WithRequired(false)
-                .WithType(ApplicationCommandOptionType.Boolean)    
-            );
     }
 }

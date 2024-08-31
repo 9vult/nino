@@ -1,8 +1,7 @@
-using System;
-using System.Text;
 using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
-using Newtonsoft.Json;
+using Nino.Handlers;
 using Nino.Records.Enums;
 using Nino.Utilities;
 using NLog;
@@ -10,17 +9,27 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    internal static partial class Release
+    public class Release(InteractionHandler handler, InteractionService commands) : InteractionModuleBase<SocketInteractionContext>
     {
+        public InteractionService Commands { get; private set; } = commands;
+        private readonly InteractionHandler _handler = handler;
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
-        
-        public const string Name = "release";
 
-        public static async Task<bool> Handle(SocketSlashCommand interaction)
+        [SlashCommand("release", "Release!")]
+        public async Task<bool> Handle(
+            [Summary("project", "Project nickname")] string alias,
+            [Summary("type", "Type of release")] ReleaseType releaseType,
+            [Summary("number", "What is being released?")] string releaseNumber,
+            [Summary("url", "Release URL(s)")] string releaseUrl,
+            [Summary("role", "Role to ping")] SocketRole? role = null
+        )
         {
+            var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
 
-            var alias = ((string)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")!.Value).Trim();
+            // Sanitize inputs
+            alias = alias.Trim();
+            var roleId = role?.Id;
 
             // Verify project and user - Owner or Admin required
             var project = Utils.ResolveAlias(alias, interaction);
@@ -29,12 +38,6 @@ namespace Nino.Commands
 
             if (!Utils.VerifyUser(interaction.User.Id, project))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
-
-            // Get inputs
-            var releaseType = (ReleaseType)Convert.ToInt32(interaction.Data.Options.FirstOrDefault(o => o.Name == "type")!.Value);
-            var releaseNumber = (string)interaction.Data.Options.FirstOrDefault(o => o.Name == "number")!.Value;
-            var releaseUrl = (string)interaction.Data.Options.FirstOrDefault(o => o.Name == "url")!.Value;
-            var roleId = ((SocketRole?)interaction.Data.Options.FirstOrDefault(o => o.Name == "role")?.Value)?.Id;
 
             var roleStr = roleId != null
                 ? roleId == project.GuildId ? "@everyone " : $"<@&{roleId}> "
@@ -76,46 +79,5 @@ namespace Nino.Commands
 
             return true;
         }
-
-        public static SlashCommandBuilder Builder =>
-            new SlashCommandBuilder()
-            .WithName(Name)
-            .WithDescription("Release!")
-            .WithNameLocalizations(GetCommandNames(Name))
-            .WithDescriptionLocalizations(GetCommandDescriptions(Name))
-            .AddOption(CommonOptions.Project())
-            .AddOption(new SlashCommandOptionBuilder()
-                .WithName("type")
-                .WithDescription("Type of release")
-                .WithNameLocalizations(GetOptionNames("release.type"))
-                .WithDescriptionLocalizations(GetOptionDescriptions("release.type"))
-                .WithRequired(true)
-                .AddChoice("Episode", 0, GetChoiceNames("release.type.episode"))
-                .AddChoice("Volume", 1, GetChoiceNames("release.type.volume"))
-                .AddChoice("Batch", 2, GetChoiceNames("release.type.batch"))
-                .AddChoice("Custom", 3, GetChoiceNames("release.type.custom"))
-                .WithType(ApplicationCommandOptionType.Number)
-            ).AddOption(new SlashCommandOptionBuilder()
-                .WithName("number")
-                .WithDescription("What is being released?")
-                .WithNameLocalizations(GetOptionNames("release.number"))
-                .WithDescriptionLocalizations(GetOptionDescriptions("release.number"))
-                .WithRequired(true)
-                .WithType(ApplicationCommandOptionType.String)
-            ).AddOption(new SlashCommandOptionBuilder()
-                .WithName("url")
-                .WithDescription("Release URL(s)")
-                .WithNameLocalizations(GetOptionNames("release.url"))
-                .WithDescriptionLocalizations(GetOptionDescriptions("release.url"))
-                .WithRequired(true)
-                .WithType(ApplicationCommandOptionType.String)
-            ).AddOption(new SlashCommandOptionBuilder()
-                .WithName("role")
-                .WithDescription("Role to ping")
-                .WithNameLocalizations(GetOptionNames("release.role"))
-                .WithDescriptionLocalizations(GetOptionDescriptions("release.role"))
-                .WithRequired(false)
-                .WithType(ApplicationCommandOptionType.Role)
-            );
     }
 }
