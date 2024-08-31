@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
 using Nino.Records;
@@ -7,19 +8,32 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    internal static partial class KeyStaff
+    public partial class KeyStaff
     {
-        public static async Task<bool> HandleAdd(SocketSlashCommand interaction, Project project)
+        [SlashCommand("add", "Add a new Key Staff to the whole project")]
+        public async Task<bool> Add(
+            [Summary("project", "Project nickname")] string alias,
+            [Summary("member", "Staff member")] SocketUser member,
+            [Summary("abbreviation", "Position shorthand")] string abbreviation,
+            [Summary("name", "Full position name")] string taskName
+        )
         {
-            var guild = Nino.Client.GetGuild(interaction.GuildId ?? 0);
+            var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
 
-            var subcommand = interaction.Data.Options.First();
+            // Sanitize imputs
+            var memberId = member.Id;
+            alias = alias.Trim();
+            taskName = taskName.Trim();
+            abbreviation = abbreviation.Trim().ToUpperInvariant();
 
-            // Get inputs
-            var memberId = ((SocketGuildUser)subcommand.Options.FirstOrDefault(o => o.Name == "member")!.Value).Id;
-            var abbreviation = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "abbreviation")!.Value).Trim().ToUpperInvariant();
-            var title = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "name")).Trim();
+            // Verify project and user - Owner or Admin required
+            var project = Utils.ResolveAlias(alias, interaction);
+            if (project == null)
+                return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+
+            if (!Utils.VerifyUser(interaction.User.Id, project))
+                return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Check if position already exists
             if (project.KeyStaff.Any(ks => ks.Role.Abbreviation == abbreviation))
@@ -32,7 +46,7 @@ namespace Nino.Commands
                 Role = new Role
                 {
                     Abbreviation = abbreviation,
-                    Name = title,
+                    Name = taskName,
                     Weight = project.KeyStaff.Max(ks => ks.Role.Weight) ?? 0 + 1
                 }
             };
@@ -45,18 +59,16 @@ namespace Nino.Commands
 
             // Add to database
             await AzureHelper.Projects!.PatchItemAsync<Project>(id: project.Id, partitionKey: AzureHelper.ProjectPartitionKey(project),
-                patchOperations: new[]
-            {
+                patchOperations: [
                 PatchOperation.Add("/keyStaff/-", newStaff)
-            });
+            ]);
 
             TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(project));
             foreach (Episode e in await Getters.GetEpisodes(project))
             {
-                batch.PatchItem(id: e.Id, new[]
-                {
+                batch.PatchItem(id: e.Id, [
                     PatchOperation.Add("/tasks/-", newTask)
-                });
+                ]);
             }
             await batch.ExecuteAsync();
 

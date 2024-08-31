@@ -2,7 +2,6 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
-using Nino.Records;
 using Nino.Utilities;
 using static Localizer.Localizer;
 
@@ -10,7 +9,7 @@ namespace Nino.Commands
 {
     public partial class AdditionalStaff
     {
-        [SlashCommand("add", "Add additional staff to an episode")]
+        [SlashCommand("swap", "Swap additional staff into an episode")]
         public async Task<bool> Swap(
             [Summary("project", "Project nickname")] string alias,
             [Summary("episode", "Episode number")] decimal episodeNumber,

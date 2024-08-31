@@ -1,5 +1,5 @@
 ﻿using Discord;
-using Discord.WebSocket;
+using Discord.Interactions;
 using Microsoft.Azure.Cosmos;
 using Nino.Records;
 using Nino.Utilities;
@@ -8,17 +8,28 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    internal static partial class KeyStaff
+    public partial class KeyStaff
     {
-        public static async Task<bool> HandleRemove(SocketSlashCommand interaction, Project project)
+        [SlashCommand("remove", "Remove a Key Staff from the whole project")]
+        public async Task<bool> Remove(
+            [Summary("project", "Project nickname")] string alias,
+            [Summary("abbreviation", "Position shorthand")] string abbreviation
+        )
         {
-            var guild = Nino.Client.GetGuild(interaction.GuildId ?? 0);
+            var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
 
-            var subcommand = interaction.Data.Options.First();
+            // Sanitize imputs
+            alias = alias.Trim();
+            abbreviation = abbreviation.Trim().ToUpperInvariant();
 
-            // Get inputs
-            var abbreviation = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "abbreviation")!.Value).Trim().ToUpperInvariant();
+            // Verify project and user - Owner or Admin required
+            var project = Utils.ResolveAlias(alias, interaction);
+            if (project == null)
+                return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+
+            if (!Utils.VerifyUser(interaction.User.Id, project))
+                return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Check if position exists
             if (!project.KeyStaff.Any(ks => ks.Role.Abbreviation == abbreviation))
@@ -27,19 +38,17 @@ namespace Nino.Commands
             // Remove from database
             var ksIndex = Array.IndexOf(project.KeyStaff, project.KeyStaff.Single(k => k.Role.Abbreviation == abbreviation));
             await AzureHelper.Projects!.PatchItemAsync<Project>(id: project.Id, partitionKey: AzureHelper.ProjectPartitionKey(project),
-                patchOperations: new[]
-            {
+                patchOperations: [
                 PatchOperation.Remove($"/keyStaff/{ksIndex}")
-            });
+            ]);
 
             TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(project));
             foreach (Episode e in await Getters.GetEpisodes(project))
             {
                 var taskIndex = Array.IndexOf(e.Tasks, e.Tasks.Single(t => t.Abbreviation == abbreviation));
-                batch.PatchItem(id: e.Id, new[]
-                {
+                batch.PatchItem(id: e.Id, [
                     PatchOperation.Remove($"/tasks/{taskIndex}")
-                });
+                ]);
             }
             await batch.ExecuteAsync();
 

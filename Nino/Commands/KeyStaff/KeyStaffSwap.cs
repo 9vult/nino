@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
 using Nino.Records;
@@ -8,19 +9,31 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    internal static partial class KeyStaff
+    public partial class KeyStaff
     {
-        public static async Task<bool> HandleSwap(SocketSlashCommand interaction, Project project)
+        [SlashCommand("swap", "Swap a Key Staff into the whole project")]
+        public async Task<bool> Swap(
+            [Summary("project", "Project nickname")] string alias,
+            [Summary("abbreviation", "Position shorthand")] string abbreviation,
+            [Summary("member", "Staff member")] SocketUser member
+        )
         {
-            var guild = Nino.Client.GetGuild(interaction.GuildId ?? 0);
+            var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
 
-            var subcommand = interaction.Data.Options.First();
+            // Sanitize imputs
+            var memberId = member.Id;
+            alias = alias.Trim();
+            abbreviation = abbreviation.Trim().ToUpperInvariant();
 
-            // Get inputs
-            var abbreviation = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "abbreviation")!.Value).Trim().ToUpperInvariant();
-            var memberId = ((SocketGuildUser)subcommand.Options.FirstOrDefault(o => o.Name == "member")!.Value).Id;
+            // Verify project and user - Owner or Admin required
+            var project = Utils.ResolveAlias(alias, interaction);
+            if (project == null)
+                return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
+            if (!Utils.VerifyUser(interaction.User.Id, project))
+                return await Response.Fail(T("error.permissionDenied", lng), interaction);
+                
             // Check if position exists
             if (!project.KeyStaff.Any(ks => ks.Role.Abbreviation == abbreviation))
                 return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
@@ -33,10 +46,9 @@ namespace Nino.Commands
 
             // Swap in database
             await AzureHelper.Projects!.PatchItemAsync<Project>(id: project.Id, partitionKey: AzureHelper.ProjectPartitionKey(project),
-                patchOperations: new[]
-            {
+                patchOperations: [
                 PatchOperation.Replace($"/keyStaff/{ksIndex}", updatedStaff)
-            });
+            ]);
 
             log.Info($"Swapped {memberId} in to {project.Id} for {abbreviation}");
 
