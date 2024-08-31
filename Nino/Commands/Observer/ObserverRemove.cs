@@ -1,22 +1,26 @@
 using Discord;
-using Discord.WebSocket;
+using Discord.Interactions;
 using Nino.Utilities;
 
 using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    internal static partial class Observer
+    public partial class Observer
     {
-        public static async Task<bool> HandleRemove(SocketSlashCommand interaction)
+        [SlashCommand("add", "Start observing a project on another server")]
+        public async Task<bool> Remove(
+            [Summary("serverid", "SID of the server you want to observe")] string serverId,
+            [Summary("project", "Project nickname")] string alias
+        )
         {
+            var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
             var guildId = interaction.GuildId ?? 0;
-            var subcommand = interaction.Data.Options.First();
 
-            // Get inputs
-            var originGuildIdStr = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "serverid")).Trim();
-            var alias = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "project")!.Value).Trim();
+            // Sanitize inputs
+            var originGuildIdStr = serverId.Trim();
+            alias = alias.Trim();
 
             // Validate observer server
             if (!ulong.TryParse(originGuildIdStr, out var originGuildId))

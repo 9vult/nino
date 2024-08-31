@@ -1,4 +1,5 @@
 using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
 using Nino.Utilities;
 
@@ -6,21 +7,26 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    internal static partial class Observer
+    public partial class Observer
     {
-        public static async Task<bool> HandleAdd(SocketSlashCommand interaction)
+        [SlashCommand("add", "Start observing a project on another server")]
+        public async Task<bool> Add(
+            [Summary("serverid", "SID of the server you want to observe")] string serverId,
+            [Summary("project", "Project nickname")] string alias,
+            [Summary("blame", "Should this project's aliases show up in /blame?")] bool blame = false,
+            [Summary("updates", "Webhook URL for progress updates")] string? updatesUrl = null,
+            [Summary("releases", "Webhook URL for releases")] string? releasesUrl = null,
+            [Summary("role", "Role to ping for releases")] SocketRole? role = null
+        )
         {
+            var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
             var guildId = interaction.GuildId ?? 0;
-            var subcommand = interaction.Data.Options.First();
 
-            // Get inputs
-            var originGuildIdStr = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "serverid")).Trim();
-            var alias = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "project")!.Value).Trim();
-            var blame = (bool)subcommand.Options.FirstOrDefault(o => o.Name == "blame")!.Value;
-            var updatesUrl = (string?)(subcommand.Options.FirstOrDefault(o => o.Name == "updates")?.Value);
-            var releasesUrl = (string?)(subcommand.Options.FirstOrDefault(o => o.Name == "releases")?.Value);
-            var roleId = ((SocketRole?)subcommand.Options.FirstOrDefault(o => o.Name == "role")?.Value)?.Id;
+            // Sanitize inputs
+            var originGuildIdStr = serverId.Trim();
+            alias = alias.Trim();
+            var roleId = role?.Id;
 
             // Validate no-op condition
             if (!blame && updatesUrl == null && releasesUrl == null)
