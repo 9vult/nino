@@ -2,27 +2,18 @@ using System;
 using System.Reflection;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Microsoft.Extensions.Configuration;
 using Nino.Listeners;
 using NLog;
 
 namespace Nino.Handlers
 {
-    public class InteractionHandler
+    public class InteractionHandler(DiscordSocketClient client, InteractionService handler, IServiceProvider services, CmdLineOptions cmdLineOptions)
     {
-        private readonly DiscordSocketClient _client;
-        private readonly InteractionService _handler;
-        private readonly IServiceProvider _services;
-        private readonly IConfiguration _configuration;
+        private readonly DiscordSocketClient _client = client;
+        private readonly InteractionService _handler = handler;
+        private readonly IServiceProvider _services = services;
+        private readonly CmdLineOptions _cmdLineOptions = cmdLineOptions;
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
-
-        public InteractionHandler(DiscordSocketClient client, InteractionService handler, IServiceProvider services, IConfiguration config)
-        {
-            _client = client;
-            _handler = handler;
-            _services = services;
-            _configuration = config;
-        }
 
         public async Task InitializeAsync()
         {
@@ -38,13 +29,27 @@ namespace Nino.Handlers
 
         private async Task ReadyAsync()
         {
-            await _handler.RegisterCommandsGloballyAsync();
+            if (_cmdLineOptions.DeployCommands || true) // TODO: Disable
+            {
+                log.Info("--deploy-commands is set. Deploying slash commands...");
+                await _handler.RegisterCommandsGloballyAsync();
+                log.Info("Slash commands deployed");
+            }
         }
 
         private async Task HandleInteraction(SocketInteraction interaction)
         {
             try
             {
+                var guildId = interaction.GuildId;
+                if (guildId == null)
+                {
+                    await interaction.FollowupAsync("Nino commands must be run in a server!");
+                    return;
+                }
+
+                await interaction.DeferAsync();
+
                 var context = new SocketInteractionContext(_client, interaction);
                 await _handler.ExecuteCommandAsync(context, _services);
             }

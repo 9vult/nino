@@ -10,7 +10,7 @@ namespace Nino.Commands
 {
     public partial class Episodes
     {
-        [SlashCommand("add", "Add an episode")]
+        [SlashCommand("remove", "Remove an episode")]
         public async Task<bool> Remove(
             [Summary("project", "Project nickname")] string alias,
             [Summary("episode", "Episode number")] decimal episodeNumber

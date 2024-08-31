@@ -1,4 +1,5 @@
-﻿using CommandLine;
+﻿using System.Text;
+using CommandLine;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
@@ -10,7 +11,6 @@ using Nino.Listeners;
 using Nino.Services;
 using Nino.Utilities;
 using NLog;
-using System.Text;
 using static Localizer.Localizer;
 
 namespace Nino
@@ -20,14 +20,13 @@ namespace Nino
         private static readonly DiscordSocketClient _client = new();
         private static readonly CmdLineOptions _cmdLineOptions = new();
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
-        private static readonly InteractiveService _interactiveService = new(_client);
+        // private static readonly InteractiveService _interactiveService = new(_client);
         private static AppConfig? _config;
-        private static IServiceProvider _services;
+        private static IServiceProvider? _services;
 
         public static DiscordSocketClient Client => _client;
-        public static InteractiveService InteractiveService => _interactiveService;
+        // public static InteractiveService InteractiveService => _interactiveService;
         public static AppConfig Config => _config!;
-        public static CmdLineOptions CmdLineOptions => _cmdLineOptions;
 
         private static readonly InteractionServiceConfig _interactionServiceConfig = new()
         {
@@ -35,23 +34,10 @@ namespace Nino
             //         new CultureInfo("en-US"), new CultureInfo("ru"))
         };
 
-        private static IServiceProvider CreateProvider()
-        {
-            var collection = new ServiceCollection()
-                .AddSingleton<DiscordSocketClient>()
-                .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>(), _interactionServiceConfig))
-                .AddSingleton<InteractionHandler>();
-
-            return collection.BuildServiceProvider();
-        }
-
         public static async Task Main(string[] args)
         {
             Console.OutputEncoding = Encoding.UTF8;
             Listener.SetupLogger();
-
-            // Read in command-line arguments
-            CommandLineParser.Default.ParseArguments(args, _cmdLineOptions);
 
             log.Info($"Starting Nino {Utils.VERSION}");
 
@@ -62,6 +48,18 @@ namespace Nino
             _config = configBuilder.GetRequiredSection("Configuration").Get<AppConfig?>();
             if (_config == null)
                 throw new Exception("Missing appsettings.json!");
+
+            // Read in command-line arguments
+            CommandLineParser.Default.ParseArguments(args, _cmdLineOptions);
+
+            // Set up services
+            _services = new ServiceCollection()
+                .AddSingleton(_config)
+                .AddSingleton(_cmdLineOptions)
+                .AddSingleton<DiscordSocketClient>()
+                .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>(), _interactionServiceConfig))
+                .AddSingleton<InteractionHandler>()
+                .BuildServiceProvider();
 
             // Set up Azure database
             await AzureHelper.Setup(_config.AzureCosmosEndpoint, _config.AzureClientSecret, _config.AzureCosmosDbName);
@@ -76,18 +74,10 @@ namespace Nino
             LoadStringLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/str")));
             LoadCommandLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/cmd")));
 
-            CmdLineOptions.DeployCommands = false;
-
             // Set up client
             var client = _services.GetRequiredService<DiscordSocketClient>();
 
             client.Log += Listener.Log;
-
-            client.InteractionCreated += async (x) =>
-            {
-                var ctx = new SocketInteractionContext(client, x);
-                await _services.GetRequiredService<InteractionService>().ExecuteCommandAsync(ctx, _services);
-            };
 
             await _services.GetRequiredService<InteractionHandler>().InitializeAsync();
 

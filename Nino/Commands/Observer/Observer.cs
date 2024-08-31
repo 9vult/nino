@@ -4,7 +4,7 @@ using NLog;
 
 namespace Nino.Commands
 {
-    [Group("keystaff", "Key Staff for the whole project")]
+    [Group("observer", "Observe a project on another server")]
     public partial class Observer(InteractionHandler handler, InteractionService commands) : InteractionModuleBase<SocketInteractionContext>
     {
         public InteractionService Commands { get; private set; } = commands;

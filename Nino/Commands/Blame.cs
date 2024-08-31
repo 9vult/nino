@@ -14,6 +14,7 @@ namespace Nino.Commands
         private readonly InteractionHandler _handler = handler;
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
 
+        [SlashCommand("blame", "Check the status of a project")]
         public async Task<bool> Handle(
             [Summary("project", "Project nickname")] string alias,
             [Summary("episode", "Episode number")] decimal? episodeNumber = null,

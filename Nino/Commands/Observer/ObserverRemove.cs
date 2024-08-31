@@ -8,7 +8,7 @@ namespace Nino.Commands
 {
     public partial class Observer
     {
-        [SlashCommand("add", "Start observing a project on another server")]
+        [SlashCommand("remove", "Stop observing a project on another server")]
         public async Task<bool> Remove(
             [Summary("serverid", "SID of the server you want to observe")] string serverId,
             [Summary("project", "Project nickname")] string alias
