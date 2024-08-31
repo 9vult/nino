@@ -10,10 +10,9 @@ namespace Nino.Commands
 {
     internal static partial class Done
     {
-        public static async Task<bool> HandleSpecified(SocketSlashCommand interaction, Project project, string abbreviation)
+        public static async Task<bool> HandleSpecified(SocketSlashCommand interaction, Project project, string abbreviation, decimal episodeNumber)
         {
             var lng = interaction.UserLocale;
-            var episodeNumber = Convert.ToDecimal(interaction.Data.Options.FirstOrDefault(o => o.Name == "episode")!.Value);
 
             // Verify episode and task
             var episode = await Getters.GetEpisode(project, episodeNumber);
@@ -44,10 +43,12 @@ namespace Nino.Commands
             episode.Tasks.Single(t => t.Abbreviation == abbreviation).Done = true;
 
             var taskTitle = project.KeyStaff.Concat(episode.AdditionalStaff).First(ks => ks.Role.Abbreviation == abbreviation).Role.Name;
-            var title = $"✅ {taskTitle}";
+            var title = $"Episode {episodeNumber}";
             var status = Cache.GetConfig(project.GuildId)?.UpdateDisplay.Equals(DisplayType.Extended) ?? false
                 ? StaffList.GenerateExplainProgress(project, episode, lng, abbreviation) // Explanitory
                 : StaffList.GenerateProgress(project, episode, abbreviation); // Standard
+
+            status = $"✅ **{taskTitle}**\n{status}";
 
             var publishEmbed = new EmbedBuilder()
                 .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString()})")

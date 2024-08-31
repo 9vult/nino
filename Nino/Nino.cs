@@ -1,6 +1,7 @@
 ﻿using CommandLine;
 using Discord;
 using Discord.WebSocket;
+using Fergun.Interactive;
 using Microsoft.Extensions.Configuration;
 using Nino.Listeners;
 using Nino.Services;
@@ -16,9 +17,11 @@ namespace Nino
         private static readonly DiscordSocketClient _client = new();
         private static readonly CmdLineOptions _cmdLineOptions = new();
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
+        private static readonly InteractiveService _interactiveService = new(_client);
         private static AppConfig? _config;
 
         public static DiscordSocketClient Client => _client;
+        public static InteractiveService InteractiveService => _interactiveService;
         public static AppConfig Config => _config!;
         public static CmdLineOptions CmdLineOptions => _cmdLineOptions;
 

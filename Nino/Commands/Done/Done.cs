@@ -26,23 +26,9 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
             if (episodeValue != null)
-                return await HandleSpecified(interaction, project, abbreviation);
+                return await HandleSpecified(interaction, project, abbreviation, Convert.ToDecimal(episodeValue));
             else
-                return true;     
-                // // Try and find the next applicable episode
-                // var nextWorkingNumber = episodes.FirstOrDefault(e => !e.Done)?.Number ?? episodes.LastOrDefault()?.Number;
-                // if (nextWorkingNumber == null)
-                //     return await Response.Fail(T("error.noEpisodes", lng), interaction);
-                // workingEpisodeNumber = (decimal)nextWorkingNumber;
-
-                // var nextTaskNumber = episodes.FirstOrDefault(e => e.Tasks.Any(t => t.Abbreviation == abbreviation && !t.Done))?.Number;
-                // if (nextTaskNumber == null)
-                // {
-                //     if (episodes.Any(e => e.Tasks.Any(t => t.Abbreviation == abbreviation)))
-                //         return await Response.Fail(T("error.progress.taskAlreadyDone", lng, abbreviation), interaction);
-                //     else
-                //         return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
-                // }
+                return await HandleUnspecified(interaction, project, abbreviation);
         }
 
         public static SlashCommandBuilder Builder =>
