@@ -1,13 +1,8 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Nino.Records
 {
-    internal record Staff
+    public record Staff
     {
         [JsonIgnore] public required ulong UserId;
         public required Role Role;

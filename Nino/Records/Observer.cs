@@ -1,10 +1,9 @@
 
-
 using Newtonsoft.Json;
 
 namespace Nino.Records
 {
-    internal record Observer
+    public record Observer
     {
         public required string Id;
         [JsonIgnore] public required ulong GuildId;

@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Nino.Records.Enums
 {
-    internal enum ProjectEditOption
+    public enum ProjectEditOption
     {
         Title = 0,
         Poster = 1,
@@ -18,7 +13,7 @@ namespace Nino.Records.Enums
         ReleaseChannelID = 7
     }
 
-    internal static class ProjectEditOptionExtensions
+    public static class ProjectEditOptionExtensions
     {
         public static string ToFriendlyString(this ProjectEditOption type)
         {

@@ -3,7 +3,7 @@ using Nino.Records.Enums;
 
 namespace Nino.Records
 {
-    internal record Configuration
+    public record Configuration
     {
         public required string Id;
         [JsonIgnore] public required ulong GuildId;

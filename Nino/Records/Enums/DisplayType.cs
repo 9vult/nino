@@ -1,6 +1,6 @@
 ﻿namespace Nino.Records.Enums
 {
-    internal enum DisplayType
+    public enum DisplayType
     {
         Normal = 0,
         Extended = 1,
@@ -8,7 +8,7 @@
         Verbose = 3
     }
 
-    internal static class ProgressDisplayExtensions
+    public static class ProgressDisplayExtensions
     {
         public static string ToFriendlyString(this DisplayType type)
         {

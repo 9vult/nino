@@ -1,14 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Nino.Records.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Nino.Records
 {
-    internal record Project
+    public record Project
     {
         public required string Id;
         [JsonIgnore] public required ulong GuildId;

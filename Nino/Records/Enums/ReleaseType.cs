@@ -1,6 +1,6 @@
 namespace Nino.Records.Enums
 {
-    internal enum ReleaseType
+    public enum ReleaseType
     {
         Episode,
         Volume,
@@ -8,7 +8,7 @@ namespace Nino.Records.Enums
         Custom
     }
 
-        internal static class ReleaseTypeExtensions
+    public static class ReleaseTypeExtensions
     {
         public static string ToFriendlyString(this ReleaseType type)
         {

@@ -1,13 +1,8 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Nino.Records
 {
-    internal record Episode
+    public record Episode
     {
         public required string Id;
         public required string ProjectId;
