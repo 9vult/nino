@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
 using Nino.Records;
@@ -7,17 +8,35 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    internal static partial class AdditionalStaff
+    public partial class AdditionalStaff
     {
-        public static async Task<bool> HandleSwap(SocketSlashCommand interaction, Episode episode)
+        [SlashCommand("add", "Add additional staff to an episode")]
+        public async Task<bool> Swap(
+            [Summary("project", "Project nickname")] string alias,
+            [Summary("episode", "Episode number")] decimal episodeNumber,
+            [Summary("abbreviation", "Position shorthand")] string abbreviation,
+            [Summary("member", "Staff member")] SocketUser member
+        )
         {
+            var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
 
-            var subcommand = interaction.Data.Options.First();
+            // Sanitize imputs
+            var memberId = member.Id;
+            alias = alias.Trim();
 
-            // Get inputs
-            var abbreviation = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "abbreviation")!.Value).Trim().ToUpperInvariant();
-            var memberId = ((SocketGuildUser)subcommand.Options.FirstOrDefault(o => o.Name == "member")!.Value).Id;
+            // Verify project and user - Owner or Admin required
+            var project = Utils.ResolveAlias(alias, interaction);
+            if (project == null)
+                return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+
+            if (!Utils.VerifyUser(interaction.User.Id, project))
+                return await Response.Fail(T("error.permissionDenied", lng), interaction);
+
+            // Verify episode
+            var episode = await Getters.GetEpisode(project, episodeNumber);
+            if (episode == null)
+                return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
 
             // Check if position exists
             if (!episode.AdditionalStaff.Any(ks => ks.Role.Abbreviation == abbreviation))

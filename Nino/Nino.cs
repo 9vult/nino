@@ -1,8 +1,11 @@
 ﻿using CommandLine;
 using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
 using Fergun.Interactive;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Nino.Handlers;
 using Nino.Listeners;
 using Nino.Services;
 using Nino.Utilities;
@@ -19,11 +22,28 @@ namespace Nino
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
         private static readonly InteractiveService _interactiveService = new(_client);
         private static AppConfig? _config;
+        private static IServiceProvider _services;
 
         public static DiscordSocketClient Client => _client;
         public static InteractiveService InteractiveService => _interactiveService;
         public static AppConfig Config => _config!;
         public static CmdLineOptions CmdLineOptions => _cmdLineOptions;
+
+        private static readonly InteractionServiceConfig _interactionServiceConfig = new()
+        {
+            // LocalizationManager = new ResxLocalizationManager("InteractionFramework.Resources.CommandLocales", Assembly.GetEntryAssembly(),
+            //         new CultureInfo("en-US"), new CultureInfo("ru"))
+        };
+
+        private static IServiceProvider CreateProvider()
+        {
+            var collection = new ServiceCollection()
+                .AddSingleton<DiscordSocketClient>()
+                .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>(), _interactionServiceConfig))
+                .AddSingleton<InteractionHandler>();
+
+            return collection.BuildServiceProvider();
+        }
 
         public static async Task Main(string[] args)
         {
@@ -42,10 +62,10 @@ namespace Nino
             _config = configBuilder.GetRequiredSection("Configuration").Get<AppConfig?>();
             if (_config == null)
                 throw new Exception("Missing appsettings.json!");
-            
+
             // Set up Azure database
             await AzureHelper.Setup(_config.AzureCosmosEndpoint, _config.AzureClientSecret, _config.AzureCosmosDbName);
-            
+
             // Build initial cache
             await Cache.BuildCache();
 
@@ -54,19 +74,26 @@ namespace Nino
 
             // Load localization files
             LoadStringLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/str")));
-            LoadCommandLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/cmd")));  
+            LoadCommandLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/cmd")));
 
-            CmdLineOptions.DeployCommands = false;          
+            CmdLineOptions.DeployCommands = false;
 
-            // Listen up
-            _client.Log += Listener.Log;
-            _client.Ready += Listener.Ready;
-            _client.SlashCommandExecuted += Listener.SlashCommandExecuted;
-            _client.AutocompleteExecuted += Listener.AutocompleteExecuted;
+            // Set up client
+            var client = _services.GetRequiredService<DiscordSocketClient>();
+
+            client.Log += Listener.Log;
+
+            client.InteractionCreated += async (x) =>
+            {
+                var ctx = new SocketInteractionContext(client, x);
+                await _services.GetRequiredService<InteractionService>().ExecuteCommandAsync(ctx, _services);
+            };
+
+            await _services.GetRequiredService<InteractionHandler>().InitializeAsync();
 
             // Start the bot
-            await _client.LoginAsync(TokenType.Bot, _config.DiscordApiToken);
-            await _client.StartAsync();
+            await client.LoginAsync(TokenType.Bot, _config.DiscordApiToken);
+            await client.StartAsync();
 
             await Task.Delay(-1);
         }

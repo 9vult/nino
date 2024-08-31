@@ -1,16 +1,11 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Nino.Utilities
 {
     internal static class Response
     {
-        public static async Task<bool> Fail(string message, SocketSlashCommand interaction)
+        public static async Task<bool> Fail(string message, SocketInteraction interaction)
         {
             var embed = new EmbedBuilder()
                 .WithTitle("Baka.")
@@ -21,7 +16,7 @@ namespace Nino.Utilities
             return false;
         }
 
-        public static async Task<bool> Info(string message, SocketSlashCommand interaction)
+        public static async Task<bool> Info(string message, SocketInteraction interaction)
         {
             var embed = new EmbedBuilder()
                 .WithTitle("Info.")
