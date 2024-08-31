@@ -1,5 +1,5 @@
 ﻿using Discord;
-using Discord.WebSocket;
+using Discord.Interactions;
 using Microsoft.Azure.Cosmos;
 using Nino.Records;
 using Nino.Records.Enums;
@@ -9,7 +9,7 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    internal static partial class ProjectManagement
+    public partial class ProjectManagement
     {
         [GeneratedRegex(@"^([0-9]{2}):([0-9]{2})$")]
         private static partial Regex Time();
@@ -18,12 +18,19 @@ namespace Nino.Commands
         [GeneratedRegex(@"^(true|yes)$")]
         private static partial Regex Truthy();
 
-        public static async Task<bool> HandleEdit(SocketSlashCommand interaction)
+        [SlashCommand("edit", "Edit a project")]
+        public async Task<bool> Edit(
+            [Summary("project", "Project nickname")] string alias,
+            [Summary("option", "Option to change")] ProjectEditOption option,
+            [Summary("newvalue", "New value")] string newValue
+        )
         {
-            var lng = interaction.UserLocale;
-            var subcommand = interaction.Data.Options.First();
+            var interaction = Context.Interaction;
+                var lng = interaction.UserLocale;
 
-            var alias = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "project")!.Value).Trim();
+            // Sanitize inputs
+            alias = alias.Trim();
+            newValue = newValue.Trim();
 
             // Verify project and user - Owner required
             var project = Utils.ResolveAlias(alias, interaction);
@@ -32,10 +39,6 @@ namespace Nino.Commands
 
             if (!Utils.VerifyUser(interaction.User.Id, project, excludeAdmins: true))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
-
-            // Get inputs
-            var option = (ProjectEditOption)Convert.ToInt32(subcommand.Options.FirstOrDefault(o => o.Name == "option")!.Value);
-            var newValue = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "newvalue")!.Value)!.Trim();
 
             string helperText = string.Empty;
             PatchOperation operation;

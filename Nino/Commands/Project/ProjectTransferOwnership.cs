@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
 using Nino.Records;
@@ -8,14 +9,16 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    internal static partial class ProjectManagement
+    public partial class ProjectManagement
     {
-        public static async Task<bool> HandleTransferOwnership(SocketSlashCommand interaction)
+        [SlashCommand("transferownership", "Transfer project ownership to someone else")]
+        public async Task<bool> Delete(
+            [Summary("project", "Project nickname")] string alias,
+            [Summary("member", "Staff member")] SocketUser member
+        )
         {
+            var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
-            var subcommand = interaction.Data.Options.First();
-
-            var alias = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "project")!.Value).Trim();
 
             // Verify project and user - Owner required
             var project = Utils.ResolveAlias(alias, interaction);
@@ -26,14 +29,13 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Get inputs
-            var memberId = ((SocketGuildUser)subcommand.Options.FirstOrDefault(o => o.Name == "member")!.Value).Id;
+            var memberId = member.Id;
 
             // Swap in database
             await AzureHelper.Projects!.PatchItemAsync<Project>(id: project.Id, partitionKey: AzureHelper.ProjectPartitionKey(project),
-                patchOperations: new[]
-            {
-                PatchOperation.Replace($"/ownerId", memberId.ToString())
-            });
+                patchOperations: [
+                    PatchOperation.Replace($"/ownerId", memberId.ToString())
+            ]);
 
             log.Info($"Transfered project ownership of {project.Id} to {memberId}");
 

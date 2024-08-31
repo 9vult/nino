@@ -1,5 +1,5 @@
 ﻿using Discord;
-using Discord.WebSocket;
+using Discord.Interactions;
 using Microsoft.Azure.Cosmos;
 using Nino.Records;
 using Nino.Utilities;
@@ -8,48 +8,53 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    internal static partial class ProjectManagement
+    public partial class ProjectManagement
     {
-        public static async Task<bool> HandleCongaRemove(SocketSlashCommand interaction)
+        public partial class Conga
         {
-            var lng = interaction.UserLocale;
-            var subcommand = interaction.Data.Options.First().Options.First();
-
-            var alias = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "project")!.Value).Trim();
-
-            // Verify project and user - Owner or Admin required
-            var project = Utils.ResolveAlias(alias, interaction);
-            if (project == null)
-                return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
-
-            if (!Utils.VerifyUser(interaction.User.Id, project))
-                return await Response.Fail(T("error.permissionDenied", lng), interaction);
-
-            // Get inputs
-            var abbreviation = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "abbreviation")!.Value).Trim().ToUpperInvariant();
-
-            // Validate participant is in the conga line
-            if (!project.CongaParticipants.Any(c => c.Current == abbreviation))
-                return await Response.Fail(T("error.noSuchConga", lng, abbreviation), interaction);
-
-            // Remove from database
-            var cIndex = Array.IndexOf(project.CongaParticipants, project.CongaParticipants.Single(c => c.Current == abbreviation));
-            await AzureHelper.Projects!.PatchItemAsync<Project>(id: project.Id, partitionKey: AzureHelper.ProjectPartitionKey(project),
-                patchOperations: new[]
+            [SlashCommand("remove", "Remove a link from the Conga line")]
+            public async Task<bool> Remove(
+                [Summary("project", "Project nickname")] string alias,
+                [Summary("abbreviation", "Position shorthand")] string abbreviation
+            )
             {
-                PatchOperation.Remove($"/congaParticipants/{cIndex}")
-            });
+                var interaction = Context.Interaction;
+                var lng = interaction.UserLocale;
 
-            log.Info($"Removed {abbreviation} from the Conga line for {project.Id}");
+                // Sanitize inputs
+                alias = alias.Trim();
+                abbreviation = abbreviation.Trim().ToUpperInvariant();
 
-            // Send success embed
-            var embed = new EmbedBuilder()
-                .WithTitle(T("title.projectModification", lng))
-                .WithDescription(T("project.conga.removed", lng, abbreviation))
-                .Build();
-            await interaction.FollowupAsync(embed: embed);
+                // Verify project and user - Owner or Admin required
+                var project = Utils.ResolveAlias(alias, interaction);
+                if (project == null)
+                    return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
-            return true;
+                if (!Utils.VerifyUser(interaction.User.Id, project))
+                    return await Response.Fail(T("error.permissionDenied", lng), interaction);
+
+                // Validate participant is in the conga line
+                if (!project.CongaParticipants.Any(c => c.Current == abbreviation))
+                    return await Response.Fail(T("error.noSuchConga", lng, abbreviation), interaction);
+
+                // Remove from database
+                var cIndex = Array.IndexOf(project.CongaParticipants, project.CongaParticipants.Single(c => c.Current == abbreviation));
+                await AzureHelper.Projects!.PatchItemAsync<Project>(id: project.Id, partitionKey: AzureHelper.ProjectPartitionKey(project),
+                    patchOperations: [
+                        PatchOperation.Remove($"/congaParticipants/{cIndex}")
+                ]);
+
+                log.Info($"Removed {abbreviation} from the Conga line for {project.Id}");
+
+                // Send success embed
+                var embed = new EmbedBuilder()
+                    .WithTitle(T("title.projectModification", lng))
+                    .WithDescription(T("project.conga.removed", lng, abbreviation))
+                    .Build();
+                await interaction.FollowupAsync(embed: embed);
+
+                return true;
+            }
         }
     }
 }

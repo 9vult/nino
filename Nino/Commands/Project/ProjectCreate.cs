@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
 using Nino.Records;
@@ -8,27 +9,32 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    internal static partial class ProjectManagement
+    public partial class ProjectManagement
     {
-        public static async Task<bool> HandleCreate(SocketSlashCommand interaction)
+        [SlashCommand("create", "Create a new project")]
+        public async Task<bool> Create(
+            [Summary("nickname", "Project nickname")] string nickname,
+            [Summary("title", "Full series title")] string title,
+            [Summary("type", "Project type")] ProjectType type,
+            [Summary("length", "Number of episodes")] int length,
+            [Summary("poster", "Poster image URL")] string posterUri,
+            [Summary("private", "Is this project private?")] bool isPrivate,
+            [Summary("updatechannel", "Channel to post updates to")] SocketTextChannel updateChannel,
+            [Summary("releaseChannel", "Channel to post releases to")] SocketTextChannel releaseChannel
+        )
         {
+            var interaction = Context.Interaction;
+            var lng = interaction.UserLocale;
+
             var guildId = interaction.GuildId ?? 0;
             var guild = Nino.Client.GetGuild(guildId);
             var member = guild.GetUser(interaction.User.Id);
-            var lng = interaction.UserLocale;
             if (!member.GuildPermissions.Administrator) return await Response.Fail(T("error.notPrivileged", lng), interaction);
 
-            var subcommand = interaction.Data.Options.First();
 
             // Get inputs
-            var nickname = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "nickname")!.Value).Trim();
-            var title = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "title")!.Value).Trim();
-            var type = (ProjectType)Convert.ToInt32(subcommand.Options.FirstOrDefault(o => o.Name == "type")!.Value);
-            var length = Convert.ToInt32(subcommand.Options.FirstOrDefault(o => o.Name == "length")!.Value);
-            var posterUri = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "poster")!.Value).Trim();
-            var isPrivate = (bool)subcommand.Options.FirstOrDefault(o => o.Name == "private")!.Value;
-            var updateChannelId = ((SocketChannel)subcommand.Options.FirstOrDefault(o => o.Name == "updatechannel")!.Value).Id;
-            var releaseChannelId = ((SocketChannel)subcommand.Options.FirstOrDefault(o => o.Name == "releasechannel")!.Value).Id;
+            var updateChannelId = updateChannel.Id;
+            var releaseChannelId = releaseChannel.Id;
             var ownerId = interaction.User.Id;
 
             // Verify data

@@ -1,5 +1,5 @@
 ﻿using Discord;
-using Discord.WebSocket;
+using Discord.Interactions;
 using Microsoft.Azure.Cosmos;
 using Nino.Records;
 using Nino.Utilities;
@@ -8,14 +8,15 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    internal static partial class ProjectManagement
+    public partial class ProjectManagement
     {
-        public static async Task<bool> HandleDelete(SocketSlashCommand interaction)
+        [SlashCommand("delete", "Delete a new project")]
+        public async Task<bool> Delete(
+            [Summary("project", "Project nickname")] string alias
+        )
         {
+            var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
-            var subcommand = interaction.Data.Options.First();
-
-            var alias = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "project")!.Value).Trim();
 
             // Verify project and user - Owner required
             var project = Utils.ResolveAlias(alias, interaction);
