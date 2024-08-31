@@ -4,7 +4,6 @@ using NLog;
 
 namespace Nino.Commands
 {
-
     [Group("additionalstaff", "Additional staff for a single episode")]
     public partial class AdditionalStaff(InteractionHandler handler, InteractionService commands) : InteractionModuleBase<SocketInteractionContext>
     {

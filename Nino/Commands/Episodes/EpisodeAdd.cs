@@ -1,5 +1,5 @@
 ﻿using Discord;
-using Discord.WebSocket;
+using Discord.Interactions;
 using Nino.Records;
 using Nino.Utilities;
 
@@ -7,14 +7,19 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    internal static partial class Episodes
+    public partial class Episodes
     {
-        public static async Task<bool> HandleAdd(SocketSlashCommand interaction)
+        [SlashCommand("add", "Add an episode")]
+        public async Task<bool> Add(
+            [Summary("project", "Project nickname")] string alias,
+            [Summary("episode", "Episode number")] decimal episodeNumber
+        )
         {
+            var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
-            var subcommand = interaction.Data.Options.First();
 
-            var alias = ((string)subcommand.Options.FirstOrDefault(o => o.Name == "project")!.Value).Trim();
+            // Sanitize imputs
+            alias = alias.Trim();
 
             // Verify project and user - Owner or Admin required
             var project = Utils.ResolveAlias(alias, interaction);
@@ -25,9 +30,7 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Verify episode doesn't exist
-            var episodeNumber = Convert.ToDecimal(subcommand.Options.FirstOrDefault(o => o.Name == "episode")!.Value);
             var episode = await Getters.GetEpisode(project, episodeNumber);
-
             if (episode != null)
                 return await Response.Fail(T("error.episode.alreadyExists", lng, episodeNumber), interaction);
 
