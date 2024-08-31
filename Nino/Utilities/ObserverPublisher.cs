@@ -34,12 +34,11 @@ namespace Nino.Utilities
                         {
                             username = "Nino",
                             avatar_url = "https://i.imgur.com/PWtteaY.png",
-                            embed = embed.ToJsonString(),
-                            content = ""
+                            content = "",
+                            embeds = new[] { Utils.EmbedToJsonObject(embed) }
                         };
                         var data = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
-                        var response = await httpClient.PostAsync(observer.ProgressWebhook, data);
-                        log.Info(response); // TODO Bad Request?
+                        await httpClient.PostAsync(observer.ProgressWebhook, data);
                     }
                     catch (Exception e)
                     {

@@ -1,9 +1,6 @@
-using System.Text;
 using Discord;
-using Discord.Rest;
 using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
-using Newtonsoft.Json;
 using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities;
@@ -91,7 +88,20 @@ namespace Nino.Commands
                 .Build();
             await interaction.FollowupAsync(embed: replyEmbed);
 
-            // TODO: Conga
+            // Everybody do the Conga!
+            var congaEntry = project.CongaParticipants.FirstOrDefault(c => c.Current == abbreviation);
+            if (congaEntry != null)
+            {
+                var nextTask = project.KeyStaff.FirstOrDefault(ks => ks.Role.Abbreviation == congaEntry.Next);
+                if (nextTask != null)
+                {
+                    var staffMention = $"<@{nextTask.UserId}>";
+                    var roleTitle = nextTask.Role.Name;
+                    var congaContent = T("progress.done.conga", lng, staffMention, episode.Number, roleTitle);
+
+                    await interaction.FollowupAsync(text: congaContent);
+                }
+            }
 
             await Cache.RebuildCacheForProject(project.Id);
             return true;

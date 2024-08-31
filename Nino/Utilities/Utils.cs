@@ -1,4 +1,5 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 using Nino.Records;
 
 namespace Nino.Utilities
@@ -70,6 +71,27 @@ namespace Nino.Utilities
             if (project.KeyStaff.Concat(episode.AdditionalStaff).Any(ks => ks.Role.Abbreviation == abbreviation && ks.UserId == userId))
                 return true;
             return false;
+        }
+
+        /// <summary>
+        /// Convert an Embed to a simple object for JSON serialization
+        /// </summary>
+        /// <param name="embed">Embed to convert</param>
+        /// <returns>Simple object for JSON serialization</returns>
+        public static object EmbedToJsonObject(Embed embed)
+        {
+            return new
+            {
+                author = new {
+                    name = embed.Author?.Name
+                },
+                title = embed.Title,
+                description = embed.Description,
+                thumbnail = new {
+                    url = embed.Thumbnail?.Url
+                },
+                timestamp = embed.Timestamp?.ToString("yyyy-MM-ddTHH:mm:ss.ffffffzzz")
+            };
         }
 
         /// <summary>
