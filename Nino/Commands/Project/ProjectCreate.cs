@@ -38,7 +38,8 @@ namespace Nino.Commands
             var ownerId = interaction.User.Id;
 
             // Verify data
-            // TODO: if name exists, reject
+            if (Cache.GetProjects(guildId).Any(p => p.Nickname == nickname))
+                return await Response.Fail(T("error.project.nameInUse", lng, nickname), interaction);
 
             // Populate data
 

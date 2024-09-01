@@ -16,8 +16,8 @@ namespace Nino.Commands
             [SlashCommand("add", "Add a link to the Conga line")]
             public async Task<RuntimeResult> Add(
                 [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-                [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(AbbreviationAutocompleteHandler))] string current,
-                [Summary("next", "Position to ping"), Autocomplete(typeof(AbbreviationAutocompleteHandler))] string next
+                [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(KeyStaffAutocompleteHandler))] string current,
+                [Summary("next", "Position to ping"), Autocomplete(typeof(KeyStaffAutocompleteHandler))] string next
             )
             {
                 var interaction = Context.Interaction;

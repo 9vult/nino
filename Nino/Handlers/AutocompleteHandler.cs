@@ -109,5 +109,36 @@ namespace Nino.Handlers
             return AutocompletionResult.FromSuccess(choices.Take(25));
         }
     }
+
+    /// <summary>
+    /// Autocompletion for Key Staff
+    /// </summary>
+    public class KeyStaffAutocompleteHandler : AutocompleteHandler
+    {
+        public override async Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
+        {
+            var interaction = (SocketAutocompleteInteraction)context.Interaction;
+            var commandName = interaction.Data.CommandName;
+            var focusedOption = interaction.Data.Current;
+            var guildId = interaction.GuildId ?? 0;
+            var userId = interaction.User.Id;
+
+            List<AutocompleteResult> choices = [];
+            var alias = ((string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")?.Value)?.Trim();
+            if (alias != null)
+            {
+                var cachedProject = Utils.ResolveAlias(alias, interaction);
+                if (cachedProject != null)
+                {
+                    // Return list of key staff
+                    choices.AddRange(cachedProject.KeyStaff
+                        .Where(ks => ks.Role.Abbreviation.StartsWith((string)focusedOption.Value))
+                        .Select(t => new AutocompleteResult(t.Role.Abbreviation, t.Role.Abbreviation))
+                    );
+                }
+            }
+            return AutocompletionResult.FromSuccess(choices.Take(25));
+        }
+    }
 #pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 }

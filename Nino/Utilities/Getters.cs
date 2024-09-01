@@ -14,7 +14,11 @@ namespace Nino.Utilities
 
             // Local guild projects
             projects.AddRange(Cache.GetProjects(guildId));
-            // TODO: Observing guild projects
+            
+            // Observing guild projects
+            projects.AddRange(Cache.GetObservers()
+                .Where(o => o.GuildId == guildId)
+                .SelectMany(o => Cache.GetProjects().Where(p => p.Id == o.Id)));
 
             // Local guild admins
             var guildAdmins = Cache.GetConfig(guildId)?.AdministratorIds ?? [];
