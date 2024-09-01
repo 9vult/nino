@@ -16,8 +16,8 @@ namespace Nino.Commands
 
         [SlashCommand("blame", "Check the status of a project")]
         public async Task<RuntimeResult> Handle(
-            [Summary("project", "Project nickname")] string alias,
-            [Summary("episode", "Episode number")] decimal? episodeNumber = null,
+            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] decimal? episodeNumber = null,
             [Summary("explain", "Explain what any of this means")] bool explain = false
         )
         {

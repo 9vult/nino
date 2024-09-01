@@ -2,6 +2,7 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
+using Nino.Handlers;
 using Nino.Records;
 using Nino.Utilities;
 
@@ -15,7 +16,7 @@ namespace Nino.Commands
         {
             [SlashCommand("enable", "Enable airing reminders")]
             public async Task<RuntimeResult> Enable(
-                [Summary("project", "Project nickname")] string alias,
+                [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
                 [Summary("channel", "Channel to post reminders in")] SocketTextChannel channel,
                 [Summary("role", "Role to ping for reminders")] SocketRole? role = null
             )

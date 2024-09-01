@@ -2,6 +2,7 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
+using Nino.Handlers;
 using Nino.Records;
 using Nino.Utilities;
 using static Localizer.Localizer;
@@ -12,8 +13,8 @@ namespace Nino.Commands
     {
         [SlashCommand("remove", "Remove additional staff from an episode")]
         public async Task<RuntimeResult> Remove(
-            [Summary("project", "Project nickname")] string alias,
-            [Summary("episode", "Episode number")] decimal episodeNumber,
+            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] decimal episodeNumber,
             [Summary("abbreviation", "Position shorthand")] string abbreviation
         )
         {

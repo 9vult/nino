@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
+using Nino.Handlers;
 using Nino.Utilities;
 
 using static Localizer.Localizer;
@@ -12,7 +13,7 @@ namespace Nino.Commands
         {
             [SlashCommand("list", "List all the Conga line participants")]
             public async Task<RuntimeResult> Remove(
-                [Summary("project", "Project nickname")] string alias
+                [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias
             )
             {
                 var interaction = Context.Interaction;

@@ -2,6 +2,7 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
+using Nino.Handlers;
 using Nino.Records;
 using Nino.Utilities;
 using static Localizer.Localizer;
@@ -12,8 +13,8 @@ namespace Nino.Commands
     {
         [SlashCommand("add", "Add additional staff to an episode")]
         public async Task<RuntimeResult> Add(
-            [Summary("project", "Project nickname")] string alias,
-            [Summary("episode", "Episode number")] decimal episodeNumber,
+            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] decimal episodeNumber,
             [Summary("member", "Staff member")] SocketUser member,
             [Summary("abbreviation", "Position shorthand")] string abbreviation,
             [Summary("name", "Full position name")] string taskName

@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
+using Nino.Handlers;
 using Nino.Records;
 using Nino.Utilities;
 
@@ -11,7 +12,7 @@ namespace Nino.Commands
     {
         [SlashCommand("add", "Add an episode")]
         public async Task<RuntimeResult> Add(
-            [Summary("project", "Project nickname")] string alias,
+            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
             [Summary("episode", "Episode number")] decimal episodeNumber
         )
         {

@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Microsoft.Azure.Cosmos;
+using Nino.Handlers;
 using Nino.Records;
 using Nino.Utilities;
 
@@ -15,7 +16,7 @@ namespace Nino.Commands
             [SlashCommand("remove", "Remove a link from the Conga line")]
             public async Task<RuntimeResult> Remove(
                 [Summary("project", "Project nickname")] string alias,
-                [Summary("abbreviation", "Position shorthand")] string abbreviation
+                [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(ProjectAutocompleteHandler))] string abbreviation
             )
             {
                 var interaction = Context.Interaction;

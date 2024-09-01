@@ -24,7 +24,8 @@ namespace Nino.Handlers
             await _handler.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
 
             // Process the InteractionCreated payloads to execute Interactions commands
-            _client.InteractionCreated += HandleInteraction;
+            _client.SlashCommandExecuted += HandleSlashCommandInteraction;
+            _client.AutocompleteExecuted += HandleAutocompleteInteraction;
         }
 
         private async Task ReadyAsync()
@@ -37,7 +38,7 @@ namespace Nino.Handlers
             }
         }
 
-        private async Task HandleInteraction(SocketInteraction interaction)
+        private async Task HandleSlashCommandInteraction(SocketSlashCommand interaction)
         {
             try
             {
@@ -57,6 +58,12 @@ namespace Nino.Handlers
             {
                 log.Error(e.Message);
             }
+        }
+
+        private async Task HandleAutocompleteInteraction(SocketAutocompleteInteraction interaction)
+        {
+            var context = new InteractionContext(_client, interaction, interaction.Channel);
+            await _handler.ExecuteCommandAsync(context, _services);
         }
     }
 }

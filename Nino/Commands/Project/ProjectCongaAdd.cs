@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Microsoft.Azure.Cosmos;
+using Nino.Handlers;
 using Nino.Records;
 using Nino.Utilities;
 
@@ -14,9 +15,9 @@ namespace Nino.Commands
         {
             [SlashCommand("add", "Add a link to the Conga line")]
             public async Task<RuntimeResult> Add(
-                [Summary("project", "Project nickname")] string alias,
-                [Summary("abbreviation", "Position shorthand")] string current,
-                [Summary("next", "Position to ping")] string next
+                [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+                [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(AbbreviationAutocompleteHandler))] string current,
+                [Summary("next", "Position to ping"), Autocomplete(typeof(AbbreviationAutocompleteHandler))] string next
             )
             {
                 var interaction = Context.Interaction;

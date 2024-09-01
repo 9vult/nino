@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Microsoft.Azure.Cosmos;
+using Nino.Handlers;
 using Nino.Records;
 using Nino.Utilities;
 
@@ -14,7 +15,7 @@ namespace Nino.Commands
         {
             [SlashCommand("remove", "Remove an alias")]
             public async Task<RuntimeResult> Remove(
-                [Summary("project", "Project nickname")] string alias,
+                [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
                 [Summary("alias", "Alias")] string input
             )
             {

@@ -16,8 +16,8 @@ namespace Nino.Commands
 
         [SlashCommand("roster", "See who's working on an episode")]
         public async Task<RuntimeResult> Handle(
-            [Summary("project", "Project nickname")] string alias,
-            [Summary("episode", "Episode number")] decimal episodeNumber
+            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] decimal episodeNumber
         )
         {
             var interaction = Context.Interaction;

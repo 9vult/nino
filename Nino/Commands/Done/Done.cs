@@ -20,9 +20,9 @@ namespace Nino.Commands
 
         [SlashCommand("done", "Mark a position as done")]
         public async Task<RuntimeResult> Handle(
-            [Summary("project", "Project nickname")] string alias,
-            [Summary("abbreviation", "Position shorthand")] string abbreviation,
-            [Summary("episode", "Episode number")] decimal? episodeNumber = null
+            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+            [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(AbbreviationAutocompleteHandler))] string abbreviation,
+            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] decimal? episodeNumber = null
         )
         {
             var interaction = Context.Interaction;

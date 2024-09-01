@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Microsoft.Azure.Cosmos;
+using Nino.Handlers;
 using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities;
@@ -20,7 +21,7 @@ namespace Nino.Commands
 
         [SlashCommand("edit", "Edit a project")]
         public async Task<RuntimeResult> Edit(
-            [Summary("project", "Project nickname")] string alias,
+            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
             [Summary("option", "Option to change")] ProjectEditOption option,
             [Summary("newvalue", "New value")] string newValue
         )

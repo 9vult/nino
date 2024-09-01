@@ -3,9 +3,9 @@ using NLog;
 using NLog.Config;
 using NLog.Targets;
 
-namespace Nino.Listeners
+namespace Nino.Handlers
 {
-    internal static partial class Listener
+    public static class LogHandler
     {
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
 

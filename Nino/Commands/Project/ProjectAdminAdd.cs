@@ -2,6 +2,7 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
+using Nino.Handlers;
 using Nino.Records;
 using Nino.Utilities;
 
@@ -15,7 +16,7 @@ namespace Nino.Commands
         {
             [SlashCommand("add", "Add an administrator to this project")]
             public async Task<RuntimeResult> Add(
-                [Summary("project", "Project nickname")] string alias,
+                [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
                 [Summary("member", "Staff member")] SocketUser member
             )
             {

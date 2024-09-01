@@ -7,7 +7,6 @@ using Fergun.Interactive;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nino.Handlers;
-using Nino.Listeners;
 using Nino.Services;
 using Nino.Utilities;
 using NLog;
@@ -34,7 +33,7 @@ namespace Nino
         public static async Task Main(string[] args)
         {
             Console.OutputEncoding = Encoding.UTF8;
-            Listener.SetupLogger();
+            LogHandler.SetupLogger();
 
             log.Info($"Starting Nino {Utils.VERSION}");
 
@@ -75,7 +74,7 @@ namespace Nino
             // Set up client
             var client = _services.GetRequiredService<DiscordSocketClient>();
 
-            client.Log += Listener.Log;
+            client.Log += LogHandler.Log;
 
             await _services.GetRequiredService<InteractionHandler>().InitializeAsync();
 

@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Microsoft.Azure.Cosmos;
+using Nino.Handlers;
 using Nino.Records;
 using Nino.Utilities;
 
@@ -12,7 +13,7 @@ namespace Nino.Commands
     {
         [SlashCommand("remove", "Remove a Key Staff from the whole project")]
         public async Task<RuntimeResult> Remove(
-            [Summary("project", "Project nickname")] string alias,
+            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
             [Summary("abbreviation", "Position shorthand")] string abbreviation
         )
         {

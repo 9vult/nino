@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Microsoft.Azure.Cosmos;
+using Nino.Handlers;
 using Nino.Records;
 using Nino.Utilities;
 
@@ -12,7 +13,7 @@ namespace Nino.Commands
     {
         [SlashCommand("delete", "Delete a new project")]
         public async Task<RuntimeResult> Delete(
-            [Summary("project", "Project nickname")] string alias
+            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias
         )
         {
             var interaction = Context.Interaction;

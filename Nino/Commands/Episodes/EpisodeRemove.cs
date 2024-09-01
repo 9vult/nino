@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Nino.Handlers;
 using Nino.Records;
 using Nino.Utilities;
 
@@ -12,8 +13,8 @@ namespace Nino.Commands
     {
         [SlashCommand("remove", "Remove an episode")]
         public async Task<RuntimeResult> Remove(
-            [Summary("project", "Project nickname")] string alias,
-            [Summary("episode", "Episode number")] decimal episodeNumber
+            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] decimal episodeNumber
         )
         {
             var interaction = Context.Interaction;

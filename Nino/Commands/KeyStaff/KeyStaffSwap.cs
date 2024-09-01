@@ -2,6 +2,7 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
+using Nino.Handlers;
 using Nino.Records;
 using Nino.Utilities;
 
@@ -13,7 +14,7 @@ namespace Nino.Commands
     {
         [SlashCommand("swap", "Swap a Key Staff into the whole project")]
         public async Task<RuntimeResult> Swap(
-            [Summary("project", "Project nickname")] string alias,
+            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
             [Summary("abbreviation", "Position shorthand")] string abbreviation,
             [Summary("member", "Staff member")] SocketUser member
         )

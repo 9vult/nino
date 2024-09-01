@@ -17,7 +17,7 @@ namespace Nino.Commands
 
         [SlashCommand("release", "Release!")]
         public async Task<RuntimeResult> Handle(
-            [Summary("project", "Project nickname")] string alias,
+            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
             [Summary("type", "Type of release")] ReleaseType releaseType,
             [Summary("number", "What is being released?")] string releaseNumber,
             [Summary("url", "Release URL(s)")] string releaseUrl,
