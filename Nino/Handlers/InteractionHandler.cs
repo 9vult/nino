@@ -2,7 +2,6 @@ using System;
 using System.Reflection;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Nino.Listeners;
 using NLog;
 
 namespace Nino.Handlers
@@ -18,7 +17,7 @@ namespace Nino.Handlers
         public async Task InitializeAsync()
         {
             _client.Ready += ReadyAsync;
-            _handler.Log += Listener.Log;
+            _handler.Log += LogHandler.Log;
 
             // Add the public modules that inherit InteractionModuleBase<T> to the InteractionService
             await _handler.AddModulesAsync(Assembly.GetEntryAssembly(), _services);

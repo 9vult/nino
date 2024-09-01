@@ -16,8 +16,11 @@ namespace Nino.Utilities
             projects.AddRange(Cache.GetProjects(guildId));
             // TODO: Observing guild projects
 
+            // Local guild admins
+            var guildAdmins = Cache.GetConfig(guildId)?.AdministratorIds ?? [];
+
             // Filter
-            var filtered = projects.Where(p => !p.IsPrivate || p.OwnerId == userId || p.AdministratorIds.Any(a => a == userId)).ToList();
+            var filtered = projects.Where(p => !p.IsPrivate || p.OwnerId == userId || p.AdministratorIds.Any(a => a == userId || guildAdmins.Any(a => a == userId))).ToList();
 
             return filtered.SelectMany(p => new[] { p.Nickname }.Concat(p.Aliases))
                 .Where(a => a.StartsWith(query, StringComparison.InvariantCultureIgnoreCase)).ToList();
