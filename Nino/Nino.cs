@@ -17,15 +17,12 @@ namespace Nino
 {
     public class Nino
     {
-        private static readonly DiscordSocketClient _client = new();
         private static readonly CmdLineOptions _cmdLineOptions = new();
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
-        // private static readonly InteractiveService _interactiveService = new(_client);
         private static AppConfig? _config;
         private static IServiceProvider? _services;
 
-        public static DiscordSocketClient Client => _client;
-        // public static InteractiveService InteractiveService => _interactiveService;
+        public static DiscordSocketClient Client => _services!.GetRequiredService<DiscordSocketClient>();
         public static AppConfig Config => _config!;
 
         private static readonly InteractionServiceConfig _interactionServiceConfig = new()
@@ -59,6 +56,7 @@ namespace Nino
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>(), _interactionServiceConfig))
                 .AddSingleton<InteractionHandler>()
+                .AddSingleton<InteractiveService>()
                 .BuildServiceProvider();
 
             // Set up Azure database

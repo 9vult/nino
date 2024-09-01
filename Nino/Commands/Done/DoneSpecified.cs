@@ -9,9 +9,9 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    internal static partial class Done
+    public partial class Done
     {
-        public static async Task<RuntimeResult> HandleSpecified(SocketSlashCommand interaction, Project project, string abbreviation, decimal episodeNumber)
+        public static async Task<RuntimeResult> HandleSpecified(SocketInteraction interaction, Project project, string abbreviation, decimal episodeNumber)
         {
             var lng = interaction.UserLocale;
 
