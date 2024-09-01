@@ -26,6 +26,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Localizer\Localizer.csproj" />
+    <ProjectReference Include="..\Nino.Records\Nino.Records.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Records/" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
