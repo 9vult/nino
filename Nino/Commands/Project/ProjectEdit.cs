@@ -105,9 +105,9 @@ namespace Nino.Commands
                 patchOperations: new[] { operation }
             );
 
-            log.Info($"Updated project {project.Id} {option.ToFriendlyString()} to {newValue}");
+            log.Info($"Updated project {project.Id} {option.ToFriendlyString(lng)} to {newValue}");
 
-            var embedDescription = T("project.edited", lng, project.Nickname, option.ToFriendlyString());
+            var embedDescription = T("project.edited", lng, project.Nickname, option.ToFriendlyString(lng));
             if (!string.IsNullOrEmpty(helperText))
                 embedDescription += $"\n{helperText}";
 

@@ -53,7 +53,7 @@ namespace Nino.Services
                             ? project.AirReminderRoleId == project.GuildId ? "@everyone" : $"<@&{project.AirReminderRoleId}>"
                             : "";
                         var embed = new EmbedBuilder()
-                            .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString()})")
+                            .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString("en-US")})")
                             .WithTitle($"Episode {episode.Number} has aired!")
                             .WithDescription(await AirDateService.GetAirDateString(project.AniDBId!, episode.Number, project.AirTime ?? "00:00"))
                             .WithThumbnailUrl(project.PosterUri)

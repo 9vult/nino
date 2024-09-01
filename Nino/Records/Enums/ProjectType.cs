@@ -1,4 +1,5 @@
-﻿
+﻿using static Localizer.Localizer;
+
 namespace Nino.Records.Enums
 {
     public enum ProjectType
@@ -10,13 +11,13 @@ namespace Nino.Records.Enums
 
     public static class ProjectTypeExtensions
     {
-        public static string ToFriendlyString(this ProjectType type)
+        public static string ToFriendlyString(this ProjectType type, string lng)
         {
             return type switch
             {
-                ProjectType.TV => "TV",
-                ProjectType.Movie => "Movie",
-                ProjectType.BD => "BD",
+                ProjectType.TV => T("choice.project.type.tv", lng),
+                ProjectType.Movie => T("choice.project.type.movie", lng),
+                ProjectType.BD => T("choice.project.type.bd", lng),
                 _ => type.ToString(),
             };
         }

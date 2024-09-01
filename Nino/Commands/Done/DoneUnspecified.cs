@@ -49,8 +49,8 @@ namespace Nino.Commands
 
             // How to proceed question embed
             var header = project.IsPrivate
-                ? $"🔒 {project.Title} ({project.Type.ToFriendlyString()})"
-                : $"{project.Title} ({project.Type.ToFriendlyString()})";
+                ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
+                : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
 
             var questionBody = T("progress.done.inTheDust", lng, workingEpisodeNo, role.Name, nextTaskEpisodeNo);
             var proceed = new ButtonBuilder()

@@ -52,7 +52,7 @@ namespace Nino.Commands
             status = $"✅ **{taskTitle}**\n{status}";
 
             var publishEmbed = new EmbedBuilder()
-                .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString()})")
+                .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString(lng)})")
                 .WithTitle(title)
                 .WithDescription(status)
                 .WithThumbnailUrl(project.PosterUri)
@@ -83,7 +83,7 @@ namespace Nino.Commands
                 : $"{T("progress.done", lng, taskTitle, episodeNumber)}{episodeDoneText}"; // Succinct (default)
 
             var replyEmbed = new EmbedBuilder()
-                .WithAuthor(name: $"{project.Title} ({project.Type.ToFriendlyString()})")
+                .WithAuthor(name: $"{project.Title} ({project.Type.ToFriendlyString(lng)})")
                 .WithTitle($"✅ {T("title.taskComplete", lng)}")
                 .WithDescription(replyBody)
                 .WithCurrentTimestamp()

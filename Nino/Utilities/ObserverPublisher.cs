@@ -70,7 +70,7 @@ namespace Nino.Utilities
                         ? observer.RoleId == observer.GuildId ? "@everyone " : $"<@&{observer.RoleId}> "
                         : "";
                     var observerBody = releaseType != ReleaseType.Custom
-                        ? $"**{project.Title} - {releaseType.ToFriendlyString()} {releaseNumber}**\n{observerRoleStr}{releaseUrl}"
+                        ? $"**{project.Title} - {releaseType.ToFriendlyString("en-US")} {releaseNumber}**\n{observerRoleStr}{releaseUrl}"
                         : $"**{project.Title} - {releaseNumber}**\n{observerRoleStr}{releaseUrl}";
                     try
                     {

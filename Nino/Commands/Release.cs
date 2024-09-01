@@ -44,7 +44,7 @@ namespace Nino.Commands
                 : "";
 
             var publishBody = releaseType != ReleaseType.Custom
-                ? $"**{project.Title} - {releaseType.ToFriendlyString()} {releaseNumber}**\n{roleStr}{releaseUrl}"
+                ? $"**{project.Title} - {releaseType.ToFriendlyString(lng)} {releaseNumber}**\n{roleStr}{releaseUrl}"
                 : $"**{project.Title} - {releaseNumber}**\n{roleStr}{releaseUrl}";
             
             // Add prefix if needed
@@ -70,9 +70,9 @@ namespace Nino.Commands
             
             // Send success embed
             var replyEmbed = new EmbedBuilder()
-                .WithAuthor(name: $"{project.Title} ({project.Type.ToFriendlyString()})")
+                .WithAuthor(name: $"{project.Title} ({project.Type.ToFriendlyString(lng)})")
                 .WithTitle(T("title.released", lng))
-                .WithDescription(T("progress.released", lng, project.Title, releaseType.ToFriendlyString(), releaseNumber))
+                .WithDescription(T("progress.released", lng, project.Title, releaseType.ToFriendlyString(lng), releaseNumber))
                 .WithCurrentTimestamp()
                 .Build();
             await interaction.FollowupAsync(embed: replyEmbed);

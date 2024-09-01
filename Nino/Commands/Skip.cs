@@ -74,7 +74,7 @@ namespace Nino.Commands
             status = $":fast_forward: **{taskTitle}** {T("progress.skipped.appendage", lng)}\n{status}";
 
             var publishEmbed = new EmbedBuilder()
-                .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString()})")
+                .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString(lng)})")
                 .WithTitle(title)
                 .WithDescription(status)
                 .WithThumbnailUrl(project.PosterUri)
@@ -105,7 +105,7 @@ namespace Nino.Commands
                 : $"{T("progress.skipped", lng, taskTitle, episodeNumber)}{episodeDoneText}"; // Succinct (default)
 
             var replyEmbed = new EmbedBuilder()
-                .WithAuthor(name: $"{project.Title} ({project.Type.ToFriendlyString()})")
+                .WithAuthor(name: $"{project.Title} ({project.Type.ToFriendlyString(lng)})")
                 .WithTitle($":fast_forward: {T("title.taskSkipped", lng)}")
                 .WithDescription(replyBody)
                 .WithCurrentTimestamp()

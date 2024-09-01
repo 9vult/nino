@@ -44,8 +44,8 @@ namespace Nino.Commands
 
             var roster = StaffList.GenerateRoster(project, episode);
             var title = project.IsPrivate
-                ? $"🔒 {project.Title} ({project.Type.ToFriendlyString()})"
-                : $"{project.Title} ({project.Type.ToFriendlyString()})";
+                ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
+                : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
 
             var embed = new EmbedBuilder()
                 .WithAuthor(title)
