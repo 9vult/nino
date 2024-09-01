@@ -11,7 +11,7 @@ namespace Nino.Commands
     public partial class AdditionalStaff
     {
         [SlashCommand("add", "Add additional staff to an episode")]
-        public async Task<bool> Add(
+        public async Task<RuntimeResult> Add(
             [Summary("project", "Project nickname")] string alias,
             [Summary("episode", "Episode number")] decimal episodeNumber,
             [Summary("member", "Staff member")] SocketUser member,
@@ -81,7 +81,7 @@ namespace Nino.Commands
             await interaction.FollowupAsync(embed: embed);
 
             await Cache.RebuildCacheForProject(episode.ProjectId);
-            return true;
+            return ExecutionResult.Success;
         }
     }
 }

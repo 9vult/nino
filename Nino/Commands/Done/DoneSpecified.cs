@@ -1,4 +1,5 @@
 using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
 using Nino.Records;
@@ -10,7 +11,7 @@ namespace Nino.Commands
 {
     internal static partial class Done
     {
-        public static async Task<bool> HandleSpecified(SocketSlashCommand interaction, Project project, string abbreviation, decimal episodeNumber)
+        public static async Task<RuntimeResult> HandleSpecified(SocketSlashCommand interaction, Project project, string abbreviation, decimal episodeNumber)
         {
             var lng = interaction.UserLocale;
 
@@ -105,7 +106,7 @@ namespace Nino.Commands
             }
 
             await Cache.RebuildCacheForProject(project.Id);
-            return true;
+            return ExecutionResult.Success;
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Nino.Commands
     public partial class Observer
     {
         [SlashCommand("remove", "Stop observing a project on another server")]
-        public async Task<bool> Remove(
+        public async Task<RuntimeResult> Remove(
             [Summary("serverid", "SID of the server you want to observe")] string serverId,
             [Summary("project", "Project nickname")] string alias
         )
@@ -53,7 +53,7 @@ namespace Nino.Commands
             await interaction.FollowupAsync(embed: embed);
 
             await Cache.RebuildObserverCache();
-            return true;
+            return ExecutionResult.Success;
         }
     }
 }

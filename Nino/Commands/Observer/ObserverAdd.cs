@@ -10,7 +10,7 @@ namespace Nino.Commands
     public partial class Observer
     {
         [SlashCommand("add", "Start observing a project on another server")]
-        public async Task<bool> Add(
+        public async Task<RuntimeResult> Add(
             [Summary("serverid", "SID of the server you want to observe")] string serverId,
             [Summary("project", "Project nickname")] string alias,
             [Summary("blame", "Should this project's aliases show up in /blame?")] bool blame = false,
@@ -73,7 +73,7 @@ namespace Nino.Commands
             await interaction.FollowupAsync(embed: embed);
 
             await Cache.RebuildObserverCache();
-            return true;
+            return ExecutionResult.Success;
         }
     }
 }

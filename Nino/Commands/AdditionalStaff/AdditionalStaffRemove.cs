@@ -11,7 +11,7 @@ namespace Nino.Commands
     public partial class AdditionalStaff
     {
         [SlashCommand("remove", "Remove additional staff from an episode")]
-        public async Task<bool> Remove(
+        public async Task<RuntimeResult> Remove(
             [Summary("project", "Project nickname")] string alias,
             [Summary("episode", "Episode number")] decimal episodeNumber,
             [Summary("abbreviation", "Position shorthand")] string abbreviation
@@ -63,7 +63,7 @@ namespace Nino.Commands
             await interaction.FollowupAsync(embed: embed);
 
             await Cache.RebuildCacheForProject(episode.ProjectId);
-            return true;
+            return ExecutionResult.Success;
         }
     }
 }

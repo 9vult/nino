@@ -1,4 +1,5 @@
 using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
 using Fergun.Interactive;
 using Nino.Records;
@@ -10,7 +11,7 @@ namespace Nino.Commands
 {
     internal static partial class Done
     {
-        public static async Task<bool> HandleUnspecified(SocketSlashCommand interaction, Project project, string abbreviation)
+        public static async Task<RuntimeResult> HandleUnspecified(SocketSlashCommand interaction, Project project, string abbreviation)
         {
             var lng = interaction.UserLocale;
 
@@ -121,7 +122,7 @@ namespace Nino.Commands
             // if (fullSend)
             //     return await HandleSpecified(interaction, project, abbreviation, (decimal)nextTaskEpisodeNo);
             
-            return true;     
+            return ExecutionResult.Success;     
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Nino.Commands
     public partial class Episodes
     {
         [SlashCommand("remove", "Remove an episode")]
-        public async Task<bool> Remove(
+        public async Task<RuntimeResult> Remove(
             [Summary("project", "Project nickname")] string alias,
             [Summary("episode", "Episode number")] decimal episodeNumber
         )
@@ -49,7 +49,7 @@ namespace Nino.Commands
             await interaction.FollowupAsync(embed: embed);
 
             await Cache.RebuildCacheForProject(project.Id);
-            return true;
+            return ExecutionResult.Success;
         }
     }
 }

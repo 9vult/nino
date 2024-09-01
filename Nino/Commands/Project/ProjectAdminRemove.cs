@@ -14,7 +14,7 @@ namespace Nino.Commands
         public partial class Admin
         {
             [SlashCommand("remove", "Remove an administrator from this project")]
-            public async Task<bool> Remove(
+            public async Task<RuntimeResult> Remove(
                 [Summary("project", "Project nickname")] string alias,
                 [Summary("member", "Staff member")] SocketUser member
             )
@@ -58,7 +58,7 @@ namespace Nino.Commands
                 await interaction.FollowupAsync(embed: embed);
 
                 await Cache.RebuildCacheForProject(project.Id);
-                return true;
+                return ExecutionResult.Success;
             }
         }
     }

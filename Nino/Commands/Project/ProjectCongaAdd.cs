@@ -13,7 +13,7 @@ namespace Nino.Commands
         public partial class Conga
         {
             [SlashCommand("add", "Add a link to the Conga line")]
-            public async Task<bool> Add(
+            public async Task<RuntimeResult> Add(
                 [Summary("project", "Project nickname")] string alias,
                 [Summary("abbreviation", "Position shorthand")] string current,
                 [Summary("next", "Position to ping")] string next
@@ -69,7 +69,7 @@ namespace Nino.Commands
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 
-                return true;
+                return ExecutionResult.Success;
             }
         }
     }

@@ -1,4 +1,5 @@
 using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
 using Nino.Records;
 using Nino.Records.Enums;
@@ -13,7 +14,7 @@ namespace Nino.Commands
         public const string Name = "done";
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
 
-        public static async Task<bool> Handle(SocketSlashCommand interaction)
+        public static async Task<RuntimeResult> Handle(SocketSlashCommand interaction)
         {
             var lng = interaction.UserLocale;
             var alias = ((string)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")!.Value).Trim();

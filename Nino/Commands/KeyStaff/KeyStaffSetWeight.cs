@@ -11,7 +11,7 @@ namespace Nino.Commands
     public partial class KeyStaff
     {
         [SlashCommand("setweight", "Set the weight of a Key Staff position")]
-        public async Task<bool> SetWeight(
+        public async Task<RuntimeResult> SetWeight(
             [Summary("project", "Project nickname")] string alias,
             [Summary("abbreviation", "Position shorthand")] string abbreviation,
             [Summary("weight", "Weight")] decimal inputWeight
@@ -58,7 +58,7 @@ namespace Nino.Commands
             await interaction.FollowupAsync(embed: embed);
 
             await Cache.RebuildCacheForProject(project.Id);
-            return true;
+            return ExecutionResult.Success;
         }
     }
 }

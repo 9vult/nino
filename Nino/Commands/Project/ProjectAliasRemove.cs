@@ -13,7 +13,7 @@ namespace Nino.Commands
         public partial class Alias
         {
             [SlashCommand("remove", "Remove an alias")]
-            public async Task<bool> Remove(
+            public async Task<RuntimeResult> Remove(
                 [Summary("project", "Project nickname")] string alias,
                 [Summary("alias", "Alias")] string input
             )
@@ -55,7 +55,7 @@ namespace Nino.Commands
                 await interaction.FollowupAsync(embed: embed);
 
                 await Cache.RebuildCacheForProject(project.Id);
-                return true;
+                return ExecutionResult.Success;
             }
         }
     }

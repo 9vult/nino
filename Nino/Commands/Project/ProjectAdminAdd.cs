@@ -14,7 +14,7 @@ namespace Nino.Commands
         public partial class Admin
         {
             [SlashCommand("add", "Add an administrator to this project")]
-            public async Task<bool> Add(
+            public async Task<RuntimeResult> Add(
                 [Summary("project", "Project nickname")] string alias,
                 [Summary("member", "Staff member")] SocketUser member
             )
@@ -55,7 +55,7 @@ namespace Nino.Commands
                 await interaction.FollowupAsync(embed: embed);
 
                 await Cache.RebuildCacheForProject(project.Id);
-                return true;
+                return ExecutionResult.Success;
             }
         }
     }

@@ -11,7 +11,7 @@ namespace Nino.Commands
     public partial class KeyStaff
     {
         [SlashCommand("remove", "Remove a Key Staff from the whole project")]
-        public async Task<bool> Remove(
+        public async Task<RuntimeResult> Remove(
             [Summary("project", "Project nickname")] string alias,
             [Summary("abbreviation", "Position shorthand")] string abbreviation
         )
@@ -62,7 +62,7 @@ namespace Nino.Commands
             await interaction.FollowupAsync(embed: embed);
 
             await Cache.RebuildCacheForProject(project.Id);
-            return true;
+            return ExecutionResult.Success;
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Nino.Commands
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         [SlashCommand("roster", "See who's working on an episode")]
-        public async Task<bool> Handle(
+        public async Task<RuntimeResult> Handle(
             [Summary("project", "Project nickname")] string alias,
             [Summary("episode", "Episode number")] decimal episodeNumber
         )
@@ -57,7 +57,7 @@ namespace Nino.Commands
 
             await interaction.FollowupAsync(embed: embed);
 
-            return true;
+            return ExecutionResult.Success;
         }
     }
 }

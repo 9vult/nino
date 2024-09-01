@@ -11,7 +11,7 @@ namespace Nino.Commands
         public partial class Conga
         {
             [SlashCommand("list", "List all the Conga line participants")]
-            public async Task<bool> Remove(
+            public async Task<RuntimeResult> Remove(
                 [Summary("project", "Project nickname")] string alias
             )
             {
@@ -44,7 +44,7 @@ namespace Nino.Commands
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 
-                return true;
+                return ExecutionResult.Success;
             }
         }
     }

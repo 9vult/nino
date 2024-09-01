@@ -11,7 +11,7 @@ namespace Nino.Commands
     public partial class ProjectManagement
     {
         [SlashCommand("delete", "Delete a new project")]
-        public async Task<bool> Delete(
+        public async Task<RuntimeResult> Delete(
             [Summary("project", "Project nickname")] string alias
         )
         {
@@ -55,7 +55,7 @@ namespace Nino.Commands
 
             await Cache.RebuildCacheForGuild(interaction.GuildId ?? 0);
             await Cache.RebuildObserverCache();
-            return true;
+            return ExecutionResult.Success;
         }
     }
 }

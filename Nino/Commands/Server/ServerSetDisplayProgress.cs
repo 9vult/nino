@@ -1,15 +1,16 @@
 ﻿using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
 using Nino.Records;
 using Nino.Records.Enums;
-
+using Nino.Utilities;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
     internal static partial class ServerManagement
     {
-        public static async Task<bool> HandleSetDisplayProgress(SocketSlashCommand interaction, Configuration config)
+        public static async Task<RuntimeResult> HandleSetDisplayProgress(SocketSlashCommand interaction, Configuration config)
         {
             var lng = interaction.UserLocale;
             var subcommand = interaction.Data.Options.First().Options.First();
@@ -30,7 +31,7 @@ namespace Nino.Commands
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 
-            return true;
+            return ExecutionResult.Success;
         }
 
     }

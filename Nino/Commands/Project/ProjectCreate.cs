@@ -12,7 +12,7 @@ namespace Nino.Commands
     public partial class ProjectManagement
     {
         [SlashCommand("create", "Create a new project")]
-        public async Task<bool> Create(
+        public async Task<RuntimeResult> Create(
             [Summary("nickname", "Project nickname")] string nickname,
             [Summary("title", "Full series title")] string title,
             [Summary("type", "Project type")] ProjectType type,
@@ -110,7 +110,7 @@ namespace Nino.Commands
                 await Response.Info(T("error.missingChannelPermsRelease", lng, $"<#{releaseChannelId}>"), interaction);
 
             await Cache.RebuildCacheForGuild(interaction.GuildId ?? 0);
-            return true;
+            return ExecutionResult.Success;
         }
     }
 }

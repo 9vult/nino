@@ -13,7 +13,7 @@ namespace Nino.Commands
         public partial class Alias
         {
             [SlashCommand("add", "Add a new alias")]
-            public async Task<bool> Add(
+            public async Task<RuntimeResult> Add(
                 [Summary("project", "Project nickname")] string alias,
                 [Summary("alias", "Alias")] string input
             )
@@ -54,7 +54,7 @@ namespace Nino.Commands
                 await interaction.FollowupAsync(embed: embed);
 
                 await Cache.RebuildCacheForProject(project.Id);
-                return true;
+                return ExecutionResult.Success;
             }
         }
     }

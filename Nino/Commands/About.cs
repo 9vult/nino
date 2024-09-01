@@ -15,7 +15,7 @@ namespace Nino.Commands
 
 
         [SlashCommand("about", "About Nino")]
-        public async Task<bool> Handle()
+        public async Task<RuntimeResult> Handle()
         {
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
@@ -27,7 +27,7 @@ namespace Nino.Commands
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 
-            return true;
+            return ExecutionResult.Success;
         }
     }
 }

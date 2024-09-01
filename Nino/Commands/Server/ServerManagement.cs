@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
 using Nino.Utilities;
 using NLog;
@@ -13,7 +14,7 @@ namespace Nino.Commands
 
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
 
-        public static async Task<bool> Handle(SocketSlashCommand interaction)
+        public static async Task<RuntimeResult> Handle(SocketSlashCommand interaction)
         {
             var guildId = interaction.GuildId ?? 0;
             var guild = Nino.Client.GetGuild(guildId);
@@ -43,7 +44,7 @@ namespace Nino.Commands
                             return  await HandleSetDisplayProgress(interaction, config);
                     }
                     log.Error($"Unknown ServerManagement/Display subcommand {subsubcommand.Name}");
-                    return false;
+                    return ExecutionResult.Failure;
                 case "admin":
                     subsubcommand = subcommand.Options.First();
                     switch (subsubcommand.Name)
@@ -54,10 +55,10 @@ namespace Nino.Commands
                             return await HandleAdminRemove(interaction, config);
                     }
                     log.Error($"Unknown ServerManagement/Admin subcommand {subsubcommand.Name}");
-                    return false;
+                    return ExecutionResult.Failure;
                 default:
                     log.Error($"Unknown ServerManagement subcommand {subcommand.Name}");
-                    return false;
+                    return ExecutionResult.Failure;
             }
         }
 

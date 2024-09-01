@@ -1,11 +1,12 @@
 ﻿using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
 
 namespace Nino.Utilities
 {
     internal static class Response
     {
-        public static async Task<bool> Fail(string message, SocketInteraction interaction)
+        public static async Task<RuntimeResult> Fail(string message, SocketInteraction interaction)
         {
             var embed = new EmbedBuilder()
                 .WithTitle("Baka.")
@@ -13,10 +14,10 @@ namespace Nino.Utilities
                 .WithColor(0xd797ff)
                 .Build();
             await interaction.FollowupAsync(embed: embed);
-            return false;
+            return ExecutionResult.Failure;
         }
 
-        public static async Task<bool> Info(string message, SocketInteraction interaction)
+        public static async Task<RuntimeResult> Info(string message, SocketInteraction interaction)
         {
             var embed = new EmbedBuilder()
                 .WithTitle("Info.")
@@ -24,7 +25,7 @@ namespace Nino.Utilities
                 .WithColor(0xd797ff)
                 .Build();
             await interaction.FollowupAsync(embed: embed);
-            return true;
+            return ExecutionResult.Success;
         }
 
         public static AllowedMentions GenerateAllowedMentions(List<ulong> users, List<ulong> roles)

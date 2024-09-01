@@ -15,7 +15,7 @@ namespace Nino.Commands
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         [SlashCommand("blame", "Check the status of a project")]
-        public async Task<bool> Handle(
+        public async Task<RuntimeResult> Handle(
             [Summary("project", "Project nickname")] string alias,
             [Summary("episode", "Episode number")] decimal? episodeNumber = null,
             [Summary("explain", "Explain what any of this means")] bool explain = false
@@ -62,7 +62,7 @@ namespace Nino.Commands
 
             await interaction.FollowupAsync(embed: embed);
 
-            return true;
+            return ExecutionResult.Success;
         }
     }
 }

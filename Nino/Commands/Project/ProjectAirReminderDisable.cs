@@ -13,7 +13,7 @@ namespace Nino.Commands
         public partial class AirReminder
         {
             [SlashCommand("disable", "Disable airing reminders")]
-            public async Task<bool> Disable(
+            public async Task<RuntimeResult> Disable(
                 [Summary("project", "Project nickname")] string alias
             )
             {
@@ -49,7 +49,7 @@ namespace Nino.Commands
                 await interaction.FollowupAsync(embed: embed);
 
                 await Cache.RebuildCacheForProject(project.Id);
-                return true;
+                return ExecutionResult.Success;
             }
         }
     }

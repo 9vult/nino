@@ -16,7 +16,7 @@ namespace Nino.Commands
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         [SlashCommand("release", "Release!")]
-        public async Task<bool> Handle(
+        public async Task<RuntimeResult> Handle(
             [Summary("project", "Project nickname")] string alias,
             [Summary("type", "Type of release")] ReleaseType releaseType,
             [Summary("number", "What is being released?")] string releaseNumber,
@@ -77,7 +77,7 @@ namespace Nino.Commands
                 .Build();
             await interaction.FollowupAsync(embed: replyEmbed);
 
-            return true;
+            return ExecutionResult.Success;
         }
     }
 }

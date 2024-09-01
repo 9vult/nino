@@ -19,7 +19,7 @@ namespace Nino.Commands
         private static partial Regex Truthy();
 
         [SlashCommand("edit", "Edit a project")]
-        public async Task<bool> Edit(
+        public async Task<RuntimeResult> Edit(
             [Summary("project", "Project nickname")] string alias,
             [Summary("option", "Option to change")] ProjectEditOption option,
             [Summary("newvalue", "New value")] string newValue
@@ -119,7 +119,7 @@ namespace Nino.Commands
 
             await Cache.RebuildCacheForProject(project.Id);
 
-            return true;
+            return ExecutionResult.Success;
         }
     }
 }

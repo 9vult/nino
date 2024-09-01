@@ -12,7 +12,7 @@ namespace Nino.Commands
     public partial class ProjectManagement
     {
         [SlashCommand("transferownership", "Transfer project ownership to someone else")]
-        public async Task<bool> Delete(
+        public async Task<RuntimeResult> Delete(
             [Summary("project", "Project nickname")] string alias,
             [Summary("member", "Staff member")] SocketUser member
         )
@@ -48,7 +48,7 @@ namespace Nino.Commands
             await interaction.FollowupAsync(embed: embed);
 
             await Cache.RebuildCacheForProject(project.Id);
-            return true;
+            return ExecutionResult.Success;
         }
     }
 }

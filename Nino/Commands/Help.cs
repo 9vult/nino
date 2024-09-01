@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Nino.Handlers;
+using Nino.Utilities;
 using NLog;
 using static Localizer.Localizer;
 
@@ -13,7 +14,7 @@ namespace Nino.Commands
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
         
         [SlashCommand("help", "Nino Help")]
-        public async Task<bool> Handle()
+        public async Task<RuntimeResult> Handle()
         {
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
@@ -24,7 +25,7 @@ namespace Nino.Commands
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 
-            return true;
+            return ExecutionResult.Success;
         }
     }
 }

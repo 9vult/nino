@@ -10,7 +10,7 @@ namespace Nino.Commands
     public partial class AdditionalStaff
     {
         [SlashCommand("swap", "Swap additional staff into an episode")]
-        public async Task<bool> Swap(
+        public async Task<RuntimeResult> Swap(
             [Summary("project", "Project nickname")] string alias,
             [Summary("episode", "Episode number")] decimal episodeNumber,
             [Summary("abbreviation", "Position shorthand")] string abbreviation,
@@ -65,7 +65,7 @@ namespace Nino.Commands
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 
-            return true;
+            return ExecutionResult.Success;
         }
     }
 }

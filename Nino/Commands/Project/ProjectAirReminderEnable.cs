@@ -14,7 +14,7 @@ namespace Nino.Commands
         public partial class AirReminder
         {
             [SlashCommand("enable", "Enable airing reminders")]
-            public async Task<bool> Enable(
+            public async Task<RuntimeResult> Enable(
                 [Summary("project", "Project nickname")] string alias,
                 [Summary("channel", "Channel to post reminders in")] SocketTextChannel channel,
                 [Summary("role", "Role to ping for reminders")] SocketRole? role = null
@@ -58,7 +58,7 @@ namespace Nino.Commands
                     await Response.Info(T("error.missingChannelPerms", lng, $"<#{channelId}>"), interaction);
 
                 await Cache.RebuildCacheForProject(project.Id);
-                return true;
+                return ExecutionResult.Success;
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
 using Nino.Records;
@@ -10,7 +11,7 @@ namespace Nino.Commands
 {
     internal static partial class ServerManagement
     {
-        public static async Task<bool> HandleAdminRemove(SocketSlashCommand interaction, Configuration config)
+        public static async Task<RuntimeResult> HandleAdminRemove(SocketSlashCommand interaction, Configuration config)
         {
             var lng = interaction.UserLocale;
             var subcommand = interaction.Data.Options.First().Options.First();
@@ -41,7 +42,7 @@ namespace Nino.Commands
             await interaction.FollowupAsync(embed: embed);
 
             await Cache.RebuildConfigCache();
-            return true;
+            return ExecutionResult.Success;
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Nino.Commands
         public partial class Conga
         {
             [SlashCommand("remove", "Remove a link from the Conga line")]
-            public async Task<bool> Remove(
+            public async Task<RuntimeResult> Remove(
                 [Summary("project", "Project nickname")] string alias,
                 [Summary("abbreviation", "Position shorthand")] string abbreviation
             )
@@ -53,7 +53,7 @@ namespace Nino.Commands
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 
-                return true;
+                return ExecutionResult.Success;
             }
         }
     }

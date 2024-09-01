@@ -12,7 +12,7 @@ namespace Nino.Commands
     public partial class KeyStaff
     {
         [SlashCommand("swap", "Swap a Key Staff into the whole project")]
-        public async Task<bool> Swap(
+        public async Task<RuntimeResult> Swap(
             [Summary("project", "Project nickname")] string alias,
             [Summary("abbreviation", "Position shorthand")] string abbreviation,
             [Summary("member", "Staff member")] SocketUser member
@@ -60,7 +60,7 @@ namespace Nino.Commands
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 
-            return true;
+            return ExecutionResult.Success;
         }
     }
 }

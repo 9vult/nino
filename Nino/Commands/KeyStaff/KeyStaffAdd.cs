@@ -11,7 +11,7 @@ namespace Nino.Commands
     public partial class KeyStaff
     {
         [SlashCommand("add", "Add a new Key Staff to the whole project")]
-        public async Task<bool> Add(
+        public async Task<RuntimeResult> Add(
             [Summary("project", "Project nickname")] string alias,
             [Summary("member", "Staff member")] SocketUser member,
             [Summary("abbreviation", "Position shorthand")] string abbreviation,
@@ -83,7 +83,7 @@ namespace Nino.Commands
             await interaction.FollowupAsync(embed: embed);
 
             await Cache.RebuildCacheForProject(project.Id);
-            return true;
+            return ExecutionResult.Success;
         }
     }
 }
