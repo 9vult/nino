@@ -1,0 +1,635 @@
+{
+    "about": {
+        "name": "about",
+        "description": "About Nino"
+    },
+    "additionalstaff": {
+        "name": "additionalstaff",
+        "description": "Additional staff for a single episode",
+        "add": {
+            "name": "add",
+            "description": "Add additional staff to an episode",
+            "project": {
+                "name": "project",
+                "description": "Project nickname"
+            },
+            "episode": {
+                "name": "episode",
+                "description": "Episode number"
+            },
+            "member": {
+                "name": "member",
+                "description": "Staff member"
+            },
+            "abbreviation": {
+                "name": "abbreviation",
+                "description": "Position shorthand"
+            },
+            "fullname": {
+                "name": "fullname",
+                "description": "Full position name"
+            }
+        },
+        "remove": {
+            "name": "remove",
+            "description": "Remove additional staff from an episode",
+            "project": {
+                "name": "project",
+                "description": "Project nickname"
+            },
+            "episode": {
+                "name": "episode",
+                "description": "Episode number"
+            },
+            "abbreviation": {
+                "name": "abbreviation",
+                "description": "Position shorthand"
+            }
+        },
+        "swap": {
+            "name": "swap",
+            "description": "Swap additional staff into an episode",
+            "project": {
+                "name": "project",
+                "description": "Project nickname"
+            },
+            "episode": {
+                "name": "episode",
+                "description": "Episode number"
+            },
+            "abbreviation": {
+                "name": "abbreviation",
+                "description": "Position shorthand"
+            },
+            "member": {
+                "name": "member",
+                "description": "Staff member"
+            }
+        }
+    },
+    "blame": {
+        "name": "blame",
+        "description": "Check the status of a project",
+        "project": {
+            "name": "project",
+            "description": "Project nickname"
+        },
+        "episode": {
+            "name": "episode",
+            "description": "Episode number"
+        },
+        "explain": {
+            "name": "explain",
+            "description": "Explain what any of this means"
+        }
+    },
+    "bulk": {
+        "name": "bulk",
+        "description": "Do a lot of episodes all at once!",
+        "project": {
+            "name": "project",
+            "description": "Project nickname"
+        },
+        "action": {
+            "name": "action",
+            "description": "Action to perform"
+        },
+        "abbreviation": {
+            "name": "abbreviation",
+            "description": "Position shorthand"
+        },
+        "start": {
+            "name": "start",
+            "description": "Start episode number"
+        },
+        "end": {
+            "name": "end",
+            "description": "End episode number"
+        }
+    },
+    "done": {
+        "name": "done",
+        "description": "Mark a position as done",
+        "project": {
+            "name": "project",
+            "description": "Project nickname"
+        },
+        "abbreviation": {
+            "name": "abbreviation",
+            "description": "Position shorthand"
+        },
+        "episode": {
+            "name": "episode",
+            "description": "Episode number"
+        }
+    },
+    "episode": {
+        "name": "episode",
+        "description": "Manage episodes",
+        "add": {
+            "name": "add",
+            "description": "Add an episode",
+            "project": {
+                "name": "project",
+                "description": "Project nickname"
+            },
+            "episode": {
+                "name": "episode",
+                "description": "Episode number"
+            }
+        },
+        "remove": {
+            "name": "remove",
+            "description": "Remove an episode",
+            "project": {
+                "name": "project",
+                "description": "Project nickname"
+            },
+            "episode": {
+                "name": "episode",
+                "description": "Episode number"
+            }
+        }
+    },
+    "help": {
+        "name": "help",
+        "description": "Nino Help"
+    },
+    "keystaff": {
+        "name": "keystaff",
+        "description": "Key staff for the whole project",
+        "add": {
+            "name": "add",
+            "description": "Add a new Key Staff to the whole project",
+            "project": {
+                "name": "project",
+                "description": "Project nickname"
+            },
+            "member": {
+                "name": "member",
+                "description": "Staff member"
+            },
+            "abbreviation": {
+                "name": "abbreviation",
+                "description": "Position shorthand"
+            },
+            "fullname": {
+                "name": "fullname",
+                "description": "Full position name"
+            }
+        },
+        "remove": {
+            "name": "remove",
+            "description": "Remove a Key Staff from the whole project",
+            "project": {
+                "name": "project",
+                "description": "Project nickname"
+            },
+            "abbreviation": {
+                "name": "abbreviation",
+                "description": "Position shorthand"
+            }
+        },
+        "setweight": {
+            "name": "setweight",
+            "description": "Set the weight of a Key Staff position",
+            "project": {
+                "name": "project",
+                "description": "Project nickname"
+            },
+            "abbreviation": {
+                "name": "abbreviation",
+                "description": "Position shorthand"
+            },
+            "weight": {
+                "name": "weight",
+                "description": "Weight"
+            }
+        },
+        "swap": {
+            "name": "swap",
+            "description": "Swap a Key Staff into the whole project",
+            "project": {
+                "name": "project",
+                "description": "Project nickname"
+            },
+            "abbreviation": {
+                "name": "abbreviation",
+                "description": "Position shorthand"
+            },
+            "member": {
+                "name": "member",
+                "description": "Staff member"
+            }
+        }
+    },
+    "observer": {
+        "name": "observer",
+        "description": "Observe a project on another server",
+        "add": {
+            "name": "add",
+            "description": "Start observing a project on another server",
+            "serverid": {
+                "name": "serverid",
+                "description": "ID of the server you want to observe"
+            },
+            "project": {
+                "name": "project",
+                "description": "Project nickname"
+            },
+            "blame": {
+                "name": "blame",
+                "description": "Should this project's aliases show up in /blame?"
+            },
+            "updates": {
+                "name": "updates",
+                "description": "Webhook URL for progress updates"
+            },
+            "releases": {
+                "name": "releases",
+                "description": "Webhook URL for releases"
+            },
+            "role": {
+                "name": "role",
+                "description": "Role to ping for releases"
+            }
+        }
+    },
+    "project": {
+        "name": "project",
+        "description": "Project management",
+        "admin": {
+            "name": "admin",
+            "description": "Project-level administrators",
+            "add": {
+                "name": "add",
+                "description": "Add an administrator to this project",
+                "project": {
+                    "name": "project",
+                    "description": "Project nickname"
+                },
+                "member": {
+                    "name": "member",
+                    "description": "Staff member"
+                }
+            },
+            "remove": {
+                "name": "remove",
+                "description": "Remove an administrator from this project",
+                "project": {
+                    "name": "project",
+                    "description": "Project nickname"
+                },
+                "member": {
+                    "name": "member",
+                    "description": "Staff member"
+                }
+            }
+        },
+        "airreminder": {
+            "name": "airreminder",
+            "description": "Enable or disable airing reminders",
+            "disable": {
+                "name": "disable",
+                "description": "Disable airing reminders",
+                "project": {
+                    "name": "project",
+                    "description": "Project nickname"
+                }
+            },
+            "enable": {
+                "name": "enable",
+                "description": "Enable airing reminders",
+                "project": {
+                    "name": "project",
+                    "description": "Project nickname"
+                },
+                "channel": {
+                    "name": "channel",
+                    "description": "Channel to post reminders in"
+                },
+                "role": {
+                    "name": "role",
+                    "description": "Role to ping for reminders"
+                }
+            }
+        },
+        "alias": {
+            "name": "alias",
+            "description": "Alternative nicknames for a project",
+            "add": {
+                "name": "add",
+                "description": "Add a new alias",
+                "project": {
+                    "name": "project",
+                    "description": "Project nickname"
+                },
+                "alias": {
+                    "name": "alias",
+                    "description": "Alias"
+                }
+            },
+            "remove": {
+                "name": "remove",
+                "description": "Remove an alias",
+                "project": {
+                    "name": "project",
+                    "description": "Project nickname"
+                },
+                "alias": {
+                    "name": "alias",
+                    "description": "Alias"
+                }
+            }
+        },
+        "conga": {
+            "name": "conga",
+            "description": "A Conga line of Key Staff",
+            "add": {
+                "name": "add",
+                "description": "Add a link to the Conga line",
+                "project": {
+                    "name": "project",
+                    "description": "Project nickname"
+                },
+                "abbreviation": {
+                    "name": "abbreviation",
+                    "description": "Position shorthand"
+                },
+                "next": {
+                    "name": "next",
+                    "description": "Position to ping"
+                }
+            },
+            "list": {
+                "name": "list",
+                "description": "List all the Conga line participants",
+                "project": {
+                    "name": "project",
+                    "description": "Project nickname"
+                }
+            },
+            "remove": {
+                "name": "remove",
+                "description": "Remove a link from the Conga line",
+                "project": {
+                    "name": "project",
+                    "description": "Project nickname"
+                },
+                "abbreviation": {
+                    "name": "abbreviation",
+                    "description": "Position shorthand"
+                }
+            }
+        },
+        "create": {
+            "name": "create",
+            "description": "Create a new project",
+            "nickname": {
+                "name": "nickname",
+                "description": "Project nickname"
+            },
+            "title": {
+                "name": "title",
+                "description": "Full series title"
+            },
+            "type": {
+                "name": "type",
+                "description": "Project type",
+                "TV": {
+                    "name": "TV"
+                },
+                "Movie": {
+                    "name": "Movie"
+                },
+                "BD": {
+                    "name": "BD"
+                }
+            },
+            "length": {
+                "name": "length",
+                "description": "Number of episodes"
+            },
+            "poster": {
+                "name": "poster",
+                "description": "Poster image URL"
+            },
+            "private": {
+                "name": "private",
+                "description": "Is this project private?"
+            },
+            "updatechannel": {
+                "name": "updatechannel",
+                "description": "Channel to post updates to"
+            },
+            "releasechannel": {
+                "name": "releasechannel",
+                "description": "Channel to post releases to"
+            }
+        },
+        "delete": {
+            "name": "delete",
+            "description": "Delete a project",
+            "project": {
+                "name": "project",
+                "description": "Project nickname"
+            }
+        },
+        "edit": {
+            "name": "edit",
+            "description": "Edit a project",
+            "project": {
+                "name": "project",
+                "description": "Project nickname"
+            },
+            "option": {
+                "name": "option",
+                "description": "Option to change",
+                "Title": {
+                    "name": "Title"
+                },
+                "Poster": {
+                    "name": "Poster"
+                },
+                "MOTD": {
+                    "name": "MOTD"
+                },
+                "AniDBId": {
+                    "name": "AniDBId"
+                },
+                "AirTime24h": {
+                    "name": "AirTime24h"
+                },
+                "IsPrivate": {
+                    "name": "IsPrivate"
+                },
+                "UpdateChannelID": {
+                    "name": "UpdateChannelID"
+                },
+                "ReleaseChannelID": {
+                    "name": "ReleaseChannelID"
+                }
+            },
+            "newvalue": {
+                "name": "newvalue",
+                "description": "New value"
+            }
+        },
+        "transferownership": {
+            "name": "transferownership",
+            "description": "Transfer project ownership to someone else",
+            "project": {
+                "name": "project",
+                "description": "Project nickname"
+            },
+            "member": {
+                "name": "member",
+                "description": "Staff member"
+            }
+        }
+    },
+    "release": {
+        "name": "release",
+        "description": "Release!",
+        "project": {
+            "name": "project",
+            "description": "Project nickname"
+        },
+        "type": {
+            "name": "type",
+            "description": "Type of release",
+            "Episode": {
+                "name": "Episode"
+            },
+            "Volume": {
+                "name": "Volume"
+            },
+            "Batch": {
+                "name": "Batch"
+            },
+            "Custom": {
+                "name": "Custom"
+            }
+        },
+        "number": {
+            "name": "number",
+            "description": "What is being released?"
+        },
+        "url": {
+            "name": "url",
+            "description": "Release URL(s)"
+        },
+        "role": {
+            "name": "role",
+            "description": "Role to ping"
+        }
+    },
+    "roster": {
+        "name": "roster",
+        "description": "See who's working on an episode",
+        "project": {
+            "name": "project",
+            "description": "Project nickname"
+        },
+        "episode": {
+            "name": "episode",
+            "description": "Episode number"
+        }
+    },
+    "server": {
+        "name": "server",
+        "description": "Server-wide options",
+        "admin": {
+            "name": "admin",
+            "description": "Server-level administrators",
+            "add": {
+                "name": "add",
+                "description": "Add an administrator to this server",
+                "member": {
+                    "name": "member",
+                    "description": "Staff member"
+                }
+            },
+            "remove": {
+                "name": "remove",
+                "description": "Remove an administrator from this server",
+                "member": {
+                    "name": "member",
+                    "description": "Staff member"
+                }
+            }
+        },
+        "display": {
+            "name": "display",
+            "description": "Control the look and features of embeds",
+            "progress": {
+                "name": "progress",
+                "description": "Control how progress command responses should look",
+                "type": {
+                    "name": "type",
+                    "description": "Display type",
+                    "Succinct": {
+                        "name": "Succinct"
+                    },
+                    "Verbose": {
+                        "name": "Verbose"
+                    }
+                }
+            },
+            "updates": {
+                "name": "updates",
+                "description": "Control how progress updates should look",
+                "type": {
+                    "name": "type",
+                    "description": "Display type",
+                    "Normal": {
+                        "name": "Normal"
+                    },
+                    "Extended": {
+                        "name": "Extended"
+                    }
+                }
+            }
+        },
+        "releaseprefix": {
+            "name": "releaseprefix",
+            "description": "Specify a prefix for releases",
+            "newvalue": {
+                "name": "newvalue",
+                "description": "New value"
+            }
+        }
+    },
+    "skip": {
+        "name": "skip",
+        "description": "Skip a position",
+        "project": {
+            "name": "project",
+            "description": "Project nickname"
+        },
+        "episode": {
+            "name": "episode",
+            "description": "Episode number"
+        },
+        "abbreviation": {
+            "name": "abbreviation",
+            "description": "Position shorthand"
+        }
+    },
+    "undone": {
+        "name": "undone",
+        "description": "Mark a position as not done",
+        "project": {
+            "name": "project",
+            "description": "Project nickname"
+        },
+        "episode": {
+            "name": "episode",
+            "description": "Episode number"
+        },
+        "abbreviation": {
+            "name": "abbreviation",
+            "description": "Position shorthand"
+        }
+    }
+}

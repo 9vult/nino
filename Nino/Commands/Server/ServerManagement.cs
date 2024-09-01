@@ -11,7 +11,7 @@ namespace Nino.Commands
         private readonly InteractionHandler _handler = handler;
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
 
-        [Group("display", "Control the look and features of displays")]
+        [Group("display", "Control the look and features of embeds")]
         public partial class Display(InteractionHandler handler, InteractionService commands) : InteractionModuleBase<SocketInteractionContext>
         {
             public InteractionService Commands { get; private set; } = commands;

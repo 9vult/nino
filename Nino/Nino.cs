@@ -26,8 +26,7 @@ namespace Nino
 
         private static readonly InteractionServiceConfig _interactionServiceConfig = new()
         {
-            // LocalizationManager = new ResxLocalizationManager("InteractionFramework.Resources.CommandLocales", Assembly.GetEntryAssembly(),
-            //         new CultureInfo("en-US"), new CultureInfo("ru"))
+            LocalizationManager = new JsonLocalizationManager("i18n/cmd", "nino")
         };
 
         public static async Task Main(string[] args)
@@ -69,7 +68,6 @@ namespace Nino
 
             // Load localization files
             LoadStringLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/str")));
-            LoadCommandLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/cmd")));
 
             // Set up client
             var client = _services.GetRequiredService<DiscordSocketClient>();

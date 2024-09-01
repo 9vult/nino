@@ -8,7 +8,7 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    [Group("episodes", "Manage episodes")]
+    [Group("episode", "Manage episodes")]
     public partial class Episodes(InteractionHandler handler, InteractionService commands) : InteractionModuleBase<SocketInteractionContext>
     {
         public InteractionService Commands { get; private set; } = commands;

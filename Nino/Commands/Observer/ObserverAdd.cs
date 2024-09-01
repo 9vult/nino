@@ -11,7 +11,7 @@ namespace Nino.Commands
     {
         [SlashCommand("add", "Start observing a project on another server")]
         public async Task<RuntimeResult> Add(
-            [Summary("serverid", "SID of the server you want to observe")] string serverId,
+            [Summary("serverid", "ID of the server you want to observe")] string serverId,
             [Summary("project", "Project nickname")] string alias,
             [Summary("blame", "Should this project's aliases show up in /blame?")] bool blame = false,
             [Summary("updates", "Webhook URL for progress updates")] string? updatesUrl = null,

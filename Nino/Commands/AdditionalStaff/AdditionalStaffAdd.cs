@@ -17,7 +17,7 @@ namespace Nino.Commands
             [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] decimal episodeNumber,
             [Summary("member", "Staff member")] SocketUser member,
             [Summary("abbreviation", "Position shorthand")] string abbreviation,
-            [Summary("name", "Full position name")] string taskName
+            [Summary("fullname", "Full position name")] string taskName
         )
         {
             var interaction = Context.Interaction;

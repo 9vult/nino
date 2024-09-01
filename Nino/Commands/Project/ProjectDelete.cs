@@ -11,7 +11,7 @@ namespace Nino.Commands
 {
     public partial class ProjectManagement
     {
-        [SlashCommand("delete", "Delete a new project")]
+        [SlashCommand("delete", "Delete a project")]
         public async Task<RuntimeResult> Delete(
             [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias
         )
