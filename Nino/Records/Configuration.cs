@@ -7,8 +7,8 @@ namespace Nino.Records
     {
         public required string Id;
         [JsonIgnore] public required ulong GuildId;
-        public required DisplayType UpdateDisplay;
-        public required DisplayType ProgressDisplay;
+        public required UpdatesDisplayType UpdateDisplay;
+        public required ProgressDisplayType ProgressDisplay;
         [JsonIgnore] public required ulong[] AdministratorIds;
         public string? ReleasePrefix;
 
@@ -36,8 +36,8 @@ namespace Nino.Records
             {
                 Id = $"{guildId}-conf",
                 GuildId = guildId,
-                UpdateDisplay = DisplayType.Normal,
-                ProgressDisplay = DisplayType.Succinct,
+                UpdateDisplay = UpdatesDisplayType.Normal,
+                ProgressDisplay = ProgressDisplayType.Succinct,
                 AdministratorIds = [],
                 ReleasePrefix = null
             };

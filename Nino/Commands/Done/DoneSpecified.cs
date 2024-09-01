@@ -45,7 +45,7 @@ namespace Nino.Commands
 
             var taskTitle = project.KeyStaff.Concat(episode.AdditionalStaff).First(ks => ks.Role.Abbreviation == abbreviation).Role.Name;
             var title = $"Episode {episodeNumber}";
-            var status = Cache.GetConfig(project.GuildId)?.UpdateDisplay.Equals(DisplayType.Extended) ?? false
+            var status = Cache.GetConfig(project.GuildId)?.UpdateDisplay.Equals(UpdatesDisplayType.Extended) ?? false
                 ? StaffList.GenerateExplainProgress(project, episode, lng, abbreviation) // Explanitory
                 : StaffList.GenerateProgress(project, episode, abbreviation); // Standard
 
@@ -78,7 +78,7 @@ namespace Nino.Commands
             var episodeDoneText = episodeDone ? $"\n{T("progress.episodeComplete", lng, episodeNumber)}" : string.Empty;
             var replyStatus = StaffList.GenerateProgress(project, episode, abbreviation);
 
-            var replyBody = Cache.GetConfig(project.GuildId)?.UpdateDisplay.Equals(DisplayType.Verbose) ?? false
+            var replyBody = Cache.GetConfig(project.GuildId)?.ProgressDisplay.Equals(ProgressDisplayType.Verbose) ?? false
                 ? $"{T("progress.done", lng, taskTitle, episodeNumber)}\n\n{replyStatus}{episodeDoneText}" // Verbose
                 : $"{T("progress.done", lng, taskTitle, episodeNumber)}{episodeDoneText}"; // Succinct (default)
 

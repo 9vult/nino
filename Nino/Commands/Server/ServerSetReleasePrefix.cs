@@ -7,20 +7,32 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    internal static partial class ServerManagement
+    public partial class ServerManagement
     {
-        public static async Task<RuntimeResult> HandleSetReleasePrefix(SocketSlashCommand interaction, Configuration config)
+        [SlashCommand("releaseprefix", "Specify a prefix for releases")]
+        public async Task<RuntimeResult> SetReleasePrefix(
+            [Summary("newvalue", "New Value")] string? newValue
+        )
         {
+            var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
-            var subcommand = interaction.Data.Options.First();
+            var guildId = interaction.GuildId ?? 0;
+            var guild = Nino.Client.GetGuild(guildId);
+
+            // Server administrator permissions required
+            var runner = guild.GetUser(interaction.User.Id);
+            if (!runner.GuildPermissions.Administrator)
+                return await Response.Fail(T("error.notPrivileged", lng), interaction);
+
+            var config = await Getters.GetConfiguration(guildId);
+            if (config == null)
+                return await Response.Fail(T("error.noSuchConfig", lng), interaction);
 
             // Get inputs
-            var newValue = (string)subcommand.Options.FirstOrDefault(o => o.Name == "newvalue")!.Value;
             var prefix = newValue == "-" ? null : newValue;
 
             // Apply change and upsert to database
             config.ReleasePrefix = prefix;
-
 
             await AzureHelper.Configurations!.UpsertItemAsync(config);
             log.Info($"Updated configuration for guild {config.GuildId}, set ReleasePrefix to {prefix ?? "(empty)"}");
@@ -34,6 +46,5 @@ namespace Nino.Commands
 
             return ExecutionResult.Success;
         }
-
     }
 }
