@@ -33,9 +33,16 @@ namespace Nino.Commands
 
             var episodes = (await Getters.GetEpisodes(project)).OrderBy(e => e.Number);
 
-            // Page size of 12, unless there's 13
-            var pageSize = episodes.Count() % 13 == 0 ? 13 : 12;
-            var pageCount = Math.Ceiling(episodes.Count() / (double)pageSize);
+            // Calculate pages
+            // Thanks to petzku and astiob for their contributions to this algorithm
+            var pageCount = Math.Ceiling(episodes.Count() / 13d);
+            var page0 = pageNumber - 1;
+            var page1 = pageNumber;
+            var pageLength = Math.Floor(episodes.Count() / pageCount);
+            var roundUp = episodes.Count() % pageCount;
+
+            var skip = (int)(page0 * pageLength + Math.Min(page0, roundUp));
+            var length = (int)(pageLength + Math.Min(page1, roundUp));
 
             if (pageNumber > pageCount)
             {
@@ -45,14 +52,7 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.blameall.invalidPageNumber", lng, map, "count"), interaction);
             }
 
-            // Some common episode counts (25) result in hanging episodes.
-            // The hanging episode should be included in the results.
-            if (episodes.Skip(pageNumber * pageSize).Count() == 1)
-            {
-                pageSize += 1;
-                pageCount -= 1;
-            }
-            var pagedEpisodes = episodes.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+            var pagedEpisodes = episodes.Skip(skip).Take(length);
             
             StringBuilder sb = new();
             foreach (var episode in pagedEpisodes)
