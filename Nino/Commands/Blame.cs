@@ -1,7 +1,9 @@
+using System.Text;
 using Discord;
 using Discord.Interactions;
 using Nino.Handlers;
 using Nino.Records.Enums;
+using Nino.Services;
 using Nino.Utilities;
 using NLog;
 using static Localizer.Localizer;
@@ -45,12 +47,27 @@ namespace Nino.Commands
             if (episode == null)
                 return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
 
-            var progress = explain ? StaffList.GenerateExplainProgress(project, episode, lng)
-                : StaffList.GenerateProgress(project, episode);
+            StringBuilder progress = new();
 
             // Add the project's MOTD, if applicable
             if (!string.IsNullOrEmpty(project.Motd))
-                progress = $"{project.Motd}\n{progress}";
+                progress.AppendLine(project.Motd);
+
+            progress.AppendLine(explain ? StaffList.GenerateExplainProgress(project, episode, lng)
+                : StaffList.GenerateProgress(project, episode));
+
+            // Add any update information
+            if (project.AniDBId != null && !episode.Tasks.Any(t => t.Done))
+            {
+                var airStatus = await AirDateService.GetAirDateString(project.AniDBId, episode.Number, project.AirTime ?? "00:00", lng);
+                progress.AppendLine();
+                progress.AppendLine(airStatus);
+            }
+            else if (episode.Updated != null)
+            {
+                progress.AppendLine();
+                progress.AppendLine(T("episode.lastUpdated", lng, $"<t:{episode.Updated?.ToUnixTimeSeconds()}:R>"));
+            }
 
             var title = project.IsPrivate
                 ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
@@ -60,7 +77,7 @@ namespace Nino.Commands
                 .WithAuthor(title)
                 .WithTitle(T("title.progress", lng, episode.Number))
                 .WithThumbnailUrl(project.PosterUri)
-                .WithDescription(progress)
+                .WithDescription(progress.ToString())
                 .WithCurrentTimestamp()
                 .Build();
 

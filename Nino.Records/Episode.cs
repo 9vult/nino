@@ -12,7 +12,7 @@ namespace Nino.Records
         public required bool ReminderPosted;
         public required Staff[] AdditionalStaff;
         public required Task[] Tasks;
-        public DateTime? Updated;
+        public DateTimeOffset? Updated;
 
         [JsonProperty("GuildId")]
         public string SerializationGuildId
