@@ -26,6 +26,7 @@ namespace Nino.Commands
         {
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
+            var gLng = interaction.GuildLocale ?? "en-US";
 
             // Sanitize inputs
             alias = alias.Trim();
@@ -44,7 +45,7 @@ namespace Nino.Commands
                 : "";
 
             var publishBody = releaseType != ReleaseType.Custom
-                ? $"**{project.Title} - {releaseType.ToFriendlyString(lng)} {releaseNumber}**\n{roleStr}{releaseUrl}"
+                ? $"**{project.Title} - {releaseType.ToFriendlyString(gLng)} {releaseNumber}**\n{roleStr}{releaseUrl}"
                 : $"**{project.Title} - {releaseNumber}**\n{roleStr}{releaseUrl}";
             
             // Add prefix if needed
@@ -69,8 +70,12 @@ namespace Nino.Commands
             await ObserverPublisher.PublishRelease(project, releaseType, releaseNumber, releaseUrl);
             
             // Send success embed
+            var replyHeader = project.IsPrivate
+                ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
+                : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
+
             var replyEmbed = new EmbedBuilder()
-                .WithAuthor(name: $"{project.Title} ({project.Type.ToFriendlyString(lng)})")
+                .WithAuthor(name: replyHeader)
                 .WithTitle(T("title.released", lng))
                 .WithDescription(T("progress.released", lng, project.Title, releaseType.ToFriendlyString(lng), releaseNumber))
                 .WithCurrentTimestamp()

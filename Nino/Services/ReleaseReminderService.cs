@@ -1,12 +1,10 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
-using Nino.Commands;
-using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities;
 using NLog;
-using System;
+using static Localizer.Localizer;
 
 namespace Nino.Services
 {
@@ -27,7 +25,7 @@ namespace Nino.Services
             _timer.Start();
         }
 
-        private async System.Threading.Tasks.Task CheckForReleases()
+        private async Task CheckForReleases()
         {
             Dictionary<string, List<CachedEpisode>> marked = [];
             foreach (var project in Cache.GetProjects().Where(p => p.AirReminderEnabled && !string.IsNullOrEmpty(p.AniDBId)))
@@ -41,6 +39,7 @@ namespace Nino.Services
                     try
                     {
                         if (await Nino.Client.GetChannelAsync((ulong)project.AirReminderChannelId!) is not SocketTextChannel channel) continue;
+                        var gLng = channel.Guild.PreferredLocale;
                         
                         if (!marked.TryGetValue(project.Id, out var markedList))
                         {
@@ -53,9 +52,9 @@ namespace Nino.Services
                             ? project.AirReminderRoleId == project.GuildId ? "@everyone" : $"<@&{project.AirReminderRoleId}>"
                             : "";
                         var embed = new EmbedBuilder()
-                            .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString("en-US")})")
-                            .WithTitle($"Episode {episode.Number} has aired!")
-                            .WithDescription(await AirDateService.GetAirDateString(project.AniDBId!, episode.Number, project.AirTime ?? "00:00"))
+                            .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString(gLng)})")
+                            .WithTitle(T("title.aired", gLng, episode.Number))
+                            .WithDescription(await AirDateService.GetAirDateString(project.AniDBId!, episode.Number, project.AirTime ?? "00:00", gLng))
                             .WithThumbnailUrl(project.PosterUri)
                             .WithCurrentTimestamp()
                             .Build();

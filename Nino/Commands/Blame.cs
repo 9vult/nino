@@ -54,7 +54,7 @@ namespace Nino.Commands
 
             var embed = new EmbedBuilder()
                 .WithAuthor(title)
-                .WithTitle(T("title.blamedEpisode", lng, episode.Number))
+                .WithTitle(T("title.progress", lng, episode.Number))
                 .WithThumbnailUrl(project.PosterUri)
                 .WithDescription(progress)
                 .WithCurrentTimestamp()

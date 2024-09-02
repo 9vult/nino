@@ -14,6 +14,7 @@ namespace Nino.Commands
         public static async Task<RuntimeResult> HandleSpecified(SocketInteraction interaction, Project project, string abbreviation, decimal episodeNumber)
         {
             var lng = interaction.UserLocale;
+            var gLng = interaction.GuildLocale ?? "en-US";
 
             // Verify episode and task
             var episode = await Getters.GetEpisode(project, episodeNumber);
@@ -44,15 +45,15 @@ namespace Nino.Commands
             episode.Tasks.Single(t => t.Abbreviation == abbreviation).Done = true;
 
             var taskTitle = project.KeyStaff.Concat(episode.AdditionalStaff).First(ks => ks.Role.Abbreviation == abbreviation).Role.Name;
-            var title = $"Episode {episodeNumber}";
+            var title = T("title.progress", gLng, episodeNumber);
             var status = Cache.GetConfig(project.GuildId)?.UpdateDisplay.Equals(UpdatesDisplayType.Extended) ?? false
-                ? StaffList.GenerateExplainProgress(project, episode, lng, abbreviation) // Explanitory
+                ? StaffList.GenerateExplainProgress(project, episode, gLng, abbreviation) // Explanitory
                 : StaffList.GenerateProgress(project, episode, abbreviation); // Standard
 
             status = $"✅ **{taskTitle}**\n{status}";
 
             var publishEmbed = new EmbedBuilder()
-                .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString(lng)})")
+                .WithAuthor(name: $"{project.Title} ({project.Type.ToFriendlyString(gLng)})")
                 .WithTitle(title)
                 .WithDescription(status)
                 .WithThumbnailUrl(project.PosterUri)
@@ -78,12 +79,16 @@ namespace Nino.Commands
             var episodeDoneText = episodeDone ? $"\n{T("progress.episodeComplete", lng, episodeNumber)}" : string.Empty;
             var replyStatus = StaffList.GenerateProgress(project, episode, abbreviation);
 
+            var replyHeader = project.IsPrivate
+                ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
+                : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
+
             var replyBody = Cache.GetConfig(project.GuildId)?.ProgressDisplay.Equals(ProgressDisplayType.Verbose) ?? false
                 ? $"{T("progress.done", lng, taskTitle, episodeNumber)}\n\n{replyStatus}{episodeDoneText}" // Verbose
                 : $"{T("progress.done", lng, taskTitle, episodeNumber)}{episodeDoneText}"; // Succinct (default)
 
             var replyEmbed = new EmbedBuilder()
-                .WithAuthor(name: $"{project.Title} ({project.Type.ToFriendlyString(lng)})")
+                .WithAuthor(replyHeader)
                 .WithTitle($"✅ {T("title.taskComplete", lng)}")
                 .WithDescription(replyBody)
                 .WithCurrentTimestamp()

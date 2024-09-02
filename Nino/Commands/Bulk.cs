@@ -28,6 +28,7 @@ namespace Nino.Commands
         {
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
+            var gLng = interaction.GuildLocale ?? "en-US";
 
             // Sanitize inputs
             alias = alias.Trim();
@@ -71,16 +72,16 @@ namespace Nino.Commands
             startEpisode.Tasks.Single(t => t.Abbreviation == abbreviation).Done = false;
 
             var taskTitle = project.KeyStaff.Concat(startEpisode.AdditionalStaff).First(ks => ks.Role.Abbreviation == abbreviation).Role.Name;
-            var title = $"Episodes {startEpisodeNumber} — {endEpisodeNumber}";
+            var title = T("title.progress.bulk", gLng, startEpisodeNumber, endEpisodeNumber);
             var status = Cache.GetConfig(project.GuildId)?.UpdateDisplay.Equals(UpdatesDisplayType.Extended) ?? false
-                ? StaffList.GenerateExplainProgress(project, startEpisode, lng, abbreviation) // Explanitory
+                ? StaffList.GenerateExplainProgress(project, startEpisode, gLng, abbreviation) // Explanitory
                 : StaffList.GenerateProgress(project, startEpisode, abbreviation); // Standard
 
             status = action switch
             {
                 ProgressType.Done => $"✅ **{taskTitle}**\n{status}",
                 ProgressType.Undone => $"❌ **{taskTitle}**\n{status}",
-                ProgressType.Skipped => $":fast_forward: **{taskTitle}** {T("progress.skipped.appendage", lng)}\n{status}",
+                ProgressType.Skipped => $":fast_forward: **{taskTitle}** {T("progress.skipped.appendage", gLng)}\n{status}",
                 _ => ""
             };
 
@@ -108,10 +109,14 @@ namespace Nino.Commands
             await ObserverPublisher.PublishProgress(project, publishEmbed);
 
             // Send success embed
+            var replyHeader = project.IsPrivate
+                ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
+                : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
+
             var replyBody = T("progress.bulk", lng, taskTitle, startEpisodeNumber, endEpisodeNumber);
 
             var replyEmbed = new EmbedBuilder()
-                .WithAuthor(name: $"{project.Title} ({project.Type.ToFriendlyString(lng)})")
+                .WithAuthor(name: replyHeader)
                 .WithTitle($"❌ {T("title.taskIncomplete", lng)}")
                 .WithDescription(replyBody)
                 .WithCurrentTimestamp()

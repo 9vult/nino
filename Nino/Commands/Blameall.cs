@@ -56,6 +56,8 @@ namespace Nino.Commands
                     sb.AppendLine($"_{T("blameall.done", lng)}_");
                 else if (project.AniDBId != null && !await AirDateService.EpisodeAired(project.AniDBId, episode.Number, project.AirTime ?? "00:00"))
                     sb.AppendLine($"_{T("blameall.notYetAired", lng)}_");
+                else if (!episode.Tasks.Any(t => t.Done))
+                    sb.AppendLine($"_{T("blameall.notStarted", lng)}_");
                 else
                     sb.AppendLine(StaffList.GenerateProgress(project, episode));
             }

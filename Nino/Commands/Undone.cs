@@ -26,6 +26,7 @@ namespace Nino.Commands
         {
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
+            var gLng = interaction.GuildLocale ?? "en-US";
 
             // Sanitize inputs
             alias = alias.Trim();
@@ -63,15 +64,15 @@ namespace Nino.Commands
             episode.Tasks.Single(t => t.Abbreviation == abbreviation).Done = false;
 
             var taskTitle = project.KeyStaff.Concat(episode.AdditionalStaff).First(ks => ks.Role.Abbreviation == abbreviation).Role.Name;
-            var title = $"Episode {episodeNumber}";
+            var title = T("title.progress", gLng, episodeNumber);
             var status = Cache.GetConfig(project.GuildId)?.UpdateDisplay.Equals(UpdatesDisplayType.Extended) ?? false
-                ? StaffList.GenerateExplainProgress(project, episode, lng, abbreviation) // Explanitory
+                ? StaffList.GenerateExplainProgress(project, episode, gLng, abbreviation) // Explanitory
                 : StaffList.GenerateProgress(project, episode, abbreviation); // Standard
 
             status = $"❌ **{taskTitle}**\n{status}";
 
             var publishEmbed = new EmbedBuilder()
-                .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString(lng)})")
+                .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString(gLng)})")
                 .WithTitle(title)
                 .WithDescription(status)
                 .WithThumbnailUrl(project.PosterUri)
@@ -96,12 +97,16 @@ namespace Nino.Commands
             // Send success embed
             var replyStatus = StaffList.GenerateProgress(project, episode, abbreviation);
 
+            var replyHeader = project.IsPrivate
+                ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
+                : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
+
             var replyBody = Cache.GetConfig(project.GuildId)?.ProgressDisplay.Equals(ProgressDisplayType.Verbose) ?? false
                 ? $"{T("progress.undone", lng, episodeNumber, taskTitle)}\n\n{replyStatus}" // Verbose
                 : $"{T("progress.undone", lng, episodeNumber, taskTitle)}"; // Succinct (default)
 
             var replyEmbed = new EmbedBuilder()
-                .WithAuthor(name: $"{project.Title} ({project.Type.ToFriendlyString(lng)})")
+                .WithAuthor(name: replyHeader)
                 .WithTitle($"❌ {T("title.taskIncomplete", lng)}")
                 .WithDescription(replyBody)
                 .WithCurrentTimestamp()
