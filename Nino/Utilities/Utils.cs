@@ -13,13 +13,19 @@ namespace Nino.Utilities
         /// <param name="interaction">Interaction requesting resolution</param>
         /// <param name="observingGuildId">ID of the build being observed, if applicable</param>
         /// <returns>Project the alias references to, or null</returns>
-        public static Project? ResolveAlias(string query, SocketInteraction interaction, ulong? observingGuildId = null)
+        public static Project? ResolveAlias(string query, SocketInteraction interaction, ulong? observingGuildId = null, bool includeObservers = false)
         {
             var guildId = observingGuildId ?? interaction.GuildId ?? 0;
             var cache = Cache.GetProjects(guildId);
             if (cache == null) return null;
 
-            return cache.Where(p => string.Equals(p.Nickname, query, StringComparison.InvariantCultureIgnoreCase) 
+            
+            var targets = !includeObservers ? cache
+                : cache.Concat(Cache.GetObservers()
+                    .Where(o => o.GuildId == guildId)
+                    .SelectMany(o => Cache.GetProjects().Where(p => p.Id == o.ProjectId)));
+
+            return targets.Where(p => string.Equals(p.Nickname, query, StringComparison.InvariantCultureIgnoreCase) 
                 || p.Aliases.Any(a => string.Equals(a, query, StringComparison.InvariantCultureIgnoreCase))).FirstOrDefault();
         }
 

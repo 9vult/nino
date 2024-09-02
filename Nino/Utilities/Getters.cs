@@ -8,7 +8,7 @@ namespace Nino.Utilities
     {
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
 
-        public static List<string> GetFilteredAliases(ulong guildId, ulong userId, string query)
+        public static List<string> GetFilteredAliases(ulong guildId, ulong userId, string query, bool includeObservers = false)
         {
             List<Project> projects = [];
 
@@ -16,9 +16,12 @@ namespace Nino.Utilities
             projects.AddRange(Cache.GetProjects(guildId));
             
             // Observing guild projects
-            projects.AddRange(Cache.GetObservers()
-                .Where(o => o.GuildId == guildId)
-                .SelectMany(o => Cache.GetProjects().Where(p => p.Id == o.Id)));
+            if (includeObservers)
+            {
+                projects.AddRange(Cache.GetObservers()
+                    .Where(o => o.GuildId == guildId)
+                    .SelectMany(o => Cache.GetProjects().Where(p => p.Id == o.ProjectId)));
+            }
 
             // Local guild admins
             var guildAdmins = Cache.GetConfig(guildId)?.AdministratorIds ?? [];

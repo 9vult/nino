@@ -27,7 +27,7 @@ namespace Nino.Commands
             alias = alias.Trim();
             
             // Verify project
-            var project = Utils.ResolveAlias(alias, interaction);
+            var project = Utils.ResolveAlias(alias, interaction, includeObservers: true);
             if (project == null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
@@ -45,6 +45,13 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.blameall.invalidPageNumber", lng, map, "count"), interaction);
             }
 
+            // Some common episode counts (25) result in hanging episodes.
+            // The hanging episode should be included in the results.
+            if (episodes.Skip(pageNumber * pageSize).Count() == 1)
+            {
+                pageSize += 1;
+                pageCount -= 1;
+            }
             var pagedEpisodes = episodes.Skip((pageNumber - 1) * pageSize).Take(pageSize);
             
             StringBuilder sb = new();

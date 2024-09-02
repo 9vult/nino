@@ -26,7 +26,7 @@ namespace Nino.Commands
             alias = alias.Trim();
             
             // Verify project
-            var project = Utils.ResolveAlias(alias, interaction);
+            var project = Utils.ResolveAlias(alias, interaction, includeObservers: true);
             if (project == null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
