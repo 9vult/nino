@@ -48,6 +48,10 @@ namespace Nino.Commands
             var progress = explain ? StaffList.GenerateExplainProgress(project, episode, lng)
                 : StaffList.GenerateProgress(project, episode);
 
+            // Add the project's MOTD, if applicable
+            if (!string.IsNullOrEmpty(project.Motd))
+                progress = $"{project.Motd}\n{progress}";
+
             var title = project.IsPrivate
                 ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
                 : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";

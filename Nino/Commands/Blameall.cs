@@ -63,6 +63,10 @@ namespace Nino.Commands
             }
             var progress = sb.ToString();
 
+            // Add the project's MOTD, if applicable
+            if (!string.IsNullOrEmpty(project.Motd))
+                progress = $"{project.Motd}\n{progress}";
+
             var title = project.IsPrivate
                 ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
                 : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
