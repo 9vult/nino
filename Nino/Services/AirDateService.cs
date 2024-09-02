@@ -82,6 +82,12 @@ namespace Nino.Services
             }
         }
 
+        public static async Task<bool> EpisodeAired(string aniDbId, decimal episodeNumber, string airTime = MIDNIGHT)
+        {
+            var time = await GetAirDate(aniDbId, episodeNumber, airTime);
+            return time < DateTimeOffset.Now;
+        }
+
         public static async Task<DateTimeOffset?> GetAirDate(string aniDbId, decimal episodeNumber, string airTime = MIDNIGHT)
         {
             var response = await AniDBCache.Get(aniDbId);

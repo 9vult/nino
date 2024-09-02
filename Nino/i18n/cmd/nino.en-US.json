@@ -83,6 +83,18 @@
             "description": "Explain what any of this means"
         }
     },
+    "blameall": {
+        "name": "blameall",
+        "description": "Check the overall status of a project",
+        "project": {
+            "name": "project",
+            "description": "Project nickname"
+        },
+        "page": {
+            "name": "page",
+            "description": "Page number"
+        }
+    },
     "bulk": {
         "name": "bulk",
         "description": "Do a lot of episodes all at once!",

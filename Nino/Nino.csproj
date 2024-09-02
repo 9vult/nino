@@ -29,10 +29,6 @@
     <ProjectReference Include="..\Nino.Records\Nino.Records.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Records/" />
-  </ItemGroup>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <ItemGroup>
         <LOCALIZATION Include="$(ProjectDir)i18n\**\*.*" />

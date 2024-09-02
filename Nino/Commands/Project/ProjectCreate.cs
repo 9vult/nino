@@ -16,7 +16,7 @@ namespace Nino.Commands
             [Summary("nickname", "Project nickname")] string nickname,
             [Summary("title", "Full series title")] string title,
             [Summary("type", "Project type")] ProjectType type,
-            [Summary("length", "Number of episodes")] int length,
+            [Summary("length", "Number of episodes"), MinValue(1)] int length,
             [Summary("poster", "Poster image URL")] string posterUri,
             [Summary("private", "Is this project private?")] bool isPrivate,
             [Summary("updatechannel", "Channel to post updates to")] SocketTextChannel updateChannel,

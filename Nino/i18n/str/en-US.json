@@ -10,6 +10,8 @@
     "airDate.estimatedHeader": "Estimate:",
     "airDate.future": "Airs on {{date|1}} ({{rel|2}})",
     "airDate.past": "Aired on {{date|1}} ({{rel|2}})",
+    "blameall.done": "Done",
+    "blameall.notYetAired": "Not yet aired",
     "choice.project.edit.option.title": "Title",
     "choice.project.edit.option.poster": "Poster",
     "choice.project.edit.option.motd": "MOTD",
@@ -122,6 +124,7 @@
     "server.admin.removed": "I removed {{staff|1}}'s administrator privileges from this server.",
     "server.configuration.saved": "Your settings have been saved!",
     "title.about": "Nino Fansub Management Bot",
+    "title.blameall": "Blame (page {{page|1}}/{{count|2}})",
     "title.blamedEpisode": "Episode {{episode|1}}",
     "title.congaList": "Conga Participants",
     "title.released": "Released!",
@@ -137,6 +140,10 @@
     "title.youDidIt": "You did it!"
   },
   "plural": {
+    "error.blameall.invalidPageNumber": {
+      "one": "There is only **{{count|1}}** page!",
+      "other": "There are only **{{count|1}}** pages!"
+    },
     "progress.done.inTheDust.doItNow": {
       "one": "{{taskName|1}} is now {{count|2}} episode ahead.",
       "other": "{{taskName|1}} is now {{count|2}} episodes ahead."

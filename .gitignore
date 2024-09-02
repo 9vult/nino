@@ -5,7 +5,7 @@ node_modules/*
 **/appsettings*.json
 *.sh
 .vscode
-.cache/*
+**/.cache/*
 **/bin/
 **/obj/
 .vs/
