@@ -53,6 +53,7 @@ namespace Nino.Commands
                 Id = $"{project.Id}-{guildId}",
                 GuildId = guildId,
                 OriginGuildId = originGuildId,
+                OwnerId = interaction.User.Id,
                 ProjectId = project.Id,
                 Blame = blame,
                 ProgressWebhook = updatesUrl,

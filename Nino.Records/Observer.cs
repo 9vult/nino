@@ -8,6 +8,7 @@ namespace Nino.Records
         public required string Id;
         [JsonIgnore] public required ulong GuildId;
         [JsonIgnore] public required ulong OriginGuildId;
+        [JsonIgnore] public required ulong OwnerId;
         public required string ProjectId;
         public required bool Blame;
         [JsonIgnore] public ulong? RoleId;
@@ -26,6 +27,13 @@ namespace Nino.Records
         {
             get => OriginGuildId.ToString();
             set => OriginGuildId = ulong.Parse(value);
+        }
+
+        [JsonProperty("OwnerId")]
+        public string SerializationOwnerId
+        {
+            get => OwnerId.ToString();
+            set => OwnerId = ulong.Parse(value);
         }
 
         [JsonProperty("RoleId")]
