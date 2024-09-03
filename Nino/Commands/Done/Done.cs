@@ -1,10 +1,6 @@
-using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
 using Fergun.Interactive;
 using Nino.Handlers;
-using Nino.Records;
-using Nino.Records.Enums;
 using Nino.Utilities;
 using NLog;
 using static Localizer.Localizer;
@@ -36,6 +32,11 @@ namespace Nino.Commands
             var project = Utils.ResolveAlias(alias, interaction);
             if (project == null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+
+            // Check progress channel permissions
+            var goOn = await PermissionChecker.Precheck(_interactiveService, interaction, project, lng, false);
+            // Cancel
+            if (!goOn) return ExecutionResult.Success;
 
             if (episodeNumber != null)
                 return await HandleSpecified(interaction, project, abbreviation, (decimal)episodeNumber);

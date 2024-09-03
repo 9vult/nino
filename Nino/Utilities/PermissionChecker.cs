@@ -1,10 +1,9 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Fergun.Interactive;
+using Nino.Records;
+using Nino.Records.Enums;
+using static Localizer.Localizer;
 
 namespace Nino.Utilities
 {
@@ -48,6 +47,76 @@ namespace Nino.Utilities
                 && perms.EmbedLinks
                 && perms.MentionEveryone
                 && perms.ManageMessages;
+        }
+
+        // Check if the bot has permission to send progress updates
+        public static async Task<bool> Precheck(InteractiveService service, SocketInteraction interaction, Project project, string lng, bool isRelease = false)
+        {
+            // Check permissions
+            if (isRelease && CheckReleasePermissions(project.ReleaseChannelId))
+                    return true;
+            else if (!isRelease && CheckPermissions(project.UpdateChannelId))
+                return true;
+
+            // No permissions... do the thing
+
+            var channelMention = isRelease ? $"<#{project.ReleaseChannelId}>" : $"<#{project.UpdateChannelId}>";
+            var questionBody = T("missingPermsPrecheck.question", lng, channelMention);
+
+            var header = project.IsPrivate
+                ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
+                : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
+
+            var component = new ComponentBuilder()
+                .WithButton(T("missingPermsPrecheck.no.button", lng), "ninoprecheckcancel", ButtonStyle.Success)
+                .WithButton(T("missingPermsPrecheck.yes.button", lng), "ninoprecheckproceed", ButtonStyle.Danger)
+                .Build();
+            var questionEmbed = new EmbedBuilder()
+                .WithAuthor(header)
+                .WithTitle($"❓ {T("progress.done.inTheDust.question", lng)}")
+                .WithDescription(questionBody)
+                .WithCurrentTimestamp()
+                .Build();
+
+            var questionResponse = await interaction.ModifyOriginalResponseAsync(m => {
+                m.Embed = questionEmbed;
+                m.Components = component;
+            });
+
+            // Wait for response
+            var questionResult = await service.NextMessageComponentAsync(
+                m => m.Message.Id == questionResponse.Id, timeout: TimeSpan.FromSeconds(60));
+
+            bool fullSend = false;
+            string finalBody = string.Empty;
+
+            if (!questionResult.IsSuccess)
+                finalBody = T("progress.done.inTheDust.timeout", lng);
+            else
+            {
+                if (questionResult.Value.Data.CustomId == "ninoprecheckcancel")
+                    finalBody = T("missingPermsPrecheck.no.response", lng);
+                else
+                {
+                    fullSend = true;
+                    finalBody = T("missingPermsPrecheck.yes.response", lng);
+                }
+            }
+
+            // Update the question embed to replect the choice
+            var editedEmbed = new EmbedBuilder()
+                .WithAuthor(header)
+                .WithTitle($"❓ {T("progress.done.inTheDust.question", lng)}")
+                .WithDescription(finalBody)
+                .WithCurrentTimestamp()
+                .Build();
+
+            await questionResponse.ModifyAsync(m => {
+                m.Components = null;
+                m.Embed = editedEmbed;
+            });
+
+            return fullSend;
         }
     }
 }

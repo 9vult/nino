@@ -1,6 +1,7 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Fergun.Interactive;
 using Nino.Handlers;
 using Nino.Records.Enums;
 using Nino.Utilities;
@@ -9,10 +10,11 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    public class Release(InteractionHandler handler, InteractionService commands) : InteractionModuleBase<SocketInteractionContext>
+    public class Release(InteractionHandler handler, InteractionService commands, InteractiveService interactive) : InteractionModuleBase<SocketInteractionContext>
     {
         public InteractionService Commands { get; private set; } = commands;
         private readonly InteractionHandler _handler = handler;
+        private readonly InteractiveService _interactiveService = interactive;
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         [SlashCommand("release", "Release!")]
@@ -39,6 +41,11 @@ namespace Nino.Commands
 
             if (!Utils.VerifyUser(interaction.User.Id, project))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
+
+            // Check progress channel permissions
+            var goOn = await PermissionChecker.Precheck(_interactiveService, interaction, project, lng, false);
+            // Cancel
+            if (!goOn) return ExecutionResult.Success;
 
             var roleStr = roleId != null
                 ? roleId == project.GuildId ? "@everyone " : $"<@&{roleId}> "

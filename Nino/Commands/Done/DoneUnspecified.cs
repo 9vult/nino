@@ -53,16 +53,6 @@ namespace Nino.Commands
                 : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
 
             var questionBody = T("progress.done.inTheDust", lng, workingEpisodeNo, role.Name, nextTaskEpisodeNo);
-            var proceed = new ButtonBuilder()
-                .WithCustomId("ninodoneproceed")
-                .WithLabel(T("progress.done.inTheDust.doItNow.button", lng))
-                .WithStyle(ButtonStyle.Danger)
-                .Build();
-            var cancel = new ButtonBuilder()
-                .WithCustomId("ninodonecancel")
-                .WithLabel(T("progress.done.inTheDust.dontDoIt.button", lng))
-                .WithStyle(ButtonStyle.Secondary)
-                .Build();
             var questionEmbed = new EmbedBuilder()
                 .WithAuthor(header)
                 .WithTitle($"❓ {T("progress.done.inTheDust.question", lng)}")
@@ -70,8 +60,8 @@ namespace Nino.Commands
                 .WithCurrentTimestamp()
                 .Build();
             var component = new ComponentBuilder()
-                .WithButton(T("progress.done.inTheDust.doItNow.button", lng), "ninodoneproceed")
-                .WithButton(T("progress.done.inTheDust.dontDoIt.button", lng), "ninodonecancel")
+                .WithButton(T("progress.done.inTheDust.doItNow.button", lng), "ninodoneproceed", ButtonStyle.Danger)
+                .WithButton(T("progress.done.inTheDust.dontDoIt.button", lng), "ninodonecancel", ButtonStyle.Secondary)
                 .Build();
             var questionResponse = await interaction.ModifyOriginalResponseAsync(m => {
                 m.Embed = questionEmbed;

@@ -128,7 +128,7 @@ namespace Nino.Utilities
         /// <returns>void</returns>
         public static async System.Threading.Tasks.Task AlertError(string error, SocketGuild guild, string nickname, ulong ownerId, string location)
             => await AlertError(new Exception(error), guild, nickname, ownerId, location);
-
+        
         /// <summary>
         /// The current version of Nino
         /// </summary>

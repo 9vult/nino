@@ -1,6 +1,7 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Fergun.Interactive;
 using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
 using Nino.Records;
@@ -11,10 +12,11 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    public partial class Skip(InteractionHandler handler, InteractionService commands) : InteractionModuleBase<SocketInteractionContext>
+    public partial class Skip(InteractionHandler handler, InteractionService commands, InteractiveService interactive) : InteractionModuleBase<SocketInteractionContext>
     {
         public InteractionService Commands { get; private set; } = commands;
         private readonly InteractionHandler _handler = handler;
+        private readonly InteractiveService _interactiveService = interactive;
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
 
         [SlashCommand("skip", "Skip a position")]
@@ -37,6 +39,10 @@ namespace Nino.Commands
             if (project == null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
+            // Check progress channel permissions
+            var goOn = await PermissionChecker.Precheck(_interactiveService, interaction, project, lng, false);
+            // Cancel
+            if (!goOn) return ExecutionResult.Success;
 
             // Verify episode and task
             var episode = await Getters.GetEpisode(project, episodeNumber);
