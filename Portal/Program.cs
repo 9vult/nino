@@ -1,4 +1,4 @@
-﻿
+﻿using Microsoft.Azure.Cosmos;
 using Newtonsoft.Json;
 using Nino.Records;
 using Nino.Records.Enums;
@@ -8,8 +8,8 @@ using StreamReader sr = new StreamReader("projects.json");
 var json = sr.ReadToEnd();
 var FB = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, FBProject>>>(json);
 
-List<Project> projects = [];
-List<Episode> episodes = [];
+Dictionary<ulong, List<Project>> projects = [];
+Dictionary<string, List<Episode>> episodes = [];
 
 foreach (var gid in FB!.Keys)
 {
@@ -21,7 +21,13 @@ foreach (var gid in FB!.Keys)
 
         ulong? airRole = !string.IsNullOrEmpty(project.airReminderRole) ? project?.airReminderRole == "@everyone" ? guildId : ulong.Parse(project!.airReminderRole!) : null;
 
-        projects.Add(new Project()
+        if (!projects.TryGetValue(guildId, out var guildList))
+        {
+            guildList = [];
+            projects[guildId] = guildList;
+        }
+
+        guildList.Add(new Project()
         {
             Id = projectId,
             GuildId = guildId,
@@ -66,10 +72,12 @@ foreach (var gid in FB!.Keys)
 
         if (project?.episodes == null)
             continue;
+
+        List<Episode> episodeList = [];
         foreach (var epid in project.episodes.Keys)
         {
             var episode = project.episodes[epid]!;
-            episodes.Add(new Episode()
+            episodeList.Add(new Episode()
             {
                 Id = $"{projectId}-{episode.number}",
                 ProjectId = projectId,
@@ -95,7 +103,66 @@ foreach (var gid in FB!.Keys)
                 Updated = episode.updated != null ? DateTimeOffset.FromUnixTimeSeconds((long)episode.updated) : null
             });
         }
+        episodes[projectId] = episodeList;
     }
 }
+Console.WriteLine($"Ready! Processed {projects.Keys.Count} guilds, {projects.Values.Sum(c => c.Count)} projects ({episodes.Values.Sum(c => c.Count)})");
+Console.WriteLine("Press any key to continue to database setup...");
+Console.ReadKey(); // PAUSE
 
-Console.WriteLine();
+// Set up database
+var endpoint = "";
+var secret = "";
+var dbname = "";
+
+CosmosClient _client = new(
+    endpoint,
+    secret,
+    new CosmosClientOptions
+    {
+        ApplicationName = "Nino",
+        SerializerOptions = new CosmosSerializationOptions
+        {
+            PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase
+        }
+    }
+);
+
+Database _database = await _client.CreateDatabaseIfNotExistsAsync(dbname);
+Container _projectsContainer = await _database.CreateContainerIfNotExistsAsync("Projects", "/guildId");
+Container _episodesContainer = await _database.CreateContainerIfNotExistsAsync("Episodes", "/projectId");
+Container _configurationContainer = await _database.CreateContainerIfNotExistsAsync("Configuration", "/guildId");
+
+Console.WriteLine("Database is ready. Press any key to begin writing projects...");
+Console.ReadKey(); // PAUSE
+
+foreach (var pair in projects)
+{
+    var guildId = pair.Key;
+    var list = pair.Value;
+
+    TransactionalBatch pBatch = _projectsContainer.CreateTransactionalBatch(partitionKey: new PartitionKey(guildId.ToString()));
+    foreach (var project in list)
+    {
+        pBatch.UpsertItem(project);
+    }
+    await pBatch.ExecuteAsync();
+}
+
+Console.WriteLine("Projects are ready. Press any key to begin writing episodes...");
+Console.ReadKey(); // PAUSE
+
+foreach (var pair in episodes)
+{
+    var projectId = pair.Key;
+    var list = pair.Value;
+
+    TransactionalBatch eBatch = _episodesContainer.CreateTransactionalBatch(partitionKey: new PartitionKey(projectId));
+    foreach (var episode in list)
+    {
+        eBatch.UpsertItem(episode);
+    }
+    await eBatch.ExecuteAsync();
+}
+
+Console.WriteLine("Done!");
