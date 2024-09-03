@@ -70,7 +70,8 @@ namespace Nino.Commands
             catch (Exception e)
             {
                 log.Error(e.Message);
-                return await Response.Fail(T("error.release.failed", lng, e.Message), interaction);
+                var guild = Nino.Client.GetGuild(interaction.GuildId ?? 0);
+                await Utils.AlertError(T("error.release.failed", lng, e.Message), guild, project.Nickname, project.OwnerId, "Release");
             }
 
             // Publish to observers

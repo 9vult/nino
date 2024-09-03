@@ -1,10 +1,10 @@
 using System;
 using System.Text;
 using Discord;
-using Discord.Rest;
 using Newtonsoft.Json;
 using Nino.Records.Enums;
 using NLog;
+using static Localizer.Localizer;
 
 namespace Nino.Utilities
 {
@@ -43,6 +43,8 @@ namespace Nino.Utilities
                     catch (Exception e)
                     {
                         log.Error($"Progress webhook for observer {observer.Id} failed: {e}");
+                        var guild = Nino.Client.GetGuild(observer.OriginGuildId);
+                        await Utils.AlertError($"The following error occured while publishing to your observer: {e.Message}", guild, project.Nickname, observer.OwnerId, "Observer/Progress");
                     }
                 }
             }
@@ -86,6 +88,8 @@ namespace Nino.Utilities
                     catch (Exception e)
                     {
                         log.Error($"Releases webhook for observer {observer.Id} failed: {e}");
+                        var guild = Nino.Client.GetGuild(observer.OriginGuildId);
+                        await Utils.AlertError($"The following error occured while publishing to your observer: {e.Message}", guild, project.Nickname, observer.OwnerId, "Observer/Release");
                     }
                 }
             }

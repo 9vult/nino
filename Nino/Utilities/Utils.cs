@@ -101,6 +101,35 @@ namespace Nino.Utilities
         }
 
         /// <summary>
+        /// Alert project owners to an error
+        /// </summary>
+        /// <param name="exception">Error that occured</param>
+        /// <param name="guild">Guild where the error occured</param>
+        /// <param name="nickname">Name of the project</param>
+        /// <param name="ownerId">ID of the project owner</param>
+        /// <param name="location">Where the error occured</param>
+        /// <returns>void</returns>
+        public static async System.Threading.Tasks.Task AlertError(Exception exception, SocketGuild guild, string nickname, ulong ownerId, string location)
+        {
+            var message = $"[{location}]: \"{exception.Message}\" from **{guild.Name}** ({guild.Id}), project `{nickname}`.";
+
+            var owner = await Nino.Client.GetUserAsync(ownerId);
+            await owner.SendMessageAsync(message);
+        }
+
+        /// <summary>
+        /// Alert project owners to an error
+        /// </summary>
+        /// <param name="error">Error that occured</param>
+        /// <param name="guild">Guild where the error occured</param>
+        /// <param name="nickname">Name of the project</param>
+        /// <param name="ownerId">ID of the project owner</param>
+        /// <param name="location">Where the error occured</param>
+        /// <returns>void</returns>
+        public static async System.Threading.Tasks.Task AlertError(string error, SocketGuild guild, string nickname, ulong ownerId, string location)
+            => await AlertError(new Exception(error), guild, nickname, ownerId, location);
+
+        /// <summary>
         /// The current version of Nino
         /// </summary>
         public static string VERSION
