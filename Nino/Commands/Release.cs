@@ -43,7 +43,7 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Check progress channel permissions
-            var goOn = await PermissionChecker.Precheck(_interactiveService, interaction, project, lng, false);
+            var goOn = await PermissionChecker.Precheck(_interactiveService, interaction, project, lng, true);
             // Cancel
             if (!goOn) return ExecutionResult.Success;
 

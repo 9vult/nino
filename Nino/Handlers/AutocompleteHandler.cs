@@ -79,15 +79,24 @@ namespace Nino.Handlers
 
             List<AutocompleteResult> choices = [];
             var alias = ((string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")?.Value)?.Trim();
-            var episodeInput = (double?)interaction.Data.Options.FirstOrDefault(o => o.Name == "episode")?.Value;
+            var episodeInput = interaction.Data.Options.FirstOrDefault(o => o.Name == "episode")?.Value;
+            decimal? episodeNumber;
             if (alias != null)
             {
                 var cachedProject = Utils.ResolveAlias(alias, interaction);
                 if (cachedProject != null)
                 {
-                    if (episodeInput != null)
+                    if (episodeInput == null)
                     {
-                        var episodeNumber = Convert.ToDecimal(episodeInput);
+                        var episodes = Cache.GetEpisodes(cachedProject.Id);
+                        episodeNumber = episodes.FirstOrDefault(e => !e.Done)?.Number;
+                    }
+                    else
+                    {
+                        episodeNumber = Convert.ToDecimal(episodeInput);
+                    }
+                    if (episodeNumber != null)
+                    {
                         var cachedEpisode = Cache.GetEpisodes(cachedProject.Id).FirstOrDefault(e => e.Number == episodeNumber);
                         if (cachedEpisode == null)
                         {

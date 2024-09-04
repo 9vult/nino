@@ -63,10 +63,7 @@ namespace Nino.Commands
                 .WithButton(T("progress.done.inTheDust.doItNow.button", lng), "ninodoneproceed", ButtonStyle.Danger)
                 .WithButton(T("progress.done.inTheDust.dontDoIt.button", lng), "ninodonecancel", ButtonStyle.Secondary)
                 .Build();
-            var questionResponse = await interaction.ModifyOriginalResponseAsync(m => {
-                m.Embed = questionEmbed;
-                m.Components = component;
-            });
+            var questionResponse = await interaction.FollowupAsync(embed: questionEmbed, components: component);
 
             // Wait for response
             var questionResult = await interactiveService.NextMessageComponentAsync(
