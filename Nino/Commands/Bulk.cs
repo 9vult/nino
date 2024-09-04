@@ -62,26 +62,19 @@ namespace Nino.Commands
                 if (taskIndex != -1)
                 {
                     batch.PatchItem(id: e.Id, [
-                        PatchOperation.Set($"/tasks/{taskIndex}", isDone)
+                        PatchOperation.Set($"/tasks/{taskIndex}/done", isDone)
                     ]);
                 }
             }
             await batch.ExecuteAsync();
 
-            // Update task for embeds
-            startEpisode.Tasks.Single(t => t.Abbreviation == abbreviation).Done = false;
-
             var taskTitle = project.KeyStaff.Concat(startEpisode.AdditionalStaff).First(ks => ks.Role.Abbreviation == abbreviation).Role.Name;
             var title = T("title.progress.bulk", gLng, startEpisodeNumber, endEpisodeNumber);
-            var status = Cache.GetConfig(project.GuildId)?.UpdateDisplay.Equals(UpdatesDisplayType.Extended) ?? false
-                ? StaffList.GenerateExplainProgress(project, startEpisode, gLng, abbreviation) // Explanitory
-                : StaffList.GenerateProgress(project, startEpisode, abbreviation); // Standard
-
-            status = action switch
+            var status = action switch
             {
-                ProgressType.Done => $"✅ **{taskTitle}**\n{status}",
-                ProgressType.Undone => $"❌ **{taskTitle}**\n{status}",
-                ProgressType.Skipped => $":fast_forward: **{taskTitle}** {T("progress.skipped.appendage", gLng)}\n{status}",
+                ProgressType.Done => $"✅ **{taskTitle}**",
+                ProgressType.Undone => $"❌ **{taskTitle}**",
+                ProgressType.Skipped => $":fast_forward: **{taskTitle}** {T("progress.skipped.appendage", gLng)}",
                 _ => ""
             };
 
@@ -115,9 +108,17 @@ namespace Nino.Commands
 
             var replyBody = T("progress.bulk", lng, taskTitle, startEpisodeNumber, endEpisodeNumber);
 
+            var replyTitle = action switch
+            {
+                ProgressType.Done => $"✅ {T("title.taskComplete", lng)}",
+                ProgressType.Undone => $"❌ {T("title.taskIncomplete", lng)}",
+                ProgressType.Skipped => $":fast_forward: {T("title.taskSkipped", lng)}",
+                _ => ""
+            };
+
             var replyEmbed = new EmbedBuilder()
                 .WithAuthor(name: replyHeader)
-                .WithTitle($"❌ {T("title.taskIncomplete", lng)}")
+                .WithTitle(replyTitle)
                 .WithDescription(replyBody)
                 .WithCurrentTimestamp()
                 .Build();
