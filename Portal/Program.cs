@@ -4,19 +4,20 @@ using Nino.Records;
 using Nino.Records.Enums;
 using Portal;
 
-using StreamReader sr = new StreamReader("projects.json");
-var json = sr.ReadToEnd();
-var FB = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, FBProject>>>(json);
+using StreamReader projectsSr = new StreamReader("projects.json");
+var projectJson = projectsSr.ReadToEnd();
+var projectsFB = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, FBProject>>>(projectJson);
 
 Dictionary<ulong, List<Project>> projects = [];
 Dictionary<string, List<Episode>> episodes = [];
+List<Configuration> configurations = [];
 
-foreach (var gid in FB!.Keys)
+foreach (var gid in projectsFB!.Keys)
 {
     ulong guildId = ulong.Parse(gid);
-    foreach (var nickname in FB![gid].Keys)
+    foreach (var nickname in projectsFB![gid].Keys)
     {
-        var project = FB![gid][nickname]!;
+        var project = projectsFB![gid][nickname]!;
         var projectId = $"{guildId}-{nickname}";
 
         ulong? airRole = !string.IsNullOrEmpty(project.airReminderRole) ? project?.airReminderRole == "@everyone" ? guildId : ulong.Parse(project!.airReminderRole!) : null;
@@ -34,7 +35,7 @@ foreach (var gid in FB!.Keys)
             Nickname = nickname,
             Title = project.title,
             OwnerId = ulong.Parse(project.owner),
-            AdministratorIds = project.administrators?.Select(a => ulong.Parse(a)).ToArray() ?? [],
+            AdministratorIds = project.administrators?.Select(ulong.Parse).ToArray() ?? [],
             KeyStaff = project.keyStaff?.Select(ks => new Staff
             {
                 UserId = ulong.Parse(ks.Value.id),
@@ -106,7 +107,38 @@ foreach (var gid in FB!.Keys)
         episodes[projectId] = episodeList;
     }
 }
-Console.WriteLine($"Ready! Processed {projects.Keys.Count} guilds, {projects.Values.Sum(c => c.Count)} projects ({episodes.Values.Sum(c => c.Count)})");
+
+using StreamReader configSr = new StreamReader("configuration.json");
+var configJson = configSr.ReadToEnd();
+var configFB = JsonConvert.DeserializeObject<Dictionary<string, FBConfig>>(configJson);
+
+foreach (var pair in configFB!)
+{
+    var guildId = pair.Key;
+    var config = pair.Value;
+
+    configurations.Add(new Configuration()
+    {
+        Id = $"{guildId}-conf",
+        GuildId = ulong.Parse(guildId),
+        UpdateDisplay = config.progressDisplay switch
+        {
+            "Normal" => UpdatesDisplayType.Normal,
+            "Extended" => UpdatesDisplayType.Extended,
+            _ => UpdatesDisplayType.Normal
+        },
+        ProgressDisplay = config.doneDisplay switch
+        {
+            "Succinct" => ProgressDisplayType.Succinct,
+            "Verbose" => ProgressDisplayType.Verbose,
+            _ => ProgressDisplayType.Succinct
+        },
+        AdministratorIds = config.administrators?.Select(ulong.Parse).ToArray() ?? [],
+        ReleasePrefix = config.releasePrefix
+    });
+}
+
+Console.WriteLine($"Ready! Processed {projects.Keys.Count} guilds ({configurations.Count} configs), {projects.Values.Sum(c => c.Count)} projects ({episodes.Values.Sum(c => c.Count)} episodes)");
 Console.WriteLine("Press any key to continue to database setup...");
 Console.ReadKey(); // PAUSE
 
@@ -163,6 +195,14 @@ foreach (var pair in episodes)
         eBatch.UpsertItem(episode);
     }
     await eBatch.ExecuteAsync();
+}
+
+Console.WriteLine("Episodes are ready. Press any key to begin writing configs...");
+Console.ReadKey(); // PAUSE
+
+foreach (var config in configurations)
+{
+    await _configurationContainer.UpsertItemAsync(config);
 }
 
 Console.WriteLine("Done!");

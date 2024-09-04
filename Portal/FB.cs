@@ -61,3 +61,11 @@ public class FBConga
     public string current {get; set;}
     public string next {get; set;}
 }
+
+public class FBConfig
+{
+    public string? progressDisplay { get; set; }
+    public string? doneDisplay { get; set; }
+    public string[]? administrators { get; set; }
+    public string? releasePrefix { get; set; }
+}
