@@ -28,6 +28,11 @@ namespace Nino.Commands
             alias = alias.Trim();
             var roleId = role?.Id;
 
+            // Check for guild administrator status
+            var guild = Nino.Client.GetGuild(guildId);
+            var member = guild.GetUser(interaction.User.Id);
+            if (!member.GuildPermissions.Administrator) return await Response.Fail(T("error.notPrivileged", lng), interaction);
+
             // Validate no-op condition
             if (!blame && updatesUrl == null && releasesUrl == null)
                 return await Response.Fail(T("error.observerNoOp", lng), interaction);

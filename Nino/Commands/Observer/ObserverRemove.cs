@@ -22,6 +22,11 @@ namespace Nino.Commands
             var originGuildIdStr = serverId.Trim();
             alias = alias.Trim();
 
+            // Check for guild administrator status
+            var guild = Nino.Client.GetGuild(guildId);
+            var member = guild.GetUser(interaction.User.Id);
+            if (!member.GuildPermissions.Administrator) return await Response.Fail(T("error.notPrivileged", lng), interaction);
+
             // Validate observer server
             if (!ulong.TryParse(originGuildIdStr, out var originGuildId))
                 return await Response.Fail(T("error.invalidServerId", lng), interaction);
