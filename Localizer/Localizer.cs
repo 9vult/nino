@@ -1,21 +1,20 @@
 ﻿using MathEvaluation;
 using MathEvaluation.Context;
-using System;
-using System.Collections.ObjectModel;
+using System.Collections.Frozen;
 using System.Text.Json;
 
 namespace Localizer
 {
     public static class Localizer
     {
-        private static readonly Dictionary<string, StringLocalization> _strLocales = [];
-        private static readonly Dictionary<string, CommandLocalization> _cmdLocales = [];
+        private static FrozenDictionary<string, Localization>? _locales;
 
-        private static StringLocalization Fallback
+        private static Localization Fallback
         {
             get
             {
-                if (!_strLocales.TryGetValue(Configuration.FallbackLocale, out var table))
+                if (_locales is null) throw new LocalizationException($"Locales were not set up!");
+                if (!_locales.TryGetValue(Configuration.FallbackLocale, out var table))
                     throw new LocalizationException($"Fallback locale {Configuration.FallbackLocale} was not found.");
                 return table;
             }
@@ -31,7 +30,8 @@ namespace Localizer
         /// <exception cref="LocalizationException">Key was not found</exception>
         public static string T(string key, string locale, params object[] args)
         {
-            if (!_strLocales.TryGetValue(locale, out var table))
+            if (_locales is null) throw new LocalizationException($"Locales were not set up!");
+            if (!_locales.TryGetValue(locale, out var table))
                 table = Fallback;
 
             if (!table.Singular.TryGetValue(key, out var target))
@@ -63,9 +63,10 @@ namespace Localizer
         /// <exception cref="LocalizationException">Key was not found</exception>
         public static string T(string key, string locale, Dictionary<string, object> args, string pluralName = "number")
         {
+            if (_locales is null) throw new LocalizationException($"Locales were not set up!");
             Dictionary<string, string>? pluralTargets = null;
 
-            if (!_strLocales.TryGetValue(locale, out var table))
+            if (!_locales.TryGetValue(locale, out var table))
                 table = Fallback;
 
             if (!table.Singular.TryGetValue(key, out var target))
@@ -98,82 +99,13 @@ namespace Localizer
         }
 
         /// <summary>
-        /// Get a map of locales/name localizations for a command
-        /// </summary>
-        /// <param name="command">Name of the command</param>
-        /// <returns>Map of command name localizations</returns>
-        public static ReadOnlyDictionary<string, string> GetCommandNames(string command)
-        {
-            return new ReadOnlyDictionary<string, string>(
-                _cmdLocales.Values
-                    .Where(l => l.Commands.ContainsKey(command))
-                    .ToDictionary(t => t.Locale, t => t.Commands[command].Name)
-            );
-        }
-
-        /// <summary>
-        /// Get a map of locales/description localizations for a command
-        /// </summary>
-        /// <param name="command">Name of the command</param>
-        /// <returns>Map of command description localizations</returns>
-        public static ReadOnlyDictionary<string, string> GetCommandDescriptions(string command)
-        {
-            return new ReadOnlyDictionary<string, string>(
-                _cmdLocales.Values
-                    .Where(l => l.Commands.ContainsKey(command))
-                    .ToDictionary(t => t.Locale, t => t.Commands[command].Description)
-            );
-        }
-
-        /// <summary>
-        /// Get a map of locales/name localizations for an option
-        /// </summary>
-        /// <param name="option">Name of the option</param>
-        /// <returns>Map of option name localizations</returns>
-        public static ReadOnlyDictionary<string, string> GetOptionNames(string option)
-        {
-            return new ReadOnlyDictionary<string, string>(
-                _cmdLocales.Values
-                    .Where(l => l.Options.ContainsKey(option))
-                    .ToDictionary(t => t.Locale, t => t.Options[option].Name)
-            );
-        }
-
-        /// <summary>
-        /// Get a map of locales/description localizations for an option
-        /// </summary>
-        /// <param name="option">Name of the option</param>
-        /// <returns>Map of option description localizations</returns>
-        public static ReadOnlyDictionary<string, string> GetOptionDescriptions(string option)
-        {
-            return new ReadOnlyDictionary<string, string>(
-                _cmdLocales.Values
-                    .Where(l => l.Options.ContainsKey(option))
-                    .ToDictionary(t => t.Locale, t => t.Options[option].Description)
-            );
-        }
-
-        /// <summary>
-        /// Get a map of locales/name localizations for a choice
-        /// </summary>
-        /// <param name="choice">Name of the choice</param>
-        /// <returns>Map of choice name localizations</returns>
-        public static ReadOnlyDictionary<string, string> GetChoiceNames(string choice)
-        {
-            return new ReadOnlyDictionary<string, string>(
-                _cmdLocales.Values
-                    .Where(l => l.Choices.ContainsKey(choice))
-                    .ToDictionary(t => t.Locale, t => t.Choices[choice].Description)
-            );
-        }
-
-        /// <summary>
-        /// Load string localization files from the directory specified
+        /// Load localization files from the directory specified
         /// </summary>
         /// <param name="directory">Uri to the directory</param>
-        public static void LoadStringLocalizations(Uri directory)
+        public static void LoadLocalizations(Uri directory)
         {
             var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+            var locales = new Dictionary<string, Localization>();
 
             try
             {
@@ -182,9 +114,9 @@ namespace Localizer
                     try
                     {
                         using StreamReader sr = new(file);
-                        var table = JsonSerializer.Deserialize<StringLocalization>(sr.ReadToEnd(), options);
+                        var table = JsonSerializer.Deserialize<Localization>(sr.ReadToEnd(), options);
                         if (table == null) continue;
-                        _strLocales.Add(table.Locale, table);
+                        locales.Add(table.Locale, table);
                     }
                     catch (Exception)
                     {
@@ -196,37 +128,7 @@ namespace Localizer
             {
                 Console.WriteLine(e.Message);
             }
-        }
-
-        /// <summary>
-        /// Load command localization files from the directory specified
-        /// </summary>
-        /// <param name="directory">Uri to the directory</param>
-        public static void LoadCommandLocalizations(Uri directory)
-        {
-            var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-
-            try
-            {
-                foreach (var file in Directory.EnumerateFiles(directory.LocalPath, "*.json"))
-                {
-                    try
-                    {
-                        using StreamReader sr = new(file);
-                        var table = JsonSerializer.Deserialize<CommandLocalization>(sr.ReadToEnd(), options);
-                        if (table == null) continue;
-                        _cmdLocales.Add(table.Locale, table);
-                    }
-                    catch (Exception)
-                    {
-                        continue;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
+            _locales = FrozenDictionary.ToFrozenDictionary(locales);
         }
 
         /// <summary>
@@ -239,7 +141,7 @@ namespace Localizer
         /// <exception cref="LocalizationException"></exception>
         /// <exception cref="FormatException">An equation was malformed</exception>
         /// <exception cref="NotSupportedException">An equation did something not supported</exception>
-        private static string ResolvePluralTarget(decimal value, Dictionary<string, string> definitions, Dictionary<string, string> targets)
+        private static string ResolvePluralTarget(decimal value, FrozenDictionary<string, string> definitions, Dictionary<string, string> targets)
         {
             var context = new ProgrammingMathContext();
             string? pluralType = null;

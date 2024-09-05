@@ -67,7 +67,7 @@ namespace Nino
             var reminderService = new ReleaseReminderService();
 
             // Load localization files
-            LoadStringLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/str")));
+            LoadLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/str")));
 
             // Set up client
             var client = _services.GetRequiredService<DiscordSocketClient>();
