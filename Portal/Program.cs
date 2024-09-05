@@ -11,7 +11,7 @@ var projectsFB = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<str
 Dictionary<ulong, List<Project>> projects = [];
 Dictionary<string, List<Episode>> episodes = [];
 List<Configuration> configurations = [];
-
+#if false
 foreach (var gid in projectsFB!.Keys)
 {
     ulong guildId = ulong.Parse(gid);
@@ -142,6 +142,8 @@ Console.WriteLine($"Ready! Processed {projects.Keys.Count} guilds ({configuratio
 Console.WriteLine("Press any key to continue to database setup...");
 Console.ReadKey(); // PAUSE
 
+#endif
+
 // Set up database
 var endpoint = "";
 var secret = "";
@@ -164,6 +166,40 @@ Database _database = await _client.CreateDatabaseIfNotExistsAsync(dbname);
 Container _projectsContainer = await _database.CreateContainerIfNotExistsAsync("Projects", "/guildId");
 Container _episodesContainer = await _database.CreateContainerIfNotExistsAsync("Episodes", "/projectId");
 Container _configurationContainer = await _database.CreateContainerIfNotExistsAsync("Configuration", "/guildId");
+
+var projectSql = new QueryDefinition("SELECT * FROM c");
+List<Project> rawProjects = [];
+using FeedIterator<Project> feed = _projectsContainer!.GetItemQueryIterator<Project>(queryDefinition: projectSql);
+while (feed.HasMoreResults)
+{
+    FeedResponse<Project> response = await feed.ReadNextAsync();
+    foreach (Project p in response)
+    {
+        rawProjects.Add(p);
+    }
+}
+
+foreach (Project p in rawProjects)
+{
+    int i = 1;
+    foreach (var ks in p.KeyStaff)
+    {
+        if (ks.Role.Weight is null)
+        {
+            ks.Role.Weight = i;
+        }
+        else
+        {
+            ks.Role.Weight++;
+        }
+        i++;
+    }
+    await _projectsContainer.UpsertItemAsync(p);
+}
+
+Console.WriteLine();
+
+#if false
 
 Console.WriteLine("Database is ready. Press any key to begin writing projects...");
 Console.ReadKey(); // PAUSE
@@ -204,5 +240,7 @@ foreach (var config in configurations)
 {
     await _configurationContainer.UpsertItemAsync(config);
 }
+
+#endif
 
 Console.WriteLine("Done!");
