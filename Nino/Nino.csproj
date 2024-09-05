@@ -36,4 +36,11 @@
     <Copy SourceFiles="@(LOCALIZATION)" DestinationFolder="$(TargetDir)\i18n\%(RecursiveDir)" SkipUnchangedFiles="true" />
   </Target>
 
+  <Target Name="PostPublish" AfterTargets="Publish">
+    <ItemGroup>
+      <LOCALIZATION Include="$(ProjectDir)i18n\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(LOCALIZATION)" DestinationFolder="$(PublishDir)\i18n\%(RecursiveDir)" SkipUnchangedFiles="true" />
+  </Target>
+
 </Project>
