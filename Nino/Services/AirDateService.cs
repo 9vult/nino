@@ -88,6 +88,12 @@ namespace Nino.Services
             return time < DateTimeOffset.Now;
         }
 
+        public static bool EpisodeAired(XDocument doc, decimal episodeNumber, string airTime = MIDNIGHT)
+        {
+            var time = GetAirDate(doc, episodeNumber, airTime);
+            return time < DateTimeOffset.Now;
+        }
+
         public static async Task<DateTimeOffset?> GetAirDate(string aniDbId, decimal episodeNumber, string airTime = MIDNIGHT)
         {
             var response = await AniDBCache.Get(aniDbId);
@@ -98,7 +104,19 @@ namespace Nino.Services
             try
             {
                 var doc = XDocument.Parse(response);
+                return GetAirDate(doc, episodeNumber, airTime);
+            }
+            catch (XmlException e)
+            {
+                log.Error(e.Message);
+                throw new Exception("error.anidb.xml");
+            }
+        }
 
+        public static DateTimeOffset? GetAirDate(XDocument doc, decimal episodeNumber, string airTime = MIDNIGHT)
+        {
+            try
+            {
                 var root = doc.Root;
                 if (root?.Name.ToString() == "error")
                     throw new Exception("error.anidb.generic");
@@ -116,8 +134,7 @@ namespace Nino.Services
                     }
                 }
                 return null;
-            }
-            catch (XmlException e)
+            } catch (XmlException e)
             {
                 log.Error(e.Message);
                 throw new Exception("error.anidb.xml");

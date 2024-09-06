@@ -1,5 +1,7 @@
 ﻿using NLog;
 using System.Text;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace Nino.Utilities
 {
@@ -7,6 +9,8 @@ namespace Nino.Utilities
     {
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
         private const string CACHE = ".cache";
+
+        public static bool ANIDB_ENABLED { get; set; } = true;
 
         private static HttpClient _client = new(new HttpClientHandler()
         {
@@ -20,6 +24,9 @@ namespace Nino.Utilities
         /// <returns>XML content or an error code</returns>
         public static async Task<string> Get(string anidbId)
         {
+            if (!ANIDB_ENABLED)
+                return "error.anidb.disabled";
+
             var clientId = Nino.Config.AniDbApiClientName;
             var baseUrl = $"http://api.anidb.net:9001/httpapi?client={clientId}&clientver=1&protover=1&request=anime&aid={anidbId}";
 
@@ -75,6 +82,28 @@ namespace Nino.Utilities
             }
 
             return "error.anidb.generic";
+        }
+
+        /// <summary>
+        /// Get the XML document
+        /// </summary>
+        /// <param name="anidbId">AniDB ID</param>
+        /// <returns>XML document object</returns>
+        public static async Task<XDocument?> GetXml(string anidbId)
+        {
+            if (!ANIDB_ENABLED)
+                throw new Exception("error.anidb.disabled");
+
+            var response = await Get(anidbId);
+            try
+            {
+                return XDocument.Parse(response);
+            }
+            catch (XmlException e)
+            {
+                log.Error(e.Message);
+                throw new Exception("error.anidb.xml");
+            }
         }
 
         /// <summary>

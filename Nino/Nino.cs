@@ -64,7 +64,10 @@ namespace Nino
             await Cache.BuildCache();
 
             // Start services
-            var reminderService = new ReleaseReminderService();
+            if (!_cmdLineOptions.DisableAniDB)
+                _ = new ReleaseReminderService();
+            else
+                AniDBCache.ANIDB_ENABLED = false;
 
             // Load localization files
             LoadLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/str")));

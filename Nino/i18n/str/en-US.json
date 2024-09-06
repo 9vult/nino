@@ -44,6 +44,7 @@
     "error.anidb.404": "Could not fetch from AniDB: Data does not exist! (404 Not Found)",
     "error.anidb.apiError": "Air date unknown: AniDB API error",
     "error.anidb.cache.ioerror": "An I/O error occured while reading the AniDB cache",
+    "error.anidb.disabled": "AniDB functionality is currently disabled!",
     "error.anidb.generic": "Air date unknown: AniDB error",
     "error.anidb.notSpecified": "Air date unknown: Not specified on AniDB",
     "error.anidb.responseEmpty": "Air date unknown: AniDB response empty",
