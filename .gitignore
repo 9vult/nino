@@ -10,3 +10,4 @@ node_modules/*
 **/obj/
 .vs/
 .DS_STORE
+*.user
