@@ -61,15 +61,22 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Update database
+            List<decimal> completedEpisodes = [];
             TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(project));
             foreach (Episode e in (await Getters.GetEpisodes(project)).Where(e => e.Number >= startEpisodeNumber && e.Number <= endEpisodeNumber))
             {
                 var taskIndex = Array.IndexOf(e.Tasks, e.Tasks.Single(t => t.Abbreviation == abbreviation));
                 var isDone = action == ProgressType.Done || action == ProgressType.Skipped;
+
+                // Check if episode will be done
+                var episodeDone = isDone && !e.Tasks.Any(t => t.Abbreviation != abbreviation && !t.Done);
+                if (episodeDone) completedEpisodes.Add(e.Number);
+
                 if (taskIndex != -1)
                 {
                     batch.PatchItem(id: e.Id, [
                         PatchOperation.Set($"/tasks/{taskIndex}/done", isDone),
+                        PatchOperation.Set($"/done", episodeDone),
                         PatchOperation.Set($"/updated", DateTimeOffset.Now)
                     ]);
                 }
@@ -115,6 +122,15 @@ namespace Nino.Commands
                 : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
 
             var replyBody = T("progress.bulk", lng, taskTitle, startEpisodeNumber, endEpisodeNumber);
+            if (completedEpisodes.Count > 0)
+            {
+                Dictionary<string, object> map = new()
+                {
+                    ["count"] = completedEpisodes.Count,
+                    ["list"] = string.Join(", ", completedEpisodes)
+                };
+                replyBody = $"{replyBody}\n{T("progress.bulk.episodeComplete", lng, args: map, pluralName: "count")}";
+            }
 
             var replyTitle = action switch
             {

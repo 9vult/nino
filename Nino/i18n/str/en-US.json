@@ -110,7 +110,7 @@
     "progress.explain.complete": "(Complete)",
     "progress.explain.incomplete": "(Incomplete)",
     "progress.projectComplete": "**{{title|1}}** is complete.\nGreat job to everyone involved!",
-    "progress.released": "Nice job releasing **{{title|1}} {{type|2}}{{publishNumber|3}}**!",
+    "progress.released": "Nice job releasing **{{title|1}} {{type|2}} {{publishNumber|3}}**!",
     "progress.skipped": "**{{taskName|1}}** for episode {{episode|2}} has been skipped.\nIf you wish to do it for realsies, `/undone` it first.",
     "progress.skipped.appendage": "(Skipped)",
     "progress.undone": "So the episode {{episode|1}} **{{taskName|2}}** wasn't done, after all.",
@@ -156,6 +156,10 @@
     "progress.done.inTheDust.doItNow": {
       "one": "{{taskName|1}} is now {{count|2}} episode ahead.",
       "other": "{{taskName|1}} is now {{count|2}} episodes ahead."
+    },
+    "progress.bulk.episodeComplete": {
+      "one": "Also, {{count|1}} episode is now complete: `{{list|2}}`",
+      "other": "Also, {{count|1}} episodes are now complete: `{{list|2}}`"
     }
   }
 }
