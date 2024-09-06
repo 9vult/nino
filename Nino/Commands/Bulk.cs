@@ -69,7 +69,8 @@ namespace Nino.Commands
                 if (taskIndex != -1)
                 {
                     batch.PatchItem(id: e.Id, [
-                        PatchOperation.Set($"/tasks/{taskIndex}/done", isDone)
+                        PatchOperation.Set($"/tasks/{taskIndex}/done", isDone),
+                        PatchOperation.Set($"/updated", DateTimeOffset.Now)
                     ]);
                 }
             }
