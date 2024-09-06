@@ -59,14 +59,23 @@ namespace Nino.Commands
             {
                 sb.Append($"{episode.Number}. ");
 
-                if (episode.Done)
-                    sb.AppendLine($"_{T("blameall.done", lng)}_");
-                else if (project.AniDBId != null && !await AirDateService.EpisodeAired(project.AniDBId, episode.Number, project.AirTime ?? "00:00"))
-                    sb.AppendLine($"_{T("blameall.notYetAired", lng)}_");
-                else if (!episode.Tasks.Any(t => t.Done))
-                    sb.AppendLine($"_{T("blameall.notStarted", lng)}_");
-                else
-                    sb.AppendLine(StaffList.GenerateProgress(project, episode));
+                try
+                {
+                    if (episode.Done)
+                        sb.AppendLine($"_{T("blameall.done", lng)}_");
+                    else if (project.AniDBId != null && !await AirDateService.EpisodeAired(project.AniDBId, episode.Number, project.AirTime ?? "00:00"))
+                        sb.AppendLine($"_{T("blameall.notYetAired", lng)}_");
+                    else if (!episode.Tasks.Any(t => t.Done))
+                        sb.AppendLine($"_{T("blameall.notStarted", lng)}_");
+                    else
+                        sb.AppendLine(StaffList.GenerateProgress(project, episode));
+                }
+                catch (Exception e)
+                {
+                    if (e.Message.StartsWith("error."))
+                        sb.AppendLine(T(e.Message, lng));
+                }
+
             }
             var progress = sb.ToString();
 
