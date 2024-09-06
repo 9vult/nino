@@ -32,12 +32,12 @@ namespace Nino.Services
             {
                 foreach (var episode in Cache.GetEpisodes(project.Id).Where(e => !e.Done && !e.ReminderPosted))
                 {
-                    var airTime = await AirDateService.GetAirDate(project.AniDBId!, episode.Number, project.AirTime ?? "00:00");
-                    if (DateTimeOffset.Now < airTime)
-                        continue;
-
                     try
                     {
+                        var airTime = await AirDateService.GetAirDate(project.AniDBId!, episode.Number, project.AirTime ?? "00:00");
+                        if (DateTimeOffset.Now < airTime)
+                            continue;
+
                         if (await Nino.Client.GetChannelAsync((ulong)project.AirReminderChannelId!) is not SocketTextChannel channel) continue;
                         var gLng = channel.Guild.PreferredLocale;
                         
