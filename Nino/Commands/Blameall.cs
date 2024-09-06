@@ -96,7 +96,7 @@ namespace Nino.Commands
             StringBuilder sb = new ();
             foreach (var episode in pagedEpisodes)
             {
-                sb.Append($"{episode.Number}. ");
+                sb.Append($"{episode.Number}: ");
 
                 try
                 {
