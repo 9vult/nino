@@ -47,6 +47,10 @@ Remove a one-off task from a single episode.
 
 Swap someone else in for an additionalstaff task.
 
+#### additionalstaff setweight
+
+Set the weight of an Additional Staff position. The weight determines the order staff appear in progress and blame embeds. By default, Additional Staff have a weight of `1000000`. This does mean that [setting a Key Staff weight](#keystaff-setweight) to greater than `1000000` will place it after (default weight) Additional Staff positions for all episodes.
+
 ### blame
 
 Check on the status of a project. May include observed projects if the `blame` flag was set during observer creation. Defaults to the current "working episode", but any episode can be requested using the `episode` option.

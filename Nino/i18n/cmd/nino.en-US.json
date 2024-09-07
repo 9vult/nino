@@ -65,7 +65,26 @@
                 "name": "member",
                 "description": "Staff member"
             }
-        }
+        },
+        "setweight": {
+            "name": "setweight",
+            "description": "Set the weight of an Additional Staff position",
+            "project": {
+                "name": "project",
+                "description": "Project nickname"
+            },
+            "episode": {
+                "name": "episode",
+                "description": "Episode number"
+            },
+            "abbreviation": {
+                "name": "abbreviation",
+                "description": "Position shorthand"
+            },
+            "weight": {
+                "name": "weight",
+                "description": "Weight"
+            }
     },
     "blame": {
         "name": "blame",
