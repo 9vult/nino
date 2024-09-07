@@ -29,12 +29,18 @@ namespace Nino.Handlers
 
         private async Task ReadyAsync()
         {
+#if DEBUG
+            log.Info("Running in debug mode. Deploying slash commands...");
+            await _handler.RegisterCommandsGloballyAsync();
+            log.Info("Slash commands deployed");
+#else
             if (_cmdLineOptions.DeployCommands)
             {
                 log.Info("--deploy-commands is set. Deploying slash commands...");
                 await _handler.RegisterCommandsGloballyAsync();
                 log.Info("Slash commands deployed");
             }
+#endif
         }
 
         private async Task HandleSlashCommandInteraction(SocketSlashCommand interaction)

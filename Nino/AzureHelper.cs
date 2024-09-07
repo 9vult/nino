@@ -157,16 +157,6 @@ namespace Nino
         /// <summary>
         /// Partition Key for use when accessing Episodes
         /// </summary>
-        /// <param name="episode">Episode being accessed</param>
-        /// <returns>Partition Key of the episode's ProjectId</returns>
-        public static PartitionKey EpisodePartitionKey(CachedEpisode episode)
-        {
-            return new PartitionKey(episode.ProjectId);
-        }
-
-        /// <summary>
-        /// Partition Key for use when accessing Episodes
-        /// </summary>
         /// <param name="project">Project the episode being accessed is from</param>
         /// <returns>Partition Key of the project's id</returns>
         public static PartitionKey EpisodePartitionKey(Records.Project project)

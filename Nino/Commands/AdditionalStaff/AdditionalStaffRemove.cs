@@ -15,7 +15,7 @@ namespace Nino.Commands
         public async Task<RuntimeResult> Remove(
             [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
             [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] decimal episodeNumber,
-            [Summary("abbreviation", "Position shorthand")] string abbreviation
+            [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(AdditionalStaffAutocompleteHandler))] string abbreviation
         )
         {
             var interaction = Context.Interaction;

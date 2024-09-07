@@ -24,7 +24,7 @@ namespace Nino.Handlers
 
             List<AutocompleteResult> choices = [];
             var alias = ((string)focusedOption.Value).Trim();
-            if (alias != null)
+            if (alias is not null)
             {
                 choices.AddRange(Getters.GetFilteredAliases(guildId, userId, (string)focusedOption.Value, includeObservers)
                     .Select(m => new AutocompleteResult(m, m))
@@ -49,10 +49,10 @@ namespace Nino.Handlers
 
             List<AutocompleteResult> choices = [];
             var alias = ((string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")?.Value)?.Trim();
-            if (alias != null)
+            if (alias is not null)
             {
                 var cachedProject = Utils.ResolveAlias(alias, interaction);
-                if (cachedProject != null)
+                if (cachedProject is not null)
                 {
                     choices.AddRange(Cache.GetEpisodes(cachedProject.Id)
                         .Where(e => e.Number.ToString().StartsWith((string)focusedOption.Value))
@@ -81,12 +81,12 @@ namespace Nino.Handlers
             var alias = ((string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")?.Value)?.Trim();
             var episodeInput = interaction.Data.Options.FirstOrDefault(o => o.Name == "episode")?.Value;
             decimal? episodeNumber;
-            if (alias != null)
+            if (alias is not null)
             {
                 var cachedProject = Utils.ResolveAlias(alias, interaction);
-                if (cachedProject != null)
+                if (cachedProject is not null)
                 {
-                    if (episodeInput == null)
+                    if (episodeInput is null)
                     {
                         var episodes = Cache.GetEpisodes(cachedProject.Id);
                         episodeNumber = episodes.FirstOrDefault(e => !e.Done)?.Number;
@@ -95,10 +95,10 @@ namespace Nino.Handlers
                     {
                         episodeNumber = Convert.ToDecimal(episodeInput);
                     }
-                    if (episodeNumber != null)
+                    if (episodeNumber is not null)
                     {
                         var cachedEpisode = Cache.GetEpisodes(cachedProject.Id).FirstOrDefault(e => e.Number == episodeNumber);
-                        if (cachedEpisode == null)
+                        if (cachedEpisode is null)
                         {
                             // Return list of key staff
                             choices.AddRange(cachedProject.KeyStaff
@@ -136,16 +136,53 @@ namespace Nino.Handlers
 
             List<AutocompleteResult> choices = [];
             var alias = ((string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")?.Value)?.Trim();
-            if (alias != null)
+            if (alias is not null)
             {
                 var cachedProject = Utils.ResolveAlias(alias, interaction);
-                if (cachedProject != null)
+                if (cachedProject is not null)
                 {
                     // Return list of key staff
                     choices.AddRange(cachedProject.KeyStaff
                         .Where(ks => ks.Role.Abbreviation.StartsWith((string)focusedOption.Value))
                         .Select(t => new AutocompleteResult(t.Role.Abbreviation, t.Role.Abbreviation))
                     );
+                }
+            }
+            return AutocompletionResult.FromSuccess(choices.Take(25));
+        }
+    }
+
+    /// <summary>
+    /// Autocompletion for Additional Staff
+    /// </summary>
+    public class AdditionalStaffAutocompleteHandler : AutocompleteHandler
+    {
+        public override async Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
+        {
+            var interaction = (SocketAutocompleteInteraction)context.Interaction;
+            var commandName = interaction.Data.CommandName;
+            var focusedOption = interaction.Data.Current;
+            var guildId = interaction.GuildId ?? 0;
+            var userId = interaction.User.Id;
+
+            List<AutocompleteResult> choices = [];
+            var alias = ((string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")?.Value)?.Trim();
+            var episodeInput = (double?)interaction.Data.Options.FirstOrDefault(o => o.Name == "episode")?.Value;
+            if (alias is not null && episodeInput is not null)
+            {
+                var episodeNumber = Convert.ToDecimal(episodeInput);
+                var cachedProject = Utils.ResolveAlias(alias, interaction);
+                if (cachedProject is not null)
+                {
+                    var cachedEpisode = Cache.GetEpisodes(cachedProject.Id).FirstOrDefault(e => e.Number == episodeNumber);
+                    if (cachedEpisode is not null)
+                    {
+                        // Return list of additional staff
+                        choices.AddRange(cachedEpisode.AdditionalStaff
+                            .Where(ks => ks.Role.Abbreviation.StartsWith((string)focusedOption.Value))
+                            .Select(t => new AutocompleteResult(t.Role.Abbreviation, t.Role.Abbreviation))
+                        );
+                    }
                 }
             }
             return AutocompletionResult.FromSuccess(choices.Take(25));

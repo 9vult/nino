@@ -15,7 +15,7 @@ namespace Nino.Commands
         [SlashCommand("swap", "Swap a Key Staff into the whole project")]
         public async Task<RuntimeResult> Swap(
             [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-            [Summary("abbreviation", "Position shorthand")] string abbreviation,
+            [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(KeyStaffAutocompleteHandler))] string abbreviation,
             [Summary("member", "Staff member")] SocketUser member
         )
         {

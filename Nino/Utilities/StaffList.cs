@@ -16,7 +16,7 @@ namespace Nino.Utilities
         {
             StringBuilder sb = new();
 
-            foreach (var ks in project.KeyStaff.OrderBy(k => k.Role.Weight).Concat(episode.AdditionalStaff))
+            foreach (var ks in project.KeyStaff.Concat(episode.AdditionalStaff).OrderBy(k => k.Role.Weight ?? decimal.MaxValue))
             {
                 var task = episode.Tasks.First(t => t.Abbreviation == ks.Role.Abbreviation);
                 if (task.Done)
@@ -38,7 +38,7 @@ namespace Nino.Utilities
         {
             StringBuilder sb = new();
 
-            foreach (var ks in project.KeyStaff.OrderBy(k => k.Role.Weight).Concat(episode.AdditionalStaff))
+            foreach (var ks in project.KeyStaff.Concat(episode.AdditionalStaff).OrderBy(k => k.Role.Weight ?? decimal.MaxValue))
             {
                 var task = episode.Tasks.First(t => t.Abbreviation == ks.Role.Abbreviation);
                 if (task.Abbreviation == updated)
@@ -66,7 +66,7 @@ namespace Nino.Utilities
         {
             StringBuilder sb = new();
 
-            foreach (var ks in project.KeyStaff.OrderBy(k => k.Role.Weight).Concat(episode.AdditionalStaff))
+            foreach (var ks in project.KeyStaff.Concat(episode.AdditionalStaff).OrderBy(k => k.Role.Weight ?? decimal.MaxValue))
             {
                 var task = episode.Tasks.First(t => t.Abbreviation == ks.Role.Abbreviation);
                 if (task.Abbreviation == updated)
