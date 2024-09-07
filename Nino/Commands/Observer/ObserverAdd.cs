@@ -13,7 +13,7 @@ namespace Nino.Commands
         public async Task<RuntimeResult> Add(
             [Summary("serverid", "ID of the server you want to observe")] string serverId,
             [Summary("project", "Project nickname")] string alias,
-            [Summary("blame", "Should this project's aliases show up in /blame?")] bool blame = false,
+            [Summary("blame", "Should this project's aliases show up in /blame?")] bool blame,
             [Summary("updates", "Webhook URL for progress updates")] string? updatesUrl = null,
             [Summary("releases", "Webhook URL for releases")] string? releasesUrl = null,
             [Summary("role", "Role to ping for releases")] SocketRole? role = null
