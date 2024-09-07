@@ -2,7 +2,12 @@
 node_modules
 node_modules/*
 .env
-firebase.json
+**/appsettings*.json
 *.sh
 .vscode
-.cache/*
+**/.cache/*
+**/bin/
+**/obj/
+.vs/
+.DS_STORE
+*.user
