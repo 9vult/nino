@@ -29,7 +29,7 @@ namespace Nino.Handlers
 
         private async Task ReadyAsync()
         {
-            if (_cmdLineOptions.DeployCommands || true)
+            if (_cmdLineOptions.DeployCommands)
             {
                 log.Info("--deploy-commands is set. Deploying slash commands...");
                 await _handler.RegisterCommandsGloballyAsync();

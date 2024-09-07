@@ -63,6 +63,7 @@ namespace Nino.Services
 
                     using var stream = File.OpenWrite(filename);
                     await JsonSerializer.SerializeAsync(stream, apiResponse);
+                    return apiResponse;
                 }
             }
             catch (HttpRequestException e) when (e.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -74,8 +75,7 @@ namespace Nino.Services
                 log.Error(e.Message);
                 return new() { Error = "error.anilist.apiError" };
             }
-            return new() { Error = "error.anilist.generic" };
-
+            return new() { Error = $"error.anilist.generic" };
         }
 
         private static StringContent CreateQuery(int id) =>
