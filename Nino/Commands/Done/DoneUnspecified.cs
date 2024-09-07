@@ -15,7 +15,7 @@ namespace Nino.Commands
         {
             var lng = interaction.UserLocale;
 
-            var episodes = Cache.GetEpisodes(project.Id);
+            var episodes = Cache.GetEpisodes(project.Id).OrderBy(e => e.Number).ToList();
 
             // Find the episode the team is working on
             var workingEpisodeNo = episodes.FirstOrDefault(e => !e.Done)?.Number ?? episodes.LastOrDefault()?.Number;
@@ -80,7 +80,9 @@ namespace Nino.Commands
                 else
                 {
                     fullSend = true;
-                    var diff = Math.Ceiling((decimal)nextTaskEpisodeNo - (decimal)workingEpisodeNo);
+                    var nextTaskIndex = episodes.FindIndex(e => e.Number == nextTaskEpisodeNo);
+                    var workingIndex = episodes.FindIndex(e => e.Number == workingEpisodeNo);
+                    var diff = nextTaskIndex - workingIndex;
                     Dictionary<string, object> map = new() { ["taskName"] = role.Name, ["count"] = diff };
                     finalBody = T("progress.done.inTheDust.doItNow", lng, args: map, pluralName: "count");
                 }
