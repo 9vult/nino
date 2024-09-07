@@ -40,12 +40,16 @@ namespace Nino.Commands
             await episodeBatch.ExecuteAsync();
 
             // Remove observers from database
-            TransactionalBatch observerBatch = AzureHelper.Observers!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.GuildId));
-            foreach (Records.Observer o in Cache.GetObservers(project.GuildId))
+            var observers = Cache.GetObservers(project.GuildId);
+            if (observers.Count > 0)
             {
-                observerBatch.DeleteItem(o.Id);
+                TransactionalBatch observerBatch = AzureHelper.Observers!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.GuildId));
+                foreach (Records.Observer o in observers)
+                {
+                    observerBatch.DeleteItem(o.Id);
+                }
+                await observerBatch.ExecuteAsync();
             }
-            await observerBatch.ExecuteAsync();
 
             // Send success embed
             var embed = new EmbedBuilder()
