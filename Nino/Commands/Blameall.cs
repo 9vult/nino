@@ -47,28 +47,17 @@ namespace Nino.Commands
             var pageLength = Math.Floor(episodes.Count() / pageCount);
             var roundUp = episodes.Count() % pageCount;
 
-            XDocument? doc = null;
-            string anidbError = string.Empty;
-            try
-            {
-                 doc = !string.IsNullOrEmpty(project.AniDBId) ? (await AniDBCache.GetXml(project.AniDBId)) : null;
-            }
-            catch (Exception e)
-            {
-                anidbError = T(e.Message, lng);
-            }
-
             // Build the paginator
             var paginator = new LazyPaginatorBuilder()
                 .AddUser(Context.User)
-                .WithPageFactory((int page0) =>
+                .WithPageFactory(async (int page0) =>
                 {
                     var page1 = page0 + 1;
                     var skip = (int)(page0 * pageLength + Math.Min(page0, roundUp));
                     var length = (int)(pageLength + Math.Min(page1, roundUp));
 
                     var pagedEpisodes = episodes.Skip(skip).Take(length);
-                    var progress = BuildProgress(pagedEpisodes, project, lng, doc, anidbError);
+                    var progress = await BuildProgress(pagedEpisodes, project, lng);
 
                     // Add the project's MOTD, if applicable
                     if (!string.IsNullOrEmpty(project.Motd))
@@ -91,7 +80,7 @@ namespace Nino.Commands
             return ExecutionResult.Success;
         }
 
-        private static string BuildProgress(IEnumerable<Episode> pagedEpisodes, Project project, string lng, XDocument? doc, string? anidbError = null)
+        private static async Task<string> BuildProgress(IEnumerable<Episode> pagedEpisodes, Project project, string lng)
         {
             StringBuilder sb = new ();
             foreach (var episode in pagedEpisodes)
@@ -104,10 +93,8 @@ namespace Nino.Commands
                         sb.AppendLine($"_{T("blameall.done", lng)}_");
                     else if (episode.Tasks.Any(t => t.Done))
                         sb.AppendLine(StaffList.GenerateProgress(project, episode));
-                    else if (doc is not null && !AirDateService.EpisodeAired(doc, episode.Number, project.AirTime ?? "00:00"))
+                    else if (project.AniListId is not null && !await AirDateService.EpisodeAired((int)project.AniListId, episode.Number))
                         sb.AppendLine($"_{T("blameall.notYetAired", lng)}_");
-                    else if (!string.IsNullOrEmpty(anidbError))
-                        sb.AppendLine(anidbError);
                     else
                         sb.AppendLine($"_{T("blameall.notStarted", lng)}_");
                 }

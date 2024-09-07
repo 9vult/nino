@@ -466,11 +466,8 @@
                 "MOTD": {
                     "name": "MOTD"
                 },
-                "AniDBId": {
-                    "name": "AniDBId"
-                },
-                "AirTime24h": {
-                    "name": "AirTime24h"
+                "AniListId": {
+                    "name": "AniListId"
                 },
                 "IsPrivate": {
                     "name": "IsPrivate"

@@ -12,7 +12,7 @@ namespace Nino.Services
     {
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
         
-        private const int FIVE_MINUTES = 1 * 60 * 1000;
+        private const int FIVE_MINUTES = 5 * 60 * 1000;
         private readonly System.Timers.Timer _timer;
 
         public ReleaseReminderService()
@@ -28,14 +28,14 @@ namespace Nino.Services
         private async Task CheckForReleases()
         {
             Dictionary<string, List<CachedEpisode>> marked = [];
-            foreach (var project in Cache.GetProjects().Where(p => p.AirReminderEnabled && !string.IsNullOrEmpty(p.AniDBId)))
+            foreach (var project in Cache.GetProjects().Where(p => p.AirReminderEnabled && p.AniListId is not null))
             {
                 foreach (var episode in Cache.GetEpisodes(project.Id).Where(e => !e.Done && !e.ReminderPosted))
                 {
                     try
                     {
-                        var airTime = await AirDateService.GetAirDate(project.AniDBId!, episode.Number, project.AirTime ?? "00:00");
-                        if (DateTimeOffset.Now < airTime)
+                        var airTime = await AirDateService.GetAirDate((int)project.AniListId!, episode.Number);
+                        if (airTime is null || DateTimeOffset.Now < airTime)
                             continue;
 
                         if (await Nino.Client.GetChannelAsync((ulong)project.AirReminderChannelId!) is not SocketTextChannel channel) continue;
@@ -48,13 +48,13 @@ namespace Nino.Services
                         }
                         markedList.Add(episode);
 
-                        var role = project.AirReminderRoleId != null
+                        var role = project.AirReminderRoleId is not null
                             ? project.AirReminderRoleId == project.GuildId ? "@everyone" : $"<@&{project.AirReminderRoleId}>"
                             : "";
                         var embed = new EmbedBuilder()
                             .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString(gLng)})")
                             .WithTitle(T("title.aired", gLng, episode.Number))
-                            .WithDescription(await AirDateService.GetAirDateString(project.AniDBId!, episode.Number, project.AirTime ?? "00:00", gLng))
+                            .WithDescription(await AirDateService.GetAirDateString((int)project.AniListId!, episode.Number, gLng))
                             .WithThumbnailUrl(project.PosterUri)
                             .WithCurrentTimestamp()
                             .Build();

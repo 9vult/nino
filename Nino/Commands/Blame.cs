@@ -57,9 +57,9 @@ namespace Nino.Commands
                 : StaffList.GenerateProgress(project, episode));
 
             // Add any update information
-            if (project.AniDBId != null && !episode.Tasks.Any(t => t.Done))
+            if (project.AniListId != null && !episode.Tasks.Any(t => t.Done))
             {
-                var airStatus = await AirDateService.GetAirDateString(project.AniDBId, episode.Number, project.AirTime ?? "00:00", lng);
+                var airStatus = await AirDateService.GetAirDateString((int)project.AniListId, episode.Number, lng);
                 progress.AppendLine();
                 progress.AppendLine(airStatus);
             }

@@ -60,14 +60,12 @@ namespace Nino.Commands
                     helperText = T("info.resettable", lng);
                     break;
 
-                case ProjectEditOption.AniDBId:
-                    operation = PatchOperation.Replace($"/aniDBId", newValue);
-                    break;
-
-                case ProjectEditOption.AirTime24h:
-                    if (!Time().IsMatch(newValue))
-                        return await Response.Fail(T("error.incorrectAirTimeFormat", lng), interaction);
-                    operation = PatchOperation.Replace($"/airTime", newValue);
+                case ProjectEditOption.AniListId:
+                    var ok = int.TryParse(newValue, out var id);
+                    if (ok)
+                        operation = PatchOperation.Replace($"/aniListId", id);
+                    else
+                        return await Response.Fail(T("error.incorrectIntegerFormat", lng), interaction);
                     break;
 
                 case ProjectEditOption.IsPrivate:

@@ -9,7 +9,6 @@ namespace Nino
         public required string AzureClientSecret { get; set; }
         public required string AzureCosmosDbName { get; set; }
         public required string DiscordApiToken { get; set; }
-        public required string AniDbApiClientName { get; set; }
     }
 
     public class CmdLineOptions
@@ -17,7 +16,7 @@ namespace Nino
         [Option("d", "deploy-commands", Required = false, HelpText = "(Re)deploy slash commands on startup")]
         public bool DeployCommands { get; set; }
         
-        [Option("a", "disable-anidb", Required = false, HelpText = "Disable AniDB API functionality")]
-        public bool DisableAniDB { get; set; }
+        [Option("a", "disable-anilist", Required = false, HelpText = "Disable AniList API functionality")]
+        public bool DisableAniList { get; set; }
     }
 }

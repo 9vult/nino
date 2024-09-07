@@ -1,8 +1,4 @@
-﻿using Nino.Utilities;
-using NLog;
-using System.Xml;
-using System.Xml.Linq;
-
+﻿using NLog;
 using static Localizer.Localizer;
 
 namespace Nino.Services
@@ -11,22 +7,32 @@ namespace Nino.Services
     {
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
         private const string LANG = "en-US";
-        private const string MIDNIGHT = "00:00";
-        public static async Task<string> GetAirDateString(string aniDbId, decimal episodeNumber, string airTime = MIDNIGHT, string lng = LANG)
+
+        public static async Task<string> GetAirDateString(int aniListId, decimal episodeNumber, string lng = LANG)
         {
             try
             {
                 var estimated = false;
-                var date = await GetAirDate(aniDbId, episodeNumber, airTime);
-                if (date == null)
+                var date = await GetAirDate(aniListId, episodeNumber);
+                if (date is null)
                 { 
                     estimated = true;
-                    date = await GetStartDate(aniDbId, airTime);
-                    if (date == null)
-                        return T("error.anidb.notSpecified", lng);
 
-                    // estimate the date based on the episode number
-                    date?.Add(new TimeSpan(days: (int)(7 * episodeNumber - 1), 0, 0, 0));
+                    // estimate based on "previous" episode
+                    var previousNumber = Math.Floor(episodeNumber) == episodeNumber ? episodeNumber - 1 : Math.Floor(episodeNumber);
+                    date = await GetAirDate(aniListId, episodeNumber);
+                    if (date is not null)
+                    {
+                        date?.Add(new TimeSpan(days: 7, 0, 0, 0)); // Add a week
+                    }
+                    else
+                    {
+                        // estimate the date based on the episode number and series start date
+                        date = await GetStartDate(aniListId);
+                        if (date is null)
+                            return T("error.anilist.notSpecified", lng);
+                        date?.Add(new TimeSpan(days: (int)(7 * episodeNumber - 1), 0, 0, 0));
+                    }
                 }
 
                 var future = date > DateTimeOffset.Now;
@@ -51,94 +57,38 @@ namespace Nino.Services
             }
         }
 
-        public static async Task<DateTimeOffset?> GetStartDate(string aniDbId, string airTime = MIDNIGHT)
+        public static async Task<DateTimeOffset?> GetStartDate(int aniListId)
         {
-            var response = await AniDBCache.Get(aniDbId);
-            if (response.StartsWith("error"))
+            var response = await AniListService.Get(aniListId);
+            if (!string.IsNullOrEmpty(response?.Error))
             {
-                throw new Exception(response);
+                throw new Exception(response.Error);
             }
-            try
-            {
-                var doc = XDocument.Parse(response);
-
-                var root = doc.Root;
-                if (root?.Name.ToString() == "error")
-                    throw new Exception("error.anidb.generic");
-
-                var airDate = root?.Element("startdate")?.Value; // YYYY-MM-DD
-                if (airDate != null)
-                {
-                    airDate = $"{airDate}T{airTime}+09:00"; // Japan
-                    return DateTimeOffset.Parse(airDate);
-                }
-
-                return null;
-            }
-            catch (XmlException e)
-            {
-                log.Error(e.Message);
-                throw new Exception("error.anidb.xml");
-            }
+            return response?.StartDate;
         }
 
-        public static async Task<bool> EpisodeAired(string aniDbId, decimal episodeNumber, string airTime = MIDNIGHT)
+        public static async Task<bool> EpisodeAired(int aniListId, decimal episodeNumber)
         {
-            var time = await GetAirDate(aniDbId, episodeNumber, airTime);
+            var time = await GetAirDate(aniListId, episodeNumber);
             return time < DateTimeOffset.Now;
         }
 
-        public static bool EpisodeAired(XDocument doc, decimal episodeNumber, string airTime = MIDNIGHT)
+        public static async Task<DateTimeOffset?> GetAirDate(int aniListId, decimal episodeNumber)
         {
-            var time = GetAirDate(doc, episodeNumber, airTime);
-            return time < DateTimeOffset.Now;
-        }
-
-        public static async Task<DateTimeOffset?> GetAirDate(string aniDbId, decimal episodeNumber, string airTime = MIDNIGHT)
-        {
-            var response = await AniDBCache.Get(aniDbId);
-            if (response.StartsWith("error"))
+            var response = await AniListService.Get(aniListId);
+            if (!string.IsNullOrEmpty(response?.Error))
             {
-                throw new Exception(response);
+                throw new Exception(response.Error);
             }
-            try
-            {
-                var doc = XDocument.Parse(response);
-                return GetAirDate(doc, episodeNumber, airTime);
-            }
-            catch (XmlException e)
-            {
-                log.Error(e.Message);
-                throw new Exception("error.anidb.xml");
-            }
-        }
 
-        public static DateTimeOffset? GetAirDate(XDocument doc, decimal episodeNumber, string airTime = MIDNIGHT)
-        {
-            try
+            foreach (var episode in response?.Episodes ?? [])
             {
-                var root = doc.Root;
-                if (root?.Name.ToString() == "error")
-                    throw new Exception("error.anidb.generic");
-
-                var episodes = doc.Descendants("episode");
-                var target = episodes.FirstOrDefault(e => e.Element("epno")?.Value == episodeNumber.ToString());
-
-                if (target != null)
+                if (episode.Episode == episodeNumber)
                 {
-                    var airDate = target.Element("airdate")?.Value; // YYYY-MM-DD
-                    if (airDate != null)
-                    {
-                        airDate = $"{airDate}T{airTime}+09:00"; // Japan
-                        return DateTimeOffset.Parse(airDate);
-                    }
+                    return DateTimeOffset.FromUnixTimeSeconds(episode.AiringAt);
                 }
-                return null;
-            } catch (XmlException e)
-            {
-                log.Error(e.Message);
-                throw new Exception("error.anidb.xml");
             }
+            return null;
         }
     }
 }

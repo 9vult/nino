@@ -20,7 +20,8 @@ namespace Nino.Commands
             [Summary("poster", "Poster image URL")] string posterUri,
             [Summary("private", "Is this project private?")] bool isPrivate,
             [Summary("updatechannel", "Channel to post updates to")] SocketTextChannel updateChannel,
-            [Summary("releaseChannel", "Channel to post releases to")] SocketTextChannel releaseChannel
+            [Summary("releaseChannel", "Channel to post releases to")] SocketTextChannel releaseChannel,
+            [Summary("anilistid", "AniList ID")] int? aniListId = null
         )
         {
             var interaction = Context.Interaction;
@@ -60,6 +61,7 @@ namespace Nino.Commands
                 KeyStaff = [],
                 CongaParticipants = [],
                 Aliases = [],
+                AniListId = aniListId
             };
 
             var episodes = new List<Episode>();

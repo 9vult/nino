@@ -20,8 +20,7 @@ namespace Nino.Records
         public required CongaParticipant[] CongaParticipants;
         public required string[] Aliases;
         public string? Motd;
-        public string? AniDBId;
-        public string? AirTime;
+        public int? AniListId;
         public required bool AirReminderEnabled;
         [JsonIgnore] public ulong? AirReminderChannelId;
         [JsonIgnore] public ulong? AirReminderRoleId;
