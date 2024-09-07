@@ -1,0 +1,227 @@
+{
+  "lang": "en-US",
+  "commands": {
+    "help": {
+      "name": "help",
+      "description": "Ohjeita Ninon käyttöön"
+    },
+    "about": {
+      "name": "about",
+      "description": "Tietoa Ninosta"
+    },
+    "newproject": {
+      "name": "newproject",
+      "description": "Luo uusi projekti"
+    },
+    "addstaff": {
+      "name": "addstaff",
+      "description": "Lisää projektiin pääasiallinen tekijärooli"
+    },
+    "removestaff": {
+      "name": "removestaff",
+      "description": "Poista projektista pääasiallinen tekijärooli"
+    },
+    "setweight": {
+      "name": "setweight",
+      "description": "Aseta pääasiallisen tekijäroolin paino (pienempi = korkeammalla)"
+    },
+    "swapstaff": {
+      "name": "swapstaff",
+      "description": "Vaihda projektin pääasiallisia tekijöitä"
+    },
+    "addadditionalstaff": {
+      "name": "addadditionalstaff",
+      "description": "Lisää jaksolle ylimääräinen tekijärooli"
+    },
+    "removeadditionalstaff": {
+      "name": "removeadditionalstaff",
+      "description": "Poista jaksolta ylimääräinen tekijärooli"
+    },
+    "swapadditionalstaff": {
+      "name": "swapadditionalstaff",
+      "description": "Vaihda jakson ylimääräisiä tekijöitä"
+    },
+    "transferownership": {
+      "name": "transferownership",
+      "description": "Siirrä projektin omistajuus toiselle käyttäjälle"
+    },
+    "deleteproject": {
+      "name": "deleteproject",
+      "description": "Poista projekti"
+    },
+    "editproject": {
+      "name": "editproject",
+      "description": "Muokkaa projektia"
+    },
+    "addepisode": {
+      "name": "addepisode",
+      "description": "Lisää jakso"
+    },
+    "removeepisode": {
+      "name": "removeepisode",
+      "description": "Poista jakso"
+    },
+    "addalias": {
+      "name": "addalias",
+      "description": "Lisää projektille lisänimi"
+    },
+    "removealias": {
+      "name": "removealias",
+      "description": "Poista projektilta lisänimi"
+    },
+    "done": {
+      "name": "done",
+      "description": "Merkitse rooli valmiiksi"
+    },
+    "undone": {
+      "name": "undone",
+      "description": "Merkitse rooli keskeneräiseksi"
+    },
+    "skip": {
+      "name": "skip",
+      "description": "Merkitse rooli ohitetuksi"
+    },
+    "blame": {
+      "name": "blame",
+      "description": "Tarkista projektin tilanne"
+    },
+    "addobserver": {
+      "name": "addobserver",
+      "description": "Seuraa toisen killan projektia"
+    },
+    "removeobserver": {
+      "name": "removeobserver",
+      "description": "Lakkaa seuraamasta toisen killan projektia"
+    },
+    "addadmin": {
+      "name": "addadmin",
+      "description": "Lisää projektiin hallinnoija"
+    },
+    "removeadmin": {
+      "name": "removeadmin",
+      "description": "Poista projektista hallinnoija"
+    },
+    "release": {
+      "name": "release",
+      "description": "Julkaise jakso!"
+    },
+    "roster": {
+      "name": "roster",
+      "description": "Tarkista jakson tekijät"
+    },
+    "configuration": {
+      "name": "configuration",
+      "description": "Kiltakohtaiset asetukset"
+    },
+    "progress_display": {
+      "name": "progress_display",
+      "description": "Valitse tilannepäivitysten näyttötyyli"
+    }
+  },
+  "options": {
+    "nickname": {
+      "name": "nickname",
+      "description": "Projektin lyhyt nimi"
+    },
+    "title": {
+      "name": "title",
+      "description": "Sarjan koko nimi"
+    },
+    "projecttype": {
+      "name": "projecttype",
+      "description": "Projektin tyyppi"
+    },
+    "length": {
+      "name": "length",
+      "description": "Jaksojen määrä"
+    },
+    "poster": {
+      "name": "poster",
+      "description": "Julistekuvan osoite"
+    },
+    "updatechannel": {
+      "name": "updatechannel",
+      "description": "Kanava tilannepäivityksille"
+    },
+    "releasechannel": {
+      "name": "releasechannel",
+      "description": "Kanava julkaisuille"
+    },
+    "project": {
+      "name": "project",
+      "description": "Projektin lyhyt nimi"
+    },
+    "member": {
+      "name": "member",
+      "description": "Tekijän käyttäjä"
+    },
+    "abbreviation": {
+      "name": "abbreviation",
+      "description": "Roolin lyhenne"
+    },
+    "name": {
+      "name": "name",
+      "description": "Roolin koko nimi"
+    },
+    "weight": {
+      "name": "weight",
+      "description": "Painoarvo"
+    },
+    "episode": {
+      "name": "episode",
+      "description": "Jakson numero"
+    },
+    "option": {
+      "name": "option",
+      "description": "Muutettava asetus"
+    },
+    "newvalue": {
+      "name": "newvalue",
+      "description": "Uusi arvo"
+    },
+    "alias": {
+      "name": "alias",
+      "description": "Lisänimi"
+    },
+    "explain": {
+      "name": "explain",
+      "description": "Selitä roolien merkitykset"
+    },
+    "guild": {
+      "name": "guild",
+      "description": "Killan ID"
+    },
+    "updates": {
+      "name": "updates",
+      "description": "Tilannepäivityksille käytettävän webhookin osoite"
+    },
+    "releases": {
+      "name": "releases",
+      "description": "Julkaisuille käytettävän webhookin osoite"
+    },
+    "type": {
+      "name": "type",
+      "description": "Julkaisun tyyppi"
+    },
+    "number": {
+      "name": "number",
+      "description": "Mikä/mitkä julkaistaan? [numero tai väli]"
+    },
+    "url": {
+      "name": "url",
+      "description": "Osoite julkaisulle"
+    },
+    "role": {
+      "name": "role",
+      "description": "Pingattava rooli"
+    },
+    "embedtype": {
+      "name": "embed_type",
+      "description": "Upotteen tyyppi"
+    },
+    "blame": {
+      "name": "blame",
+      "description": "Näytä projekti /blame:n ehdotuksissa"
+    }
+  }
+}
