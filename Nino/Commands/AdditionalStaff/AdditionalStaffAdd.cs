@@ -53,7 +53,8 @@ namespace Nino.Commands
                 Role = new Role
                 {
                     Abbreviation = abbreviation,
-                    Name = taskName
+                    Name = taskName,
+                    Weight = 1000000
                 }
             };
 

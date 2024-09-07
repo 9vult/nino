@@ -11,7 +11,7 @@ namespace Nino.Utilities
 
         private static readonly Dictionary<ulong, List<Project>> _projectCache = [];
         private static readonly Dictionary<ulong, Configuration> _configCache = [];
-        private static readonly Dictionary<string, List<CachedEpisode>> _episodeCache = [];
+        private static readonly Dictionary<string, List<Episode>> _episodeCache = [];
         private static readonly Dictionary<ulong, List<Observer>> _observerCache = [];
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace Nino.Utilities
 
             // Get data
             List<Project> rawProjects = await AzureHelper.QueryProjects<Project>(projectSql);
-            List<CachedEpisode> allEpisodes = await AzureHelper.QueryEpisodes<CachedEpisode>(episodeSql);
+            List<Episode> allEpisodes = await AzureHelper.QueryEpisodes<Episode>(episodeSql);
 
             // Transform data
             List<Project> cachedProjects = [];
@@ -60,7 +60,7 @@ namespace Nino.Utilities
 
             // Get data
             Project project = (await AzureHelper.QueryProjects<Project>(projectSql)).Single();
-            List<CachedEpisode> episodes = (await AzureHelper.QueryEpisodes<CachedEpisode>(episodeSql)).OrderBy(e => e.Number).ToList();
+            List<Episode> episodes = (await AzureHelper.QueryEpisodes<Episode>(episodeSql)).OrderBy(e => e.Number).ToList();
 
             // Transform data
             var idx = _projectCache[project.GuildId].FindIndex(p => p.Id == project.Id);
@@ -168,7 +168,7 @@ namespace Nino.Utilities
         /// Get a flattened list of all cached episodes
         /// </summary>
         /// <returns>List of all episodes</returns>
-        public static List<CachedEpisode> GetEpisodes()
+        public static List<Episode> GetEpisodes()
         {
             return _episodeCache.Values.SelectMany(list => list).ToList();
         }
@@ -178,7 +178,7 @@ namespace Nino.Utilities
         /// </summary>
         /// <param name="projectId">ID of the project</param>
         /// <returns>The episodes, or an empty list</returns>
-        public static List<CachedEpisode> GetEpisodes(string projectId)
+        public static List<Episode> GetEpisodes(string projectId)
         {
             if (_episodeCache.TryGetValue(projectId, out var episodeCache))
                 return episodeCache;
@@ -207,18 +207,5 @@ namespace Nino.Utilities
         }
 
         #endregion getters
-    }
-
-    /// <summary>
-    /// Minimal episode structure for caching purposes
-    /// </summary>
-    internal record CachedEpisode
-    {
-        public required string Id;
-        public required decimal Number;
-        public required string ProjectId;
-        public required Records.Task[] Tasks;
-        public required bool Done;
-        public required bool ReminderPosted;
     }
 }

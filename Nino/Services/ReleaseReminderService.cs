@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
+using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities;
 using NLog;
@@ -25,9 +26,9 @@ namespace Nino.Services
             _timer.Start();
         }
 
-        private async Task CheckForReleases()
+        private async System.Threading.Tasks.Task CheckForReleases()
         {
-            Dictionary<string, List<CachedEpisode>> marked = [];
+            Dictionary<string, List<Episode>> marked = [];
             foreach (var project in Cache.GetProjects().Where(p => p.AirReminderEnabled && p.AniListId is not null))
             {
                 foreach (var episode in Cache.GetEpisodes(project.Id).Where(e => !e.Done && !e.ReminderPosted))

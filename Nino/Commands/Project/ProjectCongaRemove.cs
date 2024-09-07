@@ -15,8 +15,8 @@ namespace Nino.Commands
         {
             [SlashCommand("remove", "Remove a link from the Conga line")]
             public async Task<RuntimeResult> Remove(
-                [Summary("project", "Project nickname")] string alias,
-                [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(ProjectAutocompleteHandler))] string abbreviation
+                [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+                [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(KeyStaffAutocompleteHandler))] string abbreviation
             )
             {
                 var interaction = Context.Interaction;

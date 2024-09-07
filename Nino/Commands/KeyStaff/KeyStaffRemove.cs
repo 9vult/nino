@@ -14,7 +14,7 @@ namespace Nino.Commands
         [SlashCommand("remove", "Remove a Key Staff from the whole project")]
         public async Task<RuntimeResult> Remove(
             [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-            [Summary("abbreviation", "Position shorthand")] string abbreviation
+            [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(KeyStaffAutocompleteHandler))] string abbreviation
         )
         {
             var interaction = Context.Interaction;
