@@ -65,7 +65,7 @@ namespace Nino.Commands
 
                     return new PageBuilder()
                         .WithAuthor(title)
-                        .WithTitle(T("title.blameall", lng, page1, pageCount))
+                        .WithTitle(T("title.blameall", lng))
                         .WithThumbnailUrl(project.PosterUri)
                         .WithDescription(progress)
                         .WithCurrentTimestamp();

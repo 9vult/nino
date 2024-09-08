@@ -131,7 +131,7 @@
     "server.configuration.saved": "Your settings have been saved!",
     "title.about": "Nino Fansub Management Bot",
     "title.aired": "Episode {{number|1}} has aired!",
-    "title.blameall": "Blame (page {{page|1}}/{{count|2}})",
+    "title.blameall": "Blame All",
     "title.congaList": "Conga Participants",
     "title.released": "Released!",
     "title.serverConfiguration": "Server Configuration",
@@ -148,10 +148,6 @@
     "title.youDidIt": "You did it!"
   },
   "plural": {
-    "error.blameall.invalidPageNumber": {
-      "one": "There is only **{{count|1}}** page!",
-      "other": "There are only **{{count|1}}** pages!"
-    },
     "progress.done.inTheDust.doItNow": {
       "one": "{{taskName|1}} is now {{count|2}} episode ahead.",
       "other": "{{taskName|1}} is now {{count|2}} episodes ahead."
