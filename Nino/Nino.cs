@@ -16,7 +16,7 @@ namespace Nino
 {
     public class Nino
     {
-        private static readonly CmdLineOptions _cmdLineOptions = new();
+        private static CmdLineOptions _cmdLineOptions = new();
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
         private static AppConfig? _config;
         private static IServiceProvider? _services;
@@ -45,7 +45,7 @@ namespace Nino
                 throw new Exception("Missing appsettings.json!");
 
             // Read in command-line arguments
-            CommandLineParser.Default.ParseArguments(args, _cmdLineOptions);
+            _cmdLineOptions = Parser.Default.ParseArguments<CmdLineOptions>(args).Value;
 
             // Set up services
             _services = new ServiceCollection()

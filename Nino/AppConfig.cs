@@ -13,10 +13,10 @@ namespace Nino
 
     public class CmdLineOptions
     {
-        [Option("d", "deploy-commands", Required = false, HelpText = "(Re)deploy slash commands on startup")]
+        [Option('d', "deploy-commands", Required = false, HelpText = "(Re)deploy slash commands on startup")]
         public bool DeployCommands { get; set; }
         
-        [Option("a", "disable-anilist", Required = false, HelpText = "Disable AniList API functionality")]
+        [Option("disable-anilist", Required = false, HelpText = "Disable AniList API functionality")]
         public bool DisableAniList { get; set; }
     }
 }
