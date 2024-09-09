@@ -126,6 +126,7 @@
     "project.deleted": "Cleaned out the **{{project|1}}** project for you. 残念。",
     "project.edited": "I updated project `{{project|1}}`'s {{task|2}}.",
     "project.owner.transferred": "Made {{staff|1}} owner of `{{project|2}}`. Good luck!",
+    "project.server.transferred": "Moved `{{project|1}}` to this server. Good luck!",
     "server.admin.added": "Added {{staff|1}} as an administrator for this server.",
     "server.admin.removed": "I removed {{staff|1}}'s administrator privileges from this server.",
     "server.configuration.saved": "Your settings have been saved!",

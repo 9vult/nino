@@ -114,6 +114,10 @@ namespace Nino.Utilities
         public static async System.Threading.Tasks.Task BuildCache()
         {
             log.Info("Building cache...");
+            _projectCache.Clear();
+            _episodeCache.Clear();
+            _configCache.Clear();
+            _observerCache.Clear();
             var sql = new QueryDefinition("SELECT DISTINCT c.guildId FROM c");
             var response = await AzureHelper.QueryProjects<dynamic>(sql);
 

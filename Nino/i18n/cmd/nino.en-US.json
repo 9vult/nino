@@ -85,6 +85,7 @@
                 "name": "weight",
                 "description": "Weight"
             }
+        }
     },
     "blame": {
         "name": "blame",
@@ -514,6 +515,18 @@
                 "name": "member",
                 "description": "Staff member"
             }
+        },
+        "transferserver": {
+            "name": "transferserver",
+            "description": "Transfer a project from another server to here",
+            "serverid": {
+                "name": "serverid",
+                "description": "ID of the server the project is in"
+            },
+            "project": {
+                "name": "project",
+                "description": "Project nickname"
+            },
         }
     },
     "release": {

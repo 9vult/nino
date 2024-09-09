@@ -176,6 +176,10 @@ The MOTD option can be reset by setting it to a hyphen (`-`).
 
 Transfer ownership of the project to someone else. Useful if the project owner isn't a server administrator and can't create projects themselves.
 
+#### project transferserver
+
+Transfer a project from another server. You must be the owner of the project and an administrator in the server.
+
 ### release
 
 Notify your server of a release. The Release command allows you to streamline your release notifications will automatically broadcast the release message if the channel is an announcements channel, and forward the notification to any observers.
