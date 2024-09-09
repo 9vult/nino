@@ -15,6 +15,7 @@ namespace Nino.Records
         public DateTimeOffset? Updated;
 
         [JsonProperty("GuildId")]
+        [System.Text.Json.Serialization.JsonIgnore]
         public string SerializationGuildId
         {
             get => GuildId.ToString();

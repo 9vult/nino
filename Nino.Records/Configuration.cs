@@ -13,6 +13,7 @@ namespace Nino.Records
         public string? ReleasePrefix;
 
         [JsonProperty("GuildId")]
+        [System.Text.Json.Serialization.JsonIgnore]
         public string SerializationGuildId
         {
             get => GuildId.ToString();
@@ -20,6 +21,7 @@ namespace Nino.Records
         }
 
         [JsonProperty("AdministratorIds")]
+        [System.Text.Json.Serialization.JsonIgnore]
         public string[] SerializationAdministratorIds
         {
             get => AdministratorIds != null && AdministratorIds.Length != 0 ? AdministratorIds.Select(a => a.ToString()).ToArray() : [];

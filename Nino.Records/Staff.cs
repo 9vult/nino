@@ -8,6 +8,7 @@ namespace Nino.Records
         public required Role Role;
 
         [JsonProperty("UserId")]
+        [System.Text.Json.Serialization.JsonIgnore]
         public string SerializationUserId
         {
             get => UserId.ToString();

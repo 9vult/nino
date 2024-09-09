@@ -16,6 +16,7 @@ namespace Nino.Records
         public string? ReleasesWebhook;
 
         [JsonProperty("GuildId")]
+        [System.Text.Json.Serialization.JsonIgnore]
         public string SerializationGuildId
         {
             get => GuildId.ToString();
@@ -23,6 +24,7 @@ namespace Nino.Records
         }
 
         [JsonProperty("OriginGuildId")]
+        [System.Text.Json.Serialization.JsonIgnore]
         public string SerializationOriginGuildId
         {
             get => OriginGuildId.ToString();
@@ -30,6 +32,7 @@ namespace Nino.Records
         }
 
         [JsonProperty("OwnerId")]
+        [System.Text.Json.Serialization.JsonIgnore]
         public string SerializationOwnerId
         {
             get => OwnerId.ToString();
@@ -37,6 +40,7 @@ namespace Nino.Records
         }
 
         [JsonProperty("RoleId")]
+        [System.Text.Json.Serialization.JsonIgnore]
         public string? SerializationRoleId
         {
             get => RoleId?.ToString();

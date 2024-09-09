@@ -467,6 +467,18 @@
                 "description": "Project nickname"
             }
         },
+         "export": {
+            "name": "export",
+            "description": "Export a project to JSON",
+            "project": {
+                "name": "project",
+                "description": "Project nickname"
+            },
+             "prettyprint": {
+                "name": "prettyprint",
+                "description": "Pretty-print?"
+            }
+        },
         "edit": {
             "name": "edit",
             "description": "Edit a project",

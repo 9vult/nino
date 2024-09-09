@@ -125,6 +125,7 @@
     "project.created": "I created project `{{nickname|1}}` for you. You may want to consider the following:\n1. `/keystaff add` to add positions\n2. `/keystaff setweight` to re-order positions\n3. `/project edit`: `AniList` to set airing date/times, and `/airreminder enable` to get airing notifications.",
     "project.deleted": "Cleaned out the **{{project|1}}** project for you. 残念。",
     "project.edited": "I updated project `{{project|1}}`'s {{task|2}}.",
+    "project.exported": "Here's everything I know about `{{project|1}}`!",
     "project.owner.transferred": "Made {{staff|1}} owner of `{{project|2}}`. Good luck!",
     "project.server.transferred": "Moved `{{project|1}}` to this server. Good luck!",
     "server.admin.added": "Added {{staff|1}} as an administrator for this server.",
