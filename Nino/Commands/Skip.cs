@@ -105,7 +105,7 @@ namespace Nino.Commands
             // Publish to observers
             await ObserverPublisher.PublishProgress(project, publishEmbed);
 
-            // Send success embed
+            // Prepare success embed
             var episodeDoneText = episodeDone ? $"\n{T("progress.episodeComplete", lng, episodeNumber)}" : string.Empty;
             var replyStatus = StaffList.GenerateProgress(project, episode, abbreviation);
 
@@ -117,15 +117,8 @@ namespace Nino.Commands
                 ? $"{T("progress.skipped", lng, taskTitle, episodeNumber)}\n\n{replyStatus}{episodeDoneText}" // Verbose
                 : $"{T("progress.skipped", lng, taskTitle, episodeNumber)}{episodeDoneText}"; // Succinct (default)
 
-            var replyEmbed = new EmbedBuilder()
-                .WithAuthor(name: replyHeader)
-                .WithTitle($":fast_forward: {T("title.taskSkipped", lng)}")
-                .WithDescription(replyBody)
-                .WithCurrentTimestamp()
-                .Build();
-            await interaction.FollowupAsync(embed: replyEmbed);
-
             // Everybody do the Conga!
+            var congaContent = string.Empty;
             var congaEntry = project.CongaParticipants.FirstOrDefault(c => c.Current == abbreviation);
             if (congaEntry != null)
             {
@@ -134,11 +127,18 @@ namespace Nino.Commands
                 {
                     var staffMention = $"<@{nextTask.UserId}>";
                     var roleTitle = nextTask.Role.Name;
-                    var congaContent = T("progress.done.conga", lng, staffMention, episode.Number, roleTitle);
-
-                    await interaction.FollowupAsync(text: congaContent);
+                    congaContent = T("progress.done.conga", lng, staffMention, episode.Number, roleTitle);
                 }
             }
+
+            // Send the embed
+            var replyEmbed = new EmbedBuilder()
+                .WithAuthor(name: replyHeader)
+                .WithTitle($":fast_forward: {T("title.taskSkipped", lng)}")
+                .WithDescription(replyBody)
+                .WithCurrentTimestamp()
+                .Build();
+            await interaction.FollowupAsync(embed: replyEmbed, text: congaContent);
 
             await Cache.RebuildCacheForProject(project.Id);
             return ExecutionResult.Success;
