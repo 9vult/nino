@@ -73,9 +73,10 @@ namespace Nino.Commands
                 .WithMaxPageIndex((int)pageCount - 1)
                 .AddOption(new Emoji("◀"), PaginatorAction.Backward, ButtonStyle.Secondary)
                 .AddOption(new Emoji("▶"), PaginatorAction.Forward, ButtonStyle.Secondary)
+                .WithActionOnTimeout(ActionOnStop.DeleteInput)
                 .Build();
 
-            await _interactiveService.SendPaginatorAsync(paginator, interaction, TimeSpan.FromMinutes(2), InteractionResponseType.DeferredChannelMessageWithSource);
+            await _interactiveService.SendPaginatorAsync(paginator, interaction, TimeSpan.FromMinutes(1), InteractionResponseType.DeferredChannelMessageWithSource);
 
             return ExecutionResult.Success;
         }
