@@ -285,6 +285,22 @@
                 "name": "role",
                 "description": "Role to ping for releases"
             }
+        },
+         "list": {
+            "name": "list",
+            "description": "List the projects being observed by this server"
+        },
+         "remove": {
+            "name": "remove",
+            "description": "Stop observing a project on another server",
+            "serverid": {
+                "name": "serverid",
+                "description": "ID of the server you want to observe"
+            },
+            "project": {
+                "name": "project",
+                "description": "Project nickname"
+            }
         }
     },
     "project": {
