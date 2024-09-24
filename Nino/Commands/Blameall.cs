@@ -23,7 +23,8 @@ namespace Nino.Commands
 
         [SlashCommand("blameall", "Check the overall status of a project")]
         public async Task<RuntimeResult> Handle(
-            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias
+            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+            [Summary("filter", "Filter results")] BlameAllFilter filter = BlameAllFilter.All
         )
         {
             var interaction = Context.Interaction;
@@ -39,7 +40,13 @@ namespace Nino.Commands
                 ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
                 : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
 
-            var episodes = (await Getters.GetEpisodes(project)).OrderBy(e => e.Number);
+            var episodes = filter switch
+            {
+                BlameAllFilter.All => (await Getters.GetEpisodes(project)).OrderBy(e => e.Number),
+                BlameAllFilter.InProgress => (await Getters.GetEpisodes(project)).Where(e => !e.Done && e.Tasks.Any(t => t.Done)).OrderBy(e => e.Number),
+                BlameAllFilter.Incomplete => (await Getters.GetEpisodes(project)).Where(e => !e.Done).OrderBy(e => e.Number),
+                _ => (await Getters.GetEpisodes(project)).OrderBy(e => e.Number) // All
+            };
 
             // Calculate pages
             // Thanks to petzku and astiob for their contributions to this algorithm

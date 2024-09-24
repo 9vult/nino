@@ -110,9 +110,18 @@
             "name": "project",
             "description": "Project nickname"
         },
-        "page": {
-            "name": "page",
-            "description": "Page number"
+        "filter": {
+            "name": "filter",
+            "description": "Filter results",
+            "All": {
+                "name": "All"
+            },
+            "InProgress": {
+                "name": "In Progress"
+            },
+            "Incomplete": {
+                "name": "Incomplete"
+            }
         }
     },
     "bulk": {
