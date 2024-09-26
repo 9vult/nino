@@ -18,7 +18,7 @@ namespace Nino.Utilities
         {
             var channel = Nino.Client.GetChannel(channelId);
             if (channel == null) return false;
-            if (channel.GetChannelType() != ChannelType.Text) return false;
+            if (channel.GetChannelType() != ChannelType.Text && channel.GetChannelType() != ChannelType.News) return false;
 
             var textChannel = (SocketTextChannel)channel;
             var perms = textChannel.Guild.GetUser(Nino.Client.CurrentUser.Id).GetPermissions(textChannel);
@@ -37,7 +37,7 @@ namespace Nino.Utilities
         {
             var channel = Nino.Client.GetChannel(channelId);
             if (channel == null) return false;
-            if (channel.GetChannelType() != ChannelType.Text) return false;
+            if (channel.GetChannelType() != ChannelType.Text && channel.GetChannelType() != ChannelType.News) return false;
 
             var textChannel = (SocketTextChannel)channel;
             var perms = textChannel.Guild.GetUser(Nino.Client.CurrentUser.Id).GetPermissions(textChannel);
