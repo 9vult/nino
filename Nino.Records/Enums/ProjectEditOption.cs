@@ -1,4 +1,4 @@
-﻿using static Localizer.Localizer;
+using static Localizer.Localizer;
 
 namespace Nino.Records.Enums
 {
@@ -25,7 +25,7 @@ namespace Nino.Records.Enums
                 ProjectEditOption.AniListId => T("choice.project.edit.option.anilist", lng),
                 ProjectEditOption.IsPrivate => T("choice.project.edit.option.private", lng),
                 ProjectEditOption.UpdateChannelID => T("choice.project.edit.option.updatechannel", lng),
-                ProjectEditOption.ReleaseChannelID => T("choice.project.edit.option.progresschannel", lng),
+                ProjectEditOption.ReleaseChannelID => T("choice.project.edit.option.releasechannel", lng),
                 _ => type.ToString(),
             };
         }
