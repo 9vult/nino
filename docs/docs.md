@@ -194,7 +194,9 @@ See who's assigned to each task in an episode.
 
 Add someone as a server admin. Being a server admin gives the same permissions as project admins, but for all projects at once.
 
-> **Note**: This is _not_ the same thing as the discord server administrator permission!!
+> [!NOTE]
+>
+> This is _not_ the same thing as the discord server administrator permission!!
 
 #### server admin remove
 

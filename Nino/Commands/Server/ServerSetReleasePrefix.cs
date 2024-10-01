@@ -21,7 +21,7 @@ namespace Nino.Commands
 
             // Server administrator permissions required
             var runner = guild.GetUser(interaction.User.Id);
-            if (!runner.GuildPermissions.Administrator)
+            if (!Utils.VerifyAdministrator(runner, guild, excludeServerAdmins: true))
                 return await Response.Fail(T("error.notPrivileged", lng), interaction);
 
             var config = await Getters.GetConfiguration(guildId);

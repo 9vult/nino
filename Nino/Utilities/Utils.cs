@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Microsoft.Azure.Cosmos;
 using Nino.Records;
 
 namespace Nino.Utilities
@@ -27,6 +28,27 @@ namespace Nino.Utilities
 
             return targets.Where(p => string.Equals(p.Nickname, query, StringComparison.InvariantCultureIgnoreCase) 
                 || p.Aliases.Any(a => string.Equals(a, query, StringComparison.InvariantCultureIgnoreCase))).FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Verify the given user has administrative permissions
+        /// </summary>
+        /// <param name="member">Member to check</param>
+        /// <param name="guild">Guild to check</param>
+        /// <param name="excludeServerAdmins">Whether to exclude Nino server admins</param>
+        /// <returns>True if the user is an administrator</returns>
+        public static bool VerifyAdministrator(SocketGuildUser member, SocketGuild guild, bool excludeServerAdmins = false)
+        {
+            // Admin role
+            if (member.GuildPermissions.Administrator) return true;
+
+            if (excludeServerAdmins) return false;
+
+            // Nino server-level admin
+            if (Cache.GetConfig(guild.Id)?.AdministratorIds?.Any(a => a == member.Id) ?? false)
+                return true;
+
+            return false;
         }
 
         /// <summary>
