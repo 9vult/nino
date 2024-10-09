@@ -96,7 +96,7 @@
     "missingPermsPrecheck.yes.button": "We'll do it live!",
     "missingPermsPrecheck.yes.response": "Alrighty, then, if you say so!",
     "nino.about": "Version: {{veraion|1}}\nAuthor: <@248600185423396866>",
-    "nino.help": "Some helpful tips:\n- You need to be an administrator to create new projects\n- Only the assigned staff member and the project owner can mark tasks complete\n- Additional staff can be added to individual episodes for one-off tasks\n- If odd episode numbers are needed (episode 0, episode 7.5, etc) use `/episode add`\n- If you need additional assistance, contact 9volt.\n- Full documentation: https://github.com/9vult/nino/blob/master/docs.md",
+    "nino.help": "Some helpful tips:\n- You need to be an administrator to create new projects\n- Only the assigned staff member and the project owner can mark tasks complete\n- Additional staff can be added to individual episodes for one-off tasks\n- If odd episode numbers are needed (episode 0, episode 7.5, etc) use `/episode add`\n- If you need additional assistance, contact 9volt.\n- Full documentation: https://github.com/9vult/nino/blob/master/docs/docs.md",
     "observer.added": "Subscribed to `{{project|1}}` from **{{originGuildName|2}}**.",
     "observer.list.blame": "Blame",
     "observer.list.no": "No",
