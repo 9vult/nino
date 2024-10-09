@@ -1,7 +1,8 @@
+using System;
 using System.Text;
-using System.Xml.Linq;
 using Discord;
 using Discord.Interactions;
+using FastMember;
 using Fergun.Interactive;
 using Fergun.Interactive.Pagination;
 using Nino.Handlers;
@@ -29,6 +30,7 @@ namespace Nino.Commands
         {
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
+            var gLng = interaction.GuildLocale ?? "en-US";
             alias = alias.Trim();
             
             // Verify project
@@ -81,6 +83,16 @@ namespace Nino.Commands
                 .AddOption(new Emoji("◀"), PaginatorAction.Backward, ButtonStyle.Secondary)
                 .AddOption(new Emoji("▶"), PaginatorAction.Forward, ButtonStyle.Secondary)
                 .WithActionOnTimeout(ActionOnStop.DeleteInput)
+                .WithRestrictedPageFactory((IReadOnlyCollection<IUser> users) =>
+                {
+                    var userMention = users.Count > 0 ? $"<@{users.First().Id}>" : "unknown_user";
+                    return new PageBuilder()
+                        .WithTitle(T("title.paginatorNoAccess", gLng))
+                        .WithThumbnailUrl(project.PosterUri)
+                        .WithDescription(T("error.paginatorNoAccess", gLng, userMention))
+                        .WithCurrentTimestamp()
+                        .Build();
+                })
                 .Build();
 
             await _interactiveService.SendPaginatorAsync(paginator, interaction, TimeSpan.FromMinutes(1), InteractionResponseType.DeferredChannelMessageWithSource);
