@@ -90,16 +90,38 @@ namespace Nino.Commands
                 : $"{T("progress.done", lng, taskTitle, episodeNumber)}{episodeDoneText}"; // Succinct (default)
 
             // Everybody do the Conga!
-            var congaContent = string.Empty;
-            var congaEntry = project.CongaParticipants.FirstOrDefault(c => c.Current == abbreviation);
-            if (congaEntry != null)
+            List<string> congaContent = [];
+
+            // Get all conga participants that the current task can call out
+            var congaCandidates = project.CongaParticipants
+                .GroupBy(p => p.Next)
+                .Where(group => group.Select(p => p.Current).Contains(abbreviation))
+                .ToList();
+
+            if (congaCandidates.Count > 0)
             {
-                var nextTask = project.KeyStaff.FirstOrDefault(ks => ks.Role.Abbreviation == congaEntry.Next);
-                if (nextTask != null)
+                foreach (var candidate in congaCandidates)
                 {
-                    var staffMention = $"<@{nextTask.UserId}>";
-                    var roleTitle = nextTask.Role.Name;
-                    congaContent = T("progress.done.conga", lng, staffMention, episode.Number, roleTitle);
+                    bool ping = true;
+                    if (candidate.Count() > 1) // More than just this task
+                    {
+                        // Determine if the candidate's caller(s) (not this one) are all done
+                        if (candidate.Select(c => c.Current)
+                            .Where(c => c != abbreviation)
+                            .Where(c => !episode.Tasks.FirstOrDefault(t => t.Abbreviation == c)?.Done ?? false)
+                            .Any())
+                            ping = false; // Not all caller(s) are done
+                    }
+                    if (ping)
+                    {
+                        var nextTask = project.KeyStaff.FirstOrDefault(ks => ks.Role.Abbreviation == candidate.Key);
+                        if (nextTask != null)
+                        {
+                            var staffMention = $"<@{nextTask.UserId}>";
+                            var roleTitle = nextTask.Role.Name;
+                            congaContent.Add(T("progress.done.conga", lng, staffMention, episode.Number, roleTitle));
+                        }
+                    }
                 }
             }
 
@@ -110,7 +132,7 @@ namespace Nino.Commands
                 .WithDescription(replyBody)
                 .WithCurrentTimestamp()
                 .Build();
-            await interaction.FollowupAsync(embed: replyEmbed, text: congaContent);
+            await interaction.FollowupAsync(embed: replyEmbed, text: string.Join(Environment.NewLine, congaContent));
 
             await Cache.RebuildCacheForProject(project.Id);
             return ExecutionResult.Success;

@@ -100,17 +100,19 @@ namespace Nino.Handlers
                         var cachedEpisode = Cache.GetEpisodes(cachedProject.Id).FirstOrDefault(e => e.Number == episodeNumber);
                         if (cachedEpisode is null)
                         {
+                            var value = ((string)focusedOption.Value).ToUpperInvariant();
                             // Return list of key staff
                             choices.AddRange(cachedProject.KeyStaff
-                                .Where(ks => ks.Role.Abbreviation.StartsWith((string)focusedOption.Value))
+                                .Where(ks => ks.Role.Abbreviation.StartsWith(value))
                                 .Select(t => new AutocompleteResult(t.Role.Abbreviation, t.Role.Abbreviation))
                             );
                         }
                         else
                         {
+                            var value = ((string)focusedOption.Value).ToUpperInvariant();
                             // Return list of episode tasks
                             choices.AddRange(cachedEpisode.Tasks
-                                .Where(t => t.Abbreviation.StartsWith((string)focusedOption.Value))
+                                .Where(t => t.Abbreviation.StartsWith(value))
                                 .Select(t => new AutocompleteResult(t.Abbreviation, t.Abbreviation))
                             );
                         }
@@ -141,9 +143,10 @@ namespace Nino.Handlers
                 var cachedProject = Utils.ResolveAlias(alias, interaction);
                 if (cachedProject is not null)
                 {
+                    var value = ((string)focusedOption.Value).ToUpperInvariant();
                     // Return list of key staff
                     choices.AddRange(cachedProject.KeyStaff
-                        .Where(ks => ks.Role.Abbreviation.StartsWith((string)focusedOption.Value))
+                        .Where(ks => ks.Role.Abbreviation.StartsWith(value))
                         .Select(t => new AutocompleteResult(t.Role.Abbreviation, t.Role.Abbreviation))
                     );
                 }
@@ -177,9 +180,10 @@ namespace Nino.Handlers
                     var cachedEpisode = Cache.GetEpisodes(cachedProject.Id).FirstOrDefault(e => e.Number == episodeNumber);
                     if (cachedEpisode is not null)
                     {
+                        var value = ((string)focusedOption.Value).ToUpperInvariant();
                         // Return list of additional staff
                         choices.AddRange(cachedEpisode.AdditionalStaff
-                            .Where(ks => ks.Role.Abbreviation.StartsWith((string)focusedOption.Value))
+                            .Where(ks => ks.Role.Abbreviation.StartsWith(value))
                             .Select(t => new AutocompleteResult(t.Role.Abbreviation, t.Role.Abbreviation))
                         );
                     }

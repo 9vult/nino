@@ -28,6 +28,11 @@ namespace Nino.Commands
                 current = current.Trim().ToUpperInvariant();
                 next = next.Trim().ToUpperInvariant();
 
+                List<string> manyToOne = [];
+                List<string> oneToMany = [];
+                int manyToOneCount = 0;
+                int oneToManyCount = 0;
+
                 // Verify project and user - Owner or Admin required
                 var project = Utils.ResolveAlias(alias, interaction);
                 if (project == null)
@@ -36,11 +41,16 @@ namespace Nino.Commands
                 if (!Utils.VerifyUser(interaction.User.Id, project))
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
-                // Validate tasks aren't already in the conga line
-                if (project.CongaParticipants.Any(c => c.Current == current))
-                    return await Response.Fail(T("error.conga.alreadyExists", lng, current), interaction);
-                if (project.CongaParticipants.Any(c => c.Next == next))
-                    return await Response.Fail(T("error.conga.alreadyExists", lng, next), interaction);
+                // Validate current task isn't already in the conga line
+                if (project.CongaParticipants.Any(c => c.Current == current && c.Next == next))
+                    return await Response.Fail(T("error.conga.alreadyExists", lng, current, next), interaction);
+
+                // Find current union members (one→many relationship)
+                oneToMany.AddRange(project.CongaParticipants.Where(c => c.Current == current).Select(p => p.Next));
+                oneToManyCount = oneToMany.Count;
+                // Find next union members (many→one relationship)
+                manyToOne.AddRange(project.CongaParticipants.Where(c => c.Next == next).Select(p => p.Current));
+                manyToOneCount = manyToOne.Count;
 
                 // Validate tasks exist
                 if (!project.KeyStaff.Any(ks => ks.Role.Abbreviation == current))
@@ -55,6 +65,9 @@ namespace Nino.Commands
                     Next = next
                 };
 
+                oneToMany.Add(next);
+                manyToOne.Add(current);
+
                 // Add to database
                 await AzureHelper.Projects!.PatchItemAsync<Project>(id: project.Id, partitionKey: AzureHelper.ProjectPartitionKey(project),
                     patchOperations: [
@@ -63,10 +76,30 @@ namespace Nino.Commands
 
                 log.Info($"Added {current} → {next} to the Conga line for {project.Id}");
 
+                string description;
+
+                // New one-to-many union (ex: TL → (ED, TS))
+                if (oneToMany.Count > 1 && oneToMany.Count > oneToManyCount)
+                {
+                    var unionStr = $"({string.Join(", ", oneToMany)})";
+                    description = T("project.conga.union.added.next", lng, current, next, current, unionStr);
+                }
+                // New many-to-one union (ex: (TLC, TS) → QC)
+                else if (manyToOne.Count > 1 && manyToOne.Count > manyToOneCount)
+                {
+                    var unionStr = $"({string.Join(", ", manyToOne)})";
+                    description = T("project.conga.union.added.current", lng, current, next, unionStr, next);
+                }
+                // Normal (ex: QC1 → QC2)
+                else
+                {
+                    description = T("project.conga.added", lng, current, next);
+                }
+
                 // Send success embed
                 var embed = new EmbedBuilder()
                     .WithTitle(T("title.projectModification", lng))
-                    .WithDescription(T("project.conga.added", lng, current, next))
+                    .WithDescription(description)
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 
