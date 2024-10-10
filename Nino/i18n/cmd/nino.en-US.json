@@ -436,6 +436,10 @@
                 "abbreviation": {
                     "name": "abbreviation",
                     "description": "Position shorthand"
+                },
+                "next": {
+                    "name": "next",
+                    "description": "Position to ping"
                 }
             }
         },
