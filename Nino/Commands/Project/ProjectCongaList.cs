@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Nino.Handlers;
+using Nino.Records;
 using Nino.Utilities;
 
 using static Localizer.Localizer;
@@ -40,8 +41,7 @@ namespace Nino.Commands
                     var groupedByNext = project.CongaParticipants
                         .GroupBy(p => p.Next)
                         .Where(g => g.Count() > 1)
-                        .Select(g => new { Current = g.Select(x => x.Current).ToList(), Next = g.Key })
-                        .OrderBy(g => g.Current.Count)
+                        .Select(g => new { Current = g.Select(x => WC(x.Current)).OrderBy(x => x.Weight).ToList(), Next = g.Key })
                         .ToList();
 
                     var alreadyGroupedNexts = new HashSet<string>(groupedByNext.Select(g => g.Next));
@@ -49,15 +49,34 @@ namespace Nino.Commands
                     var groupedByCurrent = project.CongaParticipants
                         .Where(p => !alreadyGroupedNexts.Contains(p.Next))
                         .GroupBy(p => p.Current)
-                        .Select(g => new { Current = g.Key, Next = g.Select(x => x.Next).ToList() })
-                        .OrderByDescending(g => g.Next.Count)
+                        .Select(g => new { Current = WC(g.Key), Next = g.Select(x => x.Next).ToList() })
                         .ToList();
 
-                    description = string.Join(Environment.NewLine,
-                        groupedByCurrent.Select(g => g.Next.Count == 1 ? $"{g.Current} → {g.Next.First()}" : $"{g.Current} → ({string.Join(", ", g.Next)})")
-                        .Concat(groupedByNext.Select(g => g.Current.Count == 1 ? $"{g.Current.First()} → {g.Next}" : $"({string.Join(", ", g.Current)}) → {g.Next}"))
+                    description = string.Join(Environment.NewLine, groupedByCurrent.Select(g =>
+                        {
+                            if (g.Next.Count == 1)
+                                return new { g.Current.Weight, Text = $"{g.Current.Value} → {g.Next.First()}" };
+                            else
+                                return new { g.Current.Weight, Text = $"{g.Current.Value} → ({string.Join(", ", g.Next)})" };
+                        })
+                        .Concat(groupedByNext.Select(g =>
+                        {
+                            if (g.Current.Count == 1)
+                                return new { g.Current.First().Weight, Text = $"{g.Current.First().Value} → {g.Next}" };
+                            else
+                                return new { g.Current.First().Weight, Text = $"({string.Join(", ", g.Current.Select(x => x.Value))}) → {g.Next}" };
+                        }))
+                        .OrderBy(x => x.Weight)
+                        .Select(x => x.Text)
                     );
                 }
+
+                // Local function for creating a weighted current
+                WeightedCurrent WC(string abbreviation) => new()
+                {
+                    Value = abbreviation,
+                    Weight = project!.KeyStaff.FirstOrDefault(k => k.Role.Abbreviation == abbreviation)?.Role.Weight ?? 0
+                };
 
                 // Send embed
                 var embed = new EmbedBuilder()
@@ -68,6 +87,12 @@ namespace Nino.Commands
 
                 return ExecutionResult.Success;
             }
+        }
+
+        private class WeightedCurrent
+        {
+            public required string Value;
+            public required decimal Weight;
         }
     }
 }
