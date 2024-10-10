@@ -62,9 +62,9 @@ namespace Nino.Commands
                         .Concat(groupedByNext.Select(g =>
                         {
                             if (g.Current.Count == 1)
-                                return new { g.Current.First().Weight, Text = $"{g.Current.First().Value} → {g.Next}" };
+                                return new { g.Current.Last().Weight, Text = $"{g.Current.Last().Value} → {g.Next}" };
                             else
-                                return new { g.Current.First().Weight, Text = $"({string.Join(", ", g.Current.Select(x => x.Value))}) → {g.Next}" };
+                                return new { g.Current.Last().Weight, Text = $"({string.Join(", ", g.Current.Select(x => x.Value))}) → {g.Next}" };
                         }))
                         .OrderBy(x => x.Weight)
                         .Select(x => x.Text)
