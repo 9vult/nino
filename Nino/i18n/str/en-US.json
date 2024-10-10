@@ -6,6 +6,7 @@
   "singular": {
     "additionalStaff.added": "Added {{staff|1}} for position {{abbreviation|2}} for episode {{episode|3}}.",
     "additionalStaff.removed": "Removed position {{abbreviation|1}} from {{episode|2}}.",
+    "additionalStaff.removed.all": "Removed position {{abbreviation|1}} from all episodes.",
     "additionalStaff.swapped": "Swapped {{staff|1}} in for position {{abbreviation|2}} for episode {{episode|3}}.",
     "airDate.estimatedHeader": "Estimate:",
     "airDate.future": "Airs on {{date|1}} ({{rel|2}})",

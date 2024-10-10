@@ -44,6 +44,10 @@
             "abbreviation": {
                 "name": "abbreviation",
                 "description": "Position shorthand"
+            },
+            "allepisodes": {
+                "name": "allepisodes",
+                "description": "Remove this position from all episodes that have it?"
             }
         },
         "swap": {

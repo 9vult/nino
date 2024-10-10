@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
 using Nino.Records;
@@ -15,7 +14,8 @@ namespace Nino.Commands
         public async Task<RuntimeResult> Remove(
             [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
             [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] decimal episodeNumber,
-            [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(AdditionalStaffAutocompleteHandler))] string abbreviation
+            [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(AdditionalStaffAutocompleteHandler))] string abbreviation,
+            [Summary("allepisodes", "Remove this position from all episodes that have it?"), Autocomplete(typeof(AdditionalStaffAutocompleteHandler))] bool allEpisodes = false
         )
         {
             var interaction = Context.Interaction;
@@ -42,24 +42,47 @@ namespace Nino.Commands
             if (!episode.AdditionalStaff.Any(ks => ks.Role.Abbreviation == abbreviation))
                 return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
 
-            var asIndex = Array.IndexOf(episode.AdditionalStaff, episode.AdditionalStaff.Single(k => k.Role.Abbreviation == abbreviation));
-            var taskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == abbreviation));
-
-            // Rewmove from database
+            // Remove from database
             TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(episode));
-            batch.PatchItem(id: episode.Id, new[]
+
+            if (allEpisodes)
             {
-                PatchOperation.Remove($"/additionalStaff/{asIndex}"),
-                PatchOperation.Remove($"/tasks/{taskIndex}")
-            });
+                foreach (Episode e in await Getters.GetEpisodes(project))
+                {
+                    if (!e.AdditionalStaff.Any(k => k.Role.Abbreviation == abbreviation)) continue;
+
+                    var asIndex = Array.IndexOf(e.AdditionalStaff, e.AdditionalStaff.Single(k => k.Role.Abbreviation == abbreviation));
+                    var taskIndex = Array.IndexOf(e.Tasks, e.Tasks.Single(t => t.Abbreviation == abbreviation));
+
+                    batch.PatchItem(id: e.Id, [
+                        PatchOperation.Remove($"/additionalStaff/{asIndex}"),
+                        PatchOperation.Remove($"/tasks/{taskIndex}")
+                    ]);
+                }
+            }  
+            else
+            {
+                var asIndex = Array.IndexOf(episode.AdditionalStaff, episode.AdditionalStaff.Single(k => k.Role.Abbreviation == abbreviation));
+                var taskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == abbreviation));
+                batch.PatchItem(id: episode.Id, [
+                    PatchOperation.Remove($"/additionalStaff/{asIndex}"),
+                    PatchOperation.Remove($"/tasks/{taskIndex}")
+                ]);
+            }
+
             await batch.ExecuteAsync();
 
-            log.Info($"Removed {abbreviation} from {episode.Id}");
+            if (allEpisodes) log.Info($"Removed {abbreviation} from {episode.Id}");
+            else log.Info($"Removed additionalstaff {abbreviation} from {episode.ProjectId}");
+
+            var description = allEpisodes 
+                ? T("additionalStaff.removed.all", lng, abbreviation) 
+                : T("additionalStaff.removed", lng, abbreviation, episode.Number);
 
             // Send success embed
             var embed = new EmbedBuilder()
                 .WithTitle(T("title.projectCreation", lng))
-                .WithDescription(T("additionalStaff.removed", lng, abbreviation, episode.Number))
+                .WithDescription(description)
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 
