@@ -500,6 +500,14 @@
                 "description": "Project nickname"
             }
         },
+        "archive": {
+            "name": "archive",
+            "description": "Archive a project",
+            "project": {
+                "name": "project",
+                "description": "Project nickname"
+            }
+        },
          "export": {
             "name": "export",
             "description": "Export a project to JSON",
