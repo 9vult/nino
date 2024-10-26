@@ -181,19 +181,7 @@ while (feed.HasMoreResults)
 
 foreach (Project p in rawProjects)
 {
-    int i = 1;
-    foreach (var ks in p.KeyStaff)
-    {
-        if (ks.Role.Weight is null)
-        {
-            ks.Role.Weight = i;
-        }
-        else
-        {
-            ks.Role.Weight++;
-        }
-        i++;
-    }
+    p.IsArchived = false;
     await _projectsContainer.UpsertItemAsync(p);
 }
 

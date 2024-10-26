@@ -20,9 +20,9 @@ namespace Nino.Records
         public required CongaParticipant[] CongaParticipants;
         public required string[] Aliases;
         public string? Motd;
-        public string? AniDBId;
-        public string? AirTime;
+        public int? AniListId;
         public required bool AirReminderEnabled;
+        public bool? IsArchived;
         [JsonIgnore] public ulong? AirReminderChannelId;
         [JsonIgnore] public ulong? AirReminderRoleId;
 
@@ -31,6 +31,7 @@ namespace Nino.Records
         //
 
         [JsonProperty("GuildId")]
+        [System.Text.Json.Serialization.JsonIgnore]
         public string SerializationGuildId
         {
             get => GuildId.ToString();
@@ -38,6 +39,7 @@ namespace Nino.Records
         }
 
         [JsonProperty("OwnerId")]
+        [System.Text.Json.Serialization.JsonIgnore]
         public string SerializationOwnerId
         {
             get => OwnerId.ToString();
@@ -45,6 +47,7 @@ namespace Nino.Records
         }
 
         [JsonProperty("AdministratorIds")]
+        [System.Text.Json.Serialization.JsonIgnore]
         public string[] SerializationAdministratorIds
         {
             get => AdministratorIds != null && AdministratorIds.Length != 0 ? AdministratorIds.Select(a => a.ToString()).ToArray() : [];
@@ -52,6 +55,7 @@ namespace Nino.Records
         }
 
         [JsonProperty("UpdateChannelId")]
+        [System.Text.Json.Serialization.JsonIgnore]
         public string SerializationUpdateChannelId
         {
             get => UpdateChannelId.ToString();
@@ -59,6 +63,7 @@ namespace Nino.Records
         }
 
         [JsonProperty("ReleaseChannelId")]
+        [System.Text.Json.Serialization.JsonIgnore]
         public string SerializationReleaseChannelId
         {
             get => ReleaseChannelId.ToString();
@@ -66,6 +71,7 @@ namespace Nino.Records
         }
 
         [JsonProperty("AirReminderChannelId")]
+        [System.Text.Json.Serialization.JsonIgnore]
         public string? SerializationAirReminderChannelId
         {
             get => AirReminderChannelId?.ToString();
@@ -73,6 +79,7 @@ namespace Nino.Records
         }
 
         [JsonProperty("AirReminderRoleId")]
+        [System.Text.Json.Serialization.JsonIgnore]
         public string? SerializationAirReminderRoleId
         {
             get => AirReminderRoleId?.ToString();
