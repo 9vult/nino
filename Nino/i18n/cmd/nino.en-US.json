@@ -452,7 +452,7 @@
             "description": "Create a new project",
             "nickname": {
                 "name": "nickname",
-                "description": "Project nickname"
+                "description": "Short project nickname (no spaces)"
             },
             "title": {
                 "name": "title",

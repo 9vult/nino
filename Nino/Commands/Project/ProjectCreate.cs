@@ -13,7 +13,7 @@ namespace Nino.Commands
     {
         [SlashCommand("create", "Create a new project")]
         public async Task<RuntimeResult> Create(
-            [Summary("nickname", "Project nickname")] string nickname,
+            [Summary("nickname", "Short project nickname (no spaces)")] string nickname,
             [Summary("title", "Full series title")] string title,
             [Summary("type", "Project type")] ProjectType type,
             [Summary("length", "Number of episodes"), MinValue(1)] int length,
@@ -32,11 +32,13 @@ namespace Nino.Commands
             var member = guild.GetUser(interaction.User.Id);
             if (!Utils.VerifyAdministrator(member, guild)) return await Response.Fail(T("error.notPrivileged", lng), interaction);
 
-
             // Get inputs
             var updateChannelId = updateChannel.Id;
             var releaseChannelId = releaseChannel.Id;
             var ownerId = interaction.User.Id;
+
+            // Sanitize input
+            nickname = nickname.Trim().ToLowerInvariant().Replace(" ", string.Empty); // remove spaces
 
             // Verify data
             if (Cache.GetProjects(guildId).Any(p => p.Nickname == nickname))
