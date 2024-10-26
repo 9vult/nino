@@ -56,6 +56,7 @@ namespace Nino.Commands
                 UpdateChannelId = updateChannelId,
                 ReleaseChannelId = releaseChannelId,
                 IsPrivate = isPrivate,
+                IsArchived = false,
                 AirReminderEnabled = false,
                 AdministratorIds = [],
                 KeyStaff = [],

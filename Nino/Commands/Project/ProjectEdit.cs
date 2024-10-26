@@ -41,6 +41,9 @@ namespace Nino.Commands
             if (!Utils.VerifyUser(interaction.User.Id, project, excludeAdmins: true))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
+            if (project.IsArchived)
+                return await Response.Fail(T("error.archived", lng), interaction);
+
             string helperText = string.Empty;
             PatchOperation operation;
 

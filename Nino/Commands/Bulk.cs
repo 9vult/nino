@@ -44,6 +44,9 @@ namespace Nino.Commands
             if (project == null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
+            if (project.IsArchived)
+                return await Response.Fail(T("error.archived", lng), interaction);
+
             // Check progress channel permissions
             var goOn = await PermissionChecker.Precheck(_interactiveService, interaction, project, lng, false);
             // Cancel

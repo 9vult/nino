@@ -42,6 +42,9 @@ namespace Nino.Commands
             if (!Utils.VerifyUser(interaction.User.Id, project))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
+            if (project.IsArchived)
+                return await Response.Fail(T("error.archived", lng), interaction);
+
             // Check progress channel permissions
             var goOn = await PermissionChecker.Precheck(_interactiveService, interaction, project, lng, true);
             // Cancel

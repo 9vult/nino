@@ -17,6 +17,7 @@ namespace Nino.Records
         [JsonIgnore] public required ulong UpdateChannelId;
         [JsonIgnore] public required ulong ReleaseChannelId;
         public required bool IsPrivate;
+        public required bool IsArchived = false;
         public required CongaParticipant[] CongaParticipants;
         public required string[] Aliases;
         public string? Motd;
