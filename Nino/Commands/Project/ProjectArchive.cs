@@ -88,7 +88,8 @@ namespace Nino.Commands
                     partitionKey: AzureHelper.ProjectPartitionKey(project),
                     patchOperations: [
                         PatchOperation.Replace($"/aliases", emptyList), // Remove aliases
-                        PatchOperation.Replace($"/isArchived", true) // set as archived
+                        PatchOperation.Set<string?>($"/motd", null), // Remove MOTD
+                        PatchOperation.Set($"/isArchived", true) // set as archived
                     ]
                 );
 

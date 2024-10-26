@@ -11,6 +11,7 @@
     "airDate.estimatedHeader": "Estimate:",
     "airDate.future": "Airs on {{date|1}} ({{rel|2}})",
     "airDate.past": "Aired on {{date|1}} ({{rel|2}})",
+    "blame.archived": "This project is archived.",
     "blameall.done": "Done",
     "blameall.notStarted": "Not started",
     "blameall.notYetAired": "Not yet aired",

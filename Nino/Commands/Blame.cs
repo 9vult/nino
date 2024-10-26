@@ -49,9 +49,11 @@ namespace Nino.Commands
 
             StringBuilder progress = new();
 
-            // Add the project's MOTD, if applicable
+            // Add the project's MOTD or archival notice, if applicable
             if (!string.IsNullOrEmpty(project.Motd))
                 progress.AppendLine(project.Motd);
+            if (project.IsArchived)
+                progress.AppendLine(T("blame.archived", lng));
 
             progress.AppendLine(explain ? StaffList.GenerateExplainProgress(project, episode, lng)
                 : StaffList.GenerateProgress(project, episode));

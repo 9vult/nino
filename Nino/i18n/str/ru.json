@@ -13,6 +13,7 @@
     "airDate.estimatedHeader": "Предположительно:",
     "airDate.future": "Выйдет в эфир {{date|1}} ({{rel|2}})",
     "airDate.past": "Вышла в эфир {{date|1}} ({{rel|2}})",
+    "blame.archived": "This project is archived.",
     "blameall.done": "Done",
     "blameall.notStarted": "Not started",
     "blameall.notYetAired": "Not yet aired",

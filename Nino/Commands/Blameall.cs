@@ -68,9 +68,11 @@ namespace Nino.Commands
                     var pagedEpisodes = episodes.Skip(skip).Take(length);
                     var progress = await BuildProgress(pagedEpisodes, project, lng);
 
-                    // Add the project's MOTD, if applicable
+                    // Add the project's MOTD or archival notice, if applicable
                     if (!string.IsNullOrEmpty(project.Motd))
                         progress = $"{project.Motd}\n{progress}";
+                    if (project.IsArchived)
+                        progress = $"{T("blame.archived", lng)}\n{progress}";
 
                     return new PageBuilder()
                         .WithAuthor(title)
