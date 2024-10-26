@@ -23,6 +23,7 @@ namespace Nino.Commands
             [Summary("explain", "Explain what any of this means")] bool explain = false
         )
         {
+            var inputEpisodeNumber = episodeNumber;
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
             alias = alias.Trim();
@@ -47,6 +48,27 @@ namespace Nino.Commands
             if (episode == null)
                 return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
 
+            var title = project.IsPrivate
+                ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
+                : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
+
+            // If no episode was specified, and the resulting episode
+            // is complete, then the project is complete...
+            // So send a "project complete" embed!
+            if (inputEpisodeNumber == null && !episode.Tasks.Any(t => !t.Done))
+            {
+                var doneEmbed = new EmbedBuilder()
+                    .WithAuthor(title)
+                    .WithTitle(T("title.blame", lng))
+                    .WithThumbnailUrl(project.PosterUri)
+                    .WithDescription(T("blame.projectComplete", lng))
+                    .WithCurrentTimestamp()
+                    .Build();
+                await interaction.FollowupAsync(embed: doneEmbed);
+                return ExecutionResult.Success;
+            }
+
+            // Generate a blame embed
             StringBuilder progress = new();
 
             // Add the project's MOTD or archival notice, if applicable
@@ -71,11 +93,7 @@ namespace Nino.Commands
                 progress.AppendLine(T("episode.lastUpdated", lng, $"<t:{episode.Updated?.ToUnixTimeSeconds()}:R>"));
             }
 
-            var title = project.IsPrivate
-                ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
-                : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
-
-            var embed = new EmbedBuilder()
+            var resultEmbed = new EmbedBuilder()
                 .WithAuthor(title)
                 .WithTitle(T("title.progress", lng, episode.Number))
                 .WithThumbnailUrl(project.PosterUri)
@@ -83,7 +101,7 @@ namespace Nino.Commands
                 .WithCurrentTimestamp()
                 .Build();
 
-            await interaction.FollowupAsync(embed: embed);
+            await interaction.FollowupAsync(embed: resultEmbed);
 
             return ExecutionResult.Success;
         }
