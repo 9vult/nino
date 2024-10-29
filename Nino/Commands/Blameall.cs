@@ -1,8 +1,6 @@
-using System;
 using System.Text;
 using Discord;
 using Discord.Interactions;
-using FastMember;
 using Fergun.Interactive;
 using Fergun.Interactive.Pagination;
 using Nino.Handlers;
@@ -25,7 +23,8 @@ namespace Nino.Commands
         [SlashCommand("blameall", "Check the overall status of a project")]
         public async Task<RuntimeResult> Handle(
             [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-            [Summary("filter", "Filter results")] BlameAllFilter filter = BlameAllFilter.All
+            [Summary("filter", "Filter results")] BlameAllFilter filter = BlameAllFilter.All,
+            [Summary("type", "Display type")] BlameAllType type = BlameAllType.Normal
         )
         {
             var interaction = Context.Interaction;
@@ -66,7 +65,7 @@ namespace Nino.Commands
                     var length = (int)(pageLength + Math.Min(page1, roundUp));
 
                     var pagedEpisodes = episodes.Skip(skip).Take(length);
-                    var progress = await BuildProgress(pagedEpisodes, project, lng);
+                    var progress = await BuildProgress(pagedEpisodes, project, lng, type);
 
                     // Add the project's MOTD or archival notice, if applicable
                     if (!string.IsNullOrEmpty(project.Motd))
@@ -102,7 +101,7 @@ namespace Nino.Commands
             return ExecutionResult.Success;
         }
 
-        private static async Task<string> BuildProgress(IEnumerable<Episode> pagedEpisodes, Project project, string lng)
+        private static async Task<string> BuildProgress(IEnumerable<Episode> pagedEpisodes, Project project, string lng, BlameAllType type)
         {
             StringBuilder sb = new ();
             foreach (var episode in pagedEpisodes)
@@ -114,7 +113,12 @@ namespace Nino.Commands
                     if (episode.Done)
                         sb.AppendLine($"_{T("blameall.done", lng)}_");
                     else if (episode.Tasks.Any(t => t.Done))
-                        sb.AppendLine(StaffList.GenerateProgress(project, episode));
+                    {
+                        if (type == BlameAllType.Normal)
+                            sb.AppendLine(StaffList.GenerateProgress(project, episode));
+                        if (type == BlameAllType.StallCheck)
+                            sb.AppendLine(T("episode.lastUpdated", lng, $"<t:{episode.Updated?.ToUnixTimeSeconds()}:R>"));
+                    }
                     else if (project.AniListId is not null && !await AirDateService.EpisodeAired((int)project.AniListId, episode.Number))
                         sb.AppendLine($"_{T("blameall.notYetAired", lng)}_");
                     else

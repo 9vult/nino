@@ -126,6 +126,16 @@
             "Incomplete": {
                 "name": "Incomplete"
             }
+        },
+        "type": {
+            "name": "type",
+            "description": "Display type",
+            "Normal": {
+                "name": "Normal"
+            },
+            "StallCheck": {
+                "name": "Stall Check"
+            }
         }
     },
     "bulk": {

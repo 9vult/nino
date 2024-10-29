@@ -19,6 +19,8 @@
     "choice.blameall.type.all": "All",
     "choice.blameall.type.inProgress": "In Progress",
     "choice.blameall.type.incomplete": "Incomplete",
+    "choice.blameall.type.normal": "Normal",
+    "choice.blameall.type.stallcheck": "Stall Check",
     "choice.project.edit.option.title": "Title",
     "choice.project.edit.option.poster": "Poster",
     "choice.project.edit.option.motd": "MOTD",
