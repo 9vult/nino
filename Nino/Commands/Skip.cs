@@ -8,6 +8,7 @@ using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities;
 using NLog;
+using System.Text;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
@@ -120,8 +121,17 @@ namespace Nino.Commands
                 ? $"{T("progress.skipped", lng, taskTitle, episodeNumber)}\n\n{replyStatus}{episodeDoneText}" // Verbose
                 : $"{T("progress.skipped", lng, taskTitle, episodeNumber)}{episodeDoneText}"; // Succinct (default)
 
+            // Send the embed
+            var replyEmbed = new EmbedBuilder()
+                .WithAuthor(name: replyHeader)
+                .WithTitle($":fast_forward: {T("title.taskSkipped", lng)}")
+                .WithDescription(replyBody)
+                .WithCurrentTimestamp()
+                .Build();
+            await interaction.FollowupAsync(embed: replyEmbed);
+
             // Everybody do the Conga!
-            List<string> congaContent = [];
+            StringBuilder congaContent = new();
 
             // Get all conga participants that the current task can call out
             var congaCandidates = project.CongaParticipants
@@ -150,20 +160,14 @@ namespace Nino.Commands
                         {
                             var staffMention = $"<@{nextTask.UserId}>";
                             var roleTitle = nextTask.Role.Name;
-                            congaContent.Add(T("progress.done.conga", lng, staffMention, episode.Number, roleTitle));
+                            congaContent.AppendLine(T("progress.done.conga", lng, staffMention, episode.Number, roleTitle));
                         }
                     }
                 }
-            }
 
-            // Send the embed
-            var replyEmbed = new EmbedBuilder()
-                .WithAuthor(name: replyHeader)
-                .WithTitle($":fast_forward: {T("title.taskSkipped", lng)}")
-                .WithDescription(replyBody)
-                .WithCurrentTimestamp()
-                .Build();
-            await interaction.FollowupAsync(embed: replyEmbed, text: string.Join(Environment.NewLine, congaContent));
+                if (congaContent.Length > 0)
+                    await interaction.Channel.SendMessageAsync(congaContent.ToString());
+            }
 
             await Cache.RebuildCacheForProject(project.Id);
             return ExecutionResult.Success;
