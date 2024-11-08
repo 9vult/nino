@@ -89,6 +89,7 @@
     "error.progress.taskAlreadyDone": "Task {{abbreviation|1}} is already done!",
     "error.progress.taskNotDone": "Task {{abbreviation|1}} is not done!",
     "error.project.nameInUse": "The name {{nickname|1}} is already in use!",
+    "error.project.invalidPosterUrl": "The poster URL is invalid.",
     "error.release.failed": "The following error occured while publishing: {{errorMessage|1}}",
     "error.taskCompleteAllEpisodes": "That task is complete for all episodes!",
     "info.resettable": "To reset this value, set a hyphen: `-`",

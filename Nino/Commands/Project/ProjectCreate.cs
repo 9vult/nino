@@ -44,6 +44,9 @@ namespace Nino.Commands
             if (Cache.GetProjects(guildId).Any(p => p.Nickname == nickname))
                 return await Response.Fail(T("error.project.nameInUse", lng, nickname), interaction);
 
+            if (!Uri.TryCreate(posterUri, UriKind.Absolute, out Uri? _))
+                return await Response.Fail(T("error.project.invalidPosterUrl", lng), interaction);
+
             // Populate data
 
             var projectData = new Project
