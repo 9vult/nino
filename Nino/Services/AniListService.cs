@@ -81,7 +81,7 @@ namespace Nino.Services
         private static StringContent CreateQuery(int id) =>
             new(JsonSerializer.Serialize(new
             {
-                query = "query ($id: Int) { Media (id: $id) { airingSchedule { nodes { episode, airingAt }}}}",
+                query = "query ($id: Int) { Media (id: $id) { startDate { year month day }, airingSchedule { nodes { episode, airingAt }}}}",
                 variables = new { id },
             }),
             Encoding.UTF8,

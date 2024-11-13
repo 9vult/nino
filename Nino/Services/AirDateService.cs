@@ -23,7 +23,7 @@ namespace Nino.Services
                     date = await GetAirDate(aniListId, previousNumber);
                     if (date is not null)
                     {
-                        date?.Add(new TimeSpan(days: 7, 0, 0, 0)); // Add a week
+                        date = date?.Add(new TimeSpan(days: 7, 0, 0, 0)); // Add a week
                     }
                     else
                     {
@@ -31,7 +31,7 @@ namespace Nino.Services
                         date = await GetStartDate(aniListId);
                         if (date is null)
                             return T("error.anilist.notSpecified", lng);
-                        date?.Add(new TimeSpan(days: (int)(7 * episodeNumber - 1), 0, 0, 0));
+                        date = date?.Add(new TimeSpan(days: (int)(7 * episodeNumber - 1), 0, 0, 0));
                     }
                 }
 
