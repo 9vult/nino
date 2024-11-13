@@ -3,6 +3,7 @@ using Discord.Interactions;
 using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
 using Nino.Records;
+using Nino.Services;
 using Nino.Utilities;
 
 using static Localizer.Localizer;
@@ -26,6 +27,14 @@ namespace Nino.Commands
 
             if (!Utils.VerifyUser(interaction.User.Id, project, excludeAdmins: true))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
+
+            log.Info($"Exporting project {project.Id} before deletion");
+
+            // Get stream
+            var file = await ExportService.ExportProject(project, false);
+
+            // Respond
+            await interaction.FollowupWithFileAsync(file, $"{project.Id}.json", T("project.exported", lng, project.Nickname));
 
             log.Info($"Deleting project {project.Id}");
 
