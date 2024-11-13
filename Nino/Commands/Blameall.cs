@@ -120,7 +120,12 @@ namespace Nino.Commands
                             sb.AppendLine(T("episode.lastUpdated", lng, $"<t:{episode.Updated?.ToUnixTimeSeconds()}:R>"));
                     }
                     else if (project.AniListId is not null && !await AirDateService.EpisodeAired((int)project.AniListId, episode.Number))
-                        sb.AppendLine($"_{T("blameall.notYetAired", lng)}_");
+                    {
+                        if (type == BlameAllType.Normal)
+                            sb.AppendLine($"_{T("blameall.notYetAired", lng)}_");
+                        if (type == BlameAllType.StallCheck)
+                            sb.AppendLine(await AirDateService.GetAirDateString((int)project.AniListId, episode.Number, lng));
+                    }
                     else
                         sb.AppendLine($"_{T("blameall.notStarted", lng)}_");
                 }
