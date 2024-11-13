@@ -20,7 +20,7 @@ namespace Nino.Services
 
                     // estimate based on "previous" episode
                     var previousNumber = Math.Floor(episodeNumber) == episodeNumber ? episodeNumber - 1 : Math.Floor(episodeNumber);
-                    date = await GetAirDate(aniListId, episodeNumber);
+                    date = await GetAirDate(aniListId, previousNumber);
                     if (date is not null)
                     {
                         date?.Add(new TimeSpan(days: 7, 0, 0, 0)); // Add a week
