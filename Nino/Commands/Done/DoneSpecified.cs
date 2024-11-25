@@ -127,6 +127,9 @@ namespace Nino.Commands
                         var nextTask = project.KeyStaff.FirstOrDefault(ks => ks.Role.Abbreviation == candidate.Key);
                         if (nextTask != null)
                         {
+                            // Skip task if task is done
+                            if (episode.Tasks.FirstOrDefault(t => t.Abbreviation == nextTask.Role.Abbreviation)?.Done ?? false) continue;
+
                             var staffMention = $"<@{nextTask.UserId}>";
                             var roleTitle = nextTask.Role.Name;
                             congaContent.AppendLine(T("progress.done.conga", lng, staffMention, episode.Number, roleTitle));
