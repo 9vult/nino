@@ -11,6 +11,7 @@ namespace Nino.Records
         public required bool Done;
         public required bool ReminderPosted;
         public required Staff[] AdditionalStaff;
+        public required PinchHitter[] PinchHitters;
         public required Task[] Tasks;
         public DateTimeOffset? Updated;
 

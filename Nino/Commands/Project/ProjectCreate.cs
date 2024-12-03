@@ -82,6 +82,7 @@ namespace Nino.Commands
                     Done = false,
                     ReminderPosted = false,
                     AdditionalStaff = [],
+                    PinchHitters = [],
                     Tasks = [],
                 });
             }

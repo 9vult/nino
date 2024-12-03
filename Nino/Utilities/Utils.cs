@@ -96,6 +96,8 @@ namespace Nino.Utilities
                 return true;
             if (Cache.GetConfig(project.GuildId)?.AdministratorIds?.Any(a => a == userId) ?? false)
                 return true;
+            if (episode.PinchHitters.Any(ph => ph.Abbreviation == abbreviation && ph.UserId == userId))
+                return true;
             if (project.KeyStaff.Concat(episode.AdditionalStaff).Any(ks => ks.Role.Abbreviation == abbreviation && ks.UserId == userId))
                 return true;
             return false;

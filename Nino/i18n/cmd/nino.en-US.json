@@ -233,6 +233,46 @@
                 "description": "Full position name"
             }
         },
+        "pinchhitter": {
+            "name": "pinchhitter",
+            "description": "Key Staff pinch hitters",
+            "remove": {
+                "name": "remove",
+                "description": "Remove a pinch hitter from an episode",
+                "project": {
+                    "name": "project",
+                    "description": "Project nickname"
+                },
+                "episode": {
+                    "name": "episode",
+                    "description": "Episode number"
+                },
+                "abbreviation": {
+                    "name": "abbreviation",
+                    "description": "Position shorthand"
+                }
+            },
+            "set": {
+                "name": "set",
+                "description": "Set a pinch hitter for an episode",
+                "project": {
+                    "name": "project",
+                    "description": "Project nickname"
+                },
+                "episode": {
+                    "name": "episode",
+                    "description": "Episode number"
+                },
+                "abbreviation": {
+                    "name": "abbreviation",
+                    "description": "Position shorthand"
+                },
+                "member": {
+                    "name": "member",
+                    "description": "Staff member"
+                }
+            }
+        },
         "remove": {
             "name": "remove",
             "description": "Remove a Key Staff from the whole project",

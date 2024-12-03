@@ -11,3 +11,4 @@ node_modules/*
 .vs/
 .DS_STORE
 *.user
+.idea/

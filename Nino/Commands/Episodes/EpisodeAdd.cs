@@ -45,6 +45,7 @@ namespace Nino.Commands
                 Done = false,
                 ReminderPosted = false,
                 AdditionalStaff = [],
+                PinchHitters = [],
                 Tasks = project.KeyStaff.Select(ks => new Records.Task { Abbreviation = ks.Role.Abbreviation, Done = false }).ToArray()
             };
 
