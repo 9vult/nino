@@ -167,22 +167,23 @@ Container _projectsContainer = await _database.CreateContainerIfNotExistsAsync("
 Container _episodesContainer = await _database.CreateContainerIfNotExistsAsync("Episodes", "/projectId");
 Container _configurationContainer = await _database.CreateContainerIfNotExistsAsync("Configuration", "/guildId");
 
-var projectSql = new QueryDefinition("SELECT * FROM c");
-List<Project> rawProjects = [];
-using FeedIterator<Project> feed = _projectsContainer!.GetItemQueryIterator<Project>(queryDefinition: projectSql);
+
+var episodeSql = new QueryDefinition("SELECT * FROM c");
+List<Episode> rawEpisodes = [];
+using FeedIterator<Episode> feed = _episodesContainer!.GetItemQueryIterator<Episode>(queryDefinition: episodeSql);
 while (feed.HasMoreResults)
 {
-    FeedResponse<Project> response = await feed.ReadNextAsync();
-    foreach (Project p in response)
+    FeedResponse<Episode> response = await feed.ReadNextAsync();
+    foreach (Episode p in response)
     {
-        rawProjects.Add(p);
+        rawEpisodes.Add(p);
     }
 }
 
-foreach (Project p in rawProjects)
+foreach (Episode e in rawEpisodes)
 {
-    p.IsArchived = false;
-    await _projectsContainer.UpsertItemAsync(p);
+    e.PinchHitters = [];
+    await _episodesContainer.UpsertItemAsync(e);
 }
 
 Console.WriteLine();
