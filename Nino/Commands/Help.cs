@@ -81,6 +81,7 @@ namespace Nino.Commands
             "nino.help.admin.title",
             "nino.help.customize.title",
             "nino.help.help.title",
+            "nino.help.localize.title",
             "nino.help.transfer.title"
         ];
         // @formatter:on

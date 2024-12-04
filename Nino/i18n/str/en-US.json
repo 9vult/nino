@@ -127,6 +127,8 @@
     "nino.help.done.title": "Mark my task complete",
     "nino.help.help.body": "You're already looking at it, silly!\n\nAdditional help can be found in the [Documentation](https://github.com/9vult/nino/blob/master/docs/docs.md).",
     "nino.help.help.title": "Get help",
+    "nino.help.localize.body": "Glad to hear it. [Detailed information](https://github.com/9vult/nino/blob/master/docs/localization.md) about localizing Nino can be found on GitHub.",
+    "nino.help.localize.title": "Localize Nino into my language",
     "nino.help.observer.body": "As long as Nino is in your server, you can observe projects that are either a) public or b) you are a part of.\nOptionally, the project can be added to your server's `/blame` hotlist. You will need webhooks to subscribe to progress updates.",
     "nino.help.observer.title": "Observe a project from my server",
     "nino.help.release.body": "Project owners and administrators can use `/release` to announce your new release.\nYou can release Episodes, Volumes, and Batches. For Episodes and Volumes, use the episode/volume number (`1`, `2`, etc). For Batches, use the range of episodes (`1-12`, etc).\nAdditionally, a role (or everyone) can be pinged.",
