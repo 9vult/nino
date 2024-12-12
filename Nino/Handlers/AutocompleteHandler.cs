@@ -55,7 +55,7 @@ namespace Nino.Handlers
                 if (cachedProject is not null)
                 {
                     choices.AddRange(Cache.GetEpisodes(cachedProject.Id)
-                        .Where(e => e.Number.ToString().StartsWith((string)focusedOption.Value))
+                        .Where(e => e.Number.ToString().StartsWith((string)focusedOption.Value, StringComparison.InvariantCultureIgnoreCase))
                         .Select(e => new AutocompleteResult(e.Number.ToString(), e.Number))
                     );
                 }
@@ -80,7 +80,7 @@ namespace Nino.Handlers
             List<AutocompleteResult> choices = [];
             var alias = ((string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")?.Value)?.Trim();
             var episodeInput = interaction.Data.Options.FirstOrDefault(o => o.Name == "episode")?.Value;
-            decimal? episodeNumber;
+            string? episodeNumber;
             if (alias is not null)
             {
                 var cachedProject = Utils.ResolveAlias(alias, interaction);
@@ -93,7 +93,7 @@ namespace Nino.Handlers
                     }
                     else
                     {
-                        episodeNumber = Convert.ToDecimal(episodeInput);
+                        episodeNumber = Utils.CanonicalizeEpisodeNumber((string)episodeInput);
                     }
                     if (episodeNumber is not null)
                     {
@@ -170,10 +170,10 @@ namespace Nino.Handlers
 
             List<AutocompleteResult> choices = [];
             var alias = ((string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")?.Value)?.Trim();
-            var episodeInput = (double?)interaction.Data.Options.FirstOrDefault(o => o.Name == "episode")?.Value;
+            var episodeInput = (string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "episode")?.Value;
             if (alias is not null && episodeInput is not null)
             {
-                var episodeNumber = Convert.ToDecimal(episodeInput);
+                var episodeNumber = Utils.CanonicalizeEpisodeNumber((string)episodeInput);
                 var cachedProject = Utils.ResolveAlias(alias, interaction);
                 if (cachedProject is not null)
                 {

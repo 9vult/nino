@@ -15,7 +15,7 @@ namespace Nino.Commands
         {
             var lng = interaction.UserLocale;
 
-            var episodes = Cache.GetEpisodes(project.Id).OrderBy(e => e.Number).ToList();
+            var episodes = Cache.GetEpisodes(project.Id).OrderBy(e => e.Number, new NumericalStringComparer()).ToList();
 
             // Find the episode the team is working on
             var workingEpisodeNo = episodes.FirstOrDefault(e => !e.Done)?.Number ?? episodes.LastOrDefault()?.Number;
@@ -34,12 +34,12 @@ namespace Nino.Commands
             
             // Are they the same? Then hand it off to the Specified handler
             if (nextTaskEpisodeNo == workingEpisodeNo)
-                return await HandleSpecified(interaction, project, abbreviation, (decimal)workingEpisodeNo);
+                return await HandleSpecified(interaction, project, abbreviation, workingEpisodeNo);
 
             // We are working ahead
 
             // Verify user
-            var nextTaskEpisode = await Getters.GetEpisode(project, (decimal)nextTaskEpisodeNo);
+            var nextTaskEpisode = await Getters.GetEpisode(project, nextTaskEpisodeNo);
 
             if (!Utils.VerifyTaskUser(interaction.User.Id, project, nextTaskEpisode!, abbreviation))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
@@ -103,7 +103,7 @@ namespace Nino.Commands
 
             // If we're continuing, hand off processing to the Specified handler
             if (fullSend)
-                return await HandleSpecified(interaction, project, abbreviation, (decimal)nextTaskEpisodeNo);
+                return await HandleSpecified(interaction, project, abbreviation, nextTaskEpisodeNo);
             
             return ExecutionResult.Success;     
         }

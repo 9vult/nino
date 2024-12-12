@@ -19,7 +19,7 @@ namespace Nino.Commands
         [SlashCommand("blame", "Check the status of a project")]
         public async Task<RuntimeResult> Handle(
             [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] decimal? episodeNumber = null,
+            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string? episodeNumber = null,
             [Summary("explain", "Explain what any of this means")] bool explain = false
         )
         {
@@ -33,7 +33,7 @@ namespace Nino.Commands
             if (project == null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
-            var episodes = Cache.GetEpisodes(project.Id).OrderBy(e => e.Number);
+            var episodes = Cache.GetEpisodes(project.Id).OrderBy(e => e.Number, new NumericalStringComparer());
 
             // Verify or find episode
             if (episodeNumber == null)
@@ -41,10 +41,14 @@ namespace Nino.Commands
                 var nextNumber = episodes.FirstOrDefault(e => !e.Done)?.Number ?? episodes.LastOrDefault()?.Number;
                 if (nextNumber == null)
                     return await Response.Fail(T("error.noEpisodes", lng), interaction);
-                episodeNumber = (decimal)nextNumber;
+                episodeNumber = nextNumber;
+            }
+            else
+            {
+                episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
             }
             
-            var episode = await Getters.GetEpisode(project, (decimal)episodeNumber);
+            var episode = await Getters.GetEpisode(project, episodeNumber);
             if (episode == null)
                 return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
 
@@ -81,9 +85,9 @@ namespace Nino.Commands
                 : StaffList.GenerateProgress(project, episode));
 
             // Add any update information
-            if (project.AniListId != null && !episode.Tasks.Any(t => t.Done))
+            if (project.AniListId != null && !episode.Tasks.Any(t => t.Done) && Utils.EpisodeNumberIsNumber(episode.Number, out var decimalNumber))
             {
-                var airStatus = await AirDateService.GetAirDateString((int)project.AniListId, episode.Number, lng);
+                var airStatus = await AirDateService.GetAirDateString((int)project.AniListId, decimalNumber, lng);
                 progress.AppendLine();
                 progress.AppendLine(airStatus);
             }

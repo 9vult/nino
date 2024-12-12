@@ -24,8 +24,8 @@ namespace Nino.Commands
             [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
             [Summary("action", "Action to perform")] ProgressType action,
             [Summary("abbreviation", "Position shorthand")] string abbreviation,
-            [Summary("start", "Start episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] decimal startEpisodeNumber,
-            [Summary("end", "End episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] decimal endEpisodeNumber
+            [Summary("start", "Start episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string startEpisodeNumber,
+            [Summary("end", "End episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string endEpisodeNumber
         )
         {
             var interaction = Context.Interaction;
@@ -35,8 +35,10 @@ namespace Nino.Commands
             // Sanitize inputs
             alias = alias.Trim();
             abbreviation = abbreviation.Trim().ToUpperInvariant();
+            startEpisodeNumber = Utils.CanonicalizeEpisodeNumber(startEpisodeNumber);
+            endEpisodeNumber = Utils.CanonicalizeEpisodeNumber(endEpisodeNumber);
 
-            if (endEpisodeNumber <= startEpisodeNumber)
+            if (endEpisodeNumber.CompareNumericallyTo(startEpisodeNumber) <= 0)
                 return await Response.Fail(T("error.invalidTimeRange", lng), interaction);
             
             // Verify project
@@ -64,12 +66,14 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Update database
-            List<decimal> completedEpisodes = [];
+            List<string> completedEpisodes = [];
             TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(project));
-            foreach (Episode e in (await Getters.GetEpisodes(project)).Where(e => e.Number >= startEpisodeNumber && e.Number <= endEpisodeNumber))
+            foreach (Episode e in (await Getters.GetEpisodes(project))
+                     .Where(e => e.Number.CompareNumericallyTo(startEpisodeNumber) >= 0 
+                                 && e.Number.CompareNumericallyTo(endEpisodeNumber) <= 0))
             {
                 var taskIndex = Array.IndexOf(e.Tasks, e.Tasks.Single(t => t.Abbreviation == abbreviation));
-                var isDone = action == ProgressType.Done || action == ProgressType.Skipped;
+                var isDone = action is ProgressType.Done or ProgressType.Skipped;
 
                 // Check if episode will be done
                 var episodeDone = isDone && !e.Tasks.Any(t => t.Abbreviation != abbreviation && !t.Done);

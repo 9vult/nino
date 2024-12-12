@@ -59,7 +59,7 @@ namespace Nino.Utilities
             return results;
         }
 
-        public static async Task<Episode?> GetEpisode(Project project, decimal number)
+        public static async Task<Episode?> GetEpisode(Project project, string number)
         {
             var id = $"{project.Id}-{number}";
             

@@ -78,7 +78,7 @@ namespace Nino.Commands
                     Id = $"{projectData.Id}-{i}",
                     GuildId = guildId,
                     ProjectId = projectData.Id,
-                    Number = i,
+                    Number = $"{i}",
                     Done = false,
                     ReminderPosted = false,
                     AdditionalStaff = [],

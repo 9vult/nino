@@ -43,10 +43,10 @@ namespace Nino.Commands
 
             var episodes = filter switch
             {
-                BlameAllFilter.All => (await Getters.GetEpisodes(project)).OrderBy(e => e.Number),
-                BlameAllFilter.InProgress => (await Getters.GetEpisodes(project)).Where(e => !e.Done && e.Tasks.Any(t => t.Done)).OrderBy(e => e.Number),
-                BlameAllFilter.Incomplete => (await Getters.GetEpisodes(project)).Where(e => !e.Done).OrderBy(e => e.Number),
-                _ => (await Getters.GetEpisodes(project)).OrderBy(e => e.Number) // All
+                BlameAllFilter.All => (await Getters.GetEpisodes(project)).OrderBy(e => e.Number, new NumericalStringComparer()),
+                BlameAllFilter.InProgress => (await Getters.GetEpisodes(project)).Where(e => !e.Done && e.Tasks.Any(t => t.Done)).OrderBy(e => e.Number, new NumericalStringComparer()),
+                BlameAllFilter.Incomplete => (await Getters.GetEpisodes(project)).Where(e => !e.Done).OrderBy(e => e.Number, new NumericalStringComparer()),
+                _ => (await Getters.GetEpisodes(project)).OrderBy(e => e.Number, new NumericalStringComparer()) // All
             };
 
             // Calculate pages
@@ -119,12 +119,12 @@ namespace Nino.Commands
                         if (type == BlameAllType.StallCheck)
                             sb.AppendLine(T("episode.lastUpdated", lng, $"<t:{episode.Updated?.ToUnixTimeSeconds()}:R>"));
                     }
-                    else if (project.AniListId is not null && !await AirDateService.EpisodeAired((int)project.AniListId, episode.Number))
+                    else if (project.AniListId is not null && Utils.EpisodeNumberIsNumber(episode.Number, out var decimalNumber) && !await AirDateService.EpisodeAired((int)project.AniListId, decimalNumber))
                     {
                         if (type == BlameAllType.Normal)
                             sb.AppendLine($"_{T("blameall.notYetAired", lng)}_");
                         if (type == BlameAllType.StallCheck)
-                            sb.AppendLine(await AirDateService.GetAirDateString((int)project.AniListId, episode.Number, lng));
+                            sb.AppendLine(await AirDateService.GetAirDateString((int)project.AniListId, decimalNumber, lng));
                     }
                     else
                         sb.AppendLine($"_{T("blameall.notStarted", lng)}_");

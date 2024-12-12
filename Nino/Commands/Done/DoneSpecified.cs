@@ -12,7 +12,7 @@ namespace Nino.Commands
 {
     public partial class Done
     {
-        public static async Task<RuntimeResult> HandleSpecified(SocketInteraction interaction, Project project, string abbreviation, decimal episodeNumber)
+        public static async Task<RuntimeResult> HandleSpecified(SocketInteraction interaction, Project project, string abbreviation, string episodeNumber)
         {
             var lng = interaction.UserLocale;
             var gLng = interaction.GuildLocale ?? "en-US";

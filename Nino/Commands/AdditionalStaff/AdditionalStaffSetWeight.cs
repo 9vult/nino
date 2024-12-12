@@ -14,7 +14,7 @@ namespace Nino.Commands
         [SlashCommand("setweight", "Set the weight of an Additional Staff position")]
         public async Task<RuntimeResult> SetWeight(
             [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] decimal episodeNumber,
+            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
             [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(AdditionalStaffAutocompleteHandler))] string abbreviation,
             [Summary("weight", "Weight")] decimal inputWeight
         )
@@ -25,6 +25,7 @@ namespace Nino.Commands
             // Sanitize imputs
             alias = alias.Trim();
             abbreviation = abbreviation.Trim().ToUpperInvariant();
+            episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
 
             // Verify project and user - Owner or Admin required
             var project = Utils.ResolveAlias(alias, interaction);

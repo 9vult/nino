@@ -14,7 +14,7 @@ namespace Nino.Commands
             [SlashCommand("remove", "Remove a pinch hitter from an episode")]
             public async Task<RuntimeResult> Remove(
                 [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-                [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] decimal episodeNumber,
+                [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
                 [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(KeyStaffAutocompleteHandler))] string abbreviation
             )
             {
@@ -24,6 +24,7 @@ namespace Nino.Commands
                 // Sanitize inputs
                 alias = alias.Trim();
                 abbreviation = abbreviation.Trim().ToUpperInvariant();
+                episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
 
                 // Verify project and user - Owner or Admin required
                 var project = Utils.ResolveAlias(alias, interaction);

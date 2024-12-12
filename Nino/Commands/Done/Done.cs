@@ -18,7 +18,7 @@ namespace Nino.Commands
         public async Task<RuntimeResult> Handle(
             [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
             [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(AbbreviationAutocompleteHandler))] string abbreviation,
-            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] decimal? episodeNumber = null
+            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string? episodeNumber = null
         )
         {
             var interaction = Context.Interaction;
@@ -42,7 +42,7 @@ namespace Nino.Commands
             if (!goOn) return ExecutionResult.Success;
 
             if (episodeNumber != null)
-                return await HandleSpecified(interaction, project, abbreviation, (decimal)episodeNumber);
+                return await HandleSpecified(interaction, project, abbreviation, Utils.CanonicalizeEpisodeNumber(episodeNumber));
             else
                 return await HandleUnspecified(interaction, project, abbreviation, _interactiveService);
         }

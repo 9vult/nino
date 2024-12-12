@@ -16,7 +16,7 @@ namespace Nino.Commands
             [SlashCommand("set", "Set a pinch hitter for an episode")]
             public async Task<RuntimeResult> Set(
                 [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-                [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] decimal episodeNumber,
+                [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
                 [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(KeyStaffAutocompleteHandler))] string abbreviation,
                 [Summary("member", "Staff member")] SocketUser member
             )
@@ -28,6 +28,7 @@ namespace Nino.Commands
                 var memberId = member.Id;
                 alias = alias.Trim();
                 abbreviation = abbreviation.Trim().ToUpperInvariant();
+                episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
 
                 // Verify project and user - Owner or Admin required
                 var project = Utils.ResolveAlias(alias, interaction);

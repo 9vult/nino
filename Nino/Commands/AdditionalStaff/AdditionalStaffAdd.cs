@@ -14,7 +14,7 @@ namespace Nino.Commands
         [SlashCommand("add", "Add additional staff to an episode")]
         public async Task<RuntimeResult> Add(
             [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] decimal episodeNumber,
+            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
             [Summary("member", "Staff member")] SocketUser member,
             [Summary("abbreviation", "Position shorthand")] string abbreviation,
             [Summary("fullname", "Full position name")] string taskName
@@ -28,6 +28,7 @@ namespace Nino.Commands
             alias = alias.Trim();
             taskName = taskName.Trim();
             abbreviation = abbreviation.Trim().ToUpperInvariant();
+            episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
 
             // Verify project and user - Owner or Admin required
             var project = Utils.ResolveAlias(alias, interaction);

@@ -13,7 +13,7 @@ namespace Nino.Commands
         [SlashCommand("swap", "Swap additional staff into an episode")]
         public async Task<RuntimeResult> Swap(
             [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] decimal episodeNumber,
+            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
             [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(AdditionalStaffAutocompleteHandler))] string abbreviation,
             [Summary("member", "Staff member")] SocketUser member
         )
@@ -24,6 +24,7 @@ namespace Nino.Commands
             // Sanitize imputs
             var memberId = member.Id;
             alias = alias.Trim();
+            episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
 
             // Verify project and user - Owner or Admin required
             var project = Utils.ResolveAlias(alias, interaction);

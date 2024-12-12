@@ -22,7 +22,7 @@ namespace Nino.Commands
         [SlashCommand("undone", "Mark a position as not done")]
         public async Task<RuntimeResult> Handle(
             [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] decimal episodeNumber,
+            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
             [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(AbbreviationAutocompleteHandler))] string abbreviation
         )
         {
@@ -33,6 +33,7 @@ namespace Nino.Commands
             // Sanitize inputs
             alias = alias.Trim();
             abbreviation = abbreviation.Trim().ToUpperInvariant();
+            episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
             
             // Verify project
             var project = Utils.ResolveAlias(alias, interaction);

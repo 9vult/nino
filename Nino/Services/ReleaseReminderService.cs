@@ -31,11 +31,12 @@ namespace Nino.Services
             Dictionary<string, List<Episode>> marked = [];
             foreach (var project in Cache.GetProjects().Where(p => p.AirReminderEnabled && p.AniListId is not null))
             {
-                foreach (var episode in Cache.GetEpisodes(project.Id).Where(e => !e.Done && !e.ReminderPosted))
+                var decimalNumber = 0m;
+                foreach (var episode in Cache.GetEpisodes(project.Id).Where(e => !e.Done && !e.ReminderPosted && Utils.EpisodeNumberIsNumber(e.Number, out decimalNumber)))
                 {
                     try
                     {
-                        var airTime = await AirDateService.GetAirDate((int)project.AniListId!, episode.Number);
+                        var airTime = await AirDateService.GetAirDate((int)project.AniListId!, decimalNumber);
                         if (airTime is null || DateTimeOffset.Now < airTime)
                             continue;
 
@@ -55,7 +56,7 @@ namespace Nino.Services
                         var embed = new EmbedBuilder()
                             .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString(gLng)})")
                             .WithTitle(T("title.aired", gLng, episode.Number))
-                            .WithDescription(await AirDateService.GetAirDateString((int)project.AniListId!, episode.Number, gLng))
+                            .WithDescription(await AirDateService.GetAirDateString((int)project.AniListId!, decimalNumber, gLng))
                             .WithThumbnailUrl(project.PosterUri)
                             .WithCurrentTimestamp()
                             .Build();

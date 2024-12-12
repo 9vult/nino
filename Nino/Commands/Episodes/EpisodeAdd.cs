@@ -13,7 +13,7 @@ namespace Nino.Commands
         [SlashCommand("add", "Add an episode")]
         public async Task<RuntimeResult> Add(
             [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-            [Summary("episode", "Episode number")] decimal episodeNumber
+            [Summary("episode", "Episode number")] string episodeNumber
         )
         {
             var interaction = Context.Interaction;
@@ -21,6 +21,7 @@ namespace Nino.Commands
 
             // Sanitize imputs
             alias = alias.Trim();
+            episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
 
             // Verify project and user - Owner or Admin required
             var project = Utils.ResolveAlias(alias, interaction);

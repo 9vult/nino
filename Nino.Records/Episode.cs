@@ -7,7 +7,7 @@ namespace Nino.Records
         public required string Id;
         public required string ProjectId;
         [JsonIgnore] public required ulong GuildId;
-        public required decimal Number;
+        public required string Number;
         public required bool Done;
         public required bool ReminderPosted;
         public required Staff[] AdditionalStaff;

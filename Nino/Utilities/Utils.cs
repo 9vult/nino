@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
 using Nino.Records;
+using System.Globalization;
 
 namespace Nino.Utilities
 {
@@ -18,7 +19,7 @@ namespace Nino.Utilities
         {
             var guildId = observingGuildId ?? interaction.GuildId ?? 0;
             var cache = Cache.GetProjects(guildId);
-            if (cache == null) return null;
+            if (cache is null) return null;
 
             
             var targets = !includeObservers ? cache
@@ -101,6 +102,29 @@ namespace Nino.Utilities
             if (project.KeyStaff.Concat(episode.AdditionalStaff).Any(ks => ks.Role.Abbreviation == abbreviation && ks.UserId == userId))
                 return true;
             return false;
+        }
+
+        /// <summary>
+        /// Canonicalize an episode number
+        /// </summary>
+        /// <param name="input">Raw episode number</param>
+        /// <returns>Canonical episode number</returns>
+        /// <remarks>If the episode number is not a decimal, it is returned as-is</remarks>
+        public static string CanonicalizeEpisodeNumber(string input)
+        {
+            var trim = input.Trim().ToUpperInvariant();
+            return decimal.TryParse(trim, out var decimalValue) ? decimalValue.ToString(CultureInfo.InvariantCulture) : trim;
+        }
+        
+        /// <summary>
+        /// Check if the episode number is a number
+        /// </summary>
+        /// <param name="input">Raw episode number</param>
+        /// <param name="episodeNumber">Output number as a decimal</param>
+        /// <returns><see langword="true"/> if the episode number is a number</returns>
+        public static bool EpisodeNumberIsNumber(string input, out decimal episodeNumber)
+        {
+            return decimal.TryParse(input, out episodeNumber);
         }
 
         /// <summary>
