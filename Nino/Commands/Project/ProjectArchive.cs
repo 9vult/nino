@@ -20,7 +20,7 @@ namespace Nino.Commands
         {
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
-            var gLng = interaction.GuildLocale ?? "en-US";
+            var gLng = Cache.GetConfig(interaction.GuildId ?? 0)?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
 
             // Verify project and user - Owner required
             var project = Utils.ResolveAlias(alias, interaction);

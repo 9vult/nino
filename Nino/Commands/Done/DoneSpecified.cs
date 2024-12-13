@@ -15,7 +15,7 @@ namespace Nino.Commands
         public static async Task<RuntimeResult> HandleSpecified(SocketInteraction interaction, Project project, string abbreviation, string episodeNumber)
         {
             var lng = interaction.UserLocale;
-            var gLng = interaction.GuildLocale ?? "en-US";
+            var gLng = Cache.GetConfig(interaction.GuildId ?? 0)?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
 
             // Verify episode and task
             var episode = await Getters.GetEpisode(project, episodeNumber);

@@ -75,7 +75,7 @@ namespace Nino.Utilities
         {
             log.Info($"Rebuilding config cache...");
 
-            var configSql = new QueryDefinition("SELECT c.id, c.guildId, c.releasePrefix, c.administratorIds FROM c");
+            var configSql = new QueryDefinition("SELECT c.id, c.guildId, c.releasePrefix, c.administratorIds, c.locale FROM c");
             List<Configuration> configs = await AzureHelper.QueryConfigurations<Configuration>(configSql);
 
             _configCache.Clear();

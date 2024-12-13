@@ -41,7 +41,7 @@ namespace Nino.Services
                             continue;
 
                         if (await Nino.Client.GetChannelAsync((ulong)project.AirReminderChannelId!) is not SocketTextChannel channel) continue;
-                        var gLng = channel.Guild.PreferredLocale;
+                        var gLng = Cache.GetConfig(channel.Guild.Id)?.Locale?.ToDiscordLocale() ?? channel.Guild.PreferredLocale;
                         
                         if (!marked.TryGetValue(project.Id, out var markedList))
                         {

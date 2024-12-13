@@ -2,6 +2,7 @@ using System;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Nino.Records.Enums;
 using Nino.Utilities;
 
 namespace Nino.Handlers
@@ -188,6 +189,32 @@ namespace Nino.Handlers
                         );
                     }
                 }
+            }
+            return AutocompletionResult.FromSuccess(choices.Take(25));
+        }
+    }
+    
+    /// <summary>
+    /// Autocompletion for project names/aliases
+    /// </summary>
+    public class LocaleAutocompleteHandler : AutocompleteHandler
+    {
+        private static readonly Dictionary<string, string> Options = Enum.GetValues<Locale>()
+            .ToDictionary(locale => locale.ToFriendlyString(),locale => $"{(int)locale}");
+        
+        public override async Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
+        {
+            var interaction = (SocketAutocompleteInteraction)context.Interaction;
+            var focusedOption = interaction.Data.Current;
+            
+            List<AutocompleteResult> choices = [];
+            var query = ((string)focusedOption.Value).Trim();
+            if (query is not null)
+            {
+                var value = ((string)focusedOption.Value).ToUpperInvariant();
+                choices.AddRange(Options.Where(o => o.Key.StartsWith(query, StringComparison.InvariantCultureIgnoreCase))
+                    .Select(o => new AutocompleteResult(o.Key, o.Value))
+                );
             }
             return AutocompletionResult.FromSuccess(choices.Take(25));
         }

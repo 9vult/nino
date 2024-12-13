@@ -28,7 +28,7 @@ namespace Nino.Commands
         {
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
-            var gLng = interaction.GuildLocale ?? "en-US";
+            var gLng = Cache.GetConfig(interaction.GuildId ?? 0)?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
 
             // Sanitize inputs
             alias = alias.Trim();

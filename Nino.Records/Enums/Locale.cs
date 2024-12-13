@@ -1,0 +1,156 @@
+namespace Nino.Records.Enums;
+
+public enum Locale
+{
+    EnglishUS,
+    EnglishGB,
+    Indonesian,
+    Bulgarian,
+    ChineseCN,
+    ChineseTW,
+    Croatian,
+    Czech,
+    Danish,
+    Dutch,
+    Finnish,
+    French,
+    German,
+    Greek,
+    Hindi,
+    Hungarian,
+    Italian,
+    Japanese,
+    Korean,
+    Lithuanian,
+    Norwegian,
+    Polish,
+    PortugueseBR,
+    Romanian,
+    Russian,
+    SpanishES,
+    Swedish,
+    Thai,
+    Turkish,
+    Ukrainian,
+    Vietnamese
+}
+
+public static class LocaleExtensions
+{
+    public static string ToDiscordLocale(this Locale type)
+    {
+        return type switch
+        {
+            Locale.EnglishUS => "en-US",
+            Locale.EnglishGB => "en-GB",
+            Locale.Indonesian => "id",
+            Locale.Bulgarian => "bg",
+            Locale.ChineseCN => "zh-CN",
+            Locale.ChineseTW => "zh-TW",
+            Locale.Croatian => "hr",
+            Locale.Czech => "cs",
+            Locale.Danish => "da",
+            Locale.Dutch => "nl",
+            Locale.Finnish => "fi",
+            Locale.French => "fr",
+            Locale.German => "de",
+            Locale.Greek => "el",
+            Locale.Hindi => "hi",
+            Locale.Hungarian => "hu",
+            Locale.Italian => "it",
+            Locale.Japanese => "ja",
+            Locale.Korean => "ko",
+            Locale.Lithuanian => "lt",
+            Locale.Norwegian => "no",
+            Locale.Polish => "pl",
+            Locale.PortugueseBR => "pt-BR",
+            Locale.Romanian => "ro",
+            Locale.Russian => "ru",
+            Locale.SpanishES => "es-ES",
+            Locale.Swedish => "sv-SE",
+            Locale.Thai => "th",
+            Locale.Turkish => "tr",
+            Locale.Ukrainian => "uk",
+            Locale.Vietnamese => "vi",
+            _ => type.ToString(),
+        };
+    }
+    
+    public static string ToDotNetLocale(this Locale type)
+    {
+        return type switch
+        {
+            Locale.EnglishUS => "en-US",
+            Locale.EnglishGB => "en-GB",
+            Locale.Indonesian => "id-ID",
+            Locale.Bulgarian => "bg-BG",
+            Locale.ChineseCN => "zh-Hans-CN",
+            Locale.ChineseTW => "zh-Hant-TW",
+            Locale.Croatian => "hr-HR",
+            Locale.Czech => "cs-CZ",
+            Locale.Danish => "da-DK",
+            Locale.Dutch => "nl-NL",
+            Locale.Finnish => "fi-FI",
+            Locale.French => "fr-FR",
+            Locale.German => "de-DE",
+            Locale.Greek => "el-GR",
+            Locale.Hindi => "hi-IN",
+            Locale.Hungarian => "hu-HU",
+            Locale.Italian => "it-IT",
+            Locale.Japanese => "ja-JP",
+            Locale.Korean => "ko-KR",
+            Locale.Lithuanian => "lt-LT",
+            Locale.Norwegian => "nn-NO",
+            Locale.Polish => "pl-PL",
+            Locale.PortugueseBR => "pt-BR",
+            Locale.Romanian => "ro-RO",
+            Locale.Russian => "ru-RU",
+            Locale.SpanishES => "es-ES",
+            Locale.Swedish => "sv-SE",
+            Locale.Thai => "th-TH",
+            Locale.Turkish => "tr-TR",
+            Locale.Ukrainian => "uk-UA",
+            Locale.Vietnamese => "vi-VN",
+            _ => type.ToString(),
+        };
+    }
+    
+    public static string ToFriendlyString(this Locale type)
+    {
+        return type switch
+        {
+            Locale.EnglishUS => "EnglishUS",
+            Locale.EnglishGB => "EnglishGB",
+            Locale.Indonesian => "Indonesian",
+            Locale.Bulgarian => "Bulgarian",
+            Locale.ChineseCN => "ChineseCN",
+            Locale.ChineseTW => "ChineseTW",
+            Locale.Croatian => "Croatian",
+            Locale.Czech => "Czech",
+            Locale.Danish => "Danish",
+            Locale.Dutch => "Dutch",
+            Locale.Finnish => "Finnish",
+            Locale.French => "French",
+            Locale.German => "German",
+            Locale.Greek => "Greek",
+            Locale.Hindi => "Hindi",
+            Locale.Hungarian => "Hungarian",
+            Locale.Italian => "Italian",
+            Locale.Japanese => "Japanese",
+            Locale.Korean => "Korean",
+            Locale.Lithuanian => "Lithuanian",
+            Locale.Norwegian => "Norwegian",
+            Locale.Polish => "Polish",
+            Locale.PortugueseBR => "PortugueseBR",
+            Locale.Romanian => "Romanian",
+            Locale.Russian => "Russian",
+            Locale.SpanishES => "SpanishES",
+            Locale.Swedish => "Swedish",
+            Locale.Thai => "Thai",
+            Locale.Turkish => "Turkish",
+            Locale.Ukrainian => "Ukrainian",
+            Locale.Vietnamese => "Vietnamese",
+            _ => type.ToString(),
+        };
+    }
+}

@@ -11,6 +11,7 @@ namespace Nino.Records
         public required ProgressDisplayType ProgressDisplay;
         [JsonIgnore] public required ulong[] AdministratorIds;
         public string? ReleasePrefix;
+        public Locale? Locale;
 
         [JsonProperty("GuildId")]
         [System.Text.Json.Serialization.JsonIgnore]
