@@ -43,17 +43,17 @@ namespace Nino.Commands
 
             var episodes = filter switch
             {
-                BlameAllFilter.All => (await Getters.GetEpisodes(project)).OrderBy(e => e.Number, new NumericalStringComparer()),
-                BlameAllFilter.InProgress => (await Getters.GetEpisodes(project)).Where(e => !e.Done && e.Tasks.Any(t => t.Done)).OrderBy(e => e.Number, new NumericalStringComparer()),
-                BlameAllFilter.Incomplete => (await Getters.GetEpisodes(project)).Where(e => !e.Done).OrderBy(e => e.Number, new NumericalStringComparer()),
-                _ => (await Getters.GetEpisodes(project)).OrderBy(e => e.Number, new NumericalStringComparer()) // All
+                BlameAllFilter.All => Cache.GetEpisodes(project.Id).OrderBy(e => e.Number, new NumericalStringComparer()).ToList(),
+                BlameAllFilter.InProgress => Cache.GetEpisodes(project.Id).Where(e => !e.Done && e.Tasks.Any(t => t.Done)).OrderBy(e => e.Number, new NumericalStringComparer()).ToList(),
+                BlameAllFilter.Incomplete => Cache.GetEpisodes(project.Id).Where(e => !e.Done).OrderBy(e => e.Number, new NumericalStringComparer()).ToList(),
+                _ => Cache.GetEpisodes(project.Id).OrderBy(e => e.Number, new NumericalStringComparer()).ToList() // All
             };
 
             // Calculate pages
             // Thanks to petzku and astiob for their contributions to this algorithm
-            var pageCount = Math.Ceiling(episodes.Count() / 13d);
-            var pageLength = Math.Floor(episodes.Count() / pageCount);
-            var roundUp = episodes.Count() % pageCount;
+            var pageCount = Math.Ceiling(episodes.Count / 13d);
+            var pageLength = Math.Floor(episodes.Count / pageCount);
+            var roundUp = episodes.Count % pageCount;
 
             // Build the paginator
             var paginator = new LazyPaginatorBuilder()

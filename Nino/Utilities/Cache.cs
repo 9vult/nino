@@ -11,7 +11,7 @@ namespace Nino.Utilities
 
         private static readonly Dictionary<ulong, List<Project>> _projectCache = [];
         private static readonly Dictionary<ulong, Configuration> _configCache = [];
-        private static readonly Dictionary<string, List<Episode>> _episodeCache = [];
+        private static readonly Dictionary<Guid, List<Episode>> _episodeCache = [];
         private static readonly Dictionary<ulong, List<Observer>> _observerCache = [];
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace Nino.Utilities
         /// Rebuild the project and episode cache for a specific project
         /// </summary>
         /// <param name="projectId">ID of the project</param>
-        public static async System.Threading.Tasks.Task RebuildCacheForProject(string projectId)
+        public static async System.Threading.Tasks.Task RebuildCacheForProject(Guid projectId)
         {
             log.Info($"Rebuilding cache for project {projectId}...");
 
@@ -182,7 +182,7 @@ namespace Nino.Utilities
         /// </summary>
         /// <param name="projectId">ID of the project</param>
         /// <returns>The episodes, or an empty list</returns>
-        public static List<Episode> GetEpisodes(string projectId)
+        public static List<Episode> GetEpisodes(Guid projectId)
         {
             if (_episodeCache.TryGetValue(projectId, out var episodeCache))
                 return episodeCache;

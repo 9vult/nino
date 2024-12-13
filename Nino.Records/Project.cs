@@ -5,7 +5,7 @@ namespace Nino.Records
 {
     public record Project
     {
-        public required string Id;
+        public required Guid Id;
         [JsonIgnore] public required ulong GuildId;
         public required string Nickname;
         public required string Title;

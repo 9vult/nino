@@ -43,9 +43,8 @@ namespace Nino.Commands
                     return await Response.Fail(T("error.alias.inUse", lng, preexistingProject.Nickname), interaction);
 
                 // Add to database
-                await AzureHelper.Projects!.PatchItemAsync<Project>(id: project.Id, partitionKey: AzureHelper.ProjectPartitionKey(project),
-                    patchOperations:[
-                        PatchOperation.Add("/aliases/-", input)
+                await AzureHelper.PatchProjectAsync(project, [
+                    PatchOperation.Add("/aliases/-", input)
                 ]);
 
                 log.Info($"Added {input} as an alias for {project.Id}");

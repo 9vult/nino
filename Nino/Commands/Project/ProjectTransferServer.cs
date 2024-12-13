@@ -47,7 +47,7 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Get the episodes
-            var episodes = await Getters.GetEpisodes(project);
+            var episodes = Cache.GetEpisodes(project.Id);
 
             var oldProjectId = project.Id;
             var oldEpisodeIds = episodes.Select(e => e.Id).ToList();
@@ -57,19 +57,19 @@ namespace Nino.Commands
             var oldObserverIds = observers.Select(o => o.Id).ToList();
 
             // Modify the data
-            project.Id = $"{newGuildId}-{project.Nickname}";
+            project.Id = AzureHelper.CreateProjectId();
             project.GuildId = newGuildId;
 
             foreach (var episode in episodes)
             {
                 episode.ProjectId = project.Id;
                 episode.GuildId = newGuildId;
-                episode.Id = $"{newGuildId}-{project.Nickname}-{episode.Number}";
+                episode.Id = AzureHelper.CreateEpisodeId();
             }
 
             foreach (var observer in observers)
             {
-                observer.Id = $"{project.Id}-{observer.GuildId}";
+                observer.Id = AzureHelper.CreateObserverId();
                 observer.OriginGuildId = newGuildId;
                 observer.ProjectId = project.Id;
             }
@@ -80,7 +80,7 @@ namespace Nino.Commands
 
             if (episodes.Count > 0)
             {
-                TransactionalBatch episodeBatch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.Id));
+                TransactionalBatch episodeBatch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.Id.ToString()));
                 foreach (var episode in episodes)
                 {
                     episodeBatch.UpsertItem(episode);
@@ -99,14 +99,14 @@ namespace Nino.Commands
             }
 
             // Remove old data from database
-            await AzureHelper.Projects!.DeleteItemAsync<Project>(oldProjectId, partitionKey: new PartitionKey(oldGuildId.ToString()));
+            await AzureHelper.Projects!.DeleteItemAsync<Project>(oldProjectId.ToString(), partitionKey: new PartitionKey(oldGuildId.ToString()));
 
             if (episodes.Count > 0)
             {
-                TransactionalBatch episodeBatch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(oldProjectId));
+                TransactionalBatch episodeBatch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(oldProjectId.ToString()));
                 foreach (var id in oldEpisodeIds)
                 {
-                    episodeBatch.DeleteItem(id);
+                    episodeBatch.DeleteItem(id.ToString());
                 }
                 await episodeBatch.ExecuteAsync();
             }
@@ -117,7 +117,7 @@ namespace Nino.Commands
                 TransactionalBatch observerBatch = AzureHelper.Observers!.CreateTransactionalBatch(partitionKey: new PartitionKey(oldGuildId.ToString()));
                 foreach (var id in oldObserverIds)
                 {
-                    observerBatch.DeleteItem(id);
+                    observerBatch.DeleteItem(id.ToString());
                 }
                 await observerBatch.ExecuteAsync();
             }

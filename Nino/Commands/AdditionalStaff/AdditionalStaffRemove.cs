@@ -35,8 +35,7 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Verify episode
-            var episode = await Getters.GetEpisode(project, episodeNumber);
-            if (episode == null)
+            if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
                 return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
 
             // Check if position exists
@@ -48,14 +47,14 @@ namespace Nino.Commands
 
             if (allEpisodes)
             {
-                foreach (Episode e in await Getters.GetEpisodes(project))
+                foreach (var e in Cache.GetEpisodes(project.Id))
                 {
-                    if (!e.AdditionalStaff.Any(k => k.Role.Abbreviation == abbreviation)) continue;
+                    if (e.AdditionalStaff.All(k => k.Role.Abbreviation != abbreviation)) continue;
 
                     var asIndex = Array.IndexOf(e.AdditionalStaff, e.AdditionalStaff.Single(k => k.Role.Abbreviation == abbreviation));
                     var taskIndex = Array.IndexOf(e.Tasks, e.Tasks.Single(t => t.Abbreviation == abbreviation));
 
-                    batch.PatchItem(id: e.Id, [
+                    batch.PatchItem(id: e.Id.ToString(), [
                         PatchOperation.Remove($"/additionalStaff/{asIndex}"),
                         PatchOperation.Remove($"/tasks/{taskIndex}")
                     ]);
@@ -65,7 +64,7 @@ namespace Nino.Commands
             {
                 var asIndex = Array.IndexOf(episode.AdditionalStaff, episode.AdditionalStaff.Single(k => k.Role.Abbreviation == abbreviation));
                 var taskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == abbreviation));
-                batch.PatchItem(id: episode.Id, [
+                batch.PatchItem(id: episode.Id.ToString(), [
                     PatchOperation.Remove($"/additionalStaff/{asIndex}"),
                     PatchOperation.Remove($"/tasks/{taskIndex}")
                 ]);

@@ -41,9 +41,8 @@ namespace Nino.Commands
                     return await Response.Fail(T("error.admin.alreadyAdmin", lng, staffMention), interaction);
 
                 // Add to database
-                await AzureHelper.Projects!.PatchItemAsync<Project>(id: project.Id, partitionKey: AzureHelper.ProjectPartitionKey(project),
-                    patchOperations: [
-                PatchOperation.Add("/administratorIds/-", memberId.ToString())
+                await AzureHelper.PatchProjectAsync(project, [
+                    PatchOperation.Add("/administratorIds/-", memberId.ToString())
                 ]);
 
                 log.Info($"Added {memberId} as an administrator for {project.Id}");

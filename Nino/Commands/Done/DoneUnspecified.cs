@@ -39,7 +39,7 @@ namespace Nino.Commands
             // We are working ahead
 
             // Verify user
-            var nextTaskEpisode = await Getters.GetEpisode(project, nextTaskEpisodeNo);
+            Getters.TryGetEpisode(project, nextTaskEpisodeNo, out var nextTaskEpisode);
 
             if (!Utils.VerifyTaskUser(interaction.User.Id, project, nextTaskEpisode!, abbreviation))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);

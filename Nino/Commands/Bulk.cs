@@ -55,10 +55,9 @@ namespace Nino.Commands
             if (!goOn) return ExecutionResult.Success;
 
             // Verify episode and task
-            var startEpisode = await Getters.GetEpisode(project, startEpisodeNumber);
-            if (startEpisode == null)
+            if (!Getters.TryGetEpisode(project, startEpisodeNumber, out var startEpisode))
                 return await Response.Fail(T("error.noSuchEpisode", lng, startEpisodeNumber), interaction);
-            if (!startEpisode.Tasks.Any(t => t.Abbreviation == abbreviation))
+            if (startEpisode.Tasks.All(t => t.Abbreviation != abbreviation))
                 return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
 
             // Verify user
@@ -68,7 +67,7 @@ namespace Nino.Commands
             // Update database
             List<string> completedEpisodes = [];
             TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(project));
-            foreach (Episode e in (await Getters.GetEpisodes(project))
+            foreach (var e in Cache.GetEpisodes(project.Id)
                      .Where(e => e.Number.CompareNumericallyTo(startEpisodeNumber) >= 0 
                                  && e.Number.CompareNumericallyTo(endEpisodeNumber) <= 0))
             {
@@ -81,7 +80,7 @@ namespace Nino.Commands
 
                 if (taskIndex != -1)
                 {
-                    batch.PatchItem(id: e.Id, [
+                    batch.PatchItem(id: e.Id.ToString(), [
                         PatchOperation.Set($"/tasks/{taskIndex}/done", isDone),
                         PatchOperation.Set($"/done", episodeDone),
                         PatchOperation.Set($"/updated", DateTimeOffset.Now)

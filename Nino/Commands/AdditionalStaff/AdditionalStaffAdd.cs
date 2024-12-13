@@ -39,8 +39,7 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Verify episode
-            var episode = await Getters.GetEpisode(project, episodeNumber);
-            if (episode == null)
+            if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
                 return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
 
             // Check if position already exists
@@ -67,7 +66,7 @@ namespace Nino.Commands
 
             // Add to database
             TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(episode));
-            batch.PatchItem(id: episode.Id, [
+            batch.PatchItem(id: episode.Id.ToString(), [
                 PatchOperation.Add("/additionalStaff/-", newStaff),
                 PatchOperation.Add("/tasks/-", newTask)
             ]);

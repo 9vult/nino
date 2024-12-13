@@ -40,14 +40,13 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
             // Validate observer
-            var observer = Cache.GetObservers(originGuildId)
-                .Where(o => o.GuildId == guildId && o.ProjectId == project.Id).SingleOrDefault();
+            var observer = Cache.GetObservers(originGuildId).SingleOrDefault(o => o.GuildId == guildId && o.ProjectId == project.Id);
 
             if (observer == null)
                 return await Response.Fail(T("error.noSuchObserver", lng), interaction);
 
             // Remove from database
-            await AzureHelper.Observers!.DeleteItemAsync<Records.Observer>(observer.Id, AzureHelper.ObserverPartitionKey(observer));
+            await AzureHelper.Observers!.DeleteItemAsync<Records.Observer>(observer.Id.ToString(), AzureHelper.ObserverPartitionKey(observer));
             log.Info($"Deleted observer {observer.Id}");
 
             // Send success embed

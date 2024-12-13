@@ -59,15 +59,14 @@ namespace Nino.Commands
             };
 
             // Add to database
-            await AzureHelper.Projects!.PatchItemAsync<Project>(id: project.Id, partitionKey: AzureHelper.ProjectPartitionKey(project),
-                patchOperations: [
+            await AzureHelper.PatchProjectAsync(project, [
                 PatchOperation.Add("/keyStaff/-", newStaff)
             ]);
 
             TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(project));
-            foreach (Episode e in await Getters.GetEpisodes(project))
+            foreach (var e in Cache.GetEpisodes(project.Id))
             {
-                batch.PatchItem(id: e.Id, [
+                batch.PatchItem(id: e.Id.ToString(), [
                     PatchOperation.Add("/tasks/-", newTask)
                 ]);
             }

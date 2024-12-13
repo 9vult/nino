@@ -36,8 +36,7 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Verify episode
-            var episode = await Getters.GetEpisode(project, episodeNumber);
-            if (episode == null)
+            if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
                 return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
 
             // Check if position exists
@@ -51,8 +50,7 @@ namespace Nino.Commands
             updatedStaff.Role.Weight = inputWeight;
 
             // Swap in database
-            await AzureHelper.Episodes!.PatchItemAsync<Episode>(id: episode.Id, partitionKey: AzureHelper.EpisodePartitionKey(project),
-                patchOperations: [
+            await AzureHelper.PatchEpisodeAsync(episode, [
                 PatchOperation.Replace($"/additionalStaff/{ksIndex}", updatedStaff)
             ]);
 

@@ -83,15 +83,11 @@ namespace Nino.Commands
                 // Update database
                 List<string> emptyList = [];
 
-                await AzureHelper.Projects!.PatchItemAsync<Project>(
-                    id: project.Id, 
-                    partitionKey: AzureHelper.ProjectPartitionKey(project),
-                    patchOperations: [
-                        PatchOperation.Replace($"/aliases", emptyList), // Remove aliases
-                        PatchOperation.Set<string?>($"/motd", null), // Remove MOTD
-                        PatchOperation.Set($"/isArchived", true) // set as archived
-                    ]
-                );
+                await AzureHelper.PatchProjectAsync(project, [
+                    PatchOperation.Replace($"/aliases", emptyList), // Remove aliases
+                    PatchOperation.Set<string?>($"/motd", null), // Remove MOTD
+                    PatchOperation.Set($"/isArchived", true) // set as archived
+                ]);
 
                 // Announce archival
                 var publishEmbed = new EmbedBuilder()

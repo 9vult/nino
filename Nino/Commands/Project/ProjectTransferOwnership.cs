@@ -33,9 +33,8 @@ namespace Nino.Commands
             var memberId = member.Id;
 
             // Swap in database
-            await AzureHelper.Projects!.PatchItemAsync<Project>(id: project.Id, partitionKey: AzureHelper.ProjectPartitionKey(project),
-                patchOperations: [
-                    PatchOperation.Replace($"/ownerId", memberId.ToString())
+            await AzureHelper.PatchProjectAsync(project, [
+                PatchOperation.Replace($"/ownerId", memberId.ToString())
             ]);
 
             log.Info($"Transfered project ownership of {project.Id} to {memberId}");

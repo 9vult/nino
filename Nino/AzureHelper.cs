@@ -1,5 +1,7 @@
 ﻿using Microsoft.Azure.Cosmos;
+using Nino.Records;
 using Nino.Utilities;
+using Task = System.Threading.Tasks.Task;
 
 namespace Nino
 {
@@ -122,6 +124,65 @@ namespace Nino
             return results;
         }
 
+        /// <summary>
+        /// Get a guaranteed-unique <see cref="Guid"/> for an episode
+        /// </summary>
+        /// <returns>A unique ID for the episode</returns>
+        public static Guid CreateEpisodeId ()
+        {
+            Guid result;
+            do
+            {
+                result = new Guid();
+            }
+            while (Cache.GetEpisodes().Any(x => x.Id == result));
+            return result;
+        }
+        
+        /// <summary>
+        /// Get a guaranteed-unique <see cref="Guid"/> for a project
+        /// </summary>
+        /// <returns>A unique ID for the project</returns>
+        public static Guid CreateProjectId ()
+        {
+            Guid result;
+            do
+            {
+                result = new Guid();
+            }
+            while (Cache.GetProjects().Any(x => x.Id == result));
+            return result;
+        }
+        
+        /// <summary>
+        /// Get a guaranteed-unique <see cref="Guid"/> for an observer
+        /// </summary>
+        /// <returns>A unique ID for the observer</returns>
+        public static Guid CreateObserverId ()
+        {
+            Guid result;
+            do
+            {
+                result = new Guid();
+            }
+            while (Cache.GetObservers().Any(x => x.Id == result));
+            return result;
+        }
+
+        public static async Task PatchProjectAsync (Project project, IReadOnlyList<PatchOperation> patchOperations)
+        {
+            var id = project.Id.ToString();
+            var partitionKey = ProjectPartitionKey(project);
+            await Projects!.PatchItemAsync<Project>(id, partitionKey, patchOperations);
+        }
+        
+        public static async Task PatchEpisodeAsync (Episode episode, IReadOnlyList<PatchOperation> patchOperations)
+        {
+            var id = episode.Id.ToString();
+            var partitionKey = EpisodePartitionKey(episode);
+            await Episodes!.PatchItemAsync<Episode>(id, partitionKey, patchOperations);
+        }
+        
         #region Partition Keys
 
         /// <summary>
@@ -151,7 +212,7 @@ namespace Nino
         /// <returns>Partition Key of the episode's ProjectId</returns>
         public static PartitionKey EpisodePartitionKey(Records.Episode episode)
         {
-            return new PartitionKey(episode.ProjectId);
+            return new PartitionKey(episode.ProjectId.ToString());
         }
 
         /// <summary>
@@ -161,7 +222,7 @@ namespace Nino
         /// <returns>Partition Key of the project's id</returns>
         public static PartitionKey EpisodePartitionKey(Records.Project project)
         {
-            return new PartitionKey(project.Id);
+            return new PartitionKey(project.Id.ToString());
         }
 
         /// <summary>
@@ -177,7 +238,7 @@ namespace Nino
         /// <summary>
         /// Partition Key for use when accessing Configurations
         /// </summary>
-        /// <param name="originGuildId">Guild ID for the project being accessed</param>
+        /// <param name="guildId">Guild ID for the project being accessed</param>
         /// <returns>Partition Key of the configuration's GuildId</returns>
         public static PartitionKey ConfigurationPartitionKey(ulong guildId)
         {

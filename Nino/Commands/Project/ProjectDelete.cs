@@ -39,12 +39,12 @@ namespace Nino.Commands
             log.Info($"Deleting project {project.Id}");
 
             // Remove from database
-            await AzureHelper.Projects!.DeleteItemAsync<Project>(project.Id, partitionKey: AzureHelper.ProjectPartitionKey(project));
+            await AzureHelper.Projects!.DeleteItemAsync<Project>(project.Id.ToString(), partitionKey: AzureHelper.ProjectPartitionKey(project));
 
-            TransactionalBatch episodeBatch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.Id));
-            foreach (Episode e in await Getters.GetEpisodes(project))
+            TransactionalBatch episodeBatch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.Id.ToString()));
+            foreach (var e in Cache.GetEpisodes(project.Id))
             {
-                episodeBatch.DeleteItem(e.Id);
+                episodeBatch.DeleteItem(e.Id.ToString());
             }
             await episodeBatch.ExecuteAsync();
 
@@ -55,7 +55,7 @@ namespace Nino.Commands
                 TransactionalBatch observerBatch = AzureHelper.Observers!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.GuildId));
                 foreach (Records.Observer o in observers)
                 {
-                    observerBatch.DeleteItem(o.Id);
+                    observerBatch.DeleteItem(o.Id.ToString());
                 }
                 await observerBatch.ExecuteAsync();
             }

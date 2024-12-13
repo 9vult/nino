@@ -39,8 +39,7 @@ namespace Nino.Commands
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
                 // Verify episode
-                var episode = await Getters.GetEpisode(project, episodeNumber);
-                if (episode == null)
+                if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
                     return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
                 
                 // Check if position exists
@@ -58,7 +57,7 @@ namespace Nino.Commands
                 TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(episode));
                 
                 var phIndex = Array.IndexOf(episode.PinchHitters, episode.PinchHitters.SingleOrDefault(k => k.Abbreviation == abbreviation));
-                batch.PatchItem(id: episode.Id, [
+                batch.PatchItem(id: episode.Id.ToString(), [
                     PatchOperation.Set($"/pinchHitters/{(phIndex != -1 ? phIndex : "-")}", hitter)
                 ]);
                 
