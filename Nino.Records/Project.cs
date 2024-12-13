@@ -25,6 +25,7 @@ namespace Nino.Records
         public required bool AirReminderEnabled;
         [JsonIgnore] public ulong? AirReminderChannelId;
         [JsonIgnore] public ulong? AirReminderRoleId;
+        public DateTimeOffset? Created;
 
         //
         // Serialization stuff because azure doesn't support ulong

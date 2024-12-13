@@ -67,7 +67,8 @@ namespace Nino.Commands
                 KeyStaff = [],
                 CongaParticipants = [],
                 Aliases = [],
-                AniListId = aniListId
+                AniListId = aniListId,
+                Created = DateTimeOffset.Now
             };
 
             var episodes = new List<Episode>();

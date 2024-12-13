@@ -71,6 +71,7 @@ namespace Nino.Commands
             var taskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == abbreviation));
             await AzureHelper.Episodes!.PatchItemAsync<Episode>(episode.Id, partitionKey: AzureHelper.EpisodePartitionKey(episode), new[] {
                 PatchOperation.Set($"/tasks/{taskIndex}/done", true),
+                PatchOperation.Set($"/tasks/{taskIndex}/updated", DateTimeOffset.Now),
                 PatchOperation.Set($"/done", episodeDone),
                 PatchOperation.Set($"/updated", DateTimeOffset.Now)
             });
