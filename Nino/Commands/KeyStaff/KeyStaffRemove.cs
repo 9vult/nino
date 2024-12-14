@@ -33,21 +33,20 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Check if position exists
-            if (!project.KeyStaff.Any(ks => ks.Role.Abbreviation == abbreviation))
+            if (project.KeyStaff.All(ks => ks.Role.Abbreviation != abbreviation))
                 return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
 
             // Remove from database
             var ksIndex = Array.IndexOf(project.KeyStaff, project.KeyStaff.Single(k => k.Role.Abbreviation == abbreviation));
-            await AzureHelper.Projects!.PatchItemAsync<Project>(id: project.Id, partitionKey: AzureHelper.ProjectPartitionKey(project),
-                patchOperations: [
+            await AzureHelper.PatchProjectAsync(project, [
                 PatchOperation.Remove($"/keyStaff/{ksIndex}")
             ]);
 
             TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(project));
-            foreach (Episode e in await Getters.GetEpisodes(project))
+            foreach (var e in Cache.GetEpisodes(project.Id))
             {
                 var taskIndex = Array.IndexOf(e.Tasks, e.Tasks.Single(t => t.Abbreviation == abbreviation));
-                batch.PatchItem(id: e.Id, [
+                batch.PatchItem(id: e.Id.ToString(), [
                     PatchOperation.Remove($"/tasks/{taskIndex}")
                 ]);
             }

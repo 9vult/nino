@@ -36,8 +36,7 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Verify episode
-            var episode = await Getters.GetEpisode(project, episodeNumber);
-            if (episode == null)
+            if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
                 return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
 
             if (project.KeyStaff.Length == 0)

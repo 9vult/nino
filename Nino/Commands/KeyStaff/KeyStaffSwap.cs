@@ -46,8 +46,7 @@ namespace Nino.Commands
             updatedStaff.UserId = memberId;
 
             // Swap in database
-            await AzureHelper.Projects!.PatchItemAsync<Project>(id: project.Id, partitionKey: AzureHelper.ProjectPartitionKey(project),
-                patchOperations: [
+            await AzureHelper.PatchProjectAsync(project, [
                 PatchOperation.Replace($"/keyStaff/{ksIndex}", updatedStaff)
             ]);
 

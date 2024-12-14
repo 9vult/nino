@@ -32,14 +32,13 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Verify episode doesn't exist
-            var episode = await Getters.GetEpisode(project, episodeNumber);
-            if (episode != null)
+            if (Getters.TryGetEpisode(project, episodeNumber, out _))
                 return await Response.Fail(T("error.episode.alreadyExists", lng, episodeNumber), interaction);
 
             // Create episode
             var newEpisode = new Episode
             {
-                Id = $"{project.Id}-{episodeNumber}",
+                Id = AzureHelper.CreateEpisodeId(),
                 GuildId = project.GuildId,
                 ProjectId = project.Id,
                 Number = episodeNumber,

@@ -103,11 +103,7 @@ namespace Nino.Commands
                     return await Response.Fail(T("error.generic", lng), interaction);
             }
 
-            await AzureHelper.Projects!.PatchItemAsync<Project>(
-                id: project.Id,
-                partitionKey: AzureHelper.ProjectPartitionKey(project),
-                patchOperations: new[] { operation }
-            );
+            await AzureHelper.PatchProjectAsync(project, [operation]);
 
             log.Info($"Updated project {project.Id} {option.ToFriendlyString(lng)} to {newValue}");
 

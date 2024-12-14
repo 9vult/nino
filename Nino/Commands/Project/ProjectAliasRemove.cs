@@ -44,9 +44,8 @@ namespace Nino.Commands
                 var aliasIndex = Array.IndexOf(project.Aliases, project.Aliases.Single(a => a == input));
 
                 // Remove from database
-                await AzureHelper.Projects!.PatchItemAsync<Project>(id: project.Id, partitionKey: AzureHelper.ProjectPartitionKey(project),
-                    patchOperations: [
-                        PatchOperation.Remove($"/aliases/{aliasIndex}")
+                await AzureHelper.PatchProjectAsync(project, [
+                    PatchOperation.Remove($"/aliases/{aliasIndex}")
                 ]);
 
                 log.Info($"Removed {input} as an alias from {project.Id}");

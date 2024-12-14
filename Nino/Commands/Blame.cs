@@ -48,8 +48,7 @@ namespace Nino.Commands
                 episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
             }
             
-            var episode = await Getters.GetEpisode(project, episodeNumber);
-            if (episode == null)
+            if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
                 return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
 
             var title = project.IsPrivate
@@ -59,7 +58,7 @@ namespace Nino.Commands
             // If no episode was specified, and the resulting episode
             // is complete, then the project is complete...
             // So send a "project complete" embed!
-            if (inputEpisodeNumber == null && !episode.Tasks.Any(t => !t.Done))
+            if (inputEpisodeNumber == null && episode.Tasks.All(t => t.Done))
             {
                 var doneEmbed = new EmbedBuilder()
                     .WithAuthor(title)

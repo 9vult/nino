@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.Cosmos;
 using Nino.Records;
 using NLog;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Nino.Utilities
 {
@@ -39,27 +40,20 @@ namespace Nino.Utilities
                 .Where(a => a.StartsWith(query, StringComparison.InvariantCultureIgnoreCase)).ToList();
         }
 
-        public static async Task<List<Episode>> GetEpisodes(Project project)
+        /// <summary>
+        /// Try to get an episode
+        /// </summary>
+        /// <param name="project">Project to get the episode from</param>
+        /// <param name="number">Number of the episode</param>
+        /// <param name="episode">Episode</param>
+        /// <returns>Found episode, or <see langword="null"/> if it doesn't exist</returns>
+        public static bool TryGetEpisode (Project project, string number, [MaybeNullWhen(false)] out Episode episode)
         {
-            var sql = new QueryDefinition("SELECT * FROM c WHERE c.projectId = @projectId")
-                .WithParameter("@projectId", project.Id);
-
-            List<Episode> results = [];
-
-            using FeedIterator<Episode> feed = AzureHelper.Episodes!.GetItemQueryIterator<Episode>(queryDefinition: sql);
-            while (feed.HasMoreResults)
-            {
-                FeedResponse<Episode> response = await feed.ReadNextAsync();
-                foreach (Episode e in response)
-                {
-                    results.Add(e);
-                }
-            }
-            
-            return results;
+            episode = Cache.GetEpisodes(project.Id).FirstOrDefault(e => e.Number == number);
+            return episode is not null;
         }
-
-        public static async Task<Episode?> GetEpisode(Project project, string number)
+        
+        private static async Task<Episode?> GetEpisode(Project project, string number)
         {
             var id = $"{project.Id}-{number}";
             

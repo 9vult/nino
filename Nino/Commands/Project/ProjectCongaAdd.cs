@@ -69,9 +69,8 @@ namespace Nino.Commands
                 manyToOne.Add(current);
 
                 // Add to database
-                await AzureHelper.Projects!.PatchItemAsync<Project>(id: project.Id, partitionKey: AzureHelper.ProjectPartitionKey(project),
-                    patchOperations: [
-                        PatchOperation.Add("/congaParticipants/-", participant)
+                await AzureHelper.PatchProjectAsync(project, [
+                    PatchOperation.Add("/congaParticipants/-", participant)
                 ]);
 
                 log.Info($"Added {current} → {next} to the Conga line for {project.Id}");

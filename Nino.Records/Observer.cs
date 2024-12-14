@@ -5,11 +5,11 @@ namespace Nino.Records
 {
     public record Observer
     {
-        public required string Id;
+        public required Guid Id;
         [JsonIgnore] public required ulong GuildId;
         [JsonIgnore] public required ulong OriginGuildId;
         [JsonIgnore] public required ulong OwnerId;
-        public required string ProjectId;
+        public required Guid ProjectId;
         public required bool Blame;
         [JsonIgnore] public ulong? RoleId;
         public string? ProgressWebhook;

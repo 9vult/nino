@@ -29,7 +29,7 @@ namespace Nino.Commands
 
             var tblData = observers.Select(o => new Dictionary<string, string>
             {
-                [T("observer.list.project", lng)] = o.ProjectId,
+                [T("observer.list.project", lng)] = o.ProjectId.ToString(),
                 [T("observer.list.blame", lng)] = o.Blame ? T("observer.list.yes", lng) : T("observer.list.no", lng),
                 [T("observer.list.updates", lng)] = !string.IsNullOrEmpty(o.ProgressWebhook) ? T("observer.list.yes", lng) : T("observer.list.no", lng),
                 [T("observer.list.releases", lng)] = !string.IsNullOrEmpty(o.ReleasesWebhook) ? T("observer.list.yes", lng) : T("observer.list.no", lng),

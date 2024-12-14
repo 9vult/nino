@@ -35,8 +35,7 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Verify episode
-            var episode = await Getters.GetEpisode(project, episodeNumber);
-            if (episode == null)
+            if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
                 return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
 
             // Check if position exists
@@ -51,10 +50,9 @@ namespace Nino.Commands
 
             // Swap in database
             TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(episode));
-            batch.PatchItem(id: episode.Id, new[]
-            {
+            batch.PatchItem(id: episode.Id.ToString(), [
                 PatchOperation.Replace($"/additionalStaff/{asIndex}", updatedStaff)
-            });
+            ]);
             await batch.ExecuteAsync();
 
             log.Info($"Swapped {memberId} in to {episode.Id} for {abbreviation}");

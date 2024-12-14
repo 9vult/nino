@@ -4,8 +4,8 @@ namespace Nino.Records
 {
     public record Episode
     {
-        public required string Id;
-        public required string ProjectId;
+        public required Guid Id;
+        public required Guid ProjectId;
         [JsonIgnore] public required ulong GuildId;
         public required string Number;
         public required bool Done;

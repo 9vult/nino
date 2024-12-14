@@ -55,7 +55,7 @@ namespace Nino.Commands
 
             var observer = new Records.Observer
             {
-                Id = $"{project.Id}-{guildId}",
+                Id = AzureHelper.CreateObserverId(),
                 GuildId = guildId,
                 OriginGuildId = originGuildId,
                 OwnerId = interaction.User.Id,

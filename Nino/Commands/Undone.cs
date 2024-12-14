@@ -49,10 +49,9 @@ namespace Nino.Commands
             if (!goOn) return ExecutionResult.Success;
 
             // Verify episode and task
-            var episode = await Getters.GetEpisode(project, episodeNumber);
-            if (episode == null)
+            if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
                 return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
-            if (!episode.Tasks.Any(t => t.Abbreviation == abbreviation))
+            if (episode.Tasks.All(t => t.Abbreviation != abbreviation))
                 return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
 
             // Verify user
@@ -65,12 +64,12 @@ namespace Nino.Commands
 
             // Update database
             var taskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == abbreviation));
-            await AzureHelper.Episodes!.PatchItemAsync<Episode>(episode.Id, partitionKey: AzureHelper.EpisodePartitionKey(episode), new[] {
+            await AzureHelper.PatchEpisodeAsync(episode, [
                 PatchOperation.Set($"/tasks/{taskIndex}/done", false),
                 PatchOperation.Set($"/tasks/{taskIndex}/updated", DateTimeOffset.Now),
                 PatchOperation.Set($"/done", false),
                 PatchOperation.Set($"/updated", DateTimeOffset.Now)
-            });
+            ]);
 
             // Update task for embeds
             episode.Tasks.Single(t => t.Abbreviation == abbreviation).Done = false;

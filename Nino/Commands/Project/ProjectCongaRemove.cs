@@ -42,9 +42,8 @@ namespace Nino.Commands
 
                 // Remove from database
                 var cIndex = Array.IndexOf(project.CongaParticipants, project.CongaParticipants.Single(c => c.Current == current && c.Next == next));
-                await AzureHelper.Projects!.PatchItemAsync<Project>(id: project.Id, partitionKey: AzureHelper.ProjectPartitionKey(project),
-                    patchOperations: [
-                        PatchOperation.Remove($"/congaParticipants/{cIndex}")
+                await AzureHelper.PatchProjectAsync(project, [
+                    PatchOperation.Remove($"/congaParticipants/{cIndex}")
                 ]);
 
                 log.Info($"Removed {current} → {next} from the Conga line for {project.Id}");

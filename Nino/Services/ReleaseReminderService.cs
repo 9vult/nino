@@ -28,7 +28,7 @@ namespace Nino.Services
 
         private async System.Threading.Tasks.Task CheckForReleases()
         {
-            Dictionary<string, List<Episode>> marked = [];
+            Dictionary<Guid, List<Episode>> marked = [];
             foreach (var project in Cache.GetProjects().Where(p => p.AirReminderEnabled && p.AniListId is not null))
             {
                 var decimalNumber = 0m;
@@ -73,13 +73,12 @@ namespace Nino.Services
             // Update database
             foreach (var kvpair in marked)
             {
-                TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(kvpair.Key));
+                TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(kvpair.Key.ToString()));
                 foreach (var episode in kvpair.Value)
                 {
-                    batch.PatchItem(id: episode.Id, new[]
-                    {
+                    batch.PatchItem(id: episode.Id.ToString(), [
                         PatchOperation.Set("/reminderPosted", true)
-                    });
+                    ]);
                 }
                 await batch.ExecuteAsync();
                 await Cache.RebuildCacheForProject(kvpair.Key);

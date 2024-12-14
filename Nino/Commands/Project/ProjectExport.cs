@@ -29,7 +29,7 @@ namespace Nino.Commands
             log.Info($"Exporting project {project.Id}");
 
             // Get stream
-            var file = await ExportService.ExportProject(project, prettyPrint);
+            var file = ExportService.ExportProject(project, prettyPrint);
 
             // Respond
             await interaction.FollowupWithFileAsync(file, $"{project.Id}.json", T("project.exported", lng, project.Nickname));

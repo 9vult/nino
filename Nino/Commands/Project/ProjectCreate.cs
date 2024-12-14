@@ -51,7 +51,7 @@ namespace Nino.Commands
 
             var projectData = new Project
             {
-                Id = $"{guildId}-{nickname}",
+                Id = AzureHelper.CreateProjectId(),
                 GuildId = guildId,
                 Nickname = nickname,
                 Title = title,
@@ -76,7 +76,7 @@ namespace Nino.Commands
             {
                 episodes.Add(new Episode
                 {
-                    Id = $"{projectData.Id}-{i}",
+                    Id = AzureHelper.CreateEpisodeId(),
                     GuildId = guildId,
                     ProjectId = projectData.Id,
                     Number = $"{i}",
@@ -93,7 +93,7 @@ namespace Nino.Commands
             // Add project and episodes to database
             await AzureHelper.Projects!.UpsertItemAsync(projectData);
 
-            TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(projectData.Id));
+            TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(projectData.Id.ToString()));
             foreach (var episode in episodes)
             {
                 batch.UpsertItem(episode);

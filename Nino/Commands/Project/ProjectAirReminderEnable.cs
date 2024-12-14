@@ -38,11 +38,10 @@ namespace Nino.Commands
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
                 // Set in database
-                await AzureHelper.Projects!.PatchItemAsync<Project>(id: project.Id, partitionKey: AzureHelper.ProjectPartitionKey(project),
-                    patchOperations: [
-                        PatchOperation.Replace($"/airReminderEnabled", true),
-                        PatchOperation.Replace($"/airReminderChannelId", channelId.ToString()),
-                        PatchOperation.Replace($"/airReminderRoleId", roleId?.ToString())
+                await AzureHelper.PatchProjectAsync(project, [
+                    PatchOperation.Replace($"/airReminderEnabled", true),
+                    PatchOperation.Replace($"/airReminderChannelId", channelId.ToString()),
+                    PatchOperation.Replace($"/airReminderRoleId", roleId?.ToString())
                 ]);
 
                 log.Info($"Enabled air reminders for {project.Id}");

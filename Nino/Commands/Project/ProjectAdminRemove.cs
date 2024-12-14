@@ -43,11 +43,9 @@ namespace Nino.Commands
                 var adminIndex = Array.IndexOf(project.AdministratorIds, project.AdministratorIds.Single(a => a == memberId));
 
                 // Remove from database
-                await AzureHelper.Projects!.PatchItemAsync<Project>(id: project.Id, partitionKey: AzureHelper.ProjectPartitionKey(project),
-                    patchOperations: new[]
-                {
-                PatchOperation.Remove($"/administratorIds/{adminIndex}")
-                });
+                await AzureHelper.PatchProjectAsync(project, [
+                    PatchOperation.Remove($"/administratorIds/{adminIndex}")
+                ]);
 
                 log.Info($"Removed {memberId} as an admin from {project.Id}");
 

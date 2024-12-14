@@ -1,6 +1,7 @@
 ﻿using Nino.Records;
 using Nino.Utilities;
 using System.Text.Json;
+using Task = System.Threading.Tasks.Task;
 
 namespace Nino.Services
 {
@@ -9,13 +10,14 @@ namespace Nino.Services
         /// <summary>
         /// Export a project as a JSON stream
         /// </summary>
-        /// <param name="project"></param>
+        /// <param name="project">Project to export</param>
+        /// <param name="prettyPrint">Pretty-print the json</param>
         /// <returns></returns>
-        public static async Task<MemoryStream> ExportProject(Project project, bool prettyPrint)
+        public static MemoryStream ExportProject(Project project, bool prettyPrint)
         {
             JsonSerializerOptions options = new() { IncludeFields = true, WriteIndented = prettyPrint };
 
-            var episodes = await Getters.GetEpisodes(project);
+            var episodes = Cache.GetEpisodes(project.Id);
 
             var export = new Export
             {
