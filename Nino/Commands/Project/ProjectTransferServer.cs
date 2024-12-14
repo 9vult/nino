@@ -49,33 +49,14 @@ namespace Nino.Commands
             // Get the episodes
             var episodes = Cache.GetEpisodes(project.Id);
 
-            var oldProjectId = project.Id;
-            var oldEpisodeIds = episodes.Select(e => e.Id).ToList();
-
-            // Get observers
-            var observers = Cache.GetObservers(oldGuildId).Where(o => o.ProjectId == oldProjectId).ToList();
-            var oldObserverIds = observers.Select(o => o.Id).ToList();
-
             // Modify the data
-            project.Id = AzureHelper.CreateProjectId();
             project.GuildId = newGuildId;
-
             foreach (var episode in episodes)
             {
-                episode.ProjectId = project.Id;
                 episode.GuildId = newGuildId;
-                episode.Id = AzureHelper.CreateEpisodeId();
-            }
-
-            foreach (var observer in observers)
-            {
-                observer.Id = AzureHelper.CreateObserverId();
-                observer.OriginGuildId = newGuildId;
-                observer.ProjectId = project.Id;
             }
 
             // Write new data to database
-
             await AzureHelper.Projects!.UpsertItemAsync(project);
 
             if (episodes.Count > 0)
@@ -87,43 +68,8 @@ namespace Nino.Commands
                 }
                 await episodeBatch.ExecuteAsync();
             }
-
-            if (observers.Count > 0)
-            {
-                TransactionalBatch observerBatch = AzureHelper.Observers!.CreateTransactionalBatch(partitionKey: AzureHelper.ObserverPartitionKey(newGuildId));
-                foreach (var observer in observers)
-                {
-                    observerBatch.UpsertItem(observer);
-                }
-                await observerBatch.ExecuteAsync();
-            }
-
-            // Remove old data from database
-            await AzureHelper.Projects!.DeleteItemAsync<Project>(oldProjectId.ToString(), partitionKey: new PartitionKey(oldGuildId.ToString()));
-
-            if (episodes.Count > 0)
-            {
-                TransactionalBatch episodeBatch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(oldProjectId.ToString()));
-                foreach (var id in oldEpisodeIds)
-                {
-                    episodeBatch.DeleteItem(id.ToString());
-                }
-                await episodeBatch.ExecuteAsync();
-            }
-
-            // Remove observers from database
-            if (observers.Count > 0)
-            {
-                TransactionalBatch observerBatch = AzureHelper.Observers!.CreateTransactionalBatch(partitionKey: new PartitionKey(oldGuildId.ToString()));
-                foreach (var id in oldObserverIds)
-                {
-                    observerBatch.DeleteItem(id.ToString());
-                }
-                await observerBatch.ExecuteAsync();
-            }
-
-
-            log.Info($"Transfered project {oldProjectId} to new server {newGuildId}");
+            
+            log.Info($"Transfered project {project.Id} from server {oldGuildId} to new server {newGuildId}");
 
             // Send success embed
             var embed = new EmbedBuilder()
