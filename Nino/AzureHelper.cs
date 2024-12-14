@@ -133,7 +133,7 @@ namespace Nino
             Guid result;
             do
             {
-                result = new Guid();
+                result = Guid.NewGuid();
             }
             while (Cache.GetEpisodes().Any(x => x.Id == result));
             return result;
@@ -148,7 +148,7 @@ namespace Nino
             Guid result;
             do
             {
-                result = new Guid();
+                result = Guid.NewGuid();
             }
             while (Cache.GetProjects().Any(x => x.Id == result));
             return result;
@@ -163,7 +163,7 @@ namespace Nino
             Guid result;
             do
             {
-                result = new Guid();
+                result = Guid.NewGuid();
             }
             while (Cache.GetObservers().Any(x => x.Id == result));
             return result;
