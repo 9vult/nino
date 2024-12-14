@@ -31,7 +31,7 @@ namespace Nino.Commands
             log.Info($"Exporting project {project.Id} before deletion");
 
             // Get stream
-            var file = await ExportService.ExportProject(project, false);
+            var file = ExportService.ExportProject(project, false);
 
             // Respond
             await interaction.FollowupWithFileAsync(file, $"{project.Id}.json", T("project.exported", lng, project.Nickname));
