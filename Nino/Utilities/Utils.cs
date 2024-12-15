@@ -112,7 +112,7 @@ namespace Nino.Utilities
         /// <remarks>If the episode number is not a decimal, it is returned as-is</remarks>
         public static string CanonicalizeEpisodeNumber(string input)
         {
-            var trim = input.Trim().ToUpperInvariant();
+            var trim = input.Trim();
             return decimal.TryParse(trim, out var decimalValue) ? decimalValue.ToString(CultureInfo.InvariantCulture) : trim;
         }
         
