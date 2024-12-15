@@ -25,7 +25,7 @@ namespace Nino.Commands
             var episodeCount = Cache.GetEpisodes().Count;
             var observerCount = Cache.GetObservers().Count;
             var uniqueObservers = Cache.GetObservers().GroupBy(o => o.ProjectId).Count();
-            var completedPercentage = Math.Truncate(Cache.GetEpisodes().Count(e => !e.Done) / (decimal)episodeCount * 100.0m);
+            var completedPercentage = Math.Round(Cache.GetEpisodes().Count(e => !e.Done) / (decimal)episodeCount * 100.0m, 2);
 
             var embed = new EmbedBuilder()
                 .WithTitle(T("title.stats", lng))
