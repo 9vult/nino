@@ -54,11 +54,10 @@ namespace Nino.Utilities
         /// Publish a release to observers
         /// </summary>
         /// <param name="project">Project being released</param>
-        /// <param name="releaseType">Type of release</param>
-        /// <param name="releaseNumber">Release number</param>
+        /// <param name="publishTitle">Title</param>
         /// <param name="releaseUrl">Release URL(s)</param>
         /// <returns></returns>
-        public static async Task PublishRelease(Records.Project project, ReleaseType releaseType, string releaseNumber, string releaseUrl)
+        public static async Task PublishRelease(Records.Project project, string publishTitle, string releaseUrl)
         {
             var observers = Cache.GetObservers(project.GuildId).Where(o => o.ProjectId == project.Id);
             if (observers.Any())
@@ -71,9 +70,8 @@ namespace Nino.Utilities
                     var observerRoleStr = observer.RoleId != null
                         ? observer.RoleId == observer.GuildId ? "@everyone " : $"<@&{observer.RoleId}> "
                         : "";
-                    var observerBody = releaseType != ReleaseType.Custom
-                        ? $"**{project.Title} - {releaseType.ToFriendlyString("en-US")} {releaseNumber}**\n{observerRoleStr}{releaseUrl}"
-                        : $"**{project.Title} - {releaseNumber}**\n{observerRoleStr}{releaseUrl}";
+                    
+                    var observerBody = $"**{publishTitle}**\n{observerRoleStr}{releaseUrl}";
                     try
                     {
                         var payload = new

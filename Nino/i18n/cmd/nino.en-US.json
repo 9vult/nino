@@ -634,38 +634,70 @@
   },
   "release": {
     "name": "release",
-    "description": "Release!",
-    "project": {
-      "name": "project",
-      "description": "Project nickname"
-    },
-    "type": {
-      "name": "type",
-      "description": "Type of release",
-      "Episode": {
-        "name": "Episode"
+    "description": "Release something to the world!",
+    "batch": {
+      "name": "batch",
+      "description": "Release a batch",
+      "project": {
+        "name": "project",
+        "description": "Project nickname"
       },
-      "Volume": {
-        "name": "Volume"
+      "first": {
+        "name": "first",
+        "description": "First episode in the batch"
       },
-      "Batch": {
-        "name": "Batch"
+      "last": {
+        "name": "last",
+        "description": "Last episode in the batch"
       },
-      "Custom": {
-        "name": "Custom"
+      "url": {
+        "name": "url",
+        "description": "Release URL(s)"
+      },
+      "role": {
+        "name": "role",
+        "description": "Role to ping"
       }
     },
-    "number": {
-      "name": "number",
-      "description": "What is being released?"
+    "episode": {
+      "name": "episode",
+      "description": "Release a single episode",
+      "project": {
+        "name": "project",
+        "description": "Project nickname"
+      },
+      "episode": {
+        "name": "episode",
+        "description": "Episode number to release"
+      },
+      "url": {
+        "name": "url",
+        "description": "Release URL(s)"
+      },
+      "role": {
+        "name": "role",
+        "description": "Role to ping"
+      }
     },
-    "url": {
-      "name": "url",
-      "description": "Release URL(s)"
-    },
-    "role": {
-      "name": "role",
-      "description": "Role to ping"
+    "volume": {
+      "name": "volume",
+      "description": "Release a volume",
+      "project": {
+        "name": "project",
+        "description": "Project nickname"
+      },
+      "volume": {
+        "name": "episode",
+        "description": "Volume number to release"
+      },
+      "url": {
+        "name": "url",
+        "description": "Release URL(s)"
+      },
+      "role": {
+        "name": "role",
+        "description": "Role to ping"
+      }
     }
   },
   "roster": {
