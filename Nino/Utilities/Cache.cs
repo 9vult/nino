@@ -136,6 +136,15 @@ namespace Nino.Utilities
         #region getters
 
         /// <summary>
+        /// Get a list of project guilds
+        /// </summary>
+        /// <returns>List of guilds with projects</returns>
+        public static List<ulong> GetProjectGuilds ()
+        {
+            return _projectCache.Keys.ToList();
+        }
+
+        /// <summary>
         /// Get a cached config
         /// </summary>
         /// <param name="guildId">ID of the guild</param>
