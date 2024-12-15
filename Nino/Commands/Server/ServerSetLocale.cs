@@ -43,6 +43,7 @@ namespace Nino.Commands
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 
+            await Cache.RebuildConfigCache();
             return ExecutionResult.Success;
         }
     }
