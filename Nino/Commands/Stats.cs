@@ -20,18 +20,38 @@ namespace Nino.Commands
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
             
+            var ongoing = Cache.GetEpisodes().GroupBy(e => e.ProjectId)
+                .Where(g => g.Any(e => !e.Done))
+                .ToDictionary(g => g.Key, g => g.ToList());
+            
             var guildCount = Cache.GetProjectGuilds().Count;
-            var projectCount = Cache.GetProjects().Count;
-            var episodeCount = Cache.GetEpisodes().Count;
+            var totalProjects = Cache.GetProjects().Count;
+            var ongoingProjects = ongoing.Count;
+            var totalEpisodes = Cache.GetEpisodes().Count;
+            var totalDoneEpisodes = Cache.GetEpisodes().Count(ep => ep.Done);
+            var ongoingProjectEpisodes = ongoing.Sum(kv => kv.Value.Count);
+            var ongoingProjectDoneEpisodes = ongoing.Sum(kv => kv.Value.Count(ep => ep.Done));
             var observerCount = Cache.GetObservers().Count;
             var uniqueObservers = Cache.GetObservers().GroupBy(o => o.ProjectId).Count();
-            var completedPercentage = Math.Round(Cache.GetEpisodes().Count(e => !e.Done) / (decimal)episodeCount * 100.0m, 2);
+            
+            var totalDoneEpisodesPercent = Math.Round(totalDoneEpisodes / (decimal)totalEpisodes * 100.0m, 2);
+            var totalDoneOngoingProjectEpisodesPercent = Math.Round(ongoingProjectDoneEpisodes / (decimal)ongoingProjectEpisodes * 100.0m, 2);
+            var ongoingProjectsPercent = Math.Round(ongoingProjects / (decimal)totalProjects * 100.0m, 2);
 
             var embed = new EmbedBuilder()
                 .WithTitle(T("title.stats", lng))
                 .WithDescription(T("nino.stats", lng, 
-                    projectCount, guildCount, episodeCount,
-                    completedPercentage, observerCount, uniqueObservers))
+                    totalProjects,
+                    guildCount,
+                    totalEpisodes,
+                    totalDoneEpisodesPercent,
+                    ongoingProjects,
+                    ongoingProjectsPercent,
+                    ongoingProjectEpisodes,
+                    totalDoneOngoingProjectEpisodesPercent,
+                    observerCount,
+                    uniqueObservers
+                ))
                 .WithUrl("https://github.com/9vult/nino")
                 .Build();
             await interaction.FollowupAsync(embed: embed);
