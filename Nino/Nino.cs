@@ -20,6 +20,10 @@ namespace Nino
         private static readonly Logger log = LogManager.GetCurrentClassLogger();
         private static AppConfig? _config;
         private static IServiceProvider? _services;
+        private static DiscordSocketConfig _socketConfig = new()
+        {
+            GatewayIntents = GatewayIntents.AllUnprivileged ^ GatewayIntents.GuildScheduledEvents ^ GatewayIntents.GuildInvites
+        };
 
         public static DiscordSocketClient Client => _services!.GetRequiredService<DiscordSocketClient>();
         public static AppConfig Config => _config!;
@@ -51,6 +55,7 @@ namespace Nino
             _services = new ServiceCollection()
                 .AddSingleton(_config)
                 .AddSingleton(_cmdLineOptions)
+                .AddSingleton(_socketConfig)
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>(), _interactionServiceConfig))
                 .AddSingleton<InteractionHandler>()

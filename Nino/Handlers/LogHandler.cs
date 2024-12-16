@@ -11,6 +11,9 @@ namespace Nino.Handlers
 
         public static Task Log(LogMessage msg)
         {
+            if (msg.Exception is System.Net.WebSockets.WebSocketException or Discord.WebSocket.GatewayReconnectException)
+                return Task.CompletedTask;
+            
             switch (msg.Severity)
             {
                 case LogSeverity.Info:
