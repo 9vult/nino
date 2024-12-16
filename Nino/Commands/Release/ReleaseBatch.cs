@@ -64,7 +64,7 @@ public partial class Release
             }
             catch (Exception e)
             {
-                log.Error(e.Message);
+                Log.Error(e.Message);
                 return await Response.Fail(T("error.release.failed", lng, e.Message), interaction);
             }
 

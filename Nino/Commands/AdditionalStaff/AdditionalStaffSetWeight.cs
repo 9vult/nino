@@ -54,7 +54,7 @@ namespace Nino.Commands
                 PatchOperation.Replace($"/additionalStaff/{ksIndex}", updatedStaff)
             ]);
 
-            log.Info($"Set {abbreviation} weight to {inputWeight} in {episode.Id}");
+            Log.Info($"Set {abbreviation} weight to {inputWeight} in {episode}");
 
             // Send success embed
             var embed = new EmbedBuilder()

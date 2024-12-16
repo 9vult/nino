@@ -63,7 +63,7 @@ namespace Nino.Commands
                 
                 await batch.ExecuteAsync();
 
-                log.Info($"Set {memberId} as pinch hitter for {abbreviation} for {episode.Id}");
+                Log.Info($"Set M[{memberId} (@{member.Username})] as pinch hitter for {abbreviation} for {episode}");
 
                 // Send success embed
                 var staffMention = $"<@{memberId}>";

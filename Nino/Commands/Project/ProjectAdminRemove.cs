@@ -47,7 +47,7 @@ namespace Nino.Commands
                     PatchOperation.Remove($"/administratorIds/{adminIndex}")
                 ]);
 
-                log.Info($"Removed {memberId} as an admin from {project.Id}");
+                Log.Info($"Removed M[{memberId} (@{member.Username})] as an admin from {project}");
 
                 // Send success embed
                 var embed = new EmbedBuilder()

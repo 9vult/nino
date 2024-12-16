@@ -78,7 +78,7 @@ namespace Nino.Commands
 
             if (goOn)
             {
-                log.Info($"Archiving project {project.Id}");
+                Log.Info($"Archiving project {project}");
 
                 // Update database
                 List<string> emptyList = [];
@@ -106,7 +106,7 @@ namespace Nino.Commands
                 }
                 catch (Exception e)
                 {
-                    log.Error(e.Message);
+                    Log.Error(e.Message);
                     var guild = Nino.Client.GetGuild(interaction.GuildId ?? 0);
                     await Utils.AlertError(T("error.release.failed", lng, e.Message), guild, project.Nickname, project.OwnerId, "Release");
                 }

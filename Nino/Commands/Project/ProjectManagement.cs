@@ -11,14 +11,13 @@ namespace Nino.Commands
         public InteractionService Commands { get; private set; } = commands;
         private readonly InteractionHandler _handler = handler;
         private readonly InteractiveService _interactiveService = interactive;
-        private static readonly Logger log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         [Group("alias", "Alternative nicknames for a project")]
         public partial class Alias(InteractionHandler handler, InteractionService commands) : InteractionModuleBase<SocketInteractionContext>
         {
             public InteractionService Commands { get; private set; } = commands;
             private readonly InteractionHandler _handler = handler;
-            private static readonly Logger log = LogManager.GetCurrentClassLogger();
         }
 
         [Group("admin", "Project-level administrators")]
@@ -26,7 +25,6 @@ namespace Nino.Commands
         {
             public InteractionService Commands { get; private set; } = commands;
             private readonly InteractionHandler _handler = handler;
-            private static readonly Logger log = LogManager.GetCurrentClassLogger();
         }
 
         [Group("airreminder", "Enable or disable airing reminders")]
@@ -34,7 +32,6 @@ namespace Nino.Commands
         {
             public InteractionService Commands { get; private set; } = commands;
             private readonly InteractionHandler _handler = handler;
-            private static readonly Logger log = LogManager.GetCurrentClassLogger();
         }
 
         [Group("conga", "A Conga line of Key Staff")]
@@ -42,7 +39,6 @@ namespace Nino.Commands
         {
             public InteractionService Commands { get; private set; } = commands;
             private readonly InteractionHandler _handler = handler;
-            private static readonly Logger log = LogManager.GetCurrentClassLogger();
         }
     }
 }

@@ -39,7 +39,7 @@ namespace Nino.Commands
                     PatchOperation.Replace<string?>($"/airReminderRoleId", null)
                 ]);
 
-                log.Info($"Disabled air reminders for {project.Id}");
+                Log.Info($"Disabled air reminders for {project}");
 
                 // Send success embed
                 var embed = new EmbedBuilder()

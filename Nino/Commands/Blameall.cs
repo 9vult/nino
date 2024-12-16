@@ -18,7 +18,7 @@ namespace Nino.Commands
         public InteractionService Commands { get; private set; } = commands;
         private readonly InteractionHandler _handler = handler;
         private readonly InteractiveService _interactiveService = interactive;
-        private static readonly Logger log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         [SlashCommand("blameall", "Check the overall status of a project")]
         public async Task<RuntimeResult> Handle(
@@ -36,6 +36,8 @@ namespace Nino.Commands
             var project = Utils.ResolveAlias(alias, interaction, includeObservers: true);
             if (project is null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+            
+            Log.Trace($"Blame All-ing {project} for M[{interaction.User.Id} (@{interaction.User.Username})]");
 
             var title = project.IsPrivate
                 ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"

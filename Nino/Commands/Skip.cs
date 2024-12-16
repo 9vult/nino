@@ -18,7 +18,7 @@ namespace Nino.Commands
         public InteractionService Commands { get; private set; } = commands;
         private readonly InteractionHandler _handler = handler;
         private readonly InteractiveService _interactiveService = interactive;
-        private static readonly Logger log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         [SlashCommand("skip", "Skip a position")]
         public async Task<RuntimeResult> Handle(
@@ -102,7 +102,7 @@ namespace Nino.Commands
             }
             catch (Exception e)
             {
-                log.Error(e.Message);
+                Log.Error(e.Message);
                 var guild = Nino.Client.GetGuild(interaction.GuildId ?? 0);
                 await Utils.AlertError(T("error.release.failed", lng, e.Message), guild, project.Nickname, project.OwnerId, "Release");
             }
@@ -130,6 +130,8 @@ namespace Nino.Commands
                 .WithCurrentTimestamp()
                 .Build();
             await interaction.FollowupAsync(embed: replyEmbed);
+            
+            Log.Info($"M[{interaction.User.Id} (@{interaction.User.Username})] skipped task {abbreviation} for {episode}");
 
             // Everybody do the Conga!
             StringBuilder congaContent = new();
@@ -148,10 +150,10 @@ namespace Nino.Commands
                     if (candidate.Count() > 1) // More than just this task
                     {
                         // Determine if the candidate's caller(s) (not this one) are all done
-                        if (candidate.Select(c => c.Current)
+                        if (candidate
+                            .Select(c => c.Current)
                             .Where(c => c != abbreviation)
-                            .Where(c => !episode.Tasks.FirstOrDefault(t => t.Abbreviation == c)?.Done ?? false)
-                            .Any())
+                            .Any(c => !episode.Tasks.FirstOrDefault(t => t.Abbreviation == c)?.Done ?? false))
                             ping = false; // Not all caller(s) are done
                     }
                     if (ping)

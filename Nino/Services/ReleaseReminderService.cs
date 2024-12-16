@@ -11,7 +11,7 @@ namespace Nino.Services
 {
     internal class ReleaseReminderService
     {
-        private static readonly Logger log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         
         private const int FIVE_MINUTES = 5 * 60 * 1000;
         private readonly System.Timers.Timer _timer;
@@ -61,10 +61,12 @@ namespace Nino.Services
                             .WithCurrentTimestamp()
                             .Build();
                         await channel.SendMessageAsync(text: role, embed: embed);
+                        
+                        Log.Info($"Published release reminder for {project} episode {episode}");
                     }
                     catch (Exception e)
                     {
-                        log.Error(e.Message);
+                        Log.Error(e.Message);
                         // TODO: Error alerting
                     }
                 }

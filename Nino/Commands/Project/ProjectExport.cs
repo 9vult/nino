@@ -26,7 +26,7 @@ namespace Nino.Commands
             if (!Utils.VerifyUser(interaction.User.Id, project, excludeAdmins: true))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
-            log.Info($"Exporting project {project.Id}");
+            Log.Info($"Exporting project {project}");
 
             // Get stream
             var file = ExportService.ExportProject(project, prettyPrint);

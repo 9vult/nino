@@ -17,6 +17,6 @@ namespace Nino.Commands
         public InteractionService Commands { get; private set; } = commands;
         private readonly InteractionHandler _handler = handler;
         private readonly InteractiveService _interactiveService = interactive;
-        private static readonly Logger log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
     }
 }

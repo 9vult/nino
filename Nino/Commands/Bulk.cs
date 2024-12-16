@@ -17,7 +17,7 @@ namespace Nino.Commands
         public InteractionService Commands { get; private set; } = commands;
         private readonly InteractionHandler _handler = handler;
         private readonly InteractiveService _interactiveService = interactive;
-        private static readonly Logger log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         [SlashCommand("bulk", "Do a lot of episodes all at once!")]
         public async Task<RuntimeResult> Handle(
@@ -115,7 +115,7 @@ namespace Nino.Commands
             }
             catch (Exception e)
             {
-                log.Error(e.Message);
+                Log.Error(e.Message);
                 return await Response.Fail(T("error.release.failed", lng, e.Message), interaction);
             }
 
@@ -153,6 +153,8 @@ namespace Nino.Commands
                 .WithCurrentTimestamp()
                 .Build();
             await interaction.FollowupAsync(embed: replyEmbed);
+            
+            Log.Info($"M[{interaction.User.Id} (@{interaction.User.Username})] batched {abbreviation} in {project} for {startEpisodeNumber}-{endEpisodeNumber}");
 
             await Cache.RebuildCacheForProject(project.Id);
             return ExecutionResult.Success;

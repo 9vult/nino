@@ -48,7 +48,7 @@ namespace Nino.Commands
                     PatchOperation.Remove($"/aliases/{aliasIndex}")
                 ]);
 
-                log.Info($"Removed {input} as an alias from {project.Id}");
+                Log.Info($"Removed {input} as an alias from {project}");
 
                 // Send success embed
                 var embed = new EmbedBuilder()

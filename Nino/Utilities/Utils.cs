@@ -2,18 +2,22 @@
 using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
 using Nino.Records;
+using NLog;
 using System.Globalization;
 
 namespace Nino.Utilities
 {
     internal static class Utils
     {
+        private static readonly Logger log = LogManager.GetCurrentClassLogger();
+        
         /// <summary>
         /// Resolve an alias to its project
         /// </summary>
         /// <param name="query">Alias to resolve</param>
         /// <param name="interaction">Interaction requesting resolution</param>
         /// <param name="observingGuildId">ID of the build being observed, if applicable</param>
+        /// <param name="includeObservers">Whether to include observers in the lookup</param>
         /// <returns>Project the alias references to, or null</returns>
         public static Project? ResolveAlias(string query, SocketInteraction interaction, ulong? observingGuildId = null, bool includeObservers = false)
         {
@@ -27,8 +31,12 @@ namespace Nino.Utilities
                     .Where(o => o.GuildId == guildId)
                     .SelectMany(o => Cache.GetProjects().Where(p => p.Id == o.ProjectId)));
 
-            return targets.Where(p => string.Equals(p.Nickname, query, StringComparison.InvariantCultureIgnoreCase) 
-                || p.Aliases.Any(a => string.Equals(a, query, StringComparison.InvariantCultureIgnoreCase))).FirstOrDefault();
+            var result = targets.FirstOrDefault(p =>
+                string.Equals(p.Nickname, query, StringComparison.InvariantCultureIgnoreCase) ||
+                p.Aliases.Any(a => string.Equals(a, query, StringComparison.InvariantCultureIgnoreCase)));
+            
+            log.Trace($"Resolved alias {query} to {result?.ToString() ?? "<resolution failed>"}");
+            return result;
         }
 
         /// <summary>

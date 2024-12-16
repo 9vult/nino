@@ -73,7 +73,7 @@ namespace Nino.Commands
                     PatchOperation.Add("/congaParticipants/-", participant)
                 ]);
 
-                log.Info($"Added {current} → {next} to the Conga line for {project.Id}");
+                Log.Info($"Added {current} → {next} to the Conga line for {project}");
 
                 string description;
 

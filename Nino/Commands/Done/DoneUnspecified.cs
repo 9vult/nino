@@ -13,6 +13,8 @@ namespace Nino.Commands
     {
         public static async Task<RuntimeResult> HandleUnspecified(SocketInteraction interaction, Project project, string abbreviation, InteractiveService interactiveService)
         {
+            Log.Info($"Handling unspecified /done by M[{interaction.User.Id} (@{interaction.User.Username})] for {project}");
+            
             var lng = interaction.UserLocale;
 
             var episodes = Cache.GetEpisodes(project.Id).OrderBy(e => e.Number, new NumericalStringComparer()).ToList();

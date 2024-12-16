@@ -46,7 +46,7 @@ namespace Nino.Commands
                     PatchOperation.Remove($"/congaParticipants/{cIndex}")
                 ]);
 
-                log.Info($"Removed {current} → {next} from the Conga line for {project.Id}");
+                Log.Info($"Removed {current} → {next} from the Conga line for {project}");
 
                 // Send success embed
                 var embed = new EmbedBuilder()

@@ -105,7 +105,7 @@ namespace Nino.Commands
 
             await AzureHelper.PatchProjectAsync(project, [operation]);
 
-            log.Info($"Updated project {project.Id} {option.ToFriendlyString(lng)} to {newValue}");
+            Log.Info($"Updated project {project} {option.ToFriendlyString(lng)} to {newValue}");
 
             var embedDescription = T("project.edited", lng, project.Nickname, option.ToFriendlyString(lng));
             if (!string.IsNullOrEmpty(helperText))

@@ -53,7 +53,7 @@ namespace Nino.Commands
                     PatchOperation.Remove($"/pinchHitters/{phIndex}")
                 ]);
                 await batch.ExecuteAsync();
-                log.Info($"Removed pinch hitter for {abbreviation} from {episode.Id}");
+                Log.Info($"Removed pinch hitter for {abbreviation} from {episode}");
 
                 // Send success embed
                 var embed = new EmbedBuilder()

@@ -11,7 +11,7 @@ namespace Nino.Commands
     {
         public InteractionService Commands { get; private set; } = commands;
         private readonly InteractionHandler _handler = handler;
-        private static readonly Logger log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
 
         [SlashCommand("stats", "Nino Statistics")]
@@ -19,6 +19,8 @@ namespace Nino.Commands
         {
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
+            
+            Log.Trace($"Displaying Stats for M[{interaction.User.Id} (@{interaction.User.Username})]");
             
             var allowedOngoingProjects = Cache.GetProjects().Where(p => !p.IsArchived).Select(p => p.Id).ToList();
             var archivedCount = Cache.GetProjects().Count(p => p.IsArchived);

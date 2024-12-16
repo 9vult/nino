@@ -28,7 +28,7 @@ namespace Nino.Commands
             if (!Utils.VerifyUser(interaction.User.Id, project, excludeAdmins: true))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
-            log.Info($"Exporting project {project.Id} before deletion");
+            Log.Info($"Exporting project {project} before deletion");
 
             // Get stream
             var file = ExportService.ExportProject(project, false);
@@ -36,7 +36,7 @@ namespace Nino.Commands
             // Respond
             await interaction.FollowupWithFileAsync(file, $"{project.Id}.json", T("project.exported", lng, project.Nickname));
 
-            log.Info($"Deleting project {project.Id}");
+            Log.Info($"Deleting project {project}");
 
             // Remove from database
             await AzureHelper.Projects!.DeleteItemAsync<Project>(project.Id.ToString(), partitionKey: AzureHelper.ProjectPartitionKey(project));

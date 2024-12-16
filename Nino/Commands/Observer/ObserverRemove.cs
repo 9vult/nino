@@ -47,7 +47,7 @@ namespace Nino.Commands
 
             // Remove from database
             await AzureHelper.Observers!.DeleteItemAsync<Records.Observer>(observer.Id.ToString(), AzureHelper.ObserverPartitionKey(observer));
-            log.Info($"Deleted observer {observer.Id}");
+            Log.Info($"Deleted observer {observer.Id} from {guildId}");
 
             // Send success embed
             var embed = new EmbedBuilder()

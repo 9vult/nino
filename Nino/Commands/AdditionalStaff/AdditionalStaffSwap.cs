@@ -55,7 +55,7 @@ namespace Nino.Commands
             ]);
             await batch.ExecuteAsync();
 
-            log.Info($"Swapped {memberId} in to {episode.Id} for {abbreviation}");
+            Log.Info($"Swapped M[{memberId} (@{member.Username})] in to {episode} for {abbreviation}");
 
             // Send success embed
             var staffMention = $"<@{memberId}>";

@@ -37,7 +37,7 @@ namespace Nino.Commands
                 PatchOperation.Replace($"/ownerId", memberId.ToString())
             ]);
 
-            log.Info($"Transfered project ownership of {project.Id} to {memberId}");
+            Log.Info($"Transfered project ownership of {project} to M[{memberId} (@{member.Username})]");
 
             // Send success embed
             var staffMention = $"<@{memberId}>";

@@ -86,5 +86,10 @@ namespace Nino.Records
             get => AirReminderRoleId?.ToString();
             set => AirReminderRoleId = !string.IsNullOrEmpty(value) ? ulong.Parse(value) : null;
         }
+
+        public override string ToString ()
+        {
+            return $"P[{Id} ({GuildId}-{Nickname})]";
+        }
     }
 }

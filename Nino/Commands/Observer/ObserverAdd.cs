@@ -69,7 +69,7 @@ namespace Nino.Commands
             // Add to database
             await AzureHelper.Observers!.UpsertItemAsync(observer);
 
-            log.Info($"Created new observer {observer.Id}");
+            Log.Info($"M[{interaction.User.Id} (@{interaction.User.Username})] created new observer {observer.Id} from {guildId} observing {project}");
 
             // Send success embed
             var embed = new EmbedBuilder()

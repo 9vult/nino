@@ -88,7 +88,7 @@ namespace Nino.Commands
                 });
             }
 
-            log.Info($"Creating project {projectData.Id} for {projectData.OwnerId} with {episodes.Count} episodes");
+            Log.Info($"Creating project {projectData} for M[{ownerId} (@{member.Username})] with {episodes.Count} episodes");
 
             // Add project and episodes to database
             await AzureHelper.Projects!.UpsertItemAsync(projectData);
@@ -103,7 +103,7 @@ namespace Nino.Commands
             // Create configuration if the guild doesn't have one yet
             if (await Getters.GetConfiguration(guildId) == null)
             {
-                log.Info($"Creating default configuration for guild {guildId}");
+                Log.Info($"Creating default configuration for guild {guildId}");
                 await AzureHelper.Configurations!.UpsertItemAsync(Configuration.CreateDefault(guildId));
             }
 

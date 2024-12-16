@@ -47,7 +47,7 @@ namespace Nino.Commands
                     PatchOperation.Add("/aliases/-", input)
                 ]);
 
-                log.Info($"Added {input} as an alias for {project.Id}");
+                Log.Info($"Added {input} as an alias for {project}");
 
                 // Send success embed
                 var embed = new EmbedBuilder()

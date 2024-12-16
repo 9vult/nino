@@ -69,7 +69,7 @@ namespace Nino.Commands
                 await episodeBatch.ExecuteAsync();
             }
             
-            log.Info($"Transfered project {project.Id} from server {oldGuildId} to new server {newGuildId}");
+            Log.Info($"Transfered project {project} from server {oldGuildId} to new server {newGuildId}");
 
             // Send success embed
             var embed = new EmbedBuilder()

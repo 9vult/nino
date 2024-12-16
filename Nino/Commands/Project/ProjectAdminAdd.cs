@@ -45,7 +45,7 @@ namespace Nino.Commands
                     PatchOperation.Add("/administratorIds/-", memberId.ToString())
                 ]);
 
-                log.Info($"Added {memberId} as an administrator for {project.Id}");
+                Log.Info($"Added M[{memberId} (@{member.Username})] as an administrator for {project}");
 
                 // Send success embed
                 var embed = new EmbedBuilder()

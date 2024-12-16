@@ -72,7 +72,7 @@ namespace Nino.Commands
             ]);
             await batch.ExecuteAsync();
 
-            log.Info($"Added {memberId} to {episode.Id} for {abbreviation}");
+            Log.Info($"Added M[{memberId} (@{member.Username})] to {episode} for {abbreviation}");
 
             // Send success embed
             var staffMention = $"<@{memberId}>";

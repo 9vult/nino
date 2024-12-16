@@ -22,5 +22,10 @@ namespace Nino.Records
             get => GuildId.ToString();
             set => GuildId = ulong.Parse(value);
         }
+
+        public override string ToString ()
+        {
+            return $"E[{Id} ({Number})]";
+        }
     }
 }

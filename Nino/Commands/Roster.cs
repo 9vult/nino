@@ -12,7 +12,7 @@ namespace Nino.Commands
     {
         public InteractionService Commands { get; private set; } = commands;
         private readonly InteractionHandler _handler = handler;
-        private static readonly Logger log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         [SlashCommand("roster", "See who's working on an episode")]
         public async Task<RuntimeResult> Handle(
@@ -38,6 +38,8 @@ namespace Nino.Commands
             // Verify episode
             if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
                 return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
+            
+            Log.Trace($"Generating roster for {project} episode {episode} for M[{interaction.User.Id} (@{interaction.User.Username})]");
 
             if (project.KeyStaff.Length == 0)
                 return await Response.Fail(T("error.noRoster", lng), interaction);

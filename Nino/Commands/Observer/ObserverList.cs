@@ -20,6 +20,8 @@ namespace Nino.Commands
             var guild = Nino.Client.GetGuild(guildId);
             var member = guild.GetUser(interaction.User.Id);
             if (!Utils.VerifyAdministrator(member, guild)) return await Response.Fail(T("error.notPrivileged", lng), interaction);
+            
+            Log.Trace($"Listing observers for {guildId}");
 
             // Get observers
             var observers = Cache.GetObservers().Where(o => o.GuildId == guildId).ToList();

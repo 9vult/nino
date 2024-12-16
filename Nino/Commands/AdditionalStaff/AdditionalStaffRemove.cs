@@ -72,8 +72,8 @@ namespace Nino.Commands
 
             await batch.ExecuteAsync();
 
-            if (allEpisodes) log.Info($"Removed {abbreviation} from {episode.Id}");
-            else log.Info($"Removed additionalstaff {abbreviation} from {episode.ProjectId}");
+            if (allEpisodes) Log.Info($"Removed {abbreviation} from {episode}");
+            else Log.Info($"Removed additionalstaff {abbreviation} from {project}");
 
             var description = allEpisodes 
                 ? T("additionalStaff.removed.all", lng, abbreviation) 

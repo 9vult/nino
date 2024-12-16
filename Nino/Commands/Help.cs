@@ -14,13 +14,16 @@ namespace Nino.Commands
     {
         public InteractionService Commands { get; private set; } = commands;
         private readonly InteractionHandler _handler = handler;
-        private static readonly Logger log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         [SlashCommand("help", "Nino Help")]
         public async Task<RuntimeResult> Handle ()
         {
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
+            
+            Log.Trace($"Displaying Help for M[{interaction.User.Id} (@{interaction.User.Username})]");
+            
             var localizedTitles = 
                 Titles.Select(key =>  new SelectionOption(key, T(key, lng), key.Replace(".title", ".body")))
                 .ToArray();

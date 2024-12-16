@@ -40,7 +40,7 @@ namespace Nino.Commands
 
             // Remove from database
             await AzureHelper.Episodes!.DeleteItemAsync<Episode>(episodeId, AzureHelper.EpisodePartitionKey(episode));
-            log.Info($"Deleted episode {episodeNumber} from {project.Id}");
+            Log.Info($"Deleted episode {episode} from {project}");
 
             // Send success embed
             var embed = new EmbedBuilder()

@@ -14,7 +14,7 @@ namespace Nino.Commands
     {
         public InteractionService Commands { get; private set; } = commands;
         private readonly InteractionHandler _handler = handler;
-        private static readonly Logger log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         [SlashCommand("blame", "Check the status of a project")]
         public async Task<RuntimeResult> Handle(
@@ -50,6 +50,8 @@ namespace Nino.Commands
             
             if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
                 return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
+            
+            Log.Trace($"Blaming {project} episode {episode} for M[{interaction.User.Id} (@{interaction.User.Username})]");
 
             var title = project.IsPrivate
                 ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"

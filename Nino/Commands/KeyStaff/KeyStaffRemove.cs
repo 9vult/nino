@@ -52,7 +52,7 @@ namespace Nino.Commands
             }
             await batch.ExecuteAsync();
 
-            log.Info($"Removed {abbreviation} from {project.Id}");
+            Log.Info($"Removed {abbreviation} from {project}");
 
             // Send success embed
             var embed = new EmbedBuilder()

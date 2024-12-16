@@ -52,7 +52,7 @@ namespace Nino.Commands
             // Add to database
             await AzureHelper.Episodes!.UpsertItemAsync(newEpisode);
 
-            log.Info($"Added episode {episodeNumber} to {project.Id}");
+            Log.Info($"Added episode {newEpisode} to {project}");
 
             // Send success embed
             var embed = new EmbedBuilder()

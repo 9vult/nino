@@ -31,8 +31,10 @@ namespace Nino.Commands
                 if (!Utils.VerifyUser(interaction.User.Id, project))
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
+                Log.Trace($"Listing Conga line for {project}");
+                
                 // Process
-                var description = string.Empty;
+                string description;
 
                 if (project.CongaParticipants.Length == 0)
                     description = T("project.conga.empty", lng);
