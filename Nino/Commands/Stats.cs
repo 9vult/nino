@@ -20,8 +20,11 @@ namespace Nino.Commands
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
             
+            var allowedOngoingProjects = Cache.GetProjects().Where(p => !p.IsArchived).Select(p => p.Id).ToList();
+            var archivedCount = Cache.GetProjects().Count(p => p.IsArchived);
+            
             var ongoing = Cache.GetEpisodes().GroupBy(e => e.ProjectId)
-                .Where(g => g.Any(e => !e.Done))
+                .Where(g => g.Any(e => !e.Done) && allowedOngoingProjects.Contains(g.Key))
                 .ToDictionary(g => g.Key, g => g.ToList());
             
             var guildCount = Cache.GetProjectGuilds().Count;
@@ -36,7 +39,6 @@ namespace Nino.Commands
             
             var totalDoneEpisodesPercent = Math.Round(totalDoneEpisodes / (decimal)totalEpisodes * 100.0m, 2);
             var totalDoneOngoingProjectEpisodesPercent = Math.Round(ongoingProjectDoneEpisodes / (decimal)ongoingProjectEpisodes * 100.0m, 2);
-            var ongoingProjectsPercent = Math.Round(ongoingProjects / (decimal)totalProjects * 100.0m, 2);
 
             var embed = new EmbedBuilder()
                 .WithTitle(T("title.stats", lng))
@@ -46,7 +48,7 @@ namespace Nino.Commands
                     totalEpisodes,
                     totalDoneEpisodesPercent,
                     ongoingProjects,
-                    ongoingProjectsPercent,
+                    archivedCount,
                     ongoingProjectEpisodes,
                     totalDoneOngoingProjectEpisodesPercent,
                     observerCount,
