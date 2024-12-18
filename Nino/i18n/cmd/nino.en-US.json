@@ -600,6 +600,9 @@
         },
         "ReleaseChannelID": {
           "name": "ReleaseChannelID"
+        },
+        "Nickname": {
+          "name": "Nickname"
         }
       },
       "newvalue": {

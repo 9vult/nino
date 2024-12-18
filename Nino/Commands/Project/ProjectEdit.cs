@@ -98,7 +98,20 @@ namespace Nino.Commands
                     if (!PermissionChecker.CheckReleasePermissions(releaseChannelId))
                         await Response.Info(T("error.missingChannelPermsRelease", lng, $"<#{releaseChannelId}>"), interaction);
                     break;
-
+                
+                case ProjectEditOption.Nickname:
+                    // Sanitize input
+                    newValue = newValue.Trim().ToLowerInvariant().Replace(" ", string.Empty);
+                    
+                    // Verify data
+                    if (Cache.GetProjects(interaction.GuildId ?? 0).Any(p => p.Nickname == newValue))
+                        return await Response.Fail(T("error.project.nameInUse", lng, newValue), interaction);
+                    
+                    Log.Info($"Changing nickname of {project} to {newValue}");
+                    operation = PatchOperation.Replace($"/nickname", newValue);
+                    project.Nickname = newValue; // For the embed
+                    break;
+                
                 default:
                     return await Response.Fail(T("error.generic", lng), interaction);
             }
