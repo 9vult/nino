@@ -40,5 +40,12 @@ namespace Nino.Commands
             public InteractionService Commands { get; private set; } = commands;
             private readonly InteractionHandler _handler = handler;
         }
+        
+        [Group("congareminder", "Enable or disable conga reminders")]
+        public partial class CongaReminder(InteractionHandler handler, InteractionService commands) : InteractionModuleBase<SocketInteractionContext>
+        {
+            public InteractionService Commands { get; private set; } = commands;
+            private readonly InteractionHandler _handler = handler;
+        }
     }
 }

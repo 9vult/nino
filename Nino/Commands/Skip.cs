@@ -167,6 +167,12 @@ namespace Nino.Commands
                             var staffMention = $"<@{nextTask.UserId}>";
                             var roleTitle = nextTask.Role.Name;
                             congaContent.AppendLine(T("progress.done.conga", lng, staffMention, episode.Number, roleTitle));
+                            
+                            // Update database with new last-reminded time
+                            var congaTaskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == nextTask.Role.Abbreviation));
+                            await AzureHelper.PatchEpisodeAsync(episode, [
+                                PatchOperation.Set($"/tasks/{congaTaskIndex}/lastReminded", DateTimeOffset.Now)
+                            ]);
                         }
                     }
                 }

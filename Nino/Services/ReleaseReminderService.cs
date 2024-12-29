@@ -13,20 +13,20 @@ namespace Nino.Services
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         
-        private const int FIVE_MINUTES = 5 * 60 * 1000;
+        private const int FiveMinutes = 5 * 60 * 1000;
         private readonly System.Timers.Timer _timer;
 
         public ReleaseReminderService()
         {
             _timer = new System.Timers.Timer
             {
-                Interval = FIVE_MINUTES
+                Interval = FiveMinutes
             };
-            _timer.Elapsed += async (object? s, System.Timers.ElapsedEventArgs e) => await CheckForReleases();
+            _timer.Elapsed += async (_, _) => await CheckForReleases();
             _timer.Start();
         }
 
-        private async System.Threading.Tasks.Task CheckForReleases()
+        private static async System.Threading.Tasks.Task CheckForReleases()
         {
             Dictionary<Guid, List<Episode>> marked = [];
             foreach (var project in Cache.GetProjects().Where(p => p.AirReminderEnabled && p.AniListId is not null))

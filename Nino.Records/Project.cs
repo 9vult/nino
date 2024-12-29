@@ -25,6 +25,9 @@ namespace Nino.Records
         public required bool AirReminderEnabled;
         [JsonIgnore] public ulong? AirReminderChannelId;
         [JsonIgnore] public ulong? AirReminderRoleId;
+        public required bool CongaReminderEnabled;
+        public TimeSpan? CongaReminderPeriod;
+        [JsonIgnore] public ulong? CongaReminderChannelId;
         public DateTimeOffset? Created;
 
         //
@@ -85,6 +88,14 @@ namespace Nino.Records
         {
             get => AirReminderRoleId?.ToString();
             set => AirReminderRoleId = !string.IsNullOrEmpty(value) ? ulong.Parse(value) : null;
+        }
+        
+        [JsonProperty("CongaReminderChannelId")]
+        [System.Text.Json.Serialization.JsonIgnore]
+        public string? SerializationCongaReminderChannelId
+        {
+            get => CongaReminderChannelId?.ToString();
+            set => CongaReminderChannelId = !string.IsNullOrEmpty(value) ? ulong.Parse(value) : null;
         }
 
         public override string ToString ()

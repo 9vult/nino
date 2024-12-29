@@ -63,6 +63,7 @@ namespace Nino.Commands
                 IsPrivate = isPrivate,
                 IsArchived = false,
                 AirReminderEnabled = false,
+                CongaReminderEnabled = false,
                 AdministratorIds = [],
                 KeyStaff = [],
                 CongaParticipants = [],

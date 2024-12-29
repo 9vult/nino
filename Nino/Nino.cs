@@ -68,11 +68,14 @@ namespace Nino
             // Build initial cache
             await Cache.BuildCache();
 
-            // Start services
+            // Start AniList service
             if (!_cmdLineOptions.DisableAniList)
                 _ = new ReleaseReminderService();
             else
                 AniListService.ANILIST_ENABLED = false;
+
+            // Start Conga Reminder service
+            _ = new CongaReminderService();
 
             // Load localization files
             LoadLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/str")));
