@@ -191,6 +191,7 @@
     "project.archive.question": "Are you sure you want to archive `{{project|1}}`?\nThis action is irreversible.",
     "project.conga.added": "I added {{current|1}} → {{next|2}} to the Conga line for you.",
     "project.conga.empty": "There is nobody doing the Conga for this project.",
+    "project.conga.firstHelp": "To have awaited tasks reminded at regular intervals, use `/project congareminder enable`.",
     "project.conga.removed": "I removed {{current|1}} → {{next|2}} from the Conga line for you.",
     "project.congareminder.disabled": "Disabled conga reminders for `{{project|1}}`.",
     "project.congareminder.enabled": "Enabled conga reminders for `{{project|1}}` with a period of {{hours|2}} hours.",

@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using System.Text;
+using Discord;
 using Discord.Interactions;
 using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
@@ -53,9 +54,9 @@ namespace Nino.Commands
                 manyToOneCount = manyToOne.Count;
 
                 // Validate tasks exist
-                if (!project.KeyStaff.Any(ks => ks.Role.Abbreviation == current))
+                if (project.KeyStaff.All(ks => ks.Role.Abbreviation != current))
                     return await Response.Fail(T("error.noSuchTask", lng, current), interaction);
-                if (!project.KeyStaff.Any(ks => ks.Role.Abbreviation == next))
+                if (project.KeyStaff.All(ks => ks.Role.Abbreviation != next))
                     return await Response.Fail(T("error.noSuchTask", lng, next), interaction);
 
                 // We good!
@@ -75,30 +76,34 @@ namespace Nino.Commands
 
                 Log.Info($"Added {current} → {next} to the Conga line for {project}");
 
-                string description;
+                var description = new StringBuilder();
 
                 // New one-to-many union (ex: TL → (ED, TS))
                 if (oneToMany.Count > 1 && oneToMany.Count > oneToManyCount)
                 {
                     var unionStr = $"({string.Join(", ", oneToMany)})";
-                    description = T("project.conga.union.added.next", lng, current, next, current, unionStr);
+                    description.AppendLine(T("project.conga.union.added.next", lng, current, next, current, unionStr));
                 }
                 // New many-to-one union (ex: (TLC, TS) → QC)
                 else if (manyToOne.Count > 1 && manyToOne.Count > manyToOneCount)
                 {
                     var unionStr = $"({string.Join(", ", manyToOne)})";
-                    description = T("project.conga.union.added.current", lng, current, next, unionStr, next);
+                    description.AppendLine(T("project.conga.union.added.current", lng, current, next, unionStr, next));
                 }
                 // Normal (ex: QC1 → QC2)
                 else
                 {
-                    description = T("project.conga.added", lng, current, next);
+                    description.AppendLine(T("project.conga.added", lng, current, next));
                 }
+                
+                // Add reminder information if this is the first conga added
+                if (project.CongaParticipants.Length == 0)
+                    description.AppendLine(T("project.conga.firstHelp", lng));
 
                 // Send success embed
                 var embed = new EmbedBuilder()
                     .WithTitle(T("title.projectModification", lng))
-                    .WithDescription(description)
+                    .WithDescription(description.ToString())
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 
