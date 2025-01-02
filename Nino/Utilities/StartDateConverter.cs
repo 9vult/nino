@@ -26,13 +26,13 @@ namespace Nino.Utilities
                     switch (propertyName)
                     {
                         case "year":
-                            year = reader.GetInt32();
+                            year = ReadNullableInt(ref reader) ?? 0;
                             break;
                         case "month":
-                            month = reader.GetInt32();
+                            month = ReadNullableInt(ref reader) ?? 1;
                             break;
                         case "day":
-                            day = reader.GetInt32();
+                            day = ReadNullableInt(ref reader) ?? 1;
                             break;
                     }
                 }
@@ -49,5 +49,16 @@ namespace Nino.Utilities
             writer.WriteNumber("day", value.Day);
             writer.WriteEndObject();
         }
+        
+        private int? ReadNullableInt(ref Utf8JsonReader reader)
+        {
+            return reader.TokenType switch
+            {
+                JsonTokenType.Null => null,
+                JsonTokenType.Number when reader.TryGetInt32(out var value) => value,
+                _ => throw new JsonException("Expected a null or integer value.")
+            };
+        }
+
     }
 }

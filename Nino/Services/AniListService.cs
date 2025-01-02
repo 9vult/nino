@@ -110,8 +110,7 @@ namespace Nino.Services
 
         [JsonIgnore]
         public List<AiringScheduleNode>? Episodes => Data?.Media?.AiringSchedule?.Nodes;
-        [JsonIgnore]
-        public DateTimeOffset? StartDate => Data?.Media?.StartDate;
+        [JsonIgnore] public DateTimeOffset? StartDate => Data?.Media?.StartDate;
 
 
         [JsonIgnore]

@@ -54,9 +54,11 @@ namespace Nino.Services
                     if (patchOperations.Count != 0)
                         await AzureHelper.PatchEpisodeAsync(episode, patchOperations);
                 }
-                
-                if (reminderText.Length > 0) await channel.SendMessageAsync(reminderText.ToString());
+
+                if (reminderText.Length <= 0) continue;
+                await channel.SendMessageAsync(reminderText.ToString());
                 Log.Info($"Published conga reminders for {project}");
+
             }
         }
 
