@@ -36,10 +36,8 @@ namespace Nino.Commands
             if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
                 return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
 
-            var episodeId = $"{project.Id}-{episodeNumber}";
-
             // Remove from database
-            await AzureHelper.Episodes!.DeleteItemAsync<Episode>(episodeId, AzureHelper.EpisodePartitionKey(episode));
+            await AzureHelper.Episodes!.DeleteItemAsync<Episode>(episode.Id.ToString(), AzureHelper.EpisodePartitionKey(episode));
             Log.Info($"Deleted episode {episode} from {project}");
 
             // Send success embed
