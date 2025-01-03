@@ -50,18 +50,27 @@ namespace Nino.Utilities
         }
 
         // Check if the bot has permission to send progress updates
-        public static async Task<bool> Precheck(InteractiveService service, SocketInteraction interaction, Project project, string lng, bool isRelease = false)
+        public static async Task<bool> Precheck(InteractiveService service, SocketInteraction interaction, Project project, string lng, bool isRelease = false, bool isConga = false)
         {
             // Check permissions
-            if (isRelease && CheckReleasePermissions(project.ReleaseChannelId))
+            if (!isConga && isRelease && CheckReleasePermissions(project.ReleaseChannelId))
                     return true;
-            else if (!isRelease && CheckPermissions(project.UpdateChannelId))
+            else if (!isConga && !isRelease && CheckPermissions(project.UpdateChannelId))
                 return true;
+            else if (isConga && CheckPermissions(interaction.Channel.Id))
+                return true;
+            
 
             // No permissions... do the thing
 
-            var channelMention = isRelease ? $"<#{project.ReleaseChannelId}>" : $"<#{project.UpdateChannelId}>";
-            var questionBody = T("missingPermsPrecheck.question", lng, channelMention);
+            var channelMention = isRelease 
+                ? $"<#{project.ReleaseChannelId}>" 
+                : !isConga 
+                    ? $"<#{project.UpdateChannelId}>" 
+                    : $"<#{interaction.Channel.Id}>";
+            var questionBody = !isConga 
+                ? T("missingPermsPrecheck.question", lng, channelMention)
+                : T("missingPermsPrecheck.question.conga", lng, channelMention);
 
             var header = project.IsPrivate
                 ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"

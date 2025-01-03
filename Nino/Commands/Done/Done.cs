@@ -40,6 +40,14 @@ namespace Nino.Commands
             var goOn = await PermissionChecker.Precheck(_interactiveService, interaction, project, lng, false);
             // Cancel
             if (!goOn) return ExecutionResult.Success;
+            
+            // Check Conga permissions
+            if (project.CongaParticipants.Length != 0)
+            {
+                goOn = await PermissionChecker.Precheck(_interactiveService, interaction, project, lng, false, true);
+                // Cancel
+                if (!goOn) return ExecutionResult.Success;
+            }
 
             if (episodeNumber != null)
                 return await HandleSpecified(interaction, project, abbreviation, Utils.CanonicalizeEpisodeNumber(episodeNumber));
