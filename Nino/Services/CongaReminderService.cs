@@ -58,7 +58,8 @@ namespace Nino.Services
                 if (reminderText.Length <= 0) continue;
                 await channel.SendMessageAsync(reminderText.ToString());
                 Log.Info($"Published conga reminders for {project}");
-
+                
+                await Cache.RebuildCacheForProject(project.Id);
             }
         }
 
