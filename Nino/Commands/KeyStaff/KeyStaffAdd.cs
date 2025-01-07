@@ -48,7 +48,7 @@ namespace Nino.Commands
                 {
                     Abbreviation = abbreviation,
                     Name = taskName,
-                    Weight = project.KeyStaff.Max(ks => ks.Role.Weight) ?? 0 + 1
+                    Weight = (project.KeyStaff.Max(ks => ks.Role.Weight) ?? 0) + 1
                 }
             };
 
