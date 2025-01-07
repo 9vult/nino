@@ -39,7 +39,7 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
 
             // Check if position exists
-            if (!episode.AdditionalStaff.Any(ks => ks.Role.Abbreviation == abbreviation))
+            if (episode.AdditionalStaff.All(ks => ks.Role.Abbreviation != abbreviation))
                 return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
 
             // Remove from database
@@ -56,7 +56,8 @@ namespace Nino.Commands
 
                     batch.PatchItem(id: e.Id.ToString(), [
                         PatchOperation.Remove($"/additionalStaff/{asIndex}"),
-                        PatchOperation.Remove($"/tasks/{taskIndex}")
+                        PatchOperation.Remove($"/tasks/{taskIndex}"),
+                        PatchOperation.Set("/done", e.Tasks.Where(t => t.Abbreviation != abbreviation).All(t => t.Done))
                     ]);
                 }
             }  
@@ -66,7 +67,8 @@ namespace Nino.Commands
                 var taskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == abbreviation));
                 batch.PatchItem(id: episode.Id.ToString(), [
                     PatchOperation.Remove($"/additionalStaff/{asIndex}"),
-                    PatchOperation.Remove($"/tasks/{taskIndex}")
+                    PatchOperation.Remove($"/tasks/{taskIndex}"),
+                    PatchOperation.Set("/done", episode.Tasks.Where(t => t.Abbreviation != abbreviation).All(t => t.Done))
                 ]);
             }
 

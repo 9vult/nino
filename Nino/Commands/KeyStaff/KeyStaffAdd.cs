@@ -67,7 +67,8 @@ namespace Nino.Commands
             foreach (var e in Cache.GetEpisodes(project.Id))
             {
                 batch.PatchItem(id: e.Id.ToString(), [
-                    PatchOperation.Add("/tasks/-", newTask)
+                    PatchOperation.Add("/tasks/-", newTask),
+                    PatchOperation.Set("/done", false)
                 ]);
             }
             await batch.ExecuteAsync();

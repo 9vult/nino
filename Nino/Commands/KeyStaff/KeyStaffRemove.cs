@@ -47,7 +47,8 @@ namespace Nino.Commands
             {
                 var taskIndex = Array.IndexOf(e.Tasks, e.Tasks.Single(t => t.Abbreviation == abbreviation));
                 batch.PatchItem(id: e.Id.ToString(), [
-                    PatchOperation.Remove($"/tasks/{taskIndex}")
+                    PatchOperation.Remove($"/tasks/{taskIndex}"),
+                    PatchOperation.Set("/done", e.Tasks.Where(t => t.Abbreviation != abbreviation).All(t => t.Done))
                 ]);
             }
             await batch.ExecuteAsync();

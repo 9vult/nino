@@ -68,7 +68,8 @@ namespace Nino.Commands
             TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(episode));
             batch.PatchItem(id: episode.Id.ToString(), [
                 PatchOperation.Add("/additionalStaff/-", newStaff),
-                PatchOperation.Add("/tasks/-", newTask)
+                PatchOperation.Add("/tasks/-", newTask),
+                PatchOperation.Set("/done", false)
             ]);
             await batch.ExecuteAsync();
 
