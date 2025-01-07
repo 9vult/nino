@@ -2,6 +2,7 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Fergun.Interactive;
+using NaturalSort.Extension;
 using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities;
@@ -17,7 +18,7 @@ namespace Nino.Commands
             
             var lng = interaction.UserLocale;
 
-            var episodes = Cache.GetEpisodes(project.Id).OrderBy(e => e.Number, new NumericalStringComparer()).ToList();
+            var episodes = Cache.GetEpisodes(project.Id).OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList();
 
             // Find the episode the team is working on
             var workingEpisodeNo = episodes.FirstOrDefault(e => !e.Done)?.Number ?? episodes.LastOrDefault()?.Number;

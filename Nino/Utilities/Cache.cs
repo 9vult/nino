@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.Cosmos;
+using NaturalSort.Extension;
 using Nino.Records;
 using Nino.Records.Enums;
 using NLog;
@@ -35,7 +36,7 @@ namespace Nino.Utilities
             List<Project> cachedProjects = [];
             foreach (var project in rawProjects)
             {
-                var episodes = allEpisodes.Where(e => e.ProjectId == project.Id).OrderBy(e => e.Number, new NumericalStringComparer()).ToList();
+                var episodes = allEpisodes.Where(e => e.ProjectId == project.Id).OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList();
                 _episodeCache[project.Id] = episodes;
 
                 cachedProjects.Add(project);
@@ -60,7 +61,7 @@ namespace Nino.Utilities
 
             // Get data
             Project project = (await AzureHelper.QueryProjects<Project>(projectSql)).Single();
-            List<Episode> episodes = (await AzureHelper.QueryEpisodes<Episode>(episodeSql)).OrderBy(e => e.Number, new NumericalStringComparer()).ToList();
+            List<Episode> episodes = (await AzureHelper.QueryEpisodes<Episode>(episodeSql)).OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList();
 
             // Transform data
             var idx = _projectCache[project.GuildId].FindIndex(p => p.Id == project.Id);

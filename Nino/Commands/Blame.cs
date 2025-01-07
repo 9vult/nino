@@ -1,6 +1,7 @@
 using System.Text;
 using Discord;
 using Discord.Interactions;
+using NaturalSort.Extension;
 using Nino.Handlers;
 using Nino.Records.Enums;
 using Nino.Services;
@@ -33,7 +34,7 @@ namespace Nino.Commands
             if (project == null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
-            var episodes = Cache.GetEpisodes(project.Id).OrderBy(e => e.Number, new NumericalStringComparer());
+            var episodes = Cache.GetEpisodes(project.Id).OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList();
 
             // Verify or find episode
             if (episodeNumber == null)

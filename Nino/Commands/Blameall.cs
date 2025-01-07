@@ -3,6 +3,7 @@ using Discord;
 using Discord.Interactions;
 using Fergun.Interactive;
 using Fergun.Interactive.Pagination;
+using NaturalSort.Extension;
 using Nino.Handlers;
 using Nino.Records;
 using Nino.Records.Enums;
@@ -45,10 +46,10 @@ namespace Nino.Commands
 
             var episodes = filter switch
             {
-                BlameAllFilter.All => Cache.GetEpisodes(project.Id).OrderBy(e => e.Number, new NumericalStringComparer()).ToList(),
-                BlameAllFilter.InProgress => Cache.GetEpisodes(project.Id).Where(e => !e.Done && e.Tasks.Any(t => t.Done)).OrderBy(e => e.Number, new NumericalStringComparer()).ToList(),
-                BlameAllFilter.Incomplete => Cache.GetEpisodes(project.Id).Where(e => !e.Done).OrderBy(e => e.Number, new NumericalStringComparer()).ToList(),
-                _ => Cache.GetEpisodes(project.Id).OrderBy(e => e.Number, new NumericalStringComparer()).ToList() // All
+                BlameAllFilter.All => Cache.GetEpisodes(project.Id).OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList(),
+                BlameAllFilter.InProgress => Cache.GetEpisodes(project.Id).Where(e => !e.Done && e.Tasks.Any(t => t.Done)).OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList(),
+                BlameAllFilter.Incomplete => Cache.GetEpisodes(project.Id).Where(e => !e.Done).OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList(),
+                _ => Cache.GetEpisodes(project.Id).OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList() // All
             };
 
             // Calculate pages
