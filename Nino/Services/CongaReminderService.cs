@@ -28,7 +28,7 @@ namespace Nino.Services
 
         private static async System.Threading.Tasks.Task RemindTardyTasks()
         {
-            foreach (var project in Cache.GetProjects().Where(p => p.CongaReminderEnabled))
+            foreach (var project in Cache.GetProjects().Where(p => p is { CongaReminderEnabled: true, IsArchived: false }))
             {
                 if (await Nino.Client.GetChannelAsync((ulong)project.CongaReminderChannelId!) is not SocketTextChannel channel) continue;
                 var gLng = Cache.GetConfig(project.GuildId)?.Locale?.ToDiscordLocale() ?? channel.Guild.PreferredLocale;
