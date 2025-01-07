@@ -34,8 +34,16 @@ namespace Nino.Commands
             if (!Utils.VerifyAdministrator(member, guild)) return await Response.Fail(T("error.notPrivileged", lng), interaction);
 
             // Validate no-op condition
-            if (!blame && updatesUrl == null && releasesUrl == null)
+            if (!blame && updatesUrl is null && releasesUrl is null)
                 return await Response.Fail(T("error.observerNoOp", lng), interaction);
+            
+            // Validate invalid webhooks
+            if (updatesUrl is not null)
+                if (!Uri.TryCreate(updatesUrl, UriKind.Absolute, out _))
+                    return await Response.Fail(T("error.observer.invalidProgressUrl", lng), interaction);
+            if (releasesUrl is not null)
+                if (!Uri.TryCreate(releasesUrl, UriKind.Absolute, out _))
+                    return await Response.Fail(T("error.observer.invalidReleasesUrl", lng), interaction);
 
             // Validate observer server
             if (!ulong.TryParse(originGuildIdStr, out var originGuildId))

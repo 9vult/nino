@@ -1,6 +1,8 @@
 using System;
+using System.Net;
 using System.Text;
 using Discord;
+using Discord.Net;
 using Newtonsoft.Json;
 using Nino.Records.Enums;
 using NLog;
@@ -10,7 +12,7 @@ namespace Nino.Utilities
 {
     internal static class ObserverPublisher
     {
-        private static readonly Logger log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// Publish a progress update to observers
@@ -20,8 +22,8 @@ namespace Nino.Utilities
         /// <returns></returns>
         public static async Task PublishProgress(Records.Project project, Embed embed)
         {
-            var observers = Cache.GetObservers(project.GuildId).Where(o => o.ProjectId == project.Id);
-            if (observers.Any())
+            var observers = Cache.GetObservers(project.GuildId).Where(o => o.ProjectId == project.Id).ToList();
+            if (observers.Count != 0)
             {
                 var httpClient = new HttpClient();
                 foreach (var observer in observers)
@@ -37,12 +39,19 @@ namespace Nino.Utilities
                             content = "",
                             embeds = new[] { Utils.EmbedToJsonObject(embed) }
                         };
-                        var data = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
+                        var data = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8,
+                            "application/json");
                         await httpClient.PostAsync(observer.ProgressWebhook, data);
+                    }
+                    catch (HttpException e) when (e.HttpCode == HttpStatusCode.NotFound)
+                    {
+                        Log.Error($"Progress webhook for observer {observer.Id} Not Found (404)!");
+                        var guild = Nino.Client.GetGuild(observer.OriginGuildId);
+                        await Utils.AlertError($"An error occured while publishing to your observer: `404 NOT FOUND`. Your observer has been deleted to comply with Discord rate-limiting guidelines.", guild, project.Nickname, observer.OwnerId, "Observer/Progress");
                     }
                     catch (Exception e)
                     {
-                        log.Error($"Progress webhook for observer {observer.Id} failed: {e}");
+                        Log.Error($"Progress webhook for observer {observer.Id} failed: {e}");
                         var guild = Nino.Client.GetGuild(observer.OriginGuildId);
                         await Utils.AlertError($"The following error occured while publishing to your observer: {e.Message}", guild, project.Nickname, observer.OwnerId, "Observer/Progress");
                     }
@@ -59,8 +68,8 @@ namespace Nino.Utilities
         /// <returns></returns>
         public static async Task PublishRelease(Records.Project project, string publishTitle, string releaseUrl)
         {
-            var observers = Cache.GetObservers(project.GuildId).Where(o => o.ProjectId == project.Id);
-            if (observers.Any())
+            var observers = Cache.GetObservers(project.GuildId).Where(o => o.ProjectId == project.Id).ToList();
+            if (observers.Count != 0)
             {
                 var httpClient = new HttpClient();
                 foreach (var observer in observers)
@@ -83,11 +92,17 @@ namespace Nino.Utilities
                         var data = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
                         await httpClient.PostAsync(observer.ReleasesWebhook, data);
                     }
+                    catch (HttpException e) when (e.HttpCode == HttpStatusCode.NotFound)
+                    {
+                        Log.Error($"Releases webhook for observer {observer.Id} Not Found (404)!");
+                        var guild = Nino.Client.GetGuild(observer.OriginGuildId);
+                        await Utils.AlertError($"An error occured while publishing to your observer: `404 NOT FOUND`. Your observer has been deleted to comply with Discord rate-limiting guidelines.", guild, project.Nickname, observer.OwnerId, "Observer/Releases");
+                    }
                     catch (Exception e)
                     {
-                        log.Error($"Releases webhook for observer {observer.Id} failed: {e}");
+                        Log.Error($"Releases webhook for observer {observer.Id} failed: {e}");
                         var guild = Nino.Client.GetGuild(observer.OriginGuildId);
-                        await Utils.AlertError($"The following error occured while publishing to your observer: {e.Message}", guild, project.Nickname, observer.OwnerId, "Observer/Release");
+                        await Utils.AlertError($"The following error occured while publishing to your observer: {e.Message}", guild, project.Nickname, observer.OwnerId, "Observer/Releases");
                     }
                 }
             }

@@ -84,6 +84,8 @@
     "error.noSuchServer": "Server {{server|1}} does not exist!",
     "error.noSuchTask": "Не существует задачи {{abbreviation|1}}!",
     "error.notPrivileged": "Надо быть администратором для совершения этого действия!",
+    "error.observer.invalidProgressUrl": "The progress webhook URL is invalid.",
+    "error.observer.invalidReleasesUrl": "The releases webhook URL is invalid.",
     "error.observerNoOp": "You need to either enable /blame or provide a webhook to observe!",
     "error.paginatorNoAccess": "Only {{user|1}} can use this paginator.\nYou can run the command yourself if you would like to access other pages.",
     "error.permissionDenied": "У тебя нет права на это действие.",
