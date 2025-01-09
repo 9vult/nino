@@ -17,7 +17,8 @@ namespace Nino.Commands
         [SlashCommand("roster", "See who's working on an episode")]
         public async Task<RuntimeResult> Handle(
             [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber
+            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
+            [Summary("weights", "Display task weights"), Autocomplete(typeof(EpisodeAutocompleteHandler))] bool withWeights = false
         )
         {
             var interaction = Context.Interaction;
@@ -44,7 +45,7 @@ namespace Nino.Commands
             if (project.KeyStaff.Length == 0)
                 return await Response.Fail(T("error.noRoster", lng), interaction);
 
-            var roster = StaffList.GenerateRoster(project, episode);
+            var roster = StaffList.GenerateRoster(project, episode, withWeights);
             var title = project.IsPrivate
                 ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
                 : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";

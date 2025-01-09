@@ -11,8 +11,9 @@ namespace Nino.Utilities
         /// </summary>
         /// <param name="project">Project the episode is of</param>
         /// <param name="episode">Episode to generate the roster for</param>
+        /// <param name="withWeight">Whether to include task weight values</param>
         /// <returns>Properly-formatted roster</returns>
-        public static string GenerateRoster(Project project, Episode episode)
+        public static string GenerateRoster(Project project, Episode episode, bool withWeight)
         {
             StringBuilder sb = new();
 
@@ -22,9 +23,9 @@ namespace Nino.Utilities
                 var userId = episode.PinchHitters.FirstOrDefault(k => k.Abbreviation == ks.Role.Abbreviation)?.UserId ?? ks.UserId;
                 
                 if (task.Done)
-                    sb.AppendLine($"~~{task.Abbreviation}~~: <@{userId}>");
+                    sb.AppendLine($"~~{task.Abbreviation}~~: <@{userId}>{(withWeight ? $" ({ks.Role.Weight})" : string.Empty)}");
                 else
-                    sb.AppendLine($"**{task.Abbreviation}**: <@{userId}>");
+                    sb.AppendLine($"**{task.Abbreviation}**: <@{userId}>{(withWeight ? $" ({ks.Role.Weight})" : string.Empty)}");
             }
 
             return sb.ToString();
