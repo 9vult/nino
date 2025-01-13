@@ -230,10 +230,17 @@ namespace Nino.Utilities
                 var mostRecentlyUpdated = prerequisites
                     .Select(p => taskLookup.TryGetValue(p, out var pTask) && pTask.Done ? pTask.Updated : null)
                     .Max();
-                        
+
+                // We aren't checking the date here
+                if (!checkDate)
+                {
+                    nextTasks.Add(nextTask);
+                    continue;
+                }
+                
                 // Add to the list if the task is indeed tardy
                 if (!taskLookup.TryGetValue(nextTask, out var candidate) || candidate.LastReminded is null) continue;
-                if (!checkDate || candidate.LastReminded < DateTimeOffset.Now - project.CongaReminderPeriod)
+                if (candidate.LastReminded < DateTimeOffset.Now - project.CongaReminderPeriod)
                     nextTasks.Add(nextTask);
             }
             
