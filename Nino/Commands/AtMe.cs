@@ -4,6 +4,7 @@ using Fergun.Interactive;
 using Fergun.Interactive.Pagination;
 using NaturalSort.Extension;
 using Nino.Handlers;
+using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities;
 using NLog;
@@ -21,6 +22,7 @@ namespace Nino.Commands
         [SlashCommand("atme", "What tasks are At Me?")]
         public async Task<RuntimeResult> Handle(
             [Summary("filter", "Filter results")] AtMeFilter filter = AtMeFilter.Auto,
+            [Summary("global", "Combine results from all servers")] bool global = false,
             [Summary("private", "Include results from Private projects")] bool displayPrivate = true
         )
         {
@@ -30,9 +32,10 @@ namespace Nino.Commands
             
             Log.Trace($"Generating At Me for M[{interaction.User.Id} (@{interaction.User.Username})]");
 
+            var projects = global ? Cache.GetProjects() : Cache.GetProjects(interaction.GuildId ?? 0);
             var episodeCandidates = (displayPrivate
-                    ? Cache.GetProjects(guildId: interaction.GuildId ?? 0).Where(p => !p.IsArchived)
-                    : Cache.GetProjects(guildId: interaction.GuildId ?? 0).Where(p => p is { IsArchived: false, IsPrivate: false }))
+                    ? projects.Where(p => !p.IsArchived)
+                    : projects.Where(p => p is { IsArchived: false, IsPrivate: false }))
                 .ToDictionary(
                     project => project,
                     project => Cache.GetEpisodes(project.Id)
