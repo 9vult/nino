@@ -45,6 +45,7 @@ namespace Nino.Commands
                 );
 
             var usingConga = true;
+            var empty = false;
             List<string> results = [];
             switch (filter)
             {
@@ -64,9 +65,13 @@ namespace Nino.Commands
                 default:
                     throw new ArgumentOutOfRangeException(nameof(filter), filter, null);
             }
-            
+
             if (results.Count == 0)
+            {
+                empty = true;
                 results.Add(T("atMe.empty", lng));
+            }
+            
 
             // Calculate pages
             // Thanks to petzku and astiob for their contributions to this algorithm
@@ -87,7 +92,7 @@ namespace Nino.Commands
                     var body = string.Join('\n', pagedTasks);
                     
                     return new PageBuilder()
-                        .WithTitle(T(usingConga ? "title.atMe.conga" : "title.atMe.incomplete", lng))
+                        .WithTitle(T(empty ? "title.atMe.empty" : usingConga ? "title.atMe.conga" : "title.atMe.incomplete", lng))
                         .WithDescription(body)
                         .WithCurrentTimestamp();
                 })
