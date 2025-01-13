@@ -37,7 +37,7 @@ namespace Nino.Services
                 foreach (var episode in Cache.GetEpisodes(project.Id).Where(e => !e.Tasks.All(t => t.Done)))
                 {
                     var patchOperations = new List<PatchOperation>();
-                    foreach (var abbreviation in GetTardyTasks(project, episode))
+                    foreach (var abbreviation in Utils.GetTardyTasks(project, episode))
                     {
                         var keyStaff = project.KeyStaff.FirstOrDefault(ks => ks.Role.Abbreviation == abbreviation);
                         if (keyStaff is null) continue;
@@ -61,45 +61,6 @@ namespace Nino.Services
                 
                 await Cache.RebuildCacheForProject(project.Id);
             }
-        }
-
-        /// <summary>
-        /// Get a list of all currently-tardy tasks for an episode
-        /// </summary>
-        /// <param name="project">Project the episode is from</param>
-        /// <param name="episode">The episode to check</param>
-        /// <returns>A list of tardy task abbreviations</returns>
-        private static List<string> GetTardyTasks(Project project, Episode episode)
-        {
-            var taskLookup = episode.Tasks.ToDictionary(t => t.Abbreviation, t => t);
-            
-            // Group by next to find prerequisites
-            var prerequisiteGroups = project.CongaParticipants
-                .GroupBy(p => p.Next)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.Select(p => p.Current).ToList()
-                );
-            
-            var nextTasks = new List<string>();
-
-            foreach (var (nextTask, prerequisites) in prerequisiteGroups)
-            {
-                // Check if all prereqs are complete
-                if (!prerequisites.All(p => taskLookup.TryGetValue(p, out var pTask) && pTask.Done)) continue;
-                if (!taskLookup.TryGetValue(nextTask, out var task) || task.Done) continue;
-                
-                var mostRecentlyUpdated = prerequisites
-                    .Select(p => taskLookup.TryGetValue(p, out var pTask) && pTask.Done ? pTask.Updated : null)
-                    .Max();
-                        
-                // Add to the list if the task is indeed tardy
-                if (!taskLookup.TryGetValue(nextTask, out var candidate) || candidate.LastReminded is null) continue;
-                if (candidate.LastReminded < DateTimeOffset.Now - project.CongaReminderPeriod)
-                    nextTasks.Add(nextTask);
-            }
-            
-            return nextTasks;
         }
     }
 }

@@ -199,5 +199,45 @@ namespace Nino.Utilities
                 return $"{version}@ {position}";
             }
         }
+
+        /// <summary>
+        /// Get a list of all currently-tardy tasks for an episode
+        /// </summary>
+        /// <param name="project">Project the episode is from</param>
+        /// <param name="episode">The episode to check</param>
+        /// <param name="checkDate">Check if the task needs to be reminded</param>
+        /// <returns>A list of tardy task abbreviations</returns>
+        public static List<string> GetTardyTasks(Project project, Episode episode, bool checkDate = true)
+        {
+            var taskLookup = episode.Tasks.ToDictionary(t => t.Abbreviation, t => t);
+            
+            // Group by next to find prerequisites
+            var prerequisiteGroups = project.CongaParticipants
+                .GroupBy(p => p.Next)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(p => p.Current).ToList()
+                );
+            
+            var nextTasks = new List<string>();
+
+            foreach (var (nextTask, prerequisites) in prerequisiteGroups)
+            {
+                // Check if all prereqs are complete
+                if (!prerequisites.All(p => taskLookup.TryGetValue(p, out var pTask) && pTask.Done)) continue;
+                if (!taskLookup.TryGetValue(nextTask, out var task) || task.Done) continue;
+                
+                var mostRecentlyUpdated = prerequisites
+                    .Select(p => taskLookup.TryGetValue(p, out var pTask) && pTask.Done ? pTask.Updated : null)
+                    .Max();
+                        
+                // Add to the list if the task is indeed tardy
+                if (!taskLookup.TryGetValue(nextTask, out var candidate) || candidate.LastReminded is null) continue;
+                if (!checkDate || candidate.LastReminded < DateTimeOffset.Now - project.CongaReminderPeriod)
+                    nextTasks.Add(nextTask);
+            }
+            
+            return nextTasks;
+        }
     }
 }
