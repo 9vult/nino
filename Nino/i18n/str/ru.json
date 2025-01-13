@@ -14,7 +14,7 @@
     "airDate.future": "Выйдет в эфир {{date|1}} ({{rel|2}})",
     "airDate.past": "Вышла в эфир {{date|1}} ({{rel|2}})",
     "atMe.empty": "There's nothing At You!",
-    "atMe.entry": "`{{nickname|1}}` ({{episode|2}}): `{{task|3}}`",
+    "atMe.entry": "`{{nickname|1}}` ({{episode|2}}): {{tasks|3}}",
     "blame.archived": "This project is archived.",
     "blame.projectComplete": "This project is complete!",
     "blameall.done": "Done",

@@ -36,7 +36,8 @@ namespace Nino.Commands
                 .ToDictionary(
                     project => project,
                     project => Cache.GetEpisodes(project.Id)
-                        .Where(e => !e.Done && Utils.VerifyUser(interaction.User.Id, project, true, true))
+                        .Where(e => (project.AirReminderEnabled && e.ReminderPosted) || !project.AirReminderEnabled)
+                        .Where(e => Utils.VerifyUser(interaction.User.Id, project, true, true))
                         .ToList()
                 );
 
@@ -121,9 +122,13 @@ namespace Nino.Commands
 
                         if (abbreviations.Count == 0) continue;
 
-                        results.AddRange(Utils.GetTardyTasks(project, episode, false)
+                        var tardyTasks = Utils.GetTardyTasks(project, episode, false)
                             .Where(t => abbreviations.Contains(t))
-                            .Select(t => T("atMe.entry", lng, project.Nickname, episode.Number, t)));
+                            .Select(t => $"`{t}`")
+                            .ToList();
+                        
+                        if (tardyTasks.Count == 0) continue;
+                        results.Add(T("atMe.entry", lng, project.Nickname, episode.Number, string.Join(", ", tardyTasks)));
                     }
                 }
             }
@@ -141,9 +146,13 @@ namespace Nino.Commands
                             .Select(p => p.Role.Abbreviation)
                             .ToList();
 
-                        results.AddRange(episode.Tasks
+                        var tardyTasks = episode.Tasks
                             .Where(t => !t.Done && abbreviations.Contains(t.Abbreviation))
-                            .Select(t => T("atMe.entry", lng, project.Nickname, episode.Number, t.Abbreviation)));
+                            .Select(t => $"`{t.Abbreviation}`")
+                            .ToList();
+                        
+                        if (tardyTasks.Count == 0) continue;
+                        results.Add(T("atMe.entry", lng, project.Nickname, episode.Number, string.Join(", ", tardyTasks)));
                     }
                 }
             }
