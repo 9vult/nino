@@ -23,7 +23,7 @@ namespace Nino.Commands
         public async Task<RuntimeResult> Handle(
             [Summary("filter", "Filter results")] AtMeFilter filter = AtMeFilter.Auto,
             [Summary("global", "Combine results from all servers")] bool global = false,
-            [Summary("private", "Include results from Private projects")] bool displayPrivate = true
+            [Summary("private", "Include results from Private projects")] bool? displayPrivateInput = null
         )
         {
             var interaction = Context.Interaction;
@@ -31,6 +31,8 @@ namespace Nino.Commands
             var gLng = Cache.GetConfig(interaction.GuildId ?? 0)?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
             
             Log.Trace($"Generating At Me for M[{interaction.User.Id} (@{interaction.User.Username})]");
+            
+            var displayPrivate = displayPrivateInput ?? !global;
 
             var projects = global ? Cache.GetProjects() : Cache.GetProjects(interaction.GuildId ?? 0);
             var episodeCandidates = (displayPrivate
