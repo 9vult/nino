@@ -73,6 +73,20 @@ namespace Nino.Services
             return time < DateTimeOffset.Now;
         }
 
+        public static async Task<List<decimal>> AiredEpisodes(int aniListId)
+        {
+            var response = await AniListService.Get(aniListId);
+            if (!string.IsNullOrEmpty(response?.Error))
+            {
+                throw new Exception(response.Error);
+            }
+
+            return (response!.Episodes ?? [])
+                .Where(e => DateTimeOffset.FromUnixTimeSeconds(e.AiringAt) <= DateTimeOffset.Now)
+                .Select(e => Convert.ToDecimal(e.Episode))
+                .ToList();
+        }
+
         public static async Task<DateTimeOffset?> GetAirDate(int aniListId, decimal episodeNumber)
         {
             var response = await AniListService.Get(aniListId);

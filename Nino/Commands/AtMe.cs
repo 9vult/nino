@@ -6,6 +6,7 @@ using NaturalSort.Extension;
 using Nino.Handlers;
 using Nino.Records;
 using Nino.Records.Enums;
+using Nino.Services;
 using Nino.Utilities;
 using NLog;
 using static Localizer.Localizer;
@@ -35,16 +36,26 @@ namespace Nino.Commands
             var displayPrivate = displayPrivateInput ?? !global;
 
             var projects = global ? Cache.GetProjects() : Cache.GetProjects(interaction.GuildId ?? 0);
-            var episodeCandidates = (displayPrivate
-                    ? projects.Where(p => !p.IsArchived)
-                    : projects.Where(p => p is { IsArchived: false, IsPrivate: false }))
-                .ToDictionary(
-                    project => project,
-                    project => Cache.GetEpisodes(project.Id)
-                        .Where(e => (project.AirReminderEnabled && e.ReminderPosted) || !project.AirReminderEnabled)
-                        .Where(e => Utils.VerifyUser(interaction.User.Id, project, true, true))
-                        .ToList()
-                );
+            var episodeCandidates = new Dictionary<Project, List<Episode>>();
+            var projectCandidates = displayPrivate
+                ? projects.Where(p => !p.IsArchived)
+                : projects.Where(p => p is { IsArchived: false, IsPrivate: false });
+
+            foreach (var project in projectCandidates)
+            {
+                var episodes = Cache.GetEpisodes(project.Id)
+                    .Where(e => Utils.VerifyUser(interaction.User.Id, project, true, true));
+
+                if (project.AniListId is not null)
+                {
+                    var airedEpisodeNumbers = await AirDateService.AiredEpisodes((int)project.AniListId);
+                    episodes = episodes
+                        .Where(e => !Utils.EpisodeNumberIsNumber(e.Number, out var dNum) ||
+                                    airedEpisodeNumbers.Contains(dNum));
+                }
+
+                episodeCandidates.Add(project, episodes.ToList());
+            }
 
             var usingConga = true;
             var empty = false;
