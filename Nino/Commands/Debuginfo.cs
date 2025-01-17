@@ -45,7 +45,8 @@ namespace Nino.Commands
                 GuildId = project.GuildId,
                 OwnerId = project.OwnerId,
                 IsArchived = project.IsArchived,
-                IsPrivate = project.IsPrivate
+                IsPrivate = project.IsPrivate,
+                AniListId = project.AniListId ?? -1,
             };
             
             await interaction.FollowupAsync($"```json\n{JsonConvert.SerializeObject(debugData, Formatting.Indented)}\n```");
