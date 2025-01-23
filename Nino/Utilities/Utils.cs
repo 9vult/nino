@@ -121,7 +121,7 @@ namespace Nino.Utilities
         public static string CanonicalizeEpisodeNumber(string input)
         {
             var trim = input.Trim();
-            return decimal.TryParse(trim, out var decimalValue) ? decimalValue.ToString(CultureInfo.InvariantCulture) : trim;
+            return decimal.TryParse(trim, CultureInfo.InvariantCulture, out var decimalValue) ? decimalValue.ToString(CultureInfo.InvariantCulture) : trim;
         }
         
         /// <summary>
