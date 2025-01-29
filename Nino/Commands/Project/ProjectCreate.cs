@@ -5,6 +5,7 @@ using Microsoft.Azure.Cosmos;
 using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities;
+using System.Text;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
@@ -19,9 +20,10 @@ namespace Nino.Commands
             [Summary("length", "Number of episodes"), MinValue(1)] int length,
             [Summary("poster", "Poster image URL")] string posterUri,
             [Summary("private", "Is this project private?")] bool isPrivate,
-            [Summary("updatechannel", "Channel to post updates to")] SocketTextChannel updateChannel,
+            [Summary("updateChannel", "Channel to post updates to")] SocketTextChannel updateChannel,
             [Summary("releaseChannel", "Channel to post releases to")] SocketTextChannel releaseChannel,
-            [Summary("anilistid", "AniList ID")] int? aniListId = null
+            [Summary("anilistId", "AniList ID")] int? aniListId = null,
+            [Summary("firstEpisode", "First episode number")] decimal firstEpisode = 1
         )
         {
             var interaction = Context.Interaction;
@@ -73,7 +75,7 @@ namespace Nino.Commands
             };
 
             var episodes = new List<Episode>();
-            for (var i = 1; i <= length; i++)
+            for (var i = firstEpisode; i <= firstEpisode + length; i++)
             {
                 episodes.Add(new Episode
                 {
@@ -89,7 +91,7 @@ namespace Nino.Commands
                 });
             }
 
-            Log.Info($"Creating project {projectData} for M[{ownerId} (@{member.Username})] with {episodes.Count} episodes");
+            Log.Info($"Creating project {projectData} for M[{ownerId} (@{member.Username})] with {episodes.Count} episodes, starting with episode {firstEpisode}");
 
             // Add project and episodes to database
             await AzureHelper.Projects!.UpsertItemAsync(projectData);
@@ -107,11 +109,20 @@ namespace Nino.Commands
                 Log.Info($"Creating default configuration for guild {guildId}");
                 await AzureHelper.Configurations!.UpsertItemAsync(Configuration.CreateDefault(guildId));
             }
+            
+            var builder = new StringBuilder();
+            builder.AppendLine(T("project.created", lng, nickname));
+
+            if (firstEpisode != 1)
+            {
+                builder.AppendLine();
+                builder.AppendLine(T("project.created.firstEpisode", lng, firstEpisode));
+            }
 
             // Send success embed
             var embed = new EmbedBuilder()
                 .WithTitle(T("title.projectCreation", lng))
-                .WithDescription(T("project.created", lng, nickname))
+                .WithDescription(builder.ToString())
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 

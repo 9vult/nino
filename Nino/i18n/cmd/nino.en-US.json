@@ -541,13 +541,21 @@
         "name": "private",
         "description": "Is this project private?"
       },
-      "updatechannel": {
-        "name": "updatechannel",
+      "updateChannel": {
+        "name": "updateChannel",
         "description": "Channel to post updates to"
       },
-      "releasechannel": {
-        "name": "releasechannel",
+      "releaseChannel": {
+        "name": "releaseChannel",
         "description": "Channel to post releases to"
+      },
+      "anilistId": {
+        "name": "anilistId",
+        "description": "AniList ID"
+      },
+      "firstEpisode": {
+        "name": "releaseChannel",
+        "description": "First episode number"
       }
     },
     "delete": {
