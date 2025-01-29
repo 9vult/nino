@@ -29,9 +29,12 @@ namespace Nino.Commands
             if (observers.Count == 0)
                 return await Response.Fail(T("error.noObservers", lng), interaction);
 
+            var projects = Cache.GetProjects();
+
             var tblData = observers.Select(o => new Dictionary<string, string>
             {
-                [T("observer.list.project", lng)] = o.ProjectId.ToString(),
+                [T("observer.list.server", lng)] = o.OriginGuildId.ToString(),
+                [T("observer.list.project", lng)] = projects.FirstOrDefault(p => p.Id == o.ProjectId)?.Nickname ?? "Unknown",
                 [T("observer.list.blame", lng)] = o.Blame ? T("observer.list.yes", lng) : T("observer.list.no", lng),
                 [T("observer.list.updates", lng)] = !string.IsNullOrEmpty(o.ProgressWebhook) ? T("observer.list.yes", lng) : T("observer.list.no", lng),
                 [T("observer.list.releases", lng)] = !string.IsNullOrEmpty(o.ReleasesWebhook) ? T("observer.list.yes", lng) : T("observer.list.no", lng),

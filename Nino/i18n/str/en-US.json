@@ -157,6 +157,7 @@
     "observer.list.project": "Project",
     "observer.list.releases": "Releases",
     "observer.list.role": "Role",
+    "observer.list.server": "Server",
     "observer.list.updates": "Updates",
     "observer.list.yes": "Yes",
     "observer.removed": "Unsubscribed from `{{project|1}}`.",
