@@ -9,7 +9,9 @@ using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities;
 using NLog;
+using System.Text;
 using static Localizer.Localizer;
+using Task = Nino.Records.Task;
 
 namespace Nino.Commands
 {
@@ -66,6 +68,8 @@ namespace Nino.Commands
             if (!Utils.VerifyTaskUser(interaction.User.Id, project, startEpisode, abbreviation))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
+            StringBuilder congaContent = new();
+            
             // Update database
             List<string> completedEpisodes = [];
             TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(project));
@@ -80,14 +84,19 @@ namespace Nino.Commands
                 var episodeDone = isDone && !e.Tasks.Any(t => t.Abbreviation != abbreviation && !t.Done);
                 if (episodeDone) completedEpisodes.Add(e.Number);
 
-                if (taskIndex != -1)
-                {
-                    batch.PatchItem(id: e.Id.ToString(), [
-                        PatchOperation.Set($"/tasks/{taskIndex}/done", isDone),
-                        PatchOperation.Set($"/done", episodeDone),
-                        PatchOperation.Set($"/updated", DateTimeOffset.Now)
-                    ]);
-                }
+                if (taskIndex == -1) continue;
+                
+                var processedConga = isDone 
+                    ? ProcessCongaForEpisode(project, e, abbreviation, lng) 
+                    : (string.Empty, []);
+                if (processedConga.Item1.Length > 0) congaContent.AppendLine(processedConga.Item1.Trim());
+                    
+                batch.PatchItem(id: e.Id.ToString(), [
+                    PatchOperation.Set($"/tasks/{taskIndex}/done", isDone),
+                    PatchOperation.Set($"/done", episodeDone),
+                    PatchOperation.Set($"/updated", DateTimeOffset.Now),
+                    ..processedConga.Item2
+                ]);
             }
             await batch.ExecuteAsync();
 
@@ -100,6 +109,9 @@ namespace Nino.Commands
                 ProgressType.Skipped => $":fast_forward: **{taskTitle}** {T("progress.skipped.appendage", gLng)}",
                 _ => ""
             };
+            
+            if (congaContent.Length > 0)
+                await interaction.Channel.SendMessageAsync(congaContent.ToString());
 
             var publishEmbed = new EmbedBuilder()
                 .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString(lng)})")
@@ -160,6 +172,58 @@ namespace Nino.Commands
 
             await Cache.RebuildCacheForProject(project.Id);
             return ExecutionResult.Success;
+        }
+
+        /// <summary>
+        /// Process an episode's conga line
+        /// </summary>
+        /// <param name="project">Project being processed</param>
+        /// <param name="episode">Episode being processed</param>
+        /// <param name="abbreviation">Task that was completed</param>
+        /// <param name="lng">Language to return results in</param>
+        /// <returns>Tuple of StringBuilder and PatchOperation list</returns>
+        private (string, List<PatchOperation>) ProcessCongaForEpisode (Project project, Episode episode, string abbreviation, string lng)
+        {
+            StringBuilder congaContent = new();
+            List<PatchOperation> operations = [];
+            
+            // Get all conga participants that the current task can call out
+            var congaCandidates = project.CongaParticipants
+                .GroupBy(p => p.Next)
+                .Where(group => group.Select(p => p.Current).Contains(abbreviation))
+                .ToList();
+            
+            if (congaCandidates.Count == 0) return (string.Empty, operations); // Empty
+            
+            foreach (var candidate in congaCandidates)
+            {
+                var ping = true;
+                if (candidate.Count() > 1) // More than just this task
+                {
+                    // Determine if the candidate's caller(s) (not this one) are all done
+                    if (candidate
+                        .Select(c => c.Current)
+                        .Where(c => c != abbreviation)
+                        .Any(c => !episode.Tasks.FirstOrDefault(t => t.Abbreviation == c)?.Done ?? false))
+                        ping = false; // Not all caller(s) are done
+                }
+                if (!ping) continue;
+                
+                var nextTask = project.KeyStaff.FirstOrDefault(ks => ks.Role.Abbreviation == candidate.Key);
+                if (nextTask == null) continue;
+                
+                // Skip task if task is done
+                if (episode.Tasks.FirstOrDefault(t => t.Abbreviation == nextTask.Role.Abbreviation)?.Done ?? false) continue;
+
+                var staffMention = $"<@{nextTask.UserId}>";
+                var roleTitle = nextTask.Role.Name;
+                congaContent.AppendLine(T("progress.done.conga", lng, staffMention, episode.Number, roleTitle));
+                        
+                var congaTaskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == nextTask.Role.Abbreviation));
+                operations.Add(PatchOperation.Set($"/tasks/{congaTaskIndex}/lastReminded", DateTimeOffset.Now));
+            }
+            
+            return (congaContent.ToString(), operations);
         }
     }
 }
