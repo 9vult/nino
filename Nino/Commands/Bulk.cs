@@ -3,6 +3,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Fergun.Interactive;
 using Microsoft.Azure.Cosmos;
+using NaturalSort.Extension;
 using Nino.Handlers;
 using Nino.Records;
 using Nino.Records.Enums;
@@ -38,7 +39,8 @@ namespace Nino.Commands
             startEpisodeNumber = Utils.CanonicalizeEpisodeNumber(startEpisodeNumber);
             endEpisodeNumber = Utils.CanonicalizeEpisodeNumber(endEpisodeNumber);
 
-            if (endEpisodeNumber.CompareNumericallyTo(startEpisodeNumber) <= 0)
+            var naturalSorter = StringComparison.OrdinalIgnoreCase.WithNaturalSort();
+            if (naturalSorter.Compare(endEpisodeNumber, startEpisodeNumber) <= 0)
                 return await Response.Fail(T("error.invalidTimeRange", lng), interaction);
             
             // Verify project
@@ -68,8 +70,8 @@ namespace Nino.Commands
             List<string> completedEpisodes = [];
             TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(project));
             foreach (var e in Cache.GetEpisodes(project.Id)
-                     .Where(e => e.Number.CompareNumericallyTo(startEpisodeNumber) >= 0 
-                                 && e.Number.CompareNumericallyTo(endEpisodeNumber) <= 0))
+                     .Where(e => naturalSorter.Compare(e.Number, startEpisodeNumber) >= 0 
+                                 && naturalSorter.Compare(e.Number, endEpisodeNumber) <= 0))
             {
                 var taskIndex = Array.IndexOf(e.Tasks, e.Tasks.Single(t => t.Abbreviation == abbreviation));
                 var isDone = action is ProgressType.Done or ProgressType.Skipped;
