@@ -27,6 +27,7 @@
     "choice.project.edit.option.poster": "Poster",
     "choice.project.edit.option.motd": "MOTD",
     "choice.project.edit.option.anilist": "AniListId",
+    "choice.project.edit.option.anilistoffset": "AniListOffset",
     "choice.project.edit.option.private": "IsPrivate",
     "choice.project.edit.option.updatechannel": "UpdateChannelID",
     "choice.project.edit.option.releasechannel": "ReleaseChannelID",

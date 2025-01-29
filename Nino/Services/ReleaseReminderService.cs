@@ -36,7 +36,7 @@ namespace Nino.Services
                 {
                     try
                     {
-                        var airTime = await AirDateService.GetAirDate((int)project.AniListId!, decimalNumber);
+                        var airTime = await AirDateService.GetAirDate((int)project.AniListId!, decimalNumber + (project.AniListOffset ?? 0));
                         if (airTime is null || DateTimeOffset.Now < airTime)
                             continue;
 
@@ -56,7 +56,7 @@ namespace Nino.Services
                         var embed = new EmbedBuilder()
                             .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString(gLng)})")
                             .WithTitle(T("title.aired", gLng, episode.Number))
-                            .WithDescription(await AirDateService.GetAirDateString((int)project.AniListId!, decimalNumber, gLng))
+                            .WithDescription(await AirDateService.GetAirDateString((int)project.AniListId!, decimalNumber + project.AniListOffset ?? 0, gLng))
                             .WithThumbnailUrl(project.PosterUri)
                             .WithCurrentTimestamp()
                             .Build();

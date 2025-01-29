@@ -73,6 +73,14 @@ namespace Nino.Commands
                     else
                         return await Response.Fail(T("error.incorrectIntegerFormat", lng), interaction);
                     break;
+                
+                case ProjectEditOption.AniListOffset:
+                    ok = int.TryParse(newValue, out var offset);
+                    if (ok)
+                        operation = PatchOperation.Set($"/aniListOffset", offset);
+                    else
+                        return await Response.Fail(T("error.incorrectIntegerFormat", lng), interaction);
+                    break;
 
                 case ProjectEditOption.IsPrivate:
                     var input = newValue.ToLowerInvariant();

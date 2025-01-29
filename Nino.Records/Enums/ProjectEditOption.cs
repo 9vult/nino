@@ -11,7 +11,8 @@ namespace Nino.Records.Enums
         IsPrivate = 5,
         UpdateChannelID = 6,
         ReleaseChannelID = 7,
-        Nickname = 8
+        Nickname = 8,
+        AniListOffset = 9
     }
 
     public static class ProjectEditOptionExtensions
@@ -28,6 +29,7 @@ namespace Nino.Records.Enums
                 ProjectEditOption.UpdateChannelID => T("choice.project.edit.option.updatechannel", lng),
                 ProjectEditOption.ReleaseChannelID => T("choice.project.edit.option.releasechannel", lng),
                 ProjectEditOption.Nickname => T("choice.project.edit.option.nickname", lng),
+                ProjectEditOption.AniListOffset => T("choice.project.edit.option.anilistoffset", lng),
                 _ => type.ToString(),
             };
         }

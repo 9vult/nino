@@ -89,7 +89,7 @@ namespace Nino.Commands
             // Add any update information
             if (project.AniListId != null && !episode.Tasks.Any(t => t.Done) && Utils.EpisodeNumberIsNumber(episode.Number, out var decimalNumber))
             {
-                var airStatus = await AirDateService.GetAirDateString((int)project.AniListId, decimalNumber, lng);
+                var airStatus = await AirDateService.GetAirDateString((int)project.AniListId, decimalNumber + (project.AniListOffset ?? 0), lng);
                 progress.AppendLine();
                 progress.AppendLine(airStatus);
             }

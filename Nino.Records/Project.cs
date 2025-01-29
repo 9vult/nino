@@ -22,6 +22,7 @@ namespace Nino.Records
         public required string[] Aliases;
         public string? Motd;
         public int? AniListId;
+        public int? AniListOffset;
         public required bool AirReminderEnabled;
         [JsonIgnore] public ulong? AirReminderChannelId;
         [JsonIgnore] public ulong? AirReminderRoleId;

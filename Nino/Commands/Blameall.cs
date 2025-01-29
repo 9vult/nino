@@ -122,12 +122,12 @@ namespace Nino.Commands
                         if (type == BlameAllType.StallCheck)
                             sb.AppendLine(T("episode.lastUpdated", lng, $"<t:{episode.Updated?.ToUnixTimeSeconds()}:R>"));
                     }
-                    else if (project.AniListId is not null && Utils.EpisodeNumberIsNumber(episode.Number, out var decimalNumber) && !await AirDateService.EpisodeAired((int)project.AniListId, decimalNumber))
+                    else if (project.AniListId is not null && Utils.EpisodeNumberIsNumber(episode.Number, out var decimalNumber) && !await AirDateService.EpisodeAired((int)project.AniListId, decimalNumber + (project.AniListOffset ?? 0)))
                     {
                         if (type == BlameAllType.Normal)
                             sb.AppendLine($"_{T("blameall.notYetAired", lng)}_");
                         if (type == BlameAllType.StallCheck)
-                            sb.AppendLine(await AirDateService.GetAirDateString((int)project.AniListId, decimalNumber, lng));
+                            sb.AppendLine(await AirDateService.GetAirDateString((int)project.AniListId, decimalNumber + (project.AniListOffset ?? 0), lng));
                     }
                     else
                         sb.AppendLine($"_{T("blameall.notStarted", lng)}_");
