@@ -50,7 +50,7 @@ namespace Nino.Handlers
                 var guildId = interaction.GuildId;
                 if (guildId == null)
                 {
-                    await interaction.FollowupAsync("Nino commands must be run in a server!");
+                    await interaction.RespondAsync("Nino commands must be run in a server!");
                     return;
                 }
 
