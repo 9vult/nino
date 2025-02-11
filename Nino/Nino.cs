@@ -10,6 +10,7 @@ using Nino.Handlers;
 using Nino.Services;
 using Nino.Utilities;
 using NLog;
+using System.Globalization;
 using static Localizer.Localizer;
 
 namespace Nino
@@ -35,6 +36,8 @@ namespace Nino
 
         public static async Task Main(string[] args)
         {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            
             Console.OutputEncoding = Encoding.UTF8;
             LogHandler.SetupLogger();
 
