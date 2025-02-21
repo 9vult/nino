@@ -240,7 +240,7 @@ namespace Nino.Utilities
                 
                 // Add to the list if the task is indeed tardy
                 if (!taskLookup.TryGetValue(nextTask, out var candidate) || candidate.LastReminded is null) continue;
-                if (candidate.LastReminded < DateTimeOffset.Now - project.CongaReminderPeriod)
+                if (candidate.LastReminded?.AddMinutes(-2) < DateTimeOffset.Now - project.CongaReminderPeriod)
                     nextTasks.Add(nextTask);
             }
             
