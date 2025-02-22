@@ -75,7 +75,7 @@ namespace Nino.Commands
             };
 
             var episodes = new List<Episode>();
-            for (var i = firstEpisode; i <= firstEpisode + length; i++)
+            for (var i = firstEpisode; i < firstEpisode + length; i++)
             {
                 episodes.Add(new Episode
                 {
