@@ -75,7 +75,7 @@ namespace Nino
             if (!_cmdLineOptions.DisableAniList)
                 _ = new ReleaseReminderService();
             else
-                AniListService.ANILIST_ENABLED = false;
+                AniListService.AniListEnabled = false;
 
             // Start Conga Reminder service
             _ = new CongaReminderService();

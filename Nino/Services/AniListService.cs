@@ -9,12 +9,12 @@ namespace Nino.Services
 {
     internal static class AniListService
     {
-        private static readonly Logger log = LogManager.GetCurrentClassLogger();
-        private const string CACHE = ".cache";
-        private const string BASE_URL = "https://graphql.anilist.co";
-        public static bool ANILIST_ENABLED { get; set; } = true;
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+        private const string Cache = ".cache";
+        private const string BaseUrl = "https://graphql.anilist.co";
+        public static bool AniListEnabled { get; set; } = true;
 
-        private static readonly HttpClient _client = new(new HttpClientHandler()
+        private static readonly HttpClient Client = new(new HttpClientHandler
         {
             AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate
         });
@@ -26,10 +26,10 @@ namespace Nino.Services
         /// <returns>API reponse</returns>
         public static async Task<ApiResponse?> Get(int anilistId)
         {
-            if (!ANILIST_ENABLED)
-                return new() { Error = "error.anilist.disabled" };
+            if (!AniListEnabled)
+                return new ApiResponse { Error = "error.anilist.disabled" };
 
-            var filename = Path.Combine(CACHE, $"{anilistId}.json");
+            var filename = Path.Combine(Cache, $"{anilistId}.json");
             PrepareCacheDirectory();
 
             try
@@ -39,43 +39,59 @@ namespace Nino.Services
                 if (fileInfo.Exists && (DateTime.UtcNow - fileInfo.LastAccessTimeUtc < new TimeSpan(days: 1, 0, 0, 0)))
                 {
                     // Use the cached version
-                    using var stream = File.OpenRead(filename);
+                    await using var stream = File.OpenRead(filename);
                     return await JsonSerializer.DeserializeAsync<ApiResponse>(stream);
                 }
             }
             catch (Exception e)
             {
-                log.Error(e.Message);
-                return new() { Error = "error.anilist.cache.ioerror" };
+                Log.Error(e.Message);
+                return new ApiResponse { Error = "error.anilist.cache.ioerror" };
             }
 
             // Either the file doesn't exist, or it's older than a day old; Time to get new info!
 
             try
             {
-                var response = await _client.PostAsync(BASE_URL, CreateQuery(anilistId));
+                var response = await Client.PostAsync(BaseUrl, CreateQuery(anilistId));
 
                 if (response.IsSuccessStatusCode)
                 {
                     var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse>();
                     if (apiResponse is null)
-                        return new() { Error = "error.anilist.cache.malformed" };
+                        return new ApiResponse
+                        {
+                            Error = "error.anilist.cache.malformed"
+                        };
 
-                    using var stream = File.OpenWrite(filename);
+                    await using var stream = File.OpenWrite(filename);
                     await JsonSerializer.SerializeAsync(stream, apiResponse);
                     return apiResponse;
                 }
             }
             catch (HttpRequestException e) when (e.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                return new() { Error = "error.anilist.404" };
+                return new ApiResponse
+                {
+                    Error = "error.anilist.404"
+                };
             }
             catch (HttpRequestException e)
             {
-                log.Error(e.Message);
-                return new() { Error = "error.anilist.apiError" };
+                Log.Error($"Error getting Start Date for AniListId: {anilistId}");
+                Log.Error(e.Message);
+                return new ApiResponse
+                {
+                    Error = "error.anilist.apiError"
+                };
             }
-            return new() { Error = $"error.anilist.generic" };
+            catch (Exception e)
+            {
+                Log.Error($"Error getting Start Date for AniListId: {anilistId}");
+                Log.Error(e.Message);
+                return new ApiResponse { Error = $"error.anilist.generic" };
+            }
+            return new ApiResponse { Error = $"error.anilist.generic" };
         }
 
         private static StringContent CreateQuery(int id) =>
@@ -94,12 +110,12 @@ namespace Nino.Services
         {
             try
             {
-                if (Directory.Exists(CACHE)) return;
-                Directory.CreateDirectory(CACHE);
+                if (Directory.Exists(Cache)) return;
+                Directory.CreateDirectory(Cache);
             }
             catch (IOException e)
             {
-                log.Error(e.Message);
+                Log.Error(e.Message);
             }
         }
     }
