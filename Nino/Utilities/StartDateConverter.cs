@@ -26,7 +26,7 @@ namespace Nino.Utilities
                     switch (propertyName)
                     {
                         case "year":
-                            year = ReadNullableInt(ref reader) ?? 0;
+                            year = ReadNullableInt(ref reader) ?? 1;
                             break;
                         case "month":
                             month = ReadNullableInt(ref reader) ?? 1;

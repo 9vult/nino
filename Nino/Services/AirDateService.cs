@@ -64,7 +64,8 @@ namespace Nino.Services
             {
                 throw new Exception(response.Error);
             }
-            return response?.StartDate;
+            // Return null if the year is 1 (complete fallback result)
+            return response?.StartDate?.Year == 1 ? null : response?.StartDate;
         }
 
         public static async Task<bool> EpisodeAired(int aniListId, decimal episodeNumber)
