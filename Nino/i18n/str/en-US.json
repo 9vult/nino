@@ -46,6 +46,7 @@
     "choice.progress.type.done": "Done",
     "choice.progress.type.undone": "Undone",
     "choice.progress.type.skipped": "Skipped",
+    "debug.cacheRebuild": "Cache rebuilt!",
     "episode.added": "I added episode {{number|1}} to `{{project|2}}` for you.",
     "episode.lastUpdated": "Last updated {{rel|1}}",
     "episode.removed": "I removed episode {{number|1}} from `{{project|2}}` for you.",

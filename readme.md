@@ -27,7 +27,8 @@ or wherever the built executable is. For hosting, place it next to the executabl
         "AzureCosmosEndpoint": "",
         "AzureClientSecret": "",
         "AzureCosmosDbName": "",
-        "DiscordApiToken": ""
+        "DiscordApiToken": "",
+        "OwnerId": 1234
     }
 }
 ```

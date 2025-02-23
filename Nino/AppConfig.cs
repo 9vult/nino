@@ -9,6 +9,7 @@ namespace Nino
         public required string AzureClientSecret { get; set; }
         public required string AzureCosmosDbName { get; set; }
         public required string DiscordApiToken { get; set; }
+        public required ulong OwnerId { get; set; }
     }
 
     public class CmdLineOptions

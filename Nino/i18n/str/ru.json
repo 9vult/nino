@@ -46,6 +46,7 @@
     "choice.progress.type.done": "Done",
     "choice.progress.type.undone": "Undone",
     "choice.progress.type.skipped": "Skipped",
+    "debug.cacheRebuild": "Cache rebuilt!",
     "episode.added": "Я добавила серию {{number|1}} в проект `{{project|2}}`.",
     "episode.lastUpdated": "Обновлено {{rel|1}}",
     "episode.removed": "Я убрала серию {{number|1}} из проекта `{{project|2}}`.",
