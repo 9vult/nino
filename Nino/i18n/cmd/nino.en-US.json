@@ -50,6 +50,30 @@
         "description": "Remove this position from all episodes that have it?"
       }
     },
+    "rename": {
+      "name": "rename",
+      "description": "Rename an additional staff position",
+      "project": {
+        "name": "project",
+        "description": "Project nickname"
+      },
+      "episode": {
+        "name": "episode",
+        "description": "Episode number"
+      },
+      "abbreviation": {
+        "name": "abbreviation",
+        "description": "Position shorthand"
+      },
+      "new_abbreviation": {
+        "name": "new_abbreviation",
+        "description": "Position shorthand"
+      },
+      "new_name": {
+        "name": "new_name",
+        "description": "Full position name"
+      }
+    },
     "setweight": {
       "name": "setweight",
       "description": "Set the weight of an Additional Staff position",
@@ -283,6 +307,26 @@
       "abbreviation": {
         "name": "abbreviation",
         "description": "Position shorthand"
+      }
+    },
+    "rename": {
+      "name": "rename",
+      "description": "Rename a Key Staff position",
+      "project": {
+        "name": "project",
+        "description": "Project nickname"
+      },
+      "abbreviation": {
+        "name": "abbreviation",
+        "description": "Position shorthand"
+      },
+      "new_abbreviation": {
+        "name": "new_abbreviation",
+        "description": "Position shorthand"
+      },
+      "new_name": {
+        "name": "new_name",
+        "description": "Full position name"
       }
     },
     "setweight": {
