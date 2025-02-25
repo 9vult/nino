@@ -40,7 +40,7 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
             
             // Check if position already exists
-            if (project.KeyStaff.Any(ks => ks.Role.Abbreviation == newAbbreviation))
+            if (abbreviation != newAbbreviation && project.KeyStaff.Any(ks => ks.Role.Abbreviation == newAbbreviation))
                 return await Response.Fail(T("error.positionExists", lng), interaction);
 
             // Update user
