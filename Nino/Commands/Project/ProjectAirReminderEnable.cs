@@ -17,7 +17,7 @@ namespace Nino.Commands
             [SlashCommand("enable", "Enable airing reminders")]
             public async Task<RuntimeResult> Enable(
                 [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-                [Summary("channel", "Channel to post reminders in")] IMessageChannel channel,
+                [Summary("channel", "Channel to post reminders in"), ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel channel,
                 [Summary("role", "Role to ping for reminders")] SocketRole? role = null
             )
             {

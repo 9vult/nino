@@ -20,8 +20,8 @@ namespace Nino.Commands
             [Summary("length", "Number of episodes"), MinValue(1)] int length,
             [Summary("poster", "Poster image URL")] string posterUri,
             [Summary("private", "Is this project private?")] bool isPrivate,
-            [Summary("updateChannel", "Channel to post updates to")] IMessageChannel updateChannel,
-            [Summary("releaseChannel", "Channel to post releases to")] IMessageChannel releaseChannel,
+            [Summary("updateChannel", "Channel to post updates to"), ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel updateChannel,
+            [Summary("releaseChannel", "Channel to post releases to"), ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel releaseChannel,
             [Summary("anilistId", "AniList ID")] int? aniListId = null,
             [Summary("firstEpisode", "First episode number")] decimal firstEpisode = 1
         )
