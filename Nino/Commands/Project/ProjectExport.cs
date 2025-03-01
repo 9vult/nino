@@ -12,7 +12,7 @@ namespace Nino.Commands
         [SlashCommand("export", "Export a project to JSON")]
         public async Task<RuntimeResult> Export(
             [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-            [Summary("prettyprint", "Pretty-print?")] bool prettyPrint = true
+            [Summary("prettyPrint", "Pretty-print?")] bool prettyPrint = true
         )
         {
             var interaction = Context.Interaction;

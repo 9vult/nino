@@ -14,8 +14,8 @@ namespace Nino.Commands
         public async Task<RuntimeResult> Rename(
             [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
             [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(KeyStaffAutocompleteHandler))] string abbreviation,
-            [Summary("new_abbreviation", "Position shorthand")] string newAbbreviation,
-            [Summary("new_name", "Full position name")] string newTaskName
+            [Summary("newAbbreviation", "Position shorthand")] string newAbbreviation,
+            [Summary("newName", "Full position name")] string newTaskName
         )
         {
             var interaction = Context.Interaction;

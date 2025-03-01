@@ -10,7 +10,7 @@ namespace Nino.Commands
     {
         [SlashCommand("remove", "Stop observing a project on another server")]
         public async Task<RuntimeResult> Remove(
-            [Summary("serverid", "SID of the server you want to observe")] string serverId,
+            [Summary("serverId", "ID of the server you want to observe")] string serverId,
             [Summary("project", "Project nickname")] string alias
         )
         {

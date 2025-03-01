@@ -21,7 +21,7 @@ namespace Nino.Handlers
             var guildId = interaction.GuildId ?? 0;
             var userId = interaction.User.Id;
 
-            var includeObservers = commandName == "blame" || commandName == "blameall";
+            var includeObservers = commandName is "blame" or "blameall";
 
             List<AutocompleteResult> choices = [];
             var alias = ((string)focusedOption.Value).Trim();

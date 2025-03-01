@@ -13,7 +13,7 @@ namespace Nino.Commands
     {
         public class RebuildCache(InteractionHandler handler, InteractionService commands) : InteractionModuleBase<SocketInteractionContext>
         {
-            [SlashCommand("rebuild_cache", "Rebuild Nino's cache")]
+            [SlashCommand("rebuild-cache", "Rebuild Nino's cache")]
             public async Task<RuntimeResult> Handle()
             {
                 var interaction = Context.Interaction;

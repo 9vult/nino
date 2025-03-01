@@ -16,7 +16,7 @@ namespace Nino.Commands
             [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
             [Summary("member", "Staff member")] SocketUser member,
             [Summary("abbreviation", "Position shorthand")] string abbreviation,
-            [Summary("fullname", "Full position name")] string taskName
+            [Summary("fullName", "Full position name")] string taskName
         )
         {
             var interaction = Context.Interaction;

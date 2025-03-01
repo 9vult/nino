@@ -25,8 +25,8 @@
         "name": "abbreviation",
         "description": "Position shorthand"
       },
-      "fullname": {
-        "name": "fullname",
+      "full-name": {
+        "name": "full-name",
         "description": "Full position name"
       }
     },
@@ -45,8 +45,8 @@
         "name": "abbreviation",
         "description": "Position shorthand"
       },
-      "allepisodes": {
-        "name": "allepisodes",
+      "all-episodes": {
+        "name": "all-episodes",
         "description": "Remove this position from all episodes that have it?"
       }
     },
@@ -65,17 +65,17 @@
         "name": "abbreviation",
         "description": "Position shorthand"
       },
-      "new_abbreviation": {
-        "name": "new_abbreviation",
+      "new-abbreviation": {
+        "name": "new-abbreviation",
         "description": "Position shorthand"
       },
-      "new_name": {
-        "name": "new_name",
+      "new-name": {
+        "name": "new-name",
         "description": "Full position name"
       }
     },
-    "setweight": {
-      "name": "setweight",
+    "set-weight": {
+      "name": "set-weight",
       "description": "Set the weight of an Additional Staff position",
       "project": {
         "name": "project",
@@ -113,6 +113,31 @@
         "name": "member",
         "description": "Staff member"
       }
+    }
+  },
+  "atme": {
+    "name": "atme",
+    "description": "What tasks are At Me?",
+    "filter": {
+      "name": "filter",
+      "description": "Filter results",
+      "Auto": {
+        "name": "Auto"
+      },
+      "Conga": {
+        "name": "Conga"
+      },
+      "Incomplete": {
+        "name": "Incomplete"
+      }
+    },
+    "global": {
+      "name": "global",
+      "description": "Combine results from all servers"
+    },
+    "private": {
+      "name": "private",
+      "description": "Include results from Private projects"
     }
   },
   "blame": {
@@ -171,7 +196,16 @@
     },
     "action": {
       "name": "action",
-      "description": "Action to perform"
+      "description": "Action to perform",
+      "Done": {
+        "name": "Done"
+      },
+      "Undone": {
+        "name": "Undone"
+      },
+      "Skipped": {
+        "name": "Skipped"
+      }
     },
     "abbreviation": {
       "name": "abbreviation",
@@ -184,6 +218,22 @@
     "end": {
       "name": "end",
       "description": "End episode number"
+    }
+  },
+  "debug": {
+    "name": "debug",
+    "description": "Commands for debugging",
+    "info": {
+      "name": "info",
+      "description": "Debugging Information",
+      "project": {
+        "name": "project",
+        "description": "Project nickname"
+      }
+    },
+    "rebuild-cache": {
+      "name": "rebuild-cache",
+      "description": "Rebuild Nino's cache"
     }
   },
   "done": {
@@ -236,7 +286,7 @@
   },
   "keystaff": {
     "name": "keystaff",
-    "description": "Key staff for the whole project",
+    "description": "Key Staff for the whole project",
     "add": {
       "name": "add",
       "description": "Add a new Key Staff to the whole project",
@@ -252,13 +302,77 @@
         "name": "abbreviation",
         "description": "Position shorthand"
       },
-      "fullname": {
-        "name": "fullname",
+      "full-name": {
+        "name": "full-name",
         "description": "Full position name"
       }
     },
-    "pinchhitter": {
-      "name": "pinchhitter",
+    "remove": {
+      "name": "remove",
+      "description": "Remove a Key Staff from the whole project",
+      "project": {
+        "name": "project",
+        "description": "Project nickname"
+      },
+      "abbreviation": {
+        "name": "abbreviation",
+        "description": "Position shorthand"
+      }
+    },
+    "rename": {
+      "name": "rename",
+      "description": "Rename a Key Staff position",
+      "project": {
+        "name": "project",
+        "description": "Project nickname"
+      },
+      "abbreviation": {
+        "name": "abbreviation",
+        "description": "Position shorthand"
+      },
+      "new-abbreviation": {
+        "name": "new-abbreviation",
+        "description": "Position shorthand"
+      },
+      "new-name": {
+        "name": "new-name",
+        "description": "Full position name"
+      }
+    },
+    "set-weight": {
+      "name": "set-weight",
+      "description": "Set the weight of a Key Staff position",
+      "project": {
+        "name": "project",
+        "description": "Project nickname"
+      },
+      "abbreviation": {
+        "name": "abbreviation",
+        "description": "Position shorthand"
+      },
+      "weight": {
+        "name": "weight",
+        "description": "Weight"
+      }
+    },
+    "swap": {
+      "name": "swap",
+      "description": "Swap a Key Staff into the whole project",
+      "project": {
+        "name": "project",
+        "description": "Project nickname"
+      },
+      "abbreviation": {
+        "name": "abbreviation",
+        "description": "Position shorthand"
+      },
+      "member": {
+        "name": "member",
+        "description": "Staff member"
+      }
+    },
+    "pinch-hitter": {
+      "name": "pinch-hitter",
       "description": "Key Staff pinch hitters",
       "remove": {
         "name": "remove",
@@ -296,70 +410,6 @@
           "description": "Staff member"
         }
       }
-    },
-    "remove": {
-      "name": "remove",
-      "description": "Remove a Key Staff from the whole project",
-      "project": {
-        "name": "project",
-        "description": "Project nickname"
-      },
-      "abbreviation": {
-        "name": "abbreviation",
-        "description": "Position shorthand"
-      }
-    },
-    "rename": {
-      "name": "rename",
-      "description": "Rename a Key Staff position",
-      "project": {
-        "name": "project",
-        "description": "Project nickname"
-      },
-      "abbreviation": {
-        "name": "abbreviation",
-        "description": "Position shorthand"
-      },
-      "new_abbreviation": {
-        "name": "new_abbreviation",
-        "description": "Position shorthand"
-      },
-      "new_name": {
-        "name": "new_name",
-        "description": "Full position name"
-      }
-    },
-    "setweight": {
-      "name": "setweight",
-      "description": "Set the weight of a Key Staff position",
-      "project": {
-        "name": "project",
-        "description": "Project nickname"
-      },
-      "abbreviation": {
-        "name": "abbreviation",
-        "description": "Position shorthand"
-      },
-      "weight": {
-        "name": "weight",
-        "description": "Weight"
-      }
-    },
-    "swap": {
-      "name": "swap",
-      "description": "Swap a Key Staff into the whole project",
-      "project": {
-        "name": "project",
-        "description": "Project nickname"
-      },
-      "abbreviation": {
-        "name": "abbreviation",
-        "description": "Position shorthand"
-      },
-      "member": {
-        "name": "member",
-        "description": "Staff member"
-      }
     }
   },
   "observer": {
@@ -368,8 +418,8 @@
     "add": {
       "name": "add",
       "description": "Start observing a project on another server",
-      "serverid": {
-        "name": "serverid",
+      "server-id": {
+        "name": "server-id",
         "description": "ID of the server you want to observe"
       },
       "project": {
@@ -400,8 +450,8 @@
     "remove": {
       "name": "remove",
       "description": "Stop observing a project on another server",
-      "serverid": {
-        "name": "serverid",
+      "server-id": {
+        "name": "server-id",
         "description": "ID of the server you want to observe"
       },
       "project": {
@@ -413,6 +463,154 @@
   "project": {
     "name": "project",
     "description": "Project management",
+    "archive": {
+      "name": "archive",
+      "description": "Archive a project",
+      "project": {
+        "name": "project",
+        "description": "Project nickname"
+      }
+    },
+    "create": {
+      "name": "create",
+      "description": "Create a new project",
+      "nickname": {
+        "name": "nickname",
+        "description": "Short project nickname (no spaces)"
+      },
+      "title": {
+        "name": "title",
+        "description": "Full series title"
+      },
+      "type": {
+        "name": "type",
+        "description": "Project type",
+        "TV": {
+          "name": "TV"
+        },
+        "Movie": {
+          "name": "Movie"
+        },
+        "BD": {
+          "name": "BD"
+        }
+      },
+      "length": {
+        "name": "length",
+        "description": "Number of episodes"
+      },
+      "poster": {
+        "name": "poster",
+        "description": "Poster image URL"
+      },
+      "private": {
+        "name": "private",
+        "description": "Is this project private?"
+      },
+      "update-channel": {
+        "name": "update-channel",
+        "description": "Channel to post updates to"
+      },
+      "release-channel": {
+        "name": "release-channel",
+        "description": "Channel to post releases to"
+      },
+      "anilist-id": {
+        "name": "anilist-id",
+        "description": "AniList ID"
+      },
+      "first-episode": {
+        "name": "first-episode",
+        "description": "First episode number"
+      }
+    },
+    "delete": {
+      "name": "delete",
+      "description": "Delete a project",
+      "project": {
+        "name": "project",
+        "description": "Project nickname"
+      }
+    },
+    "edit": {
+      "name": "edit",
+      "description": "Edit a project",
+      "project": {
+        "name": "project",
+        "description": "Project nickname"
+      },
+      "option": {
+        "name": "option",
+        "description": "Option to change",
+        "Title": {
+          "name": "Title"
+        },
+        "Poster": {
+          "name": "Poster"
+        },
+        "MOTD": {
+          "name": "MOTD"
+        },
+        "AniListId": {
+          "name": "AniListId"
+        },
+        "IsPrivate": {
+          "name": "IsPrivate"
+        },
+        "UpdateChannelID": {
+          "name": "UpdateChannelID"
+        },
+        "ReleaseChannelID": {
+          "name": "ReleaseChannelID"
+        },
+        "Nickname": {
+          "name": "Nickname"
+        },
+        "AniListOffset": {
+          "name": "AniListOffset"
+        }
+      },
+      "new-value": {
+        "name": "new-value",
+        "description": "New value"
+      }
+    },
+    "export": {
+      "name": "export",
+      "description": "Export a project to JSON",
+      "project": {
+        "name": "project",
+        "description": "Project nickname"
+      },
+      "pretty-print": {
+        "name": "pretty-print",
+        "description": "Pretty-print?"
+      }
+    },
+    "transfer-ownership": {
+      "name": "transfer-ownership",
+      "description": "Transfer project ownership to someone else",
+      "project": {
+        "name": "project",
+        "description": "Project nickname"
+      },
+      "member": {
+        "name": "member",
+        "description": "Staff member"
+      }
+    },
+    "transfer-server": {
+      "name": "transfer-server",
+      "description": "Transfer a project from another server to here",
+      "server-id": {
+        "name": "server-id",
+        "description": "ID of the server the project is currently in"
+      },
+      "project": {
+        "name": "project",
+        "description": "Project nickname"
+      }
+    },
     "admin": {
       "name": "admin",
       "description": "Project-level administrators",
@@ -441,8 +639,8 @@
         }
       }
     },
-    "airreminder": {
-      "name": "airreminder",
+    "air-reminder": {
+      "name": "air-reminder",
       "description": "Enable or disable airing reminders",
       "disable": {
         "name": "disable",
@@ -497,14 +695,6 @@
         }
       }
     },
-    "archive": {
-      "name": "archive",
-      "description": "Archive a project",
-      "project": {
-        "name": "project",
-        "description": "Project nickname"
-      }
-    },
     "conga": {
       "name": "conga",
       "description": "A Conga line of Key Staff",
@@ -549,141 +739,32 @@
         }
       }
     },
-    "create": {
-      "name": "create",
-      "description": "Create a new project",
-      "nickname": {
-        "name": "nickname",
-        "description": "Short project nickname (no spaces)"
-      },
-      "title": {
-        "name": "title",
-        "description": "Full series title"
-      },
-      "type": {
-        "name": "type",
-        "description": "Project type",
-        "TV": {
-          "name": "TV"
-        },
-        "Movie": {
-          "name": "Movie"
-        },
-        "BD": {
-          "name": "BD"
+    "conga-reminder": {
+      "name": "conga-reminder",
+      "description": "Enable or disable conga reminders",
+      "disable": {
+        "name": "disable",
+        "description": "Disable conga reminders",
+        "project": {
+          "name": "project",
+          "description": "Project nickname"
         }
       },
-      "length": {
-        "name": "length",
-        "description": "Number of episodes"
-      },
-      "poster": {
-        "name": "poster",
-        "description": "Poster image URL"
-      },
-      "private": {
-        "name": "private",
-        "description": "Is this project private?"
-      },
-      "updateChannel": {
-        "name": "updateChannel",
-        "description": "Channel to post updates to"
-      },
-      "releaseChannel": {
-        "name": "releaseChannel",
-        "description": "Channel to post releases to"
-      },
-      "anilistId": {
-        "name": "anilistId",
-        "description": "AniList ID"
-      },
-      "firstEpisode": {
-        "name": "releaseChannel",
-        "description": "First episode number"
-      }
-    },
-    "delete": {
-      "name": "delete",
-      "description": "Delete a project",
-      "project": {
-        "name": "project",
-        "description": "Project nickname"
-      }
-    },
-    "export": {
-      "name": "export",
-      "description": "Export a project to JSON",
-      "project": {
-        "name": "project",
-        "description": "Project nickname"
-      },
-      "prettyprint": {
-        "name": "prettyprint",
-        "description": "Pretty-print?"
-      }
-    },
-    "edit": {
-      "name": "edit",
-      "description": "Edit a project",
-      "project": {
-        "name": "project",
-        "description": "Project nickname"
-      },
-      "option": {
-        "name": "option",
-        "description": "Option to change",
-        "Title": {
-          "name": "Title"
+      "enable": {
+        "name": "enable",
+        "description": "Enable conga reminders",
+        "project": {
+          "name": "project",
+          "description": "Project nickname"
         },
-        "Poster": {
-          "name": "Poster"
+        "days": {
+          "name": "days",
+          "description": "Reminder period"
         },
-        "MOTD": {
-          "name": "MOTD"
-        },
-        "AniListId": {
-          "name": "AniListId"
-        },
-        "IsPrivate": {
-          "name": "IsPrivate"
-        },
-        "UpdateChannelID": {
-          "name": "UpdateChannelID"
-        },
-        "ReleaseChannelID": {
-          "name": "ReleaseChannelID"
-        },
-        "Nickname": {
-          "name": "Nickname"
+        "channel": {
+          "name": "channel",
+          "description": "Channel to post reminders in"
         }
-      },
-      "newvalue": {
-        "name": "newvalue",
-        "description": "New value"
-      }
-    },
-    "transferownership": {
-      "name": "transferownership",
-      "description": "Transfer project ownership to someone else",
-      "project": {
-        "name": "project",
-        "description": "Project nickname"
-      },
-      "member": {
-        "name": "member",
-        "description": "Staff member"
-      }
-    },
-    "transferserver": {
-      "name": "transferserver",
-      "description": "Transfer a project from another server to here",
-      "serverid": {
-        "name": "serverid",
-        "description": "ID of the server the project is in"
-      },
-      "project": {
-        "name": "project",
-        "description": "Project nickname"
       }
     }
   },
@@ -742,7 +823,7 @@
         "description": "Project nickname"
       },
       "volume": {
-        "name": "episode",
+        "name": "volume",
         "description": "Volume number to release"
       },
       "url": {
@@ -765,11 +846,31 @@
     "episode": {
       "name": "episode",
       "description": "Episode number"
+    },
+    "weights": {
+      "name": "weights",
+      "description": "Display task weights"
     }
   },
   "server": {
     "name": "server",
     "description": "Server-wide options",
+    "set-locale": {
+      "name": "set-locale",
+      "description": "Set the locale for this server",
+      "new-value": {
+        "name": "new-value",
+        "description": "New Value"
+      }
+    },
+    "release-prefix": {
+      "name": "release-prefix",
+      "description": "Specify a prefix for releases",
+      "new-value": {
+        "name": "new-value",
+        "description": "New Value"
+      }
+    },
     "admin": {
       "name": "admin",
       "description": "Server-level administrators",
@@ -821,14 +922,6 @@
           }
         }
       }
-    },
-    "setlocale": {
-      "name": "setlocale",
-      "description": "Set the locale for this server",
-      "newvalue": {
-        "name": "newvalue",
-        "description": "New Value"
-      }
     }
   },
   "skip": {
@@ -846,6 +939,10 @@
       "name": "abbreviation",
       "description": "Position shorthand"
     }
+  },
+  "stats": {
+    "name": "stats",
+    "description": "Nino Statistics"
   },
   "undone": {
     "name": "undone",

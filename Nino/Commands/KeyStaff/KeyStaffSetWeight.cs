@@ -11,7 +11,7 @@ namespace Nino.Commands
 {
     public partial class KeyStaff
     {
-        [SlashCommand("setweight", "Set the weight of a Key Staff position")]
+        [SlashCommand("set-weight", "Set the weight of a Key Staff position")]
         public async Task<RuntimeResult> SetWeight(
             [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
             [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(KeyStaffAutocompleteHandler))] string abbreviation,

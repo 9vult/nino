@@ -9,9 +9,9 @@ namespace Nino.Commands
 {
     public partial class ServerManagement
     {
-        [SlashCommand("releaseprefix", "Specify a prefix for releases")]
+        [SlashCommand("release-prefix", "Specify a prefix for releases")]
         public async Task<RuntimeResult> SetReleasePrefix(
-            [Summary("newvalue", "New Value")] string? newValue
+            [Summary("newValue", "New Value")] string? newValue
         )
         {
             var interaction = Context.Interaction;

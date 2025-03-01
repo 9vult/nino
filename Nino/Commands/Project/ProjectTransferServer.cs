@@ -12,9 +12,9 @@ namespace Nino.Commands
 {
     public partial class ProjectManagement
     {
-        [SlashCommand("transferserver", "Transfer a project from another server to here")]
+        [SlashCommand("transfer-server", "Transfer a project from another server to here")]
         public async Task<RuntimeResult> TransferServer(
-            [Summary("serverid", "ID of the server the project is currently in")] string serverId,
+            [Summary("serverId", "ID of the server the project is currently in")] string serverId,
             [Summary("project", "Project nickname")] string alias
         )
         {

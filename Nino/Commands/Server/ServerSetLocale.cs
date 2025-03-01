@@ -11,9 +11,9 @@ namespace Nino.Commands
 {
     public partial class ServerManagement
     {
-        [SlashCommand("setlocale", "Set the locale for this server")]
+        [SlashCommand("set-locale", "Set the locale for this server")]
         public async Task<RuntimeResult> SetLocale(
-            [Summary("newvalue", "New Value"), Autocomplete(typeof(LocaleAutocompleteHandler))] Locale locale
+            [Summary("newValue", "New Value"), Autocomplete(typeof(LocaleAutocompleteHandler))] Locale locale
         )
         {
             var interaction = Context.Interaction;

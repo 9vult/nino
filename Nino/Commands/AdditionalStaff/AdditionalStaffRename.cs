@@ -16,8 +16,8 @@ namespace Nino.Commands
             [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
             [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
             [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(AdditionalStaffAutocompleteHandler))] string abbreviation,
-            [Summary("new_abbreviation", "Position shorthand")] string newAbbreviation,
-            [Summary("new_name", "Full position name")] string newTaskName
+            [Summary("newAbbreviation", "Position shorthand")] string newAbbreviation,
+            [Summary("newName", "Full position name")] string newTaskName
         )
         {
             var interaction = Context.Interaction;

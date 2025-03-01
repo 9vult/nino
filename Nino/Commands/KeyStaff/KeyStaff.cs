@@ -11,7 +11,7 @@ namespace Nino.Commands
         private readonly InteractionHandler _handler = handler;
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         
-        [Group("pinchhitter", "Key Staff pinch hitters")]
+        [Group("pinch-hitter", "Key Staff pinch hitters")]
         public partial class PinchHitterManagement(InteractionHandler handler, InteractionService commands) : InteractionModuleBase<SocketInteractionContext>
         {
             public InteractionService Commands { get; private set; } = commands;

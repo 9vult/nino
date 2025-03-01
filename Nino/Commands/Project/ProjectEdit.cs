@@ -23,7 +23,7 @@ namespace Nino.Commands
         public async Task<RuntimeResult> Edit(
             [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
             [Summary("option", "Option to change")] ProjectEditOption option,
-            [Summary("newvalue", "New value")] string newValue
+            [Summary("newValue", "New value")] string newValue
         )
         {
             var interaction = Context.Interaction;

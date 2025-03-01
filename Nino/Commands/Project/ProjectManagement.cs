@@ -27,7 +27,7 @@ namespace Nino.Commands
             private readonly InteractionHandler _handler = handler;
         }
 
-        [Group("airreminder", "Enable or disable airing reminders")]
+        [Group("air-reminder", "Enable or disable airing reminders")]
         public partial class AirReminder(InteractionHandler handler, InteractionService commands) : InteractionModuleBase<SocketInteractionContext>
         {
             public InteractionService Commands { get; private set; } = commands;
@@ -41,7 +41,7 @@ namespace Nino.Commands
             private readonly InteractionHandler _handler = handler;
         }
         
-        [Group("congareminder", "Enable or disable conga reminders")]
+        [Group("conga-reminder", "Enable or disable conga reminders")]
         public partial class CongaReminder(InteractionHandler handler, InteractionService commands) : InteractionModuleBase<SocketInteractionContext>
         {
             public InteractionService Commands { get; private set; } = commands;

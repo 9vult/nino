@@ -11,7 +11,7 @@ namespace Nino.Commands
 {
     public partial class AdditionalStaff
     {
-        [SlashCommand("setweight", "Set the weight of an Additional Staff position")]
+        [SlashCommand("set-weight", "Set the weight of an Additional Staff position")]
         public async Task<RuntimeResult> SetWeight(
             [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
             [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,

@@ -12,7 +12,7 @@ namespace Nino.Commands
 {
     public partial class ProjectManagement
     {
-        [SlashCommand("transferownership", "Transfer project ownership to someone else")]
+        [SlashCommand("transfer-ownership", "Transfer project ownership to someone else")]
         public async Task<RuntimeResult> Delete(
             [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
             [Summary("member", "Staff member")] SocketUser member
