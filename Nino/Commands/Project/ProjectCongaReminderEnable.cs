@@ -18,7 +18,7 @@ namespace Nino.Commands
             public async Task<RuntimeResult> Enable(
                 [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
                 [Summary("days", "Reminder period")] int days,
-                [Summary("channel", "Channel to post reminders in")] SocketTextChannel channel
+                [Summary("channel", "Channel to post reminders in")] IMessageChannel channel
             )
             {
                 var interaction = Context.Interaction;
