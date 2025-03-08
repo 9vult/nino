@@ -134,6 +134,17 @@ namespace Nino.Utilities
         {
             return decimal.TryParse(input, out episodeNumber);
         }
+        
+        /// <summary>
+        /// Check if the episode number is an integer
+        /// </summary>
+        /// <param name="input">Raw episode number</param>
+        /// <param name="episodeNumber">Output number as an integer</param>
+        /// <returns><see langword="true"/> if the episode number is an integer</returns>
+        public static bool EpisodeNumberIsInteger(string input, out int episodeNumber)
+        {
+            return int.TryParse(input, out episodeNumber);
+        }
 
         /// <summary>
         /// Convert an Embed to a simple object for JSON serialization

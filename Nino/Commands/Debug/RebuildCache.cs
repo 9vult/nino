@@ -11,7 +11,7 @@ namespace Nino.Commands
 {
     public partial class Debug
     {
-        public class RebuildCache(InteractionHandler handler, InteractionService commands) : InteractionModuleBase<SocketInteractionContext>
+        public class RebuildCache() : InteractionModuleBase<SocketInteractionContext>
         {
             [SlashCommand("rebuild-cache", "Rebuild Nino's cache")]
             public async Task<RuntimeResult> Handle()

@@ -11,7 +11,7 @@ namespace Nino.Commands
 {
     public partial class Debug
     {
-        public class DebugInfo(InteractionHandler handler, InteractionService commands) : InteractionModuleBase<SocketInteractionContext>
+        public class DebugInfo() : InteractionModuleBase<SocketInteractionContext>
         {
             [SlashCommand("info", "Debugging Information")]
             public async Task<RuntimeResult> Handle(
