@@ -99,7 +99,7 @@ namespace Nino.Commands
                 {
                     var page1 = page0 + 1;
                     var skip = (int)(page0 * pageLength + Math.Min(page0, roundUp));
-                    var length = (int)(pageLength + Math.Min(page1, roundUp));
+                    var length = (int)(pageLength + (page1 <= roundUp ? 1 : 0));
 
                     var pagedTasks = results.Skip(skip).Take(length);
                     var body = string.Join('\n', pagedTasks);
