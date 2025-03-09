@@ -114,7 +114,7 @@ namespace Nino.Commands
                 await interaction.Channel.SendMessageAsync(congaContent.ToString());
 
             var publishEmbed = new EmbedBuilder()
-                .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString(lng)})")
+                .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString(lng)})", url: project.AniListUrl)
                 .WithTitle(title)
                 .WithDescription(status)
                 .WithThumbnailUrl(project.PosterUri)
@@ -161,7 +161,7 @@ namespace Nino.Commands
             };
 
             var replyEmbed = new EmbedBuilder()
-                .WithAuthor(name: replyHeader)
+                .WithAuthor(name: replyHeader, url: project.AniListUrl)
                 .WithTitle(replyTitle)
                 .WithDescription(replyBody)
                 .WithCurrentTimestamp()

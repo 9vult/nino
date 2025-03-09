@@ -57,7 +57,7 @@ namespace Nino.Commands
             status = $"✅ **{taskTitle}**\n{status}";
 
             var publishEmbed = new EmbedBuilder()
-                .WithAuthor(name: $"{project.Title} ({project.Type.ToFriendlyString(gLng)})")
+                .WithAuthor(name: $"{project.Title} ({project.Type.ToFriendlyString(gLng)})", url: project.AniListUrl)
                 .WithTitle(title)
                 .WithDescription(status)
                 .WithThumbnailUrl(project.PosterUri)
@@ -94,7 +94,7 @@ namespace Nino.Commands
 
             // Send the embed
             var replyEmbed = new EmbedBuilder()
-                .WithAuthor(replyHeader)
+                .WithAuthor(replyHeader, url: project.AniListUrl)
                 .WithTitle($"✅ {T("title.taskComplete", lng)}")
                 .WithDescription(replyBody)
                 .WithCurrentTimestamp()

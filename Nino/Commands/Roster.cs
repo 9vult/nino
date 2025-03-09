@@ -51,7 +51,7 @@ namespace Nino.Commands
                 : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
 
             var embed = new EmbedBuilder()
-                .WithAuthor(title)
+                .WithAuthor(title, url: project.AniListUrl)
                 .WithTitle(T("title.progress", lng, episode.Number))
                 .WithThumbnailUrl(project.PosterUri)
                 .WithDescription(roster)

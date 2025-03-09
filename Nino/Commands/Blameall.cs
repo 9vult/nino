@@ -77,7 +77,7 @@ namespace Nino.Commands
                         progress = $"{T("blame.archived", lng)}\n{progress}";
 
                     return new PageBuilder()
-                        .WithAuthor(title)
+                        .WithAuthor(title, url: project.AniListUrl)
                         .WithTitle(T("title.blameall", lng))
                         .WithThumbnailUrl(project.PosterUri)
                         .WithDescription(progress)

@@ -98,6 +98,15 @@ namespace Nino.Records
             get => CongaReminderChannelId?.ToString();
             set => CongaReminderChannelId = !string.IsNullOrEmpty(value) ? ulong.Parse(value) : null;
         }
+        
+        /// <summary>
+        /// AniList URL. <see langword="null"/> if <see cref="AniListId"/> is <see langword="null"/>.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonIgnore]
+        public string? AniListUrl
+        {
+            get => AniListId is null ? null : $"https://anilist.co/anime/{AniListId}";
+        }
 
         public override string ToString ()
         {

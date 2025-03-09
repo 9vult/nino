@@ -64,7 +64,7 @@ namespace Nino.Commands
             if (inputEpisodeNumber == null && episode.Tasks.All(t => t.Done))
             {
                 var doneEmbed = new EmbedBuilder()
-                    .WithAuthor(title)
+                    .WithAuthor(title, url: project.AniListUrl)
                     .WithTitle(T("title.blame", lng))
                     .WithThumbnailUrl(project.PosterUri)
                     .WithDescription(T("blame.projectComplete", lng))
@@ -100,7 +100,7 @@ namespace Nino.Commands
             }
 
             var resultEmbed = new EmbedBuilder()
-                .WithAuthor(title)
+                .WithAuthor(title, url: project.AniListUrl)
                 .WithTitle(T("title.progress", lng, episode.Number))
                 .WithThumbnailUrl(project.PosterUri)
                 .WithDescription(progress.ToString())

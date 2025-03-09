@@ -156,7 +156,8 @@ namespace Nino.Utilities
             return new
             {
                 author = new {
-                    name = embed.Author?.Name
+                    name = embed.Author?.Name,
+                    url = embed.Author?.Url,
                 },
                 title = embed.Title,
                 description = embed.Description,
