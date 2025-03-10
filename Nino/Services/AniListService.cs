@@ -68,6 +68,9 @@ namespace Nino.Services
                     await JsonSerializer.SerializeAsync(stream, apiResponse);
                     return apiResponse;
                 }
+                
+                Log.Error($"AniList status code for ID {anilistId} is {response.StatusCode}");
+                return new ApiResponse { Error = $"error.anilist.generic" };
             }
             catch (HttpRequestException e) when (e.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
@@ -91,7 +94,6 @@ namespace Nino.Services
                 Log.Error(e.Message);
                 return new ApiResponse { Error = $"error.anilist.generic" };
             }
-            return new ApiResponse { Error = $"error.anilist.generic" };
         }
 
         private static StringContent CreateQuery(int id) =>

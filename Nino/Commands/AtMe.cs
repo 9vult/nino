@@ -48,10 +48,17 @@ namespace Nino.Commands
 
                 if (project.AniListId is not null)
                 {
-                    var airedEpisodeNumbers = await AirDateService.AiredEpisodes((int)project.AniListId);
-                    episodes = episodes
-                        .Where(e => !Utils.EpisodeNumberIsNumber(e.Number, out var dNum) ||
-                                    airedEpisodeNumbers.Contains(dNum + (project.AniListOffset ?? 0)));
+                    try
+                    {
+                        var airedEpisodeNumbers = await AirDateService.AiredEpisodes((int)project.AniListId);
+                        episodes = episodes
+                            .Where(e => !Utils.EpisodeNumberIsNumber(e.Number, out var dNum) ||
+                                        airedEpisodeNumbers.Contains(dNum + (project.AniListOffset ?? 0)));
+                    }
+                    catch (Exception e)
+                    {
+                        return await Response.Fail(T(e.Message, lng), interaction);
+                    }
                 }
 
                 episodeCandidates.Add(project, episodes.ToList());
