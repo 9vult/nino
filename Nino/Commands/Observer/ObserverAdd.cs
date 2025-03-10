@@ -50,7 +50,7 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.invalidServerId", lng), interaction);
             var originGuild = Nino.Client.GetGuild(originGuildId);
             if (originGuild == null)
-                return await Response.Fail(T("error.noSuchServer", lng), interaction);
+                return await Response.Fail(T("error.noSuchServer", lng, originGuildIdStr), interaction);
 
             // Verify project and user access
             var project = Utils.ResolveAlias(alias, interaction, observingGuildId: originGuildId);
@@ -61,13 +61,18 @@ namespace Nino.Commands
             if (project.IsPrivate && !Utils.VerifyUser(interaction.User.Id, project))
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
+            // Use existing observer ID, if it exists
+            var observerId = Cache.GetObservers().Where(o => o.GuildId == guildId)
+                .FirstOrDefault(o => o.OriginGuildId == originGuildId && o.ProjectId == project.Id)
+                ?.Id ?? AzureHelper.CreateObserverId();
+
             var observer = new Records.Observer
             {
-                Id = AzureHelper.CreateObserverId(),
+                Id = observerId,
                 GuildId = guildId,
                 OriginGuildId = originGuildId,
-                OwnerId = interaction.User.Id,
                 ProjectId = project.Id,
+                OwnerId = interaction.User.Id,
                 Blame = blame,
                 ProgressWebhook = updatesUrl,
                 ReleasesWebhook = releasesUrl,
