@@ -31,14 +31,18 @@ namespace Localizer
         public Dictionary<string, string> SerializationSingular
         {
             get => new(Singular);
-            init => Singular = value.ToFrozenDictionary();
+            init => Singular = value
+                .Where(l => !string.IsNullOrEmpty(l.Value))
+                .ToFrozenDictionary();
         }
 
         [JsonPropertyName("plural")]
         public Dictionary<string, Dictionary<string, string>> SerializationPlural
         {
             get => new(Plural);
-            init => Plural = value.ToFrozenDictionary();
+            init => Plural = value
+                .Where(l => !l.Value.Any(p => string.IsNullOrEmpty(p.Value)))
+                .ToFrozenDictionary();
         }
     }
 }
