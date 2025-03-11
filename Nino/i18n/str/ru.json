@@ -1,10 +1,4 @@
 {
-  "locale": "ru",
-  "pluralDefinitions": {
-    "one": "x % 10 = 1 AND x % 100 <> 11",
-    "few": "(x % 10 >= 2 AND x % 10 <= 4) AND (x % 100 < 12 OR x % 100 > 14)",
-    "many": "x % 10 = 0 OR (x % 10 >= 5 AND x % 10 <= 9) OR (x % 100 >= 11 AND x % 100 <= 14)"
-  },
   "singular": {
     "additionalStaff.added": "Я добавила {{staff|1}} на позицию {{abbreviation|2}} в серии {{episode|3}}.",
     "additionalStaff.removed": "Позиция {{abbreviation|1}} убрана из серии {{episode|2}}.",

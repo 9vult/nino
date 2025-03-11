@@ -1,6 +1,6 @@
-﻿using MathEvaluation;
-using MathEvaluation.Context;
+﻿using ICU4N.Text;
 using System.Collections.Frozen;
+using System.Globalization;
 using System.Text.Json;
 
 namespace Localizer
@@ -80,8 +80,8 @@ namespace Localizer
             {
                 if (!args.TryGetValue(pluralName, out var pluralObj))
                     throw new LocalizationException($"No match found for plural {pluralName}");
-                decimal pluralValue = Convert.ToDecimal(pluralObj);
-                target = ResolvePluralTarget(pluralValue, table.PluralDefinitions, pluralTargets);
+                var pluralValue = Convert.ToDouble(pluralObj);
+                target = ResolvePluralTarget(pluralValue, table.PluralRules, pluralTargets);
             }
 
             if (target == null) throw new LocalizationException($"No suitable singular or plural match found for {key}.");
@@ -89,7 +89,7 @@ namespace Localizer
             var parts = StringParser.Parse(target);
             foreach (var part in parts)
             {
-                string name = part.Name;
+                var name = part.Name;
                 if (args.TryGetValue(name, out var arg))
                 {
                     target = StringParser.Interpolate(target, part, arg);
@@ -116,11 +116,15 @@ namespace Localizer
                         using StreamReader sr = new(file);
                         var table = JsonSerializer.Deserialize<Localization>(sr.ReadToEnd(), options);
                         if (table == null) continue;
-                        locales.Add(table.Locale, table);
+
+                        var locale = Path.GetFileNameWithoutExtension(file);
+                        table.PluralRules = PluralRules.GetInstance(new CultureInfo(locale));
+                        
+                        locales.Add(locale, table);
                     }
                     catch (Exception)
                     {
-                        continue;
+                        // ignored
                     }
                 }
             }
@@ -128,35 +132,20 @@ namespace Localizer
             {
                 Console.WriteLine(e.Message);
             }
-            _locales = FrozenDictionary.ToFrozenDictionary(locales);
+            _locales = locales.ToFrozenDictionary();
         }
 
         /// <summary>
         /// Resolve the correct plural form to use
         /// </summary>
-        /// <param name="value">Decimal value</param>
-        /// <param name="definitions">Plural definitions for the locale</param>
+        /// <param name="value">Double value</param>
+        /// <param name="rules">Plural rules to use</param>
         /// <param name="targets">Potential plural forms</param>
         /// <returns>Target matching the correct plural form</returns>
-        /// <exception cref="LocalizationException"></exception>
-        /// <exception cref="FormatException">An equation was malformed</exception>
-        /// <exception cref="NotSupportedException">An equation did something not supported</exception>
-        private static string ResolvePluralTarget(decimal value, FrozenDictionary<string, string> definitions, Dictionary<string, string> targets)
+        /// <exception cref="LocalizationException">Plural of type was not found</exception>
+        private static string ResolvePluralTarget(double value, PluralRules? rules, Dictionary<string, string> targets)
         {
-            var context = new ProgrammingMathContext();
-            string? pluralType = null;
-            foreach (var definition in definitions)
-            {
-                bool match = definition.Value
-                    .SetContext(context)
-                    .BindVariable(value, "x")
-                    .EvaluateBoolean();
-
-                if (!match) continue;
-                pluralType = definition.Key;
-            }
-
-            pluralType ??= "other";
+            var pluralType = rules?.Select(value) ?? "other";
 
             if (!targets.TryGetValue(pluralType, out var target))
                 throw new LocalizationException($"Plural type {pluralType} was not found.");

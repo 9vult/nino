@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 
 namespace Localizer
 {
@@ -24,16 +19,13 @@ namespace Localizer
             try
             {
                 var matches = Interpolation().Matches(input);
-                foreach (Match match in matches.Cast<Match>())
+                parts.AddRange(matches.Select(match => new Part
                 {
-                    parts.Add(new Part
-                    {
-                        // match.Groups[0] == match.Value
-                        Name = match.Groups[1].Value,
-                        Index = int.Parse(match.Groups[2].Value),
-                        Match = match.Value
-                    });
-                }
+                    // match.Groups[0] == match.Value
+                    Name = match.Groups[1].Value,
+                    Index = int.Parse(match.Groups[2].Value),
+                    Match = match.Value
+                }));
             }
             catch (Exception e)
             {
@@ -56,21 +48,21 @@ namespace Localizer
     }
 
     /// <summary>
-    /// Represents the part of a string that's a interpolation target
+    /// Represents the part of a string that's an interpolation target
     /// </summary>
     internal class Part
     {
         /// <summary>
         /// Name of the value
         /// </summary>
-        public required string Name { get; set; }
+        public required string Name { get; init; }
         /// <summary>
         /// Index of the value
         /// </summary>
-        public required int Index { get; set; }
+        public required int Index { get; init; }
         /// <summary>
         /// Full match
         /// </summary>
-        public required string Match { get; set; }
+        public required string Match { get; init; }
     }
 }

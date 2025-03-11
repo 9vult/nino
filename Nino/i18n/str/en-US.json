@@ -1,8 +1,4 @@
 {
-  "locale": "en-US",
-  "pluralDefinitions": {
-    "one": "x = 1"
-  },
   "singular": {
     "additionalStaff.added": "Added {{staff|1}} for position {{abbreviation|2}} for episode {{episode|3}}.",
     "additionalStaff.removed": "Removed position {{abbreviation|1}} from {{episode|2}}.",
