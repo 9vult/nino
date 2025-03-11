@@ -35,9 +35,10 @@ or wherever the built executable is. For hosting, place it next to the executabl
 
 ## Localization
 
-Localization pull requests are more than welcome! Please see the [Localization Docs](./docs/localization.md) for more information.
+Please see the [Localization Docs](./docs/localization.md) for more information.
 
-<img src="https://docs.google.com/spreadsheets/d/e/2PACX-1vSE6onkEKAwG4d2vT44LxWv0jmYfBUKln_Oi3uzYB47IS7Bf9E4bqCc6-Wyc__0QeLbTiGYdvkvonRo/pubchart?oid=1917133197&format=image" alt="Localization progress by language" width="75%">
+TL;DR: For text content, see [POEditor](https://poeditor.com/join/project/jScNllHwy9), for commands, make a pull request.
+
 
 ## License
 

@@ -10,19 +10,16 @@ Localizing Nino's commands is relatively straightforward, if a bit repetitive. Y
 - Several command options, namely `project`, `episode`, and `abbreviation`, are used numerous times throughout the bot. I would strongly suggest using find+replace for these items for your sanity.
 - Choice names appear both in the command localization and the string localization. Make sure to be consistent!
 
+Finally, make a pull request!
+
 ## Localizing Strings
 
-String localization is a bit less straightforward. To start with, you will need to create a `[locale].json` in the `Nino/i18n/str` directory. I'd recommend using `en-US.json` as a starting point.
-
-The strings file has 2 sections to be aware of:
-
-1. `"singular": {}`. The bulk of the file, these are all the non-plural strings.
-2. `"plural": {}`. The plural section. Define a translation for each rule, plus an "other" rule. Following the above examples, English should have `one` and `other` rules, and Russian should have `one`, `few`, `many`, and `other` rules.
+String localization is now super straightforward! Visit the project on [POEditor](https://poeditor.com/join/project/jScNllHwy9) and start translating!
 
 A key feature of string localization is interpolation. Interpolation is how the real values will be injected into the string. Nino's string localization template follows this format: `{name_#}`, where `name` is the name of the value being inserted, and `#` is the interpolation index. **Do not change these values!** You are free and encouraged to re-order the templates as needed, but do not change the interpolation name or index!
 
 ## A word of advice
 
-The number of strings and commands can be daunting, so I'd reccommend starting with "public" values, like those for `/blame`, `/release`, `/done`, etc.
+The number of strings and commands can be daunting, so I'd recommend starting with "public" values, like those for `/blame`, `/release`, `/done`, etc.
 
 Good luck, and thanks again for considering localizing Nino into your language!
