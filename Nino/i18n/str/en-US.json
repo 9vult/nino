@@ -116,7 +116,7 @@
     "missingPermsPrecheck.question.conga": "I do not have sufficient permissions to publish Conga pings to {channel_1}!\nDo you want to continue anyway?",
     "missingPermsPrecheck.yes.button": "We'll do it live!",
     "missingPermsPrecheck.yes.response": "Alrighty, then, if you say so!",
-    "nino.about": "Version: {veraion_1}\nAuthor: <@248600185423396866>",
+    "nino.about": "Version: {version_1}\nAuthor: <@248600185423396866>",
     "nino.help.body": "Select a topic to learn about!",
     "nino.help.prompt": "I want to...",
     "nino.help.prompt.filled": "I want to {title_1}",
