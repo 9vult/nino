@@ -4,7 +4,7 @@ namespace Localizer
 {
     internal static partial class StringParser
     {
-        [GeneratedRegex(@"\{\{([^\|]+)\|([0-9]+)\}\}")]
+        [GeneratedRegex(@"\{([^_]+)_([0-9]+)\}")]
         private static partial Regex Interpolation();
 
         /// <summary>
