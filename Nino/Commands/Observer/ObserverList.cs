@@ -30,6 +30,8 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.noObservers", lng), interaction);
 
             // End the interaction
+            if (!PermissionChecker.CheckPermissions(interaction.Channel.Id))
+                await Response.Info(T("error.missingChannelPerms", lng, $"<#{interaction.Channel.Id}>"), interaction);
             await interaction.FollowupAsync(T("observer.list.response", lng));
             
             var projects = Cache.GetProjects();

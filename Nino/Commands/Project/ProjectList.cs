@@ -30,6 +30,8 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.noProjects", lng), interaction);
 
             // End the interaction
+            if (!PermissionChecker.CheckPermissions(interaction.Channel.Id))
+                await Response.Info(T("error.missingChannelPerms", lng, $"<#{interaction.Channel.Id}>"), interaction);
             await interaction.FollowupAsync(T("observer.list.response", lng));
 
             var tblData = projects.Select(p => new Dictionary<string, string>
@@ -49,7 +51,7 @@ namespace Nino.Commands
                 sb.AppendLine("```");
 
                 // Send table
-                await interaction.Channel.SendMessageAsync(text: sb.ToString(), allowedMentions: new AllowedMentions(AllowedMentionTypes.None));
+                await interaction.FollowupAsync(text: sb.ToString(), allowedMentions: new AllowedMentions(AllowedMentionTypes.None));
             }
 
             return ExecutionResult.Success;
