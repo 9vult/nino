@@ -33,12 +33,12 @@ namespace Nino.Commands
             alias = alias.Trim();
             newValue = newValue.Trim();
 
-            // Verify project and user - Owner required
+            // Verify project and user - Owner or Admin required
             var project = Utils.ResolveAlias(alias, interaction);
             if (project == null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
-            if (!Utils.VerifyUser(interaction.User.Id, project, excludeAdmins: true))
+            if (!Utils.VerifyUser(interaction.User.Id, project))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             if (project.IsArchived)
