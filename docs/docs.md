@@ -23,6 +23,10 @@ Some additional setup options:
 
 > **Info**: If you are coming from Deschtimes and have been using its Joint feature to relay progress updates and use /blame in another server, see the section for [Adding an Observer](#observer-add).
 
+#### Creating a Project from a JSON file
+
+If you are creating many projects or want a template, you can [create a project from a JSON file](./create-from-json.md).
+
 ### Server Options
 
 Once you've created a project in your server, you have the option to set some server settings. For more details, see the section on Server Commands.
