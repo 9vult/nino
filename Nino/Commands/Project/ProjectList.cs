@@ -7,9 +7,9 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    public partial class Observer
+    public partial class ProjectManagement
     {
-        [SlashCommand("list", "List the projects being observed by this server")]
+        [SlashCommand("list", "List the projects in this server")]
         public async Task<RuntimeResult> List()
         {
             var interaction = Context.Interaction;
@@ -21,27 +21,24 @@ namespace Nino.Commands
             var member = guild.GetUser(interaction.User.Id);
             if (!Utils.VerifyAdministrator(member, guild)) return await Response.Fail(T("error.notPrivileged", lng), interaction);
             
-            Log.Trace($"Listing observers for {guildId}");
+            Log.Trace($"Listing projects for {guildId}");
 
-            // Get observers
-            var observers = Cache.GetObservers().Where(o => o.GuildId == guildId).ToList();
+            // Get projects
+            var projects = Cache.GetProjects(guildId);
 
-            if (observers.Count == 0)
-                return await Response.Fail(T("error.noObservers", lng), interaction);
+            if (projects.Count == 0)
+                return await Response.Fail(T("error.noProjects", lng), interaction);
 
             // End the interaction
             await interaction.FollowupAsync(T("observer.list.response", lng));
-            
-            var projects = Cache.GetProjects();
 
-            var tblData = observers.Select(o => new Dictionary<string, string>
+            var tblData = projects.Select(p => new Dictionary<string, string>
             {
-                [T("observer.list.server", lng)] = o.OriginGuildId.ToString(),
-                [T("observer.list.project", lng)] = projects.FirstOrDefault(p => p.Id == o.ProjectId)?.Nickname ?? "Unknown",
-                [T("observer.list.blame", lng)] = o.Blame ? T("observer.list.yes", lng) : T("observer.list.no", lng),
-                [T("observer.list.updates", lng)] = !string.IsNullOrEmpty(o.ProgressWebhook) ? T("observer.list.yes", lng) : T("observer.list.no", lng),
-                [T("observer.list.releases", lng)] = !string.IsNullOrEmpty(o.ReleasesWebhook) ? T("observer.list.yes", lng) : T("observer.list.no", lng),
-                [T("observer.list.role", lng)] = o.RoleId is not null ? T("observer.list.yes", lng) : T("observer.list.no", lng),
+                [T("project.list.nickname", lng)] = p.Nickname,
+                [T("project.list.owner", lng)] = Nino.Client.GetUser(p.OwnerId)?.Username ?? $"<@{p.OwnerId}>",
+                [T("project.list.isPrivate", lng)] = p.IsPrivate ? T("observer.list.yes", lng) : T("observer.list.no", lng),
+                [T("project.list.isArchived", lng)] = p.IsArchived ? T("observer.list.yes", lng) : T("observer.list.no", lng),
+                [T("project.list.episodeCount", lng)] = Cache.GetEpisodes(p.Id).Count.ToString()
             }).Chunk(10).ToList();
 
             foreach (var chunk in tblData)

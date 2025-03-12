@@ -768,6 +768,10 @@
       }
     }
   },
+  "list": {
+    "name": "list",
+    "description": "List the projects in this server"
+  },
   "release": {
     "name": "release",
     "description": "Release something to the world!",
