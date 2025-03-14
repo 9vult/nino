@@ -39,6 +39,13 @@ Please see the [Localization Docs](./docs/localization.md) for more information.
 
 TL;DR: For text content, see [POEditor](https://poeditor.com/join/project/jScNllHwy9), for commands, make a pull request.
 
+### Localization Contributions
+
+Big thanks to everyone who's contributed!
+
+| Language | Contributor |
+| -------- | ----------- |
+| Russian  | astiob<br/>JohnnyZB |
 
 ## License
 
