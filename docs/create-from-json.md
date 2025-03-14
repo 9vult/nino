@@ -9,7 +9,7 @@ If you have multiple projects to create, or you have a template you use often, y
     // Required fields
     Nickname: string,
     Title: string,
-    Type: "TV" | "Movie" | "BD",
+    Type: "TV" | "Movie" | "BD" | "OVA" | "ONA",
     Length: uint,
     PosterUri: string,
     IsPrivate: boolean,

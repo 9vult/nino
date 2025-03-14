@@ -36,6 +36,8 @@
     "choice.project.type.tv": "TV",
     "choice.project.type.movie": "Movie",
     "choice.project.type.bd": "BD",
+    "choice.project.type.ova": "OVA",
+    "choice.project.type.ona": "ONA",
     "choice.release.type.episode": "Episode",
     "choice.release.type.volume": "Volume",
     "choice.release.type.batch": "Batch",
