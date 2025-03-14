@@ -167,7 +167,7 @@
     "observer.list.updates": "Updates",
     "observer.list.yes": "Yes",
     "observer.removed": "Unsubscribed from `{project_1}`.",
-    "progress.bulk": "I see you've been busy.\n**{taskName_1}** for episodes {start_episode_2} through {end_episode_3} have been updated.",
+    "progress.bulk": "I see you've been busy.\n**{taskName_1}** for episodes {startEpisode_2} through {endEpisode_3} have been updated.",
     "progress.done": "Nice job getting the **{taskName_1}** for episode {episode_2} done.",
     "progress.done.conga": "{staff_1}, episode {episode_2}'s **{role_3}** is At You!",
     "progress.done.conga.reminder": "{staff_1}, episode {episode_2}'s **{role_3}** is still At You!",
