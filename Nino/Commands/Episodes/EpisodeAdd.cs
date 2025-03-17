@@ -101,7 +101,8 @@ namespace Nino.Commands
                     else
                     {
                         fullSend = true;
-                        finalBody = T("episode.add.proceed.response", lng, episodeNumbersToAdd.Count);
+                        var bodyDict = new Dictionary<string, object>() { ["number"] = episodeNumbersToAdd.Count };
+                        finalBody = T("episode.add.proceed.response", lng, bodyDict);
                     }
                 }
                 
@@ -133,7 +134,9 @@ namespace Nino.Commands
                 await batch.ExecuteAsync();
                 
                 Log.Info($"Added {bulkEpisodes.Count} episodes to {project}");
-                successDescription = T("episode.added.bulk", lng, bulkEpisodes.Count, project.Nickname);
+                var replyDict = new Dictionary<string, object>
+                    { ["number"] = bulkEpisodes.Count, ["project"] = project.Nickname };
+                successDescription = T("episode.added.bulk", lng, replyDict);
             }
 
             // Send success embed

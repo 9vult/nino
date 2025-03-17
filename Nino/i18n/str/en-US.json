@@ -46,10 +46,8 @@
     "choice.progress.type.undone": "Undone",
     "choice.progress.type.skipped": "Skipped",
     "debug.cacheRebuild": "Cache rebuilt!",
-    "episode.add.proceed.response": "You got it! {count_1} episodes, coming right up!",
     "episode.add.cancel.response": "Okay, I won't add those.",
     "episode.added": "I added episode {number_1} to `{project_2}` for you.",
-    "episode.added.bulk": "I added {count_1} episodes to `{project_2}` for you.",
     "episode.displayListOfCandidates": "Please make sure these are the episodes you want to add:\n\n{candidates_1}",
     "episode.lastUpdated": "Last updated {rel_1}",
     "episode.removed": "I removed episode {number_1} from `{project_2}` for you.",
@@ -157,7 +155,11 @@
     "nino.help.transfer.title": "Transfer my project to another person, server, or bot",
     "nino.help.weight.body": "You can use `/keystaff set-weight` and `/additionalstaff set-weight` to change the display order of tasks.\nThe default weight for Key Staff positions is the number they were added in, so the first task added has a weight of `1`. Additional Staff have a default weight of `1000000`, so setting any Key Staff's weight to `>1000000` will place it after Additional Staff positions (useful for Quality Check, for example).",
     "nino.help.weight.title": "Re-order tasks",
-    "nino.stats": "- Nino is currently managing **{totalProjects_1}** projects across **{guilds_2}** servers.\n- Of **{totalEpisodes_3}** total episodes, **{totalDonePercent_4}%** are complete.\n\n- There are **{ongoingProjects_5}** ongoing projects and **{archivedProjects_6}** archived projects.\n- Of **{ongoingEpisodes_7}** episodes from ongoing projects, **{ongoingDonePercent_8}%** are complete.\n\n- There are also **{observerCount_9}** observers observing **{uniqueObservers_10}** unique projects.",
+    "nino.stats.projects.total": "- Nino is currently managing {projectCount_1} {serverCount_2}.",
+    "nino.stats.episodes.total": "- Of {episodeCount_1}, **{totalDonePercent_2}%** are complete.",
+    "nino.stats.projects.details": "- {ongoingCount_1} and {archivedCount_2}.",
+    "nino.stats.episodes.details": "- Of {ongoingCount_1} from ongoing projects, **{ongoingDonePercent_2}%** are complete.",
+    "nino.stats.observers.total": "- {observerCount_1} observing {projectCount_2}.",
     "observer.added": "Subscribed to `{project_1}` from **{originGuildName_2}**.",
     "observer.list.blame": "Blame",
     "observer.list.no": "No",
@@ -254,13 +256,53 @@
     "title.youDidIt": "You did it!"
   },
   "plural": {
+    "episode.add.proceed.response": {
+      "one": "You got it! {number_1} episode, coming right up!",
+      "other": "You got it! {number_1} episodes, coming right up!"
+    },
+    "episode.added.bulk": {
+      "one": "I added {number_1} episode to `{project_2}` for you.",
+      "other": "I added {number_1} episodes to `{project_2}` for you."
+    },
     "progress.done.inTheDust.doItNow": {
       "one": "{taskName_1} is now {count_2} episode ahead.",
       "other": "{taskName_1} is now {count_2} episodes ahead."
     },
     "progress.bulk.episodeComplete": {
-      "one": "Also, {count_1} episode is now complete: `{list_2}`",
-      "other": "Also, {count_1} episodes are now complete: `{list_2}`"
+      "one": "Also, {number_1} episode is now complete: `{list_2}`",
+      "other": "Also, {number_1} episodes are now complete: `{list_2}`"
+    },
+    "nino.stats.projects.total.projectCount": {
+      "one": "**{number_1}** project",
+      "other": "**{number_1}** projects"
+    },
+    "nino.stats.projects.total.guildCount": {
+      "one": "from **{number_1}** server",
+      "other": "across **{number_1}** servers"
+    },
+    "nino.stats.episodes.total.episodeCount": {
+      "one": "**{number_1}** episode",
+      "other": "**{number_1}** episodes"
+    },
+    "nino.stats.projects.details.ongoingCount": {
+      "one": "There is **{number_1}** ongoing project",
+      "other": "There are **{number_1}** ongoing projects"
+    },
+    "nino.stats.projects.details.archivedCount": {
+      "one": "**{number_1}** archived project",
+      "other": "**{number_1}** archived projects"
+    },
+    "nino.stats.episodes.details.ongoingCount": {
+      "one": "**{number_1}** episode",
+      "other": "**{number_1}** episodes"
+    },
+    "nino.stats.observers.observerCount": {
+      "one": "There is also **{number_1}** observer",
+      "other": "There are also **{number_1}** observers"
+    },
+    "nino.stats.observers.projectCount": {
+      "one": "**{number_1}** unique project",
+      "other": "**{number_1}** unique projects"
     }
   }
 }

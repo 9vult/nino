@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using System.Text;
+using Discord;
 using Discord.Interactions;
 using Nino.Handlers;
 using Nino.Utilities;
@@ -29,38 +30,60 @@ namespace Nino.Commands
                 .Where(g => g.Any(e => !e.Done) && allowedOngoingProjects.Contains(g.Key))
                 .ToDictionary(g => g.Key, g => g.ToList());
             
-            var guildCount = Cache.GetProjectGuilds().Count;
+            var totalGuilds = Cache.GetProjectGuilds().Count;
             var totalProjects = Cache.GetProjects().Count;
             var ongoingProjects = ongoing.Count;
             var totalEpisodes = Cache.GetEpisodes().Count;
             var totalDoneEpisodes = Cache.GetEpisodes().Count(ep => ep.Done);
             var ongoingProjectEpisodes = ongoing.Sum(kv => kv.Value.Count);
             var ongoingProjectDoneEpisodes = ongoing.Sum(kv => kv.Value.Count(ep => ep.Done));
-            var observerCount = Cache.GetObservers().Count;
+            var totalObservers = Cache.GetObservers().Count;
             var uniqueObservers = Cache.GetObservers().GroupBy(o => o.ProjectId).Count();
             
             var totalDoneEpisodesPercent = Math.Round(totalDoneEpisodes / (decimal)totalEpisodes * 100.0m, 2);
             var totalDoneOngoingProjectEpisodesPercent = Math.Round(ongoingProjectDoneEpisodes / (decimal)ongoingProjectEpisodes * 100.0m, 2);
 
+            // String components
+            var projectsTotalPart = T("nino.stats.projects.total", lng,
+                T("nino.stats.projects.total.projectCount", lng, PluralDict(totalProjects)),
+                T("nino.stats.projects.total.guildCount", lng, PluralDict(totalGuilds))
+            );
+            var episodesTotalPart = T("nino.stats.episodes.total", lng,
+                T("nino.stats.episodes.total.episodeCount", lng, PluralDict(totalEpisodes)),
+                totalDoneEpisodesPercent
+            );
+            var projectsDetailsPart = T("nino.stats.projects.details", lng,
+                T("nino.stats.projects.details.ongoingCount", lng, PluralDict(ongoingProjects)),
+                T("nino.stats.projects.details.archivedCount", lng, PluralDict(archivedCount))
+            );
+            var episodesDetailsPart = T("nino.stats.episodes.details", lng,
+                T("nino.stats.episodes.details.ongoingCount", lng, PluralDict(ongoingProjectEpisodes)),
+                totalDoneOngoingProjectEpisodesPercent
+            );
+            var observersPart = T("nino.stats.observers.total", lng,
+                T("nino.stats.observers.observerCount", lng, PluralDict(totalObservers)),
+                T("nino.stats.observers.projectCount", lng, PluralDict(uniqueObservers))
+            );
+
+            var sb = new StringBuilder();
+            sb.AppendLine(projectsTotalPart);
+            sb.AppendLine(episodesTotalPart);
+            sb.AppendLine();
+            sb.AppendLine(projectsDetailsPart);
+            sb.AppendLine(episodesDetailsPart);
+            sb.AppendLine();
+            sb.AppendLine(observersPart);
+            
             var embed = new EmbedBuilder()
                 .WithTitle(T("title.stats", lng))
-                .WithDescription(T("nino.stats", lng, 
-                    totalProjects,
-                    guildCount,
-                    totalEpisodes,
-                    totalDoneEpisodesPercent,
-                    ongoingProjects,
-                    archivedCount,
-                    ongoingProjectEpisodes,
-                    totalDoneOngoingProjectEpisodesPercent,
-                    observerCount,
-                    uniqueObservers
-                ))
+                .WithDescription(sb.ToString())
                 .WithUrl("https://github.com/9vult/nino")
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 
             return ExecutionResult.Success;
         }
+
+        private Dictionary<string, object> PluralDict(object value) => new() { ["number"] = value };
     }
 }
