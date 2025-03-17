@@ -151,7 +151,7 @@
     "nino.help.release.title": "Release/publish something",
     "nino.help.roster.body": "Project members can use `/roster` to view assignees for an episode.",
     "nino.help.roster.title": "See who's assigned to a task",
-    "nino.help.staffswap.body": "For Key Staff positions:\n- To swap someone in for a single episode, use `/keystaff pinch-hitter set`.\n- To swap someone in for all episodes, use `/keystaff swap`.\n\nFor Additionsl Staff positions, use `/additionalstaff swap`.",
+    "nino.help.staffswap.body": "For Key Staff positions:\n- To swap someone in for a single episode, use `/keystaff pinch-hitter set`.\n- To swap someone in for all episodes, use `/keystaff swap`.\n\nFor Additional Staff positions, use `/additionalstaff swap`.",
     "nino.help.staffswap.title": "Change who's doing what",
     "nino.help.transfer.body": "- Transferring to another owner: `/project transfer-ownership`\n- Transferring to another server: `/project transfer-server` in the new server\n- Transferring to another bot: `/project export`",
     "nino.help.transfer.title": "Transfer my project to another person, server, or bot",
