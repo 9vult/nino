@@ -44,10 +44,8 @@
     "choice.progress.type.undone": "Не выполнено",
     "choice.progress.type.skipped": "Пропущено",
     "debug.cacheRebuild": "Кэш перестроен!",
-    "episode.add.proceed.response": "Без проблем! Держи {count_1} серий!",
     "episode.add.cancel.response": "Хорошо, эти не добавлю.",
     "episode.added": "Я добавила серию {number_1} в проект `{project_2}`.",
-    "episode.added.bulk": "Я добавила {count_1} серий в проект `{project_2}`.",
     "episode.displayListOfCandidates": "Убедитесь, что будут добавлены именно эти эпизоды: \n\n{candidates_1}",
     "episode.lastUpdated": "Обновлено {rel_1}",
     "episode.removed": "Я убрала серию {number_1} из проекта `{project_2}`.",
@@ -154,7 +152,6 @@
     "nino.help.transfer.title": "Перенести мой проект другому владельцу, на другой сервер, или другому боту",
     "nino.help.weight.body": "Используйте команды `/keystaff set-weight` и `/additionalstaff set-weight` для изменения отображения порядка задач.\nПо умолчанию, вес ключевых позиций равен порядку их добавления, т.е. вес первой задачи будет `1`. Вес дополнительных позиций начинается с `1000000`, поэтому, если назначить вес ключевой позиции `>1000000`, то она будет располагаться после дополнительных в списке (может быть полезно, например, для QC).",
     "nino.help.weight.title": "Изменить порядок задач",
-    "nino.stats": "- В данный момент Nino управляет **{totalProjects_1}** проектами в **{guilds_2}** серверах.\n- Из **{totalEpisodes_3}** серий, **{totalDonePercent_4}%** завершены.\n\n- **{ongoingProjects_5}** проектов находятся в работе и **{archivedProjects_6}** проектов архивировано.\n- Среди проектов находящихся в работе, из **{ongoingEpisodes_7}** серий завершено **{ongoingDonePercent_8}%**.\n\n- **{observerCount_9}** наблюдателей следят за **{uniqueObservers_10}** проектами.",
     "observer.added": "Подписала на `{project_1}` из **{originGuildName_2}**.",
     "observer.list.blame": "Долги",
     "observer.list.no": "Нет",
@@ -250,8 +247,13 @@
     "project.list.isPrivate": "Приватный",
     "project.list.nickname": "Псевдоним",
     "project.list.owner": "Владелец",
-    "choice.project.type.ova": "",
-    "choice.project.type.ona": ""
+    "choice.project.type.ova": "OVA",
+    "choice.project.type.ona": "ONA",
+    "nino.stats.projects.total": "- В данный момент Nino управляет {projectCount_1} {serverCount_2}.",
+    "nino.stats.episodes.total": "- Из {episodeCount_1}, **{totalDonePercent_2}%** завершены.",
+    "nino.stats.projects.details": "- {ongoingCount_1} и {archivedCount_2}.",
+    "nino.stats.episodes.details": "- Среди проектов находящихся в работе, из {ongoingCount_1} завершены **{ongoingDonePercent_2}%**.",
+    "nino.stats.observers.total": "- {observerCount_1} за {projectCount_2}."
   },
   "plural": {
     "progress.done.inTheDust.doItNow": {
@@ -265,6 +267,66 @@
       "few": "Кроме этого, {count_1} серии теперь завершены: `{list_2}`",
       "many": "Кроме этого, {count_1} серий теперь завершены: `{list_2}`",
       "other": "Кроме этого, {count_1} серии теперь завершены: `{list_2}`"
+    },
+    "episode.add.proceed.response": {
+      "one": "Без проблем! Держи {number_1} серию!",
+      "few": "Без проблем! Держи {number_1} серии!",
+      "many": "Без проблем! Держи {number_1} серий!",
+      "other": "Без проблем! Держи {number_1} серии!"
+    },
+    "episode.added.bulk": {
+      "one": "Я добавила {number_1} серию в проект `{project_2}`.",
+      "few": "Я добавила {number_1} серии в проект `{project_2}`.",
+      "many": "Я добавила {number_1} серий в проект `{project_2}`.",
+      "other": "Я добавила {number_1} серии в проект `{project_2}`."
+    },
+    "nino.stats.projects.total.projectCount": {
+      "one": "**{number_1}** проектом",
+      "few": "**{number_1}** проектами",
+      "many": "**{number_1}** проектами",
+      "other": "**{number_1}** проектами"
+    },
+    "nino.stats.projects.total.guildCount": {
+      "one": "на **{number_1}** сервере",
+      "few": "на **{number_1}** серверах",
+      "many": "на **{number_1}** серверах",
+      "other": "на **{number_1}** серверах"
+    },
+    "nino.stats.episodes.total.episodeCount": {
+      "one": "**{number_1}** серии",
+      "few": "**{number_1}** серий",
+      "many": "**{number_1}** серий",
+      "other": "**{number_1}** серий"
+    },
+    "nino.stats.projects.details.ongoingCount": {
+      "one": "**{number_1}** проект находится в работе",
+      "few": "**{number_1}** проекта находятся в работе",
+      "many": "**{number_1}** проектов находятся в работе",
+      "other": "**{number_1}** проекта находятся в работе"
+    },
+    "nino.stats.projects.details.archivedCount": {
+      "one": "**{number_1}** проект архивирован",
+      "few": "**{number_1}** проекта архивированы",
+      "many": "**{number_1}** проектов архивированы",
+      "other": "**{number_1}** проекта архивированы"
+    },
+    "nino.stats.episodes.details.ongoingCount": {
+      "one": "**{number_1}** серии",
+      "few": "**{number_1}** серий",
+      "many": "**{number_1}** серий",
+      "other": "**{number_1}** серий"
+    },
+    "nino.stats.observers.observerCount": {
+      "one": "**{number_1}** наблюдатель следит",
+      "few": "**{number_1}** наблюдателя следят",
+      "many": "**{number_1}** наблюдателей следят",
+      "other": "**{number_1}** наблюдателя следят"
+    },
+    "nino.stats.observers.projectCount": {
+      "one": "**{number_1}** проектом",
+      "few": "**{number_1}** проектами",
+      "many": "**{number_1}** проектами",
+      "other": "**{number_1}** проектами"
     }
   }
 }
