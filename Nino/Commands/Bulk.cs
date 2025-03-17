@@ -10,6 +10,7 @@ using Nino.Records.Enums;
 using Nino.Utilities;
 using NLog;
 using System.Text;
+using Localizer;
 using static Localizer.Localizer;
 using Task = Nino.Records.Task;
 

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Localizer;
+using Newtonsoft.Json;
 using Nino.Records.Enums;
 
 namespace Nino.Records

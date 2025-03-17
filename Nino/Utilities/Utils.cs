@@ -4,6 +4,7 @@ using Microsoft.Azure.Cosmos;
 using Nino.Records;
 using NLog;
 using System.Globalization;
+using ICU4N.Globalization;
 
 namespace Nino.Utilities
 {
@@ -121,7 +122,9 @@ namespace Nino.Utilities
         public static string CanonicalizeEpisodeNumber(string input)
         {
             var trim = input.Trim();
-            return decimal.TryParse(trim, CultureInfo.InvariantCulture, out var decimalValue) ? decimalValue.ToString(CultureInfo.InvariantCulture) : trim;
+            var replaced = input.Replace(',', '.');
+            // If replacing commas with periods results in a decimal, use that. Otherwise, keep the commas.
+            return decimal.TryParse(replaced, CultureInfo.InvariantCulture, out var decimalValue) ? decimalValue.ToString(CultureInfo.InvariantCulture) : trim;
         }
         
         /// <summary>

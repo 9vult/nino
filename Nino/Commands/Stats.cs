@@ -1,7 +1,11 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 using Discord;
 using Discord.Interactions;
+using ICU4N;
+using Localizer;
 using Nino.Handlers;
+using Nino.Records.Enums;
 using Nino.Utilities;
 using NLog;
 using static Localizer.Localizer;
@@ -43,26 +47,28 @@ namespace Nino.Commands
             var totalDoneEpisodesPercent = Math.Round(totalDoneEpisodes / (decimal)totalEpisodes * 100.0m, 2);
             var totalDoneOngoingProjectEpisodesPercent = Math.Round(ongoingProjectDoneEpisodes / (decimal)ongoingProjectEpisodes * 100.0m, 2);
 
+            var nfi = NumberFormatInfo.GetInstance(GetCultureInfo(lng));
+            
             // String components
             var projectsTotalPart = T("nino.stats.projects.total", lng,
-                T("nino.stats.projects.total.projectCount", lng, PluralDict(totalProjects)),
-                T("nino.stats.projects.total.guildCount", lng, PluralDict(totalGuilds))
+                T("nino.stats.projects.total.projectCount", lng, PluralDict(totalProjects.ToString(nfi))),
+                T("nino.stats.projects.total.guildCount", lng, PluralDict(totalGuilds.ToString(nfi)))
             );
             var episodesTotalPart = T("nino.stats.episodes.total", lng,
-                T("nino.stats.episodes.total.episodeCount", lng, PluralDict(totalEpisodes)),
-                totalDoneEpisodesPercent
+                T("nino.stats.episodes.total.episodeCount", lng, PluralDict(totalEpisodes.ToString(nfi))),
+                totalDoneEpisodesPercent.ToString(nfi)
             );
             var projectsDetailsPart = T("nino.stats.projects.details", lng,
-                T("nino.stats.projects.details.ongoingCount", lng, PluralDict(ongoingProjects)),
-                T("nino.stats.projects.details.archivedCount", lng, PluralDict(archivedCount))
+                T("nino.stats.projects.details.ongoingCount", lng, PluralDict(ongoingProjects.ToString(nfi))),
+                T("nino.stats.projects.details.archivedCount", lng, PluralDict(archivedCount.ToString(nfi)))
             );
             var episodesDetailsPart = T("nino.stats.episodes.details", lng,
-                T("nino.stats.episodes.details.ongoingCount", lng, PluralDict(ongoingProjectEpisodes)),
-                totalDoneOngoingProjectEpisodesPercent
+                T("nino.stats.episodes.details.ongoingCount", lng, PluralDict(ongoingProjectEpisodes.ToString(nfi))),
+                totalDoneOngoingProjectEpisodesPercent.ToString(nfi)
             );
             var observersPart = T("nino.stats.observers.total", lng,
-                T("nino.stats.observers.observerCount", lng, PluralDict(totalObservers)),
-                T("nino.stats.observers.projectCount", lng, PluralDict(uniqueObservers))
+                T("nino.stats.observers.observerCount", lng, PluralDict(totalObservers.ToString(nfi))),
+                T("nino.stats.observers.projectCount", lng, PluralDict(uniqueObservers.ToString(nfi)))
             );
 
             var sb = new StringBuilder();

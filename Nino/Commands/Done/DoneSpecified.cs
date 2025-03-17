@@ -6,6 +6,7 @@ using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities;
 using System.Text;
+using Localizer;
 using static Localizer.Localizer;
 
 namespace Nino.Commands

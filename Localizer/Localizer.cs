@@ -8,6 +8,21 @@ namespace Localizer
     public static class Localizer
     {
         private static FrozenDictionary<string, Localization>? _locales;
+        private static readonly Dictionary<string, CultureInfo> Cultures = new();
+
+        /// <summary>
+        /// Get a culture info
+        /// </summary>
+        /// <param name="discordLocale">Discord locale code</param>
+        /// <returns>Culture info for the given locale, or the fallback locale</returns>
+        /// <exception cref="LocalizationException">Locale and fallback were not found</exception>
+        public static CultureInfo GetCultureInfo(string discordLocale)
+        {
+            var dotNetLocale = discordLocale.FromDiscordLocale().ToDotNetLocale(); // Convert Discord naming to .NET naming
+            if (Cultures.TryGetValue(dotNetLocale, out var cultureInfo)) return cultureInfo;
+            if (Cultures.TryGetValue(Configuration.FallbackLocale, out cultureInfo)) return cultureInfo;
+            throw new LocalizationException($"Fallback locale {Configuration.FallbackLocale} was not found.");
+        }
 
         private static Localization Fallback
         {
@@ -118,7 +133,9 @@ namespace Localizer
                         if (table == null) continue;
 
                         var locale = Path.GetFileNameWithoutExtension(file);
-                        table.PluralRules = PluralRules.GetInstance(new CultureInfo(locale));
+                        var ci = new CultureInfo(locale);
+                        Cultures.Add(locale.FromDiscordLocale().ToDotNetLocale(), ci); // Convert Discord naming to .NET naming
+                        table.PluralRules = PluralRules.GetInstance(ci);
                         
                         locales.Add(locale, table);
                     }

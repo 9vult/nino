@@ -3,6 +3,7 @@ using Discord;
 using Discord.Interactions;
 using Fergun.Interactive;
 using Fergun.Interactive.Pagination;
+using Localizer;
 using NaturalSort.Extension;
 using Nino.Handlers;
 using Nino.Records;

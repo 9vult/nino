@@ -1,5 +1,8 @@
-namespace Nino.Records.Enums;
+using System.Diagnostics.CodeAnalysis;
 
+namespace Localizer;
+
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 public enum Locale
 {
     EnglishUS,
@@ -155,6 +158,46 @@ public static class LocaleExtensions
             Locale.Ukrainian => "Ukrainian",
             Locale.Vietnamese => "Vietnamese",
             _ => type.ToString(),
+        };
+    }
+    
+    public static Locale FromDiscordLocale(this string discordLocale)
+    {
+        return discordLocale switch
+        {
+            "en-US" => Locale.EnglishUS,
+            "en-GB" => Locale.EnglishGB,
+            "id" => Locale.Indonesian,
+            "bg" => Locale.Bulgarian,
+            "zh-CN" => Locale.ChineseCN,
+            "zh-TW" => Locale.ChineseTW,
+            "hr" => Locale.Croatian,
+            "cs" => Locale.Czech,
+            "da" => Locale.Danish,
+            "nl" => Locale.Dutch,
+            "fi" => Locale.Finnish,
+            "fr" => Locale.French,
+            "de" => Locale.German,
+            "el" => Locale.Greek,
+            "hi" => Locale.Hindi,
+            "hu" => Locale.Hungarian,
+            "it" => Locale.Italian,
+            "ja" => Locale.Japanese,
+            "ko" => Locale.Korean,
+            "lt" => Locale.Lithuanian,
+            "no" => Locale.Norwegian,
+            "pl" => Locale.Polish,
+            "pt-BR" => Locale.PortugueseBR,
+            "ro" => Locale.Romanian,
+            "ru" => Locale.Russian,
+            "es-ES" => Locale.SpanishES,
+            "es-419" => Locale.Spanish419,
+            "sv-SE" => Locale.Swedish,
+            "th" => Locale.Thai,
+            "tr" => Locale.Turkish,
+            "uk" => Locale.Ukrainian,
+            "vi" => Locale.Vietnamese,
+            _ => throw new ArgumentException($"Unknown locale: {discordLocale}")
         };
     }
 }

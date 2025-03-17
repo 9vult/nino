@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Discord.WebSocket;
+using Localizer;
 using Microsoft.Azure.Cosmos;
 using Nino.Records;
 using Nino.Records.Enums;

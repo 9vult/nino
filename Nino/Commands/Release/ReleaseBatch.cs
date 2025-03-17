@@ -1,6 +1,7 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Localizer;
 using Nino.Handlers;
 using Nino.Records.Enums;
 using Nino.Utilities;

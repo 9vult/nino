@@ -2,6 +2,7 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Fergun.Interactive;
+using Localizer;
 using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
 using Nino.Records;
