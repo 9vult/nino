@@ -68,10 +68,10 @@ namespace Nino.Services
             return response?.StartDate?.Year == 1 ? null : response?.StartDate;
         }
 
-        public static async Task<bool> EpisodeAired(int aniListId, decimal episodeNumber)
+        public static async Task<bool?> EpisodeAired(int aniListId, decimal episodeNumber)
         {
             var time = await GetAirDate(aniListId, episodeNumber);
-            return time < DateTimeOffset.Now;
+            return time is not null ? time < DateTimeOffset.Now : null;
         }
 
         public static async Task<List<decimal>> AiredEpisodes(int aniListId)
