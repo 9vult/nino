@@ -12,6 +12,10 @@ namespace Nino.Services
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         private const string Cache = ".cache";
         private const string BaseUrl = "https://graphql.anilist.co";
+        private static readonly TimeSpan OneDay = TimeSpan.FromDays(1);
+        
+        private static readonly Dictionary<int, ApiResponse> RamCache = new();
+        
         public static bool AniListEnabled { get; set; } = true;
 
         private static readonly HttpClient Client = new(new HttpClientHandler
@@ -29,6 +33,15 @@ namespace Nino.Services
             if (!AniListEnabled)
                 return new ApiResponse { Error = "error.anilist.disabled" };
 
+            // Check if it's in the RAM cache
+            if (RamCache.TryGetValue(anilistId, out var ramValue))
+            {
+                if (DateTime.UtcNow - ramValue.SaveDate.ToUniversalTime() < OneDay)
+                    return ramValue;
+            }
+            
+            // It's either not in the RAM cache or it's too old, continue to the disk cache
+            
             var filename = Path.Combine(Cache, $"{anilistId}.json");
             PrepareCacheDirectory();
 
@@ -36,11 +49,16 @@ namespace Nino.Services
             {
                 // Check if the file exists and is younger than a day old
                 var fileInfo = new FileInfo(filename);
-                if (fileInfo.Exists && (DateTime.UtcNow - fileInfo.LastAccessTimeUtc < new TimeSpan(days: 1, 0, 0, 0)))
+                if (fileInfo.Exists && (DateTime.UtcNow - fileInfo.LastWriteTimeUtc < OneDay))
                 {
                     // Use the cached version
                     await using var stream = File.OpenRead(filename);
-                    return await JsonSerializer.DeserializeAsync<ApiResponse>(stream);
+                    var response = await JsonSerializer.DeserializeAsync<ApiResponse>(stream);
+                    
+                    if (response is null) return null;
+                    response.SaveDate = fileInfo.LastWriteTimeUtc;
+                    RamCache[anilistId] = response;
+                    return response;
                 }
             }
             catch (Exception e)
@@ -66,6 +84,9 @@ namespace Nino.Services
 
                     await using var stream = File.OpenWrite(filename);
                     await JsonSerializer.SerializeAsync(stream, apiResponse);
+                    
+                    apiResponse.SaveDate = DateTime.UtcNow;
+                    RamCache[anilistId] = apiResponse;
                     return apiResponse;
                 }
                 
@@ -124,15 +145,16 @@ namespace Nino.Services
 
     public class ApiResponse
     {
-        public Data? Data { get; set; }
+        public Data? Data { get; init; }
 
         [JsonIgnore]
         public List<AiringScheduleNode>? Episodes => Data?.Media?.AiringSchedule?.Nodes;
-        [JsonIgnore] public DateTimeOffset? StartDate => Data?.Media?.StartDate;
-
-
+        [JsonIgnore]
+        public DateTimeOffset? StartDate => Data?.Media?.StartDate;
         [JsonIgnore]
         public string? Error { get; set; }
+        [JsonIgnore]
+        public DateTime SaveDate { get; set; }
     }
 
     public class Data
