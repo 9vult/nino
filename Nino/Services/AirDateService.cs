@@ -71,7 +71,13 @@ namespace Nino.Services
         public static async Task<bool?> EpisodeAired(int aniListId, decimal episodeNumber)
         {
             var time = await GetAirDate(aniListId, episodeNumber);
-            return time is not null ? time < DateTimeOffset.Now : null;
+            if (time is not null) return time < DateTimeOffset.Now;
+            
+            // Estimation
+            var start = await GetStartDate(aniListId);
+            if (start is null) return null; // ???
+            
+            return start.Value.AddDays(7 * ((double)episodeNumber - 1)) < DateTimeOffset.Now;
         }
 
         public static async Task<List<decimal>> AiredEpisodes(int aniListId)

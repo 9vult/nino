@@ -125,7 +125,7 @@ namespace Nino.Commands
                     }
                     else if (project.AniListId is not null 
                              && Utils.EpisodeNumberIsNumber(episode.Number, out var decimalNumber)
-                             && await AirDateService.EpisodeAired((int)project.AniListId, decimalNumber + (project.AniListOffset ?? 0)) is true)
+                             && await AirDateService.EpisodeAired((int)project.AniListId, decimalNumber + (project.AniListOffset ?? 0)) is false)
                     {
                         if (type == BlameAllType.Normal)
                             sb.AppendLine($"_{T("blameall.notYetAired", lng)}_");
