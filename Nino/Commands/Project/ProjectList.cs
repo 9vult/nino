@@ -29,11 +29,6 @@ namespace Nino.Commands
             if (projects.Count == 0)
                 return await Response.Fail(T("error.noProjects", lng), interaction);
 
-            // End the interaction
-            if (!PermissionChecker.CheckPermissions(interaction.Channel.Id))
-                await Response.Info(T("error.missingChannelPerms", lng, $"<#{interaction.Channel.Id}>"), interaction);
-            await interaction.FollowupAsync(T("observer.list.response", lng));
-
             var tblData = projects.Select(p => new Dictionary<string, string>
             {
                 [T("project.list.nickname", lng)] = p.Nickname,
