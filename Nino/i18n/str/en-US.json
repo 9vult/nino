@@ -65,6 +65,7 @@
     "error.archived": "This project is archived.",
     "error.blameFailureGeneric": "The project is complete, or the specified episode could not be found.",
     "error.conga.alreadyExists": "{current_1} → {next_2} is already in the Conga line!",
+    "error.databaseError": "A database error occured.",
     "error.doneFailureGeneric": "Your task is complete for all episodes, or the specified episode could not be found.",
     "error.episode.alreadyExists": "Episode {episode_1} already exists!",
     "error.episode.notInteger": "To add multiple episodes, the starting episode number must be a positive integer.",

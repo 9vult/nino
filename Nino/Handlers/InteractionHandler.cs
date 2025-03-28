@@ -1,8 +1,12 @@
 using System;
+using System.Net;
 using System.Reflection;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Microsoft.Azure.Cosmos;
 using NLog;
+
+using static Localizer.Localizer;
 
 namespace Nino.Handlers
 {
@@ -12,7 +16,7 @@ namespace Nino.Handlers
         private readonly InteractionService _handler = handler;
         private readonly IServiceProvider _services = services;
         private readonly CmdLineOptions _cmdLineOptions = cmdLineOptions;
-        private static readonly Logger log = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         public async Task InitializeAsync()
         {
@@ -30,9 +34,9 @@ namespace Nino.Handlers
         private async Task ReadyAsync()
         {
 #if DEBUG
-            log.Info("Running in debug mode. Deploying slash commands...");
+            Log.Info("Running in debug mode. Deploying slash commands...");
             await _handler.RegisterCommandsGloballyAsync();
-            log.Info("Slash commands deployed");
+            Log.Info("Slash commands deployed");
 #else
             if (_cmdLineOptions.DeployCommands)
             {
@@ -59,9 +63,19 @@ namespace Nino.Handlers
                 var context = new SocketInteractionContext(_client, interaction);
                 await _handler.ExecuteCommandAsync(context, _services);
             }
+            catch (CosmosException e)
+                when (e.StatusCode is
+                          HttpStatusCode.RequestTimeout or
+                          HttpStatusCode.InternalServerError or 
+                          HttpStatusCode.BadRequest)
+            {
+                Log.Error(e.Message);
+                await interaction.FollowupAsync(T("error.databaseError", interaction.UserLocale));
+            }
             catch (Exception e)
             {
-                log.Error(e.Message);
+                Log.Error(e.Message);
+                await interaction.FollowupAsync(T("error.generic", interaction.UserLocale));
             }
         }
 
