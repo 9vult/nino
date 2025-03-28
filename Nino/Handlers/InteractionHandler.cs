@@ -40,9 +40,9 @@ namespace Nino.Handlers
 #else
             if (_cmdLineOptions.DeployCommands)
             {
-                log.Info("--deploy-commands is set. Deploying slash commands...");
+                Log.Info("--deploy-commands is set. Deploying slash commands...");
                 await _handler.RegisterCommandsGloballyAsync();
-                log.Info("Slash commands deployed");
+                Log.Info("Slash commands deployed");
             }
 #endif
         }
