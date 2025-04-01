@@ -270,8 +270,8 @@
       "other": "{taskName_1} is now {count_2} episodes ahead."
     },
     "progress.bulk.episodeComplete": {
-      "one": "Also, {number_1} episode is now complete: `{list_2}`",
-      "other": "Also, {number_1} episodes are now complete: `{list_2}`"
+      "one": "Also, {count_1} episode is now complete: `{list_2}`",
+      "other": "Also, {count_1} episodes are now complete: `{list_2}`"
     },
     "nino.stats.projects.total.projectCount": {
       "one": "**{number_1}** project",

@@ -183,7 +183,7 @@ namespace Nino.Commands
         /// <param name="abbreviation">Task that was completed</param>
         /// <param name="lng">Language to return results in</param>
         /// <returns>Tuple of StringBuilder and PatchOperation list</returns>
-        private (string, List<PatchOperation>) ProcessCongaForEpisode (Project project, Episode episode, string abbreviation, string lng)
+        private static (string, List<PatchOperation>) ProcessCongaForEpisode (Project project, Episode episode, string abbreviation, string lng)
         {
             StringBuilder congaContent = new();
             List<PatchOperation> operations = [];
