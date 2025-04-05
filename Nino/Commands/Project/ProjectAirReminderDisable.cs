@@ -34,9 +34,10 @@ namespace Nino.Commands
 
                 // Set in database
                 await AzureHelper.PatchProjectAsync(project, [
-                    PatchOperation.Replace($"/airReminderEnabled", false),
-                    PatchOperation.Replace<string?>($"/airReminderChannelId", null),
-                    PatchOperation.Replace<string?>($"/airReminderRoleId", null)
+                    PatchOperation.Set($"/airReminderEnabled", false),
+                    PatchOperation.Set<string?>($"/airReminderChannelId", null),
+                    PatchOperation.Set<string?>($"/airReminderRoleId", null),
+                    PatchOperation.Set<string?>($"/airReminderUserId", null)
                 ]);
 
                 Log.Info($"Disabled air reminders for {project}");

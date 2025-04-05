@@ -672,6 +672,10 @@
         "role": {
           "name": "role",
           "description": "Role to ping for reminders"
+        },
+        "member": {
+          "name": "member",
+          "description": "Member to ping for reminders"
         }
       }
     },

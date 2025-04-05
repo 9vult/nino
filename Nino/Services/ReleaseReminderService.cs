@@ -53,7 +53,11 @@ namespace Nino.Services
 
                         var role = project.AirReminderRoleId is not null
                             ? project.AirReminderRoleId == project.GuildId ? "@everyone" : $"<@&{project.AirReminderRoleId}>"
-                            : "";
+                            : string.Empty;
+                        var member = project.AirReminderUserId is not null
+                            ? $"<@{project.AirReminderUserId}>"
+                            : string.Empty;
+                        var mention = $"{role}{member}";
                         var embed = new EmbedBuilder()
                             .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString(gLng)})", url: project.AniListUrl)
                             .WithTitle(T("title.aired", gLng, episode.Number))
@@ -61,7 +65,7 @@ namespace Nino.Services
                             .WithThumbnailUrl(project.PosterUri)
                             .WithCurrentTimestamp()
                             .Build();
-                        await channel.SendMessageAsync(text: role, embed: embed);
+                        await channel.SendMessageAsync(text: mention, embed: embed);
                         
                         Log.Info($"Published release reminder for {project} episode {episode}");
                     }

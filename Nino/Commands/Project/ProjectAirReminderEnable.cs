@@ -18,7 +18,8 @@ namespace Nino.Commands
             public async Task<RuntimeResult> Enable(
                 [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
                 [Summary("channel", "Channel to post reminders in"), ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel channel,
-                [Summary("role", "Role to ping for reminders")] SocketRole? role = null
+                [Summary("role", "Role to ping for reminders")] SocketRole? role = null,
+                [Summary("member", "Member to ping for reminders")] SocketUser? member = null
             )
             {
                 var interaction = Context.Interaction;
@@ -28,6 +29,7 @@ namespace Nino.Commands
                 alias = alias.Trim();
                 var channelId = channel.Id;
                 var roleId = role?.Id;
+                var memberId = member?.Id;
 
                 // Verify project and user - Owner or Admin required
                 var project = Utils.ResolveAlias(alias, interaction);
@@ -39,9 +41,10 @@ namespace Nino.Commands
 
                 // Set in database
                 await AzureHelper.PatchProjectAsync(project, [
-                    PatchOperation.Replace($"/airReminderEnabled", true),
-                    PatchOperation.Replace($"/airReminderChannelId", channelId.ToString()),
-                    PatchOperation.Replace($"/airReminderRoleId", roleId?.ToString())
+                    PatchOperation.Set($"/airReminderEnabled", true),
+                    PatchOperation.Set($"/airReminderChannelId", channelId.ToString()),
+                    PatchOperation.Set($"/airReminderRoleId", roleId?.ToString()),
+                    PatchOperation.Set($"/airReminderUserId", memberId?.ToString())
                 ]);
 
                 Log.Info($"Enabled air reminders for {project}");
