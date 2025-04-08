@@ -53,7 +53,7 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.noSuchServer", lng, originGuildIdStr), interaction);
 
             // Verify project and user access
-            var project = Utils.ResolveAlias(alias, interaction, observingGuildId: originGuildId);
+            var project = Utils.ResolveAlias(alias, interaction, observingGuildId: originGuildId, includeObservers: true);
             if (project == null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
@@ -70,7 +70,7 @@ namespace Nino.Commands
             {
                 Id = observerId,
                 GuildId = guildId,
-                OriginGuildId = originGuildId,
+                OriginGuildId = project.GuildId,
                 ProjectId = project.Id,
                 OwnerId = interaction.User.Id,
                 Blame = blame,
