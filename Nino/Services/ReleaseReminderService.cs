@@ -38,7 +38,7 @@ namespace Nino.Services
                     try
                     {
                         var airTime = await AirDateService.GetAirDate((int)project.AniListId!, decimalNumber + (project.AniListOffset ?? 0));
-                        if (airTime is null || DateTimeOffset.Now < airTime)
+                        if (airTime is null || DateTimeOffset.UtcNow < airTime)
                             continue;
 
                         if (await Nino.Client.GetChannelAsync((ulong)project.AirReminderChannelId!) is not SocketTextChannel channel) continue;

@@ -67,9 +67,9 @@ namespace Nino.Commands
             var taskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == abbreviation));
             await AzureHelper.PatchEpisodeAsync(episode, [
                 PatchOperation.Set($"/tasks/{taskIndex}/done", false),
-                PatchOperation.Set($"/tasks/{taskIndex}/updated", DateTimeOffset.Now),
+                PatchOperation.Set($"/tasks/{taskIndex}/updated", DateTimeOffset.UtcNow),
                 PatchOperation.Set($"/done", false),
-                PatchOperation.Set($"/updated", DateTimeOffset.Now)
+                PatchOperation.Set($"/updated", DateTimeOffset.UtcNow)
             ]);
 
             // Update task for embeds

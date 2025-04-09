@@ -110,7 +110,7 @@ namespace Nino.Commands
                 CongaParticipants = template.CongaParticipants ?? [],
                 Aliases = template.Aliases ?? [],
                 AniListId = template.AniListId,
-                Created = DateTimeOffset.Now
+                Created = DateTimeOffset.UtcNow
             };
             
             var episodes = new List<Episode>();

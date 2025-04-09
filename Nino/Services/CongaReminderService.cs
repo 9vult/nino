@@ -49,7 +49,7 @@ namespace Nino.Services
                         
                         // Update database with new last-reminded time
                         var taskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == abbreviation));
-                        patchOperations.Add(PatchOperation.Set($"/tasks/{taskIndex}/lastReminded", DateTimeOffset.Now));
+                        patchOperations.Add(PatchOperation.Set($"/tasks/{taskIndex}/lastReminded", DateTimeOffset.UtcNow));
                     }
                     
                     if (patchOperations.Count != 0)

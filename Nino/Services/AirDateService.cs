@@ -35,7 +35,7 @@ namespace Nino.Services
                     }
                 }
 
-                var future = date > DateTimeOffset.Now;
+                var future = date > DateTimeOffset.UtcNow;
                 var result = string.Empty;
                 var utcSeconds = date!.Value.ToUnixTimeSeconds();
                 if (estimated)
@@ -71,13 +71,13 @@ namespace Nino.Services
         public static async Task<bool?> EpisodeAired(int aniListId, decimal episodeNumber)
         {
             var time = await GetAirDate(aniListId, episodeNumber);
-            if (time is not null) return time < DateTimeOffset.Now;
+            if (time is not null) return time < DateTimeOffset.UtcNow;
             
             // Estimation
             var start = await GetStartDate(aniListId);
             if (start is null) return null; // ???
             
-            return start.Value.AddDays(7 * ((double)episodeNumber - 1)) < DateTimeOffset.Now;
+            return start.Value.AddDays(7 * ((double)episodeNumber - 1)) < DateTimeOffset.UtcNow;
         }
 
         public static async Task<List<decimal>> AiredEpisodes(int aniListId)
@@ -89,7 +89,7 @@ namespace Nino.Services
             }
 
             return (response!.Episodes ?? [])
-                .Where(e => DateTimeOffset.FromUnixTimeSeconds(e.AiringAt) <= DateTimeOffset.Now)
+                .Where(e => DateTimeOffset.FromUnixTimeSeconds(e.AiringAt) <= DateTimeOffset.UtcNow)
                 .Select(e => Convert.ToDecimal(e.Episode))
                 .ToList();
         }

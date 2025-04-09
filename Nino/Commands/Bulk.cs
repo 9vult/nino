@@ -95,7 +95,7 @@ namespace Nino.Commands
                 batch.PatchItem(id: e.Id.ToString(), [
                     PatchOperation.Set($"/tasks/{taskIndex}/done", isDone),
                     PatchOperation.Set($"/done", episodeDone),
-                    PatchOperation.Set($"/updated", DateTimeOffset.Now),
+                    PatchOperation.Set($"/updated", DateTimeOffset.UtcNow),
                     ..processedConga.Item2
                 ]);
             }
@@ -221,7 +221,7 @@ namespace Nino.Commands
                 congaContent.AppendLine(T("progress.done.conga", lng, staffMention, episode.Number, roleTitle));
                         
                 var congaTaskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == nextTask.Role.Abbreviation));
-                operations.Add(PatchOperation.Set($"/tasks/{congaTaskIndex}/lastReminded", DateTimeOffset.Now));
+                operations.Add(PatchOperation.Set($"/tasks/{congaTaskIndex}/lastReminded", DateTimeOffset.UtcNow));
             }
             
             return (congaContent.ToString(), operations);

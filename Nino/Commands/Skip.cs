@@ -79,9 +79,9 @@ namespace Nino.Commands
             var taskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == abbreviation));
             await AzureHelper.PatchEpisodeAsync(episode, [
                 PatchOperation.Set($"/tasks/{taskIndex}/done", true),
-                PatchOperation.Set($"/tasks/{taskIndex}/updated", DateTimeOffset.Now),
+                PatchOperation.Set($"/tasks/{taskIndex}/updated", DateTimeOffset.UtcNow),
                 PatchOperation.Set($"/done", episodeDone),
-                PatchOperation.Set($"/updated", DateTimeOffset.Now)
+                PatchOperation.Set($"/updated", DateTimeOffset.UtcNow)
             ]);
 
             // Update task for embeds
@@ -180,7 +180,7 @@ namespace Nino.Commands
                             // Update database with new last-reminded time
                             var congaTaskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == nextTask.Role.Abbreviation));
                             await AzureHelper.PatchEpisodeAsync(episode, [
-                                PatchOperation.Set($"/tasks/{congaTaskIndex}/lastReminded", DateTimeOffset.Now)
+                                PatchOperation.Set($"/tasks/{congaTaskIndex}/lastReminded", DateTimeOffset.UtcNow)
                             ]);
                         }
                     }
