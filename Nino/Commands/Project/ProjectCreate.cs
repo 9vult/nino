@@ -22,7 +22,7 @@ namespace Nino.Commands
             [Summary("private", "Is this project private?")] bool isPrivate,
             [Summary("updateChannel", "Channel to post updates to"), ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel updateChannel,
             [Summary("releaseChannel", "Channel to post releases to"), ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel releaseChannel,
-            [Summary("anilistId", "AniList ID")] int? aniListId = null,
+            [Summary("anilistId", "AniList ID")] int aniListId,
             [Summary("firstEpisode", "First episode number")] decimal firstEpisode = 1
         )
         {

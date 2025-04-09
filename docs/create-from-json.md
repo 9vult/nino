@@ -17,9 +17,9 @@ If you have multiple projects to create, or you have a template you use often, y
     ReleaseChannelId: ulong,
     KeyStaff: Staff[],
     AdditionalStaff: Map<string, Staff[]>,
+	AniListId: int,
 
     // Optional fields
-    AniListId: int,
     FirstEpisode: decimal,
     AdministratorIds: ulong[],
     Aliases: string[],

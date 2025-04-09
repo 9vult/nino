@@ -12,8 +12,8 @@ public record ProjectTemplate
     public required bool IsPrivate;
     public required ulong UpdateChannelId;
     public required ulong ReleaseChannelId;
+    public int AniListId;
     
-    public int? AniListId;
     public decimal? FirstEpisode;
     public ulong[]? AdministratorIds;
     public string[]? Aliases;
