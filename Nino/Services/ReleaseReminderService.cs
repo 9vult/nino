@@ -14,7 +14,7 @@ namespace Nino.Services
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         
-        private const int FiveMinutes = 5 * 60 * 1000;
+        private const int FiveMinutes = 1 * 30 * 1000;
         private readonly System.Timers.Timer _timer;
 
         public ReleaseReminderService()
@@ -23,7 +23,11 @@ namespace Nino.Services
             {
                 Interval = FiveMinutes
             };
-            _timer.Elapsed += async (_, _) => await CheckForReleases();
+            _timer.Elapsed += async (_, _) =>
+            {
+                _timer.Stop();
+                await CheckForReleases();
+            };
             _timer.Start();
         }
 
@@ -61,7 +65,7 @@ namespace Nino.Services
                         var embed = new EmbedBuilder()
                             .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString(gLng)})", url: project.AniListUrl)
                             .WithTitle(T("title.aired", gLng, episode.Number))
-                            .WithDescription(await AirDateService.GetAirDateString((int)project.AniListId!, decimalNumber + project.AniListOffset ?? 0, gLng))
+                            .WithDescription(await AirDateService.GetAirDateString((int)project.AniListId!, decimalNumber + (project.AniListOffset ?? 0), gLng))
                             .WithThumbnailUrl(project.PosterUri)
                             .WithCurrentTimestamp()
                             .Build();
