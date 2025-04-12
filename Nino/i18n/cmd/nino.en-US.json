@@ -907,6 +907,23 @@
         }
       }
     },
+    "conga-prefix": {
+      "name": "conga-prefix",
+      "description": "Set a prefix for Conga notifications",
+      "type": {
+        "name": "type",
+        "description": "Prefix type",
+        "None": {
+          "name": "None"
+        },
+        "Nickname": {
+          "name": "Nickname"
+        },
+        "Title": {
+          "name": "Title"
+        }
+      }
+    },
     "display": {
       "name": "display",
       "description": "Control the look and features of embeds",

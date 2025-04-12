@@ -10,6 +10,7 @@ namespace Nino.Records
         [JsonIgnore] public required ulong GuildId;
         public required UpdatesDisplayType UpdateDisplay;
         public required ProgressDisplayType ProgressDisplay;
+        public required CongaPrefixType CongaPrefix;
         [JsonIgnore] public required ulong[] AdministratorIds;
         public string? ReleasePrefix;
         public Locale? Locale;
@@ -42,6 +43,7 @@ namespace Nino.Records
                 GuildId = guildId,
                 UpdateDisplay = UpdatesDisplayType.Normal,
                 ProgressDisplay = ProgressDisplayType.Succinct,
+                CongaPrefix = CongaPrefixType.None,
                 AdministratorIds = [],
                 ReleasePrefix = null
             };

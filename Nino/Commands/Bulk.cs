@@ -69,6 +69,7 @@ namespace Nino.Commands
             if (!Utils.VerifyTaskUser(interaction.User.Id, project, startEpisode, abbreviation))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
+            var prefixMode = Cache.GetConfig(project.GuildId)?.CongaPrefix ?? CongaPrefixType.None;
             StringBuilder congaContent = new();
             
             // Update database
@@ -88,7 +89,7 @@ namespace Nino.Commands
                 if (taskIndex == -1) continue;
                 
                 var processedConga = isDone 
-                    ? ProcessCongaForEpisode(project, e, abbreviation, lng) 
+                    ? ProcessCongaForEpisode(project, e, abbreviation, lng, prefixMode) 
                     : (string.Empty, []);
                 if (processedConga.Item1.Length > 0) congaContent.AppendLine(processedConga.Item1.Trim());
                     
@@ -182,8 +183,9 @@ namespace Nino.Commands
         /// <param name="episode">Episode being processed</param>
         /// <param name="abbreviation">Task that was completed</param>
         /// <param name="lng">Language to return results in</param>
+        /// <param name="prefixMode">Conga prefix type</param>
         /// <returns>Tuple of StringBuilder and PatchOperation list</returns>
-        private static (string, List<PatchOperation>) ProcessCongaForEpisode (Project project, Episode episode, string abbreviation, string lng)
+        private static (string, List<PatchOperation>) ProcessCongaForEpisode (Project project, Episode episode, string abbreviation, string lng, CongaPrefixType prefixMode)
         {
             StringBuilder congaContent = new();
             List<PatchOperation> operations = [];
@@ -218,6 +220,15 @@ namespace Nino.Commands
 
                 var staffMention = $"<@{nextTask.UserId}>";
                 var roleTitle = nextTask.Role.Name;
+                if (prefixMode != CongaPrefixType.None)
+                {
+                    // Using a switch expression in the middle of string interpolation is insane btw
+                    congaContent.Append($"[{prefixMode switch {
+                        CongaPrefixType.Nickname => project.Nickname,
+                        CongaPrefixType.Title => project.Title,
+                        _ => string.Empty 
+                    }}] ");
+                }
                 congaContent.AppendLine(T("progress.done.conga", lng, staffMention, episode.Number, roleTitle));
                         
                 var congaTaskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == nextTask.Role.Abbreviation));

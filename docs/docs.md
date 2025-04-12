@@ -214,7 +214,11 @@ Control how Nino's replies to [/done](#done), etc look. For example, add a blame
 
 Control how updates in the Progress channel look. For example, set it to use the [explanitory blame](#blame) format instead of the short format.
 
-#### server releaseprefix
+#### server conga-prefix
+
+Adds a prefix to Conga notifications. Choose between None (default), Nickname, and Title.
+
+#### server release-prefix
 
 Add a prefix to releases. The release prefix can be reset by setting it to a hyphen (`-`).
 

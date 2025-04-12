@@ -34,6 +34,7 @@ namespace Nino.Services
                 if (await Nino.Client.GetChannelAsync((ulong)project.CongaReminderChannelId!) is not SocketTextChannel channel) continue;
                 var gLng = Cache.GetConfig(project.GuildId)?.Locale?.ToDiscordLocale() ?? channel.Guild.PreferredLocale;
                 
+                var prefixMode = Cache.GetConfig(project.GuildId)?.CongaPrefix ?? CongaPrefixType.None;
                 var reminderText = new StringBuilder();
                 foreach (var episode in Cache.GetEpisodes(project.Id).Where(e => !e.Tasks.All(t => t.Done)))
                 {
@@ -45,6 +46,15 @@ namespace Nino.Services
 
                         var staffMention = $"<@{keyStaff.UserId}>";
                         var roleTitle = keyStaff.Role.Name;
+                        if (prefixMode != CongaPrefixType.None)
+                        {
+                            // Using a switch expression in the middle of string interpolation is insane btw
+                            reminderText.Append($"[{prefixMode switch {
+                                CongaPrefixType.Nickname => project.Nickname,
+                                CongaPrefixType.Title => project.Title,
+                                _ => string.Empty 
+                            }}] ");
+                        }
                         reminderText.AppendLine(T("progress.done.conga.reminder", gLng, staffMention, episode.Number, roleTitle));
                         
                         // Update database with new last-reminded time

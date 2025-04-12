@@ -105,6 +105,7 @@ namespace Nino.Commands
             Log.Info($"M[{interaction.User.Id} (@{interaction.User.Username})] marked task {abbreviation} done for {episode}");
 
             // Everybody do the Conga!
+            var prefixMode = Cache.GetConfig(project.GuildId)?.CongaPrefix ?? CongaPrefixType.None;
             StringBuilder congaContent = new();
 
             // Get all conga participants that the current task can call out
@@ -137,6 +138,15 @@ namespace Nino.Commands
 
                             var staffMention = $"<@{nextTask.UserId}>";
                             var roleTitle = nextTask.Role.Name;
+                            if (prefixMode != CongaPrefixType.None)
+                            {
+                                // Using a switch expression in the middle of string interpolation is insane btw
+                                congaContent.Append($"[{prefixMode switch {
+                                    CongaPrefixType.Nickname => project.Nickname,
+                                    CongaPrefixType.Title => project.Title,
+                                    _ => string.Empty 
+                                }}] ");
+                            }
                             congaContent.AppendLine(T("progress.done.conga", lng, staffMention, episode.Number, roleTitle));
                             
                             // Update database with new last-reminded time
