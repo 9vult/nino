@@ -14,7 +14,7 @@ namespace Nino.Services
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         
-        private const int FiveMinutes = 1 * 30 * 1000;
+        private const int FiveMinutes = 5 * 60 * 1000;
         private readonly System.Timers.Timer _timer;
 
         public ReleaseReminderService()

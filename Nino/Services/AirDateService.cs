@@ -80,13 +80,16 @@ namespace Nino.Services
             return start.Value.AddDays(7 * ((double)episodeNumber - 1)) < DateTimeOffset.UtcNow;
         }
 
-        public static async Task<List<decimal>> AiredEpisodes(int aniListId)
+        public static async Task<List<decimal>?> AiredEpisodes(int aniListId)
         {
             var response = await AniListService.Get(aniListId);
             if (!string.IsNullOrEmpty(response?.Error))
             {
                 throw new Exception(response.Error);
             }
+
+            if (response?.Episodes?.Count == 0)
+                return null;
 
             return (response!.Episodes ?? [])
                 .Where(e => DateTimeOffset.FromUnixTimeSeconds(e.AiringAt) <= DateTimeOffset.UtcNow)
