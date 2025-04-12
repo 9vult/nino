@@ -55,8 +55,9 @@ namespace Nino.Commands
                         if (airedEpisodeNumbers is not null)
                         {
                             episodes = episodes
-                                .Where(e => !Utils.EpisodeNumberIsNumber(e.Number, out var dNum) ||
-                                            airedEpisodeNumbers.Contains(dNum + (project.AniListOffset ?? 0)));
+                                .Where(e => !Utils.EpisodeNumberIsNumber(e.Number, out var dNum)
+                                            || airedEpisodeNumbers.Contains(dNum + (project.AniListOffset ?? 0))
+                                            || dNum + (project.AniListOffset ?? 0) < airedEpisodeNumbers.Max());
                         }
                     }
                     catch (Exception e)
