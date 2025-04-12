@@ -25,7 +25,6 @@ namespace Nino.Services
             };
             _timer.Elapsed += async (_, _) =>
             {
-                _timer.Stop();
                 await CheckForReleases();
             };
             _timer.Start();
