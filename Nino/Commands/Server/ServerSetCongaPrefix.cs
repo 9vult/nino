@@ -33,7 +33,7 @@ namespace Nino.Commands
             config.CongaPrefix = type;
 
             await AzureHelper.Configurations!.UpsertItemAsync(config);
-            log.Info($"Updated configuration for guild {config.GuildId}, set Progress Display to {type.ToFriendlyString(lng)}");
+            log.Info($"Updated configuration for guild {config.GuildId}, set Conga Prefix to {type.ToFriendlyString(lng)}");
 
             // Send success embed
             var embed = new EmbedBuilder()

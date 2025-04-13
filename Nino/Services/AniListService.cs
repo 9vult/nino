@@ -1,4 +1,5 @@
-﻿using Nino.Utilities;
+﻿using System.Net;
+using Nino.Utilities;
 using NLog;
 using System.Net.Http.Json;
 using System.Text;
@@ -32,6 +33,8 @@ namespace Nino.Services
         {
             if (!AniListEnabled)
                 return new ApiResponse { Error = "error.anilist.disabled" };
+            if (anilistId <= 0)
+                return new ApiResponse { Error = "error.anilist.404" };
 
             // Check if it's in the RAM cache
             if (RamCache.TryGetValue(anilistId, out var ramValue))
@@ -77,10 +80,7 @@ namespace Nino.Services
                 {
                     var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse>();
                     if (apiResponse is null)
-                        return new ApiResponse
-                        {
-                            Error = "error.anilist.cache.malformed"
-                        };
+                        return new ApiResponse { Error = "error.anilist.cache.malformed" };
 
                     await using var stream = File.OpenWrite(filename);
                     await JsonSerializer.SerializeAsync(stream, apiResponse);
@@ -91,7 +91,14 @@ namespace Nino.Services
                 }
                 
                 Log.Error($"AniList status code for ID {anilistId} is {response.StatusCode}");
-                return new ApiResponse { Error = $"error.anilist.generic" };
+                return new ApiResponse
+                {
+                    Error =
+                        response.StatusCode == HttpStatusCode.NotFound
+                            ? $"error.anilist.404"
+                            : $"error.anilist.generic",
+                };
+
             }
             catch (HttpRequestException e) when (e.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
