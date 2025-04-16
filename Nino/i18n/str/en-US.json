@@ -221,6 +221,7 @@
     "project.created.firstEpisode": "First episode **{episode_1}** is nonstandard and may cause misalignment with AniList.\nConsider using `/project edit AniListOffset` to align with AniList's numbers.",
     "project.conga.union.added.current": "I added {current_1} → {next_2} to the Conga line for you.\nThere is now a union: {union_3} → {next_4}",
     "project.conga.union.added.next": "I added {current_1} → {next_2} to the Conga line for you.\nThere is now a union: {current_3} → {union_4}",
+    "project.delete.question": "Are you sure you want to delete `{project_1}`?\nThis action is irreversible.",
     "project.deleted": "Cleaned out the **{project_1}** project for you. 残念。",
     "project.edited": "I updated project `{project_1}`'s {task_2}.",
     "project.exported": "Here's everything I know about `{project_1}`!",

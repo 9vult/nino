@@ -63,8 +63,8 @@ namespace Nino.Commands
                 .WithCurrentTimestamp()
                 .Build();
             var component = new ComponentBuilder()
-                .WithButton(T("progress.done.inTheDust.doItNow.button", lng), "ninodoneproceed", ButtonStyle.Danger)
-                .WithButton(T("progress.done.inTheDust.dontDoIt.button", lng), "ninodonecancel", ButtonStyle.Secondary)
+                .WithButton(T("progress.done.inTheDust.dontDoIt.button", lng), "ninodonecancel", ButtonStyle.Danger)
+                .WithButton(T("progress.done.inTheDust.doItNow.button", lng), "ninodoneproceed", ButtonStyle.Success)
                 .Build();
             var questionResponse = await interaction.FollowupAsync(embed: questionEmbed, components: component);
 

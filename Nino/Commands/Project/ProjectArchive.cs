@@ -4,7 +4,6 @@ using Discord.WebSocket;
 using Localizer;
 using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
-using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities;
 
@@ -35,47 +34,8 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.archived", lng), interaction);
 
             // Ask if the user is sure
-            var questionBody = T("project.archive.question", lng, project.Nickname);
-
-            var header = project.IsPrivate
-                ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
-                : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
-
-            var component = new ComponentBuilder()
-                .WithButton(T("project.archive.cancel.button", lng), "ninoarchivecancel", ButtonStyle.Success)
-                .WithButton(T("project.archive.continue.button", lng), "ninoarchivecontinue", ButtonStyle.Danger)
-                .Build();
-            var questionEmbed = new EmbedBuilder()
-                .WithAuthor(header)
-                .WithTitle($"❓ {T("progress.done.inTheDust.question", lng)}")
-                .WithDescription(questionBody)
-                .WithCurrentTimestamp()
-                .Build();
-
-            var questionResponse = await interaction.ModifyOriginalResponseAsync(m => {
-                m.Embed = questionEmbed;
-                m.Components = component;
-            });
-
-            // Wait for response
-            var questionResult = await _interactiveService.NextMessageComponentAsync(
-                m => m.Message.Id == questionResponse.Id, timeout: TimeSpan.FromSeconds(60));
-
-            bool goOn = false;
-            string finalBody = string.Empty;
-
-            if (!questionResult.IsSuccess)
-                finalBody = T("progress.done.inTheDust.timeout", lng);
-            else
-            {
-                if (questionResult.Value.Data.CustomId == "ninoarchivecancel")
-                    finalBody = T("progress.done.inTheDust.dontDoIt", lng);
-                else
-                {
-                    goOn = true;
-                    finalBody = T("project.archive.done", lng, project.Nickname);
-                }
-            }
+            var (goOn, finalBody) = await Ask.AboutIrreversibleAction(_interactiveService, interaction, project, lng,
+                Ask.IrreversibleAction.Archive);
 
             if (goOn)
             {

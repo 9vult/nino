@@ -77,8 +77,8 @@ namespace Nino.Utilities
                 : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
 
             var component = new ComponentBuilder()
-                .WithButton(T("missingPermsPrecheck.no.button", lng), "ninoprecheckcancel", ButtonStyle.Success)
-                .WithButton(T("missingPermsPrecheck.yes.button", lng), "ninoprecheckproceed", ButtonStyle.Danger)
+                .WithButton(T("missingPermsPrecheck.no.button", lng), "ninoprecheckcancel", ButtonStyle.Danger)
+                .WithButton(T("missingPermsPrecheck.yes.button", lng), "ninoprecheckproceed", ButtonStyle.Secondary)
                 .Build();
             var questionEmbed = new EmbedBuilder()
                 .WithAuthor(header)

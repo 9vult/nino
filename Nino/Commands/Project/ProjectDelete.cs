@@ -27,7 +27,24 @@ namespace Nino.Commands
 
             if (!Utils.VerifyUser(interaction.User.Id, project, excludeAdmins: true))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
+            
+            // Ask if the user is sure
+            var (goOn, finalBody) = await Ask.AboutIrreversibleAction(_interactiveService, interaction, project, lng,
+                Ask.IrreversibleAction.Delete);
 
+            if (!goOn)
+            {
+                var cancelEmbed = new EmbedBuilder()
+                    .WithTitle(T("title.projectDeletion", lng))
+                    .WithDescription(finalBody)
+                    .Build();
+                await interaction.ModifyOriginalResponseAsync(m => {
+                    m.Embed = cancelEmbed;
+                    m.Components = null;
+                });
+                return ExecutionResult.Success;
+            }
+            
             Log.Info($"Exporting project {project} before deletion");
 
             // Get stream
@@ -65,7 +82,10 @@ namespace Nino.Commands
                 .WithTitle(T("title.projectDeletion", lng))
                 .WithDescription(T("project.deleted", lng, project.Title))
                 .Build();
-            await interaction.FollowupAsync(embed: embed);
+            await interaction.ModifyOriginalResponseAsync(m => {
+                m.Embed = embed;
+                m.Components = null;
+            });
 
             await Cache.RebuildCacheForGuild(interaction.GuildId ?? 0);
             await Cache.RebuildObserverCache();
