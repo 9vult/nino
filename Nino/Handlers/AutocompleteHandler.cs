@@ -23,12 +23,13 @@ namespace Nino.Handlers
             var userId = interaction.User.Id;
 
             var includeObservers = commandName is "blame" or "blameall";
+            var includeArchived = includeObservers || interaction.Data.Options.FirstOrDefault()?.Name == "delete";
 
             List<AutocompleteResult> choices = [];
             var alias = ((string)focusedOption.Value).Trim();
             if (alias is not null)
             {
-                choices.AddRange(Getters.GetFilteredAliases(guildId, userId, (string)focusedOption.Value, includeObservers)
+                choices.AddRange(Getters.GetFilteredAliases(guildId, userId, (string)focusedOption.Value, includeObservers, includeArchived)
                     .Select(m => new AutocompleteResult(m, m))
                 );
             }
