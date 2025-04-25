@@ -81,7 +81,7 @@ namespace Nino.Commands
             // Go through the additional staff dictionary
             foreach (var ep in template.AdditionalStaff)
             {
-                idxWeight = 1;
+                idxWeight = 10000;
                 foreach (var ks in ep.Value)
                 {
                     ks.Role.Weight ??= idxWeight++;
