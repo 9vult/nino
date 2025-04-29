@@ -11,6 +11,7 @@ using NLog;
 using System.Text;
 using Localizer;
 using static Localizer.Localizer;
+using Task = System.Threading.Tasks.Task;
 
 namespace Nino.Commands
 {
@@ -143,65 +144,91 @@ namespace Nino.Commands
             Log.Info($"M[{interaction.User.Id} (@{interaction.User.Username})] skipped task {abbreviation} for {episode}");
 
             // Everybody do the Conga!
-            var prefixMode = Cache.GetConfig(project.GuildId)?.CongaPrefix ?? CongaPrefixType.None;
-            StringBuilder congaContent = new();
-
             // Get all conga participants that the current task can call out
             var congaCandidates = project.CongaParticipants
                 .GroupBy(p => p.Next)
                 .Where(group => group.Select(p => p.Current).Contains(abbreviation))
                 .ToList();
-
-            if (congaCandidates.Count > 0)
+            await DoTheConga();
+            
+            
+            await Cache.RebuildCacheForProject(project.Id);
+            return ExecutionResult.Success; 
+            
+            // -----
+            
+            // Helper method for doing the conga
+            async Task DoTheConga()
             {
+                if (congaCandidates.Count == 0) return;
+                
+                var prefixMode = Cache.GetConfig(project.GuildId)?.CongaPrefix ?? CongaPrefixType.None;
+                StringBuilder congaContent = new();
+
+                var singleCandidates = new List<IGrouping<string, CongaParticipant>>();
+                var multiCandidates = new List<IGrouping<string, CongaParticipant>>();
+                
                 foreach (var candidate in congaCandidates)
                 {
-                    bool ping = true;
-                    if (candidate.Count() > 1) // More than just this task
+                    if (candidate.Count() == 1)
                     {
-                        // Determine if the candidate's caller(s) (not this one) are all done
-                        if (candidate
-                            .Select(c => c.Current)
-                            .Where(c => c != abbreviation)
-                            .Any(c => !episode.Tasks.FirstOrDefault(t => t.Abbreviation == c)?.Done ?? false))
-                            ping = false; // Not all caller(s) are done
+                        singleCandidates.Add(candidate);
+                        continue;
                     }
-                    if (ping)
-                    {
-                        var nextTask = project.KeyStaff.FirstOrDefault(ks => ks.Role.Abbreviation == candidate.Key);
-                        if (nextTask != null)
-                        {
-                            // Skip task if task is done
-                            if (episode.Tasks.FirstOrDefault(t => t.Abbreviation == nextTask.Role.Abbreviation)?.Done ?? false) continue;
-                            
-                            var staffMention = $"<@{nextTask.UserId}>";
-                            var roleTitle = nextTask.Role.Name;
-                            if (prefixMode != CongaPrefixType.None)
-                            {
-                                // Using a switch expression in the middle of string interpolation is insane btw
-                                congaContent.Append($"[{prefixMode switch {
-                                    CongaPrefixType.Nickname => project.Nickname,
-                                    CongaPrefixType.Title => project.Title,
-                                    _ => string.Empty 
-                                }}] ");
-                            }
-                            congaContent.AppendLine(T("progress.done.conga", lng, staffMention, episode.Number, roleTitle));
-                            
-                            // Update database with new last-reminded time
-                            var congaTaskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == nextTask.Role.Abbreviation));
-                            await AzureHelper.PatchEpisodeAsync(episode, [
-                                PatchOperation.Set($"/tasks/{congaTaskIndex}/lastReminded", DateTimeOffset.UtcNow)
-                            ]);
-                        }
-                    }
+                    // More than just this task
+                    // Determine if the candidate's caller(s) (not this one) are all done
+                    if (candidate
+                        .Select(c => c.Current)
+                        .Where(c => c != abbreviation)
+                        .Any(c => !episode.Tasks.FirstOrDefault(t => t.Abbreviation == c)?.Done ?? false))
+                        continue; // Not all callers are done
+                    multiCandidates.Add(candidate); // All callers are done
                 }
+                
+                // Because we're skipping, find out if single-prereq tasks should still be pinged
+                if (singleCandidates.Count > 0)
+                {
+                    var (pingOn, finalBody, questionMessage) 
+                        = await Ask.AboutAction(_interactiveService, interaction, project, lng,  Ask.InconsequentialAction.PingCongaAfterSkip);
+                    
+                    if (!pingOn)
+                        singleCandidates.Clear(); // Do not ping the single-prereq tasks
 
+                    if (questionMessage is not null) await questionMessage.DeleteAsync(); // Remove the question embed
+                }
+                
+                // Ping everyone to be pung
+                foreach (var candidate in multiCandidates.Concat(singleCandidates))
+                {
+                    var nextTask = project.KeyStaff.FirstOrDefault(ks => ks.Role.Abbreviation == candidate.Key);
+                    if (nextTask is null) continue;
+                    
+                    // Skip task if already done
+                    if (episode.Tasks.FirstOrDefault(t => t.Abbreviation == nextTask.Role.Abbreviation)?.Done ?? false) continue;
+                    
+                    var staffMention = $"<@{nextTask.UserId}>";
+                    var roleTitle = nextTask.Role.Name;
+                    if (prefixMode != CongaPrefixType.None)
+                    {
+                        // Using a switch expression in the middle of string interpolation is insane btw
+                        congaContent.Append($"[{prefixMode switch {
+                            CongaPrefixType.Nickname => project.Nickname,
+                            CongaPrefixType.Title => project.Title,
+                            _ => string.Empty 
+                        }}] ");
+                    }
+                    congaContent.AppendLine(T("progress.done.conga", lng, staffMention, episode.Number, roleTitle));
+                    
+                    // Update database with new last-reminded time
+                    var congaTaskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == nextTask.Role.Abbreviation));
+                    await AzureHelper.PatchEpisodeAsync(episode, [
+                        PatchOperation.Set($"/tasks/{congaTaskIndex}/lastReminded", DateTimeOffset.UtcNow)
+                    ]);
+                }
+                
                 if (congaContent.Length > 0)
                     await interaction.Channel.SendMessageAsync(congaContent.ToString());
             }
-
-            await Cache.RebuildCacheForProject(project.Id);
-            return ExecutionResult.Success;
         }
     }
 }
