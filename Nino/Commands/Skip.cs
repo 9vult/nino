@@ -206,7 +206,8 @@ namespace Nino.Commands
                     // Skip task if already done
                     if (episode.Tasks.FirstOrDefault(t => t.Abbreviation == nextTask.Role.Abbreviation)?.Done ?? false) continue;
                     
-                    var staffMention = $"<@{nextTask.UserId}>";
+                    var userId = episode.PinchHitters.FirstOrDefault(t => t.Abbreviation == nextTask.Role.Abbreviation)?.UserId ?? nextTask.UserId;
+                    var staffMention = $"<@{userId}>";
                     var roleTitle = nextTask.Role.Name;
                     if (prefixMode != CongaPrefixType.None)
                     {
