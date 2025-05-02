@@ -47,7 +47,7 @@ namespace Nino.Commands
                 var episodes = Cache.GetEpisodes(project.Id)
                     .Where(e => Utils.VerifyUser(interaction.User.Id, project, true, true));
 
-                if (project.AniListId is not null)
+                if (project.AniListId is not null && project.AniListId > 0)
                 {
                     try
                     {
