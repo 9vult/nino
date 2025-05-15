@@ -155,7 +155,7 @@ namespace Nino.Commands
 
                         if (abbreviations.Count == 0) continue;
 
-                        var tardyTasks = Utils.GetTardyTasks(project, episode, false)
+                        var tardyTasks = CongaHelper.GetTardyTasks(project, episode, false)
                             .Where(t => abbreviations.Contains(t))
                             .Select(t => $"`{t}`")
                             .ToList();

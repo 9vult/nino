@@ -17,7 +17,7 @@ public record ProjectTemplate
     public decimal? FirstEpisode;
     public ulong[]? AdministratorIds;
     public string[]? Aliases;
-    public CongaParticipant[]? CongaParticipants;
+    public CongaNodeDto[]? CongaParticipants;
     
     public required Staff[] KeyStaff;
     public required Dictionary<string, Staff[]> AdditionalStaff;

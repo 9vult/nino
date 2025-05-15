@@ -191,28 +191,26 @@ namespace Nino.Commands
             List<PatchOperation> operations = [];
             
             // Get all conga participants that the current task can call out
-            var congaCandidates = project.CongaParticipants
-                .GroupBy(p => p.Next)
-                .Where(group => group.Select(p => p.Current).Contains(abbreviation))
-                .ToList();
+            var congaCandidates = project.CongaParticipants.Get(abbreviation)?.Dependents ?? [];
             
             if (congaCandidates.Count == 0) return (string.Empty, operations); // Empty
             
             foreach (var candidate in congaCandidates)
             {
+                var prereqs = candidate.Prerequisites;
                 var ping = true;
-                if (candidate.Count() > 1) // More than just this task
+                if (prereqs.Count > 1) // More than just this task
                 {
                     // Determine if the candidate's caller(s) (not this one) are all done
-                    if (candidate
-                        .Select(c => c.Current)
+                    if (prereqs
+                        .Select(c => c.Abbreviation)
                         .Where(c => c != abbreviation)
                         .Any(c => !episode.Tasks.FirstOrDefault(t => t.Abbreviation == c)?.Done ?? false))
                         ping = false; // Not all caller(s) are done
                 }
                 if (!ping) continue;
                 
-                var nextTask = project.KeyStaff.FirstOrDefault(ks => ks.Role.Abbreviation == candidate.Key);
+                var nextTask = project.KeyStaff.FirstOrDefault(ks => ks.Role.Abbreviation == candidate.Abbreviation);
                 if (nextTask == null) continue;
                 
                 // Skip task if task is done

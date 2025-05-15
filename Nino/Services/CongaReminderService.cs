@@ -39,7 +39,7 @@ namespace Nino.Services
                 foreach (var episode in Cache.GetEpisodes(project.Id).Where(e => !e.Tasks.All(t => t.Done)))
                 {
                     var patchOperations = new List<PatchOperation>();
-                    foreach (var abbreviation in Utils.GetTardyTasks(project, episode))
+                    foreach (var abbreviation in CongaHelper.GetTardyTasks(project, episode))
                     {
                         var keyStaff = project.KeyStaff.FirstOrDefault(ks => ks.Role.Abbreviation == abbreviation);
                         if (keyStaff is null) continue;

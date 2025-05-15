@@ -4,12 +4,12 @@ using Discord.WebSocket;
 using Fergun.Interactive;
 using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
-using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities;
 using NLog;
 using System.Text;
 using Localizer;
+using Nino.Records;
 using static Localizer.Localizer;
 using Task = System.Threading.Tasks.Task;
 
@@ -52,7 +52,7 @@ namespace Nino.Commands
             if (!goOn) return ExecutionResult.Success;
             
             // Check Conga permissions
-            if (project.CongaParticipants.Length != 0)
+            if (project.CongaParticipants.Nodes.Count != 0)
             {
                 goOn = await PermissionChecker.Precheck(_interactiveService, interaction, project, lng, false, true);
                 // Cancel
@@ -144,13 +144,7 @@ namespace Nino.Commands
             Log.Info($"M[{interaction.User.Id} (@{interaction.User.Username})] skipped task {abbreviation} for {episode}");
 
             // Everybody do the Conga!
-            // Get all conga participants that the current task can call out
-            var congaCandidates = project.CongaParticipants
-                .GroupBy(p => p.Next)
-                .Where(group => group.Select(p => p.Current).Contains(abbreviation))
-                .ToList();
             await DoTheConga();
-            
             
             await Cache.RebuildCacheForProject(project.Id);
             return ExecutionResult.Success; 
@@ -160,25 +154,27 @@ namespace Nino.Commands
             // Helper method for doing the conga
             async Task DoTheConga()
             {
+                var congaCandidates = project.CongaParticipants.Get(abbreviation)?.Dependents ?? [];
                 if (congaCandidates.Count == 0) return;
                 
                 var prefixMode = Cache.GetConfig(project.GuildId)?.CongaPrefix ?? CongaPrefixType.None;
                 StringBuilder congaContent = new();
 
-                var singleCandidates = new List<IGrouping<string, CongaParticipant>>();
-                var multiCandidates = new List<IGrouping<string, CongaParticipant>>();
+                var singleCandidates = new List<CongaNode>();
+                var multiCandidates = new List<CongaNode>();
                 
                 foreach (var candidate in congaCandidates)
                 {
-                    if (candidate.Count() == 1)
+                    var prereqs = candidate.Prerequisites;
+                    if (prereqs.Count == 1)
                     {
                         singleCandidates.Add(candidate);
                         continue;
                     }
                     // More than just this task
                     // Determine if the candidate's caller(s) (not this one) are all done
-                    if (candidate
-                        .Select(c => c.Current)
+                    if (prereqs
+                        .Select(c => c.Abbreviation)
                         .Where(c => c != abbreviation)
                         .Any(c => !episode.Tasks.FirstOrDefault(t => t.Abbreviation == c)?.Done ?? false))
                         continue; // Not all callers are done
@@ -200,7 +196,7 @@ namespace Nino.Commands
                 // Ping everyone to be pung
                 foreach (var candidate in multiCandidates.Concat(singleCandidates))
                 {
-                    var nextTask = project.KeyStaff.FirstOrDefault(ks => ks.Role.Abbreviation == candidate.Key);
+                    var nextTask = project.KeyStaff.FirstOrDefault(ks => ks.Role.Abbreviation == candidate.Abbreviation);
                     if (nextTask is null) continue;
                     
                     // Skip task if already done

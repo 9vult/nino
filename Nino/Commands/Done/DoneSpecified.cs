@@ -109,54 +109,51 @@ namespace Nino.Commands
             StringBuilder congaContent = new();
 
             // Get all conga participants that the current task can call out
-            var congaCandidates = project.CongaParticipants
-                .GroupBy(p => p.Next)
-                .Where(group => group.Select(p => p.Current).Contains(abbreviation))
-                .ToList();
+            var congaCandidates = project.CongaParticipants.Get(abbreviation)?.Dependents ?? [];
 
             if (congaCandidates.Count > 0)
             {
                 foreach (var candidate in congaCandidates)
                 {
-                    bool ping = true;
-                    if (candidate.Count() > 1) // More than just this task
+                    var prereqs = candidate.Prerequisites;
+                    var ping = true;
+                    if (prereqs.Count > 1) // More than just this task
                     {
                         // Determine if the candidate's caller(s) (not this one) are all done
-                        if (candidate
-                            .Select(c => c.Current)
+                        if (prereqs
+                            .Select(c => c.Abbreviation)
                             .Where(c => c != abbreviation)
                             .Any(c => !episode.Tasks.FirstOrDefault(t => t.Abbreviation == c)?.Done ?? false))
                             ping = false; // Not all caller(s) are done
                     }
-                    if (ping)
-                    {
-                        var nextTask = project.KeyStaff.FirstOrDefault(ks => ks.Role.Abbreviation == candidate.Key);
-                        if (nextTask != null)
-                        {
-                            // Skip task if task is done
-                            if (episode.Tasks.FirstOrDefault(t => t.Abbreviation == nextTask.Role.Abbreviation)?.Done ?? false) continue;
 
-                            var userId = episode.PinchHitters.FirstOrDefault(t => t.Abbreviation == nextTask.Role.Abbreviation)?.UserId ?? nextTask.UserId;
-                            var staffMention = $"<@{userId}>";
-                            var roleTitle = nextTask.Role.Name;
-                            if (prefixMode != CongaPrefixType.None)
-                            {
-                                // Using a switch expression in the middle of string interpolation is insane btw
-                                congaContent.Append($"[{prefixMode switch {
-                                    CongaPrefixType.Nickname => project.Nickname,
-                                    CongaPrefixType.Title => project.Title,
-                                    _ => string.Empty 
-                                }}] ");
-                            }
-                            congaContent.AppendLine(T("progress.done.conga", lng, staffMention, episode.Number, roleTitle));
-                            
-                            // Update database with new last-reminded time
-                            var congaTaskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == nextTask.Role.Abbreviation));
-                            await AzureHelper.PatchEpisodeAsync(episode, [
-                                PatchOperation.Set($"/tasks/{congaTaskIndex}/lastReminded", DateTimeOffset.UtcNow)
-                            ]);
-                        }
+                    if (!ping) continue;
+                    
+                    var nextTask = project.KeyStaff.FirstOrDefault(ks => ks.Role.Abbreviation == candidate.Abbreviation);
+                    if (nextTask == null) continue;
+                    
+                    // Skip task if task is done
+                    if (episode.Tasks.FirstOrDefault(t => t.Abbreviation == nextTask.Role.Abbreviation)?.Done ?? false) continue;
+
+                    var userId = episode.PinchHitters.FirstOrDefault(t => t.Abbreviation == nextTask.Role.Abbreviation)?.UserId ?? nextTask.UserId;
+                    var staffMention = $"<@{userId}>";
+                    var roleTitle = nextTask.Role.Name;
+                    if (prefixMode != CongaPrefixType.None)
+                    {
+                        // Using a switch expression in the middle of string interpolation is insane btw
+                        congaContent.Append($"[{prefixMode switch {
+                            CongaPrefixType.Nickname => project.Nickname,
+                            CongaPrefixType.Title => project.Title,
+                            _ => string.Empty 
+                        }}] ");
                     }
+                    congaContent.AppendLine(T("progress.done.conga", lng, staffMention, episode.Number, roleTitle));
+                            
+                    // Update database with new last-reminded time
+                    var congaTaskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == nextTask.Role.Abbreviation));
+                    await AzureHelper.PatchEpisodeAsync(episode, [
+                        PatchOperation.Set($"/tasks/{congaTaskIndex}/lastReminded", DateTimeOffset.UtcNow)
+                    ]);
                 }
                 if (congaContent.Length > 0)
                     await interaction.Channel.SendMessageAsync(congaContent.ToString());

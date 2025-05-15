@@ -29,11 +29,6 @@ namespace Nino.Commands
                 current = current.Trim().ToUpperInvariant();
                 next = next.Trim().ToUpperInvariant();
 
-                List<string> manyToOne = [];
-                List<string> oneToMany = [];
-                int manyToOneCount = 0;
-                int oneToManyCount = 0;
-
                 // Verify project and user - Owner or Admin required
                 var project = Utils.ResolveAlias(alias, interaction);
                 if (project == null)
@@ -43,15 +38,9 @@ namespace Nino.Commands
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
                 // Validate current task isn't already in the conga line
-                if (project.CongaParticipants.Any(c => c.Current == current && c.Next == next))
+                if (project.CongaParticipants.Contains(current) 
+                    && project.CongaParticipants.GetDependentsOf(current).Any(c => c.Abbreviation == next))
                     return await Response.Fail(T("error.conga.alreadyExists", lng, current, next), interaction);
-
-                // Find current union members (one→many relationship)
-                oneToMany.AddRange(project.CongaParticipants.Where(c => c.Current == current).Select(p => p.Next));
-                oneToManyCount = oneToMany.Count;
-                // Find next union members (many→one relationship)
-                manyToOne.AddRange(project.CongaParticipants.Where(c => c.Next == next).Select(p => p.Current));
-                manyToOneCount = manyToOne.Count;
 
                 // Validate tasks exist
                 if (project.KeyStaff.All(ks => ks.Role.Abbreviation != current))
@@ -59,19 +48,18 @@ namespace Nino.Commands
                 if (project.KeyStaff.All(ks => ks.Role.Abbreviation != next))
                     return await Response.Fail(T("error.noSuchTask", lng, next), interaction);
 
-                // We good!
-                var participant = new CongaParticipant
-                {
-                    Current = current,
-                    Next = next
-                };
-
-                oneToMany.Add(next);
-                manyToOne.Add(current);
+                // We are good to go!
+                var originalPrereqCount = project.CongaParticipants.GetPrerequisitesFor(next).Count();
+                var originalDepsCount = project.CongaParticipants.GetDependentsOf(current).Count();
+                
+                project.CongaParticipants.Add(current, next);
+                
+                var prereqs = project.CongaParticipants.GetPrerequisitesFor(next).ToList();
+                var deps = project.CongaParticipants.GetDependentsOf(current).ToList();
 
                 // Add to database
                 await AzureHelper.PatchProjectAsync(project, [
-                    PatchOperation.Add("/congaParticipants/-", participant)
+                    PatchOperation.Set("/congaParticipants", project.CongaParticipants.Serialize())
                 ]);
 
                 Log.Info($"Added {current} → {next} to the Conga line for {project}");
@@ -79,15 +67,15 @@ namespace Nino.Commands
                 var description = new StringBuilder();
 
                 // New one-to-many union (ex: TL → (ED, TS))
-                if (oneToMany.Count > 1 && oneToMany.Count > oneToManyCount)
+                if (deps.Count > 1 && deps.Count > originalDepsCount)
                 {
-                    var unionStr = $"({string.Join(", ", oneToMany)})";
+                    var unionStr = $"({string.Join(", ", deps)})";
                     description.AppendLine(T("project.conga.union.added.next", lng, current, next, current, unionStr));
                 }
                 // New many-to-one union (ex: (TLC, TS) → QC)
-                else if (manyToOne.Count > 1 && manyToOne.Count > manyToOneCount)
+                else if (prereqs.Count > 1 && prereqs.Count > originalPrereqCount)
                 {
-                    var unionStr = $"({string.Join(", ", manyToOne)})";
+                    var unionStr = $"({string.Join(", ", prereqs)})";
                     description.AppendLine(T("project.conga.union.added.current", lng, current, next, unionStr, next));
                 }
                 // Normal (ex: QC1 → QC2)
@@ -97,7 +85,7 @@ namespace Nino.Commands
                 }
                 
                 // Add reminder information if this is the first conga added
-                if (project.CongaParticipants.Length == 0)
+                if (project.CongaParticipants.Nodes.Count == 1)
                     description.AppendLine(T("project.conga.firstHelp", lng));
 
                 // Send success embed

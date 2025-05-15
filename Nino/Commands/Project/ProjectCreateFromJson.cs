@@ -107,7 +107,7 @@ namespace Nino.Commands
                 CongaReminderEnabled = false,
                 AdministratorIds = template.AdministratorIds ?? [],
                 KeyStaff = template.KeyStaff,
-                CongaParticipants = template.CongaParticipants ?? [],
+                CongaParticipants = CongaGraph.Deserialize(template.CongaParticipants?.ToList() ?? []) ,
                 Aliases = template.Aliases ?? [],
                 AniListId = template.AniListId,
                 Created = DateTimeOffset.UtcNow

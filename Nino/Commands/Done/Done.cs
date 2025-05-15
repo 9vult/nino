@@ -42,7 +42,7 @@ namespace Nino.Commands
             if (!goOn) return ExecutionResult.Success;
             
             // Check Conga permissions
-            if (project.CongaParticipants.Length != 0)
+            if (project.CongaParticipants.Nodes.Count != 0)
             {
                 goOn = await PermissionChecker.Precheck(_interactiveService, interaction, project, lng, false, true);
                 // Cancel

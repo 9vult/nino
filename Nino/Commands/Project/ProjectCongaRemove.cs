@@ -37,13 +37,14 @@ namespace Nino.Commands
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
                 // Validate participant is in the conga line
-                if (!project.CongaParticipants.Any(c => c.Current == current && c.Next == next))
+                if (!project.CongaParticipants.Contains(current) 
+                    || project.CongaParticipants.GetDependentsOf(current).All(c => c.Abbreviation != next))
                     return await Response.Fail(T("error.noSuchConga", lng, current), interaction);
 
-                // Remove from database
-                var cIndex = Array.IndexOf(project.CongaParticipants, project.CongaParticipants.Single(c => c.Current == current && c.Next == next));
+                // Update database
+                project.CongaParticipants.Remove(current, next);
                 await AzureHelper.PatchProjectAsync(project, [
-                    PatchOperation.Remove($"/congaParticipants/{cIndex}")
+                    PatchOperation.Set($"/congaParticipants", project.CongaParticipants.Serialize()),
                 ]);
 
                 Log.Info($"Removed {current} → {next} from the Conga line for {project}");

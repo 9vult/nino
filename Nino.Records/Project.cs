@@ -18,7 +18,7 @@ namespace Nino.Records
         [JsonIgnore] public required ulong ReleaseChannelId;
         public required bool IsPrivate;
         public required bool IsArchived = false;
-        public required CongaParticipant[] CongaParticipants;
+        [JsonIgnore] public required CongaGraph CongaParticipants;
         public required string[] Aliases;
         public string? Motd;
         public int? AniListId;
@@ -115,6 +115,14 @@ namespace Nino.Records
         public string? AniListUrl
         {
             get => AniListId is null ? null : $"https://anilist.co/anime/{AniListId}";
+        }
+        
+        [JsonProperty("CongaParticipants")]
+        [System.Text.Json.Serialization.JsonIgnore]
+        public List<CongaNodeDto> SerializationCongaGraph
+        {
+            get => CongaParticipants.Serialize();
+            set => CongaParticipants = CongaGraph.Deserialize(value);
         }
 
         public override string ToString ()

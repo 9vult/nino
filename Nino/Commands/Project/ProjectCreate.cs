@@ -68,7 +68,7 @@ namespace Nino.Commands
                 CongaReminderEnabled = false,
                 AdministratorIds = [],
                 KeyStaff = [],
-                CongaParticipants = [],
+                CongaParticipants = new CongaGraph(),
                 Aliases = [],
                 AniListId = aniListId,
                 Created = DateTimeOffset.UtcNow
