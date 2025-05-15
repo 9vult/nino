@@ -2,12 +2,23 @@ using System.Collections.ObjectModel;
 
 namespace Nino.Records;
 
+/// <summary>
+/// Represents the Conga graph for a project
+/// </summary>
 public class CongaGraph
 {
     private readonly Dictionary<string, CongaNode> _nodes = [];
 
+    /// <summary>
+    /// All the nodes
+    /// </summary>
     public ReadOnlyCollection<CongaNode> Nodes => _nodes.Values.ToList().AsReadOnly();
 
+    /// <summary>
+    /// Add a new link to the graph
+    /// </summary>
+    /// <param name="current">Current task abbreviation</param>
+    /// <param name="next">Next task abbreviation</param>
     public void Add(string current, string next)
     {
         var currentNode = GetOrCreateNode(current);
@@ -17,6 +28,11 @@ public class CongaGraph
         nextNode.Prerequisites.Add(currentNode);
     }
 
+    /// <summary>
+    /// Remove a link from the graph
+    /// </summary>
+    /// <param name="current">Current task abbreviation</param>
+    /// <param name="next">Next task abbreviation</param>
     public void Remove(string current, string next)
     {
         if (!_nodes.TryGetValue(current, out var currentNode) || !_nodes.TryGetValue(next, out var nextNode)) return;
@@ -25,6 +41,11 @@ public class CongaGraph
         nextNode.Prerequisites.Remove(currentNode);
     }
 
+    /// <summary>
+    /// Get prerequisites for a task
+    /// </summary>
+    /// <param name="abbreviation">Task to look up</param>
+    /// <returns>Prerequisite nodes</returns>
     public IEnumerable<CongaNode> GetPrerequisitesFor(string abbreviation)
     {
         return _nodes.TryGetValue(abbreviation, out var node) 
@@ -32,6 +53,11 @@ public class CongaGraph
             : Enumerable.Empty<CongaNode>();
     }
 
+    /// <summary>
+    /// Get dependents of a task
+    /// </summary>
+    /// <param name="abbreviation">Task to look up</param>
+    /// <returns>Dependent nodes</returns>
     public IEnumerable<CongaNode> GetDependentsOf(string abbreviation)
     {
         return _nodes.TryGetValue(abbreviation, out var node)
@@ -39,16 +65,31 @@ public class CongaGraph
             : Enumerable.Empty<CongaNode>();
     }
     
+    /// <summary>
+    /// Get if a task is part of the graph
+    /// </summary>
+    /// <param name="abbreviation">Task to look up</param>
+    /// <returns><see langword="true"/> if the task exists in the graph</returns>
     public bool Contains(string abbreviation)
     {
         return _nodes.ContainsKey(abbreviation);
     }
 
+    /// <summary>
+    /// Get a node
+    /// </summary>
+    /// <param name="abbreviation">Task to look up</param>
+    /// <returns>The node, or <see langword="null"/></returns>
     public CongaNode? Get(string abbreviation)
     {
         return _nodes.GetValueOrDefault(abbreviation);
     }
 
+    /// <summary>
+    /// Gets or creates a node
+    /// </summary>
+    /// <param name="abbreviation">Task to get or create</param>
+    /// <returns>The node</returns>
     private CongaNode GetOrCreateNode(string abbreviation)
     {
         if (_nodes.TryGetValue(abbreviation, out var node)) return node;
@@ -58,6 +99,10 @@ public class CongaGraph
         return node;
     }
 
+    /// <summary>
+    /// Serialize the graph into a flat list
+    /// </summary>
+    /// <returns>Flat list</returns>
     public List<CongaNodeDto> Serialize()
     {
         var participants = new List<CongaNodeDto>();
@@ -69,6 +114,11 @@ public class CongaGraph
         return participants;
     }
 
+    /// <summary>
+    /// Deserialize a flat list to a graph
+    /// </summary>
+    /// <param name="nodes">Flat list of nodes</param>
+    /// <returns>Graph</returns>
     public static CongaGraph Deserialize(List<CongaNodeDto> nodes)
     {
         var graph = new CongaGraph();

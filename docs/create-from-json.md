@@ -23,7 +23,7 @@ If you have multiple projects to create, or you have a template you use often, y
     FirstEpisode: decimal,
     AdministratorIds: ulong[],
     Aliases: string[],
-    CongaParticipants: CongaParticipant[]
+    CongaParticipants: CongaNodeDto[]
 }
 ```
 

@@ -732,6 +732,10 @@
         "project": {
           "name": "project",
           "description": "Project nickname"
+        },
+        "episode": {
+          "name": "episode",
+          "description": "Episode number"
         }
       },
       "remove": {
