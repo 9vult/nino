@@ -31,9 +31,10 @@ namespace Nino.Services
         {
             foreach (var project in Cache.GetProjects().Where(p => p is { CongaReminderEnabled: true, IsArchived: false }))
             {
-                if (await Nino.Client.GetChannelAsync((ulong)project.CongaReminderChannelId!) is not SocketTextChannel channel) continue;
+                if (await Nino.Client.GetChannelAsync((ulong)project.CongaReminderChannelId!) is not SocketTextChannel
+                    channel) continue;
                 var gLng = Cache.GetConfig(project.GuildId)?.Locale?.ToDiscordLocale() ?? channel.Guild.PreferredLocale;
-                
+
                 var prefixMode = Cache.GetConfig(project.GuildId)?.CongaPrefix ?? CongaPrefixType.None;
                 var reminderText = new StringBuilder();
                 foreach (var episode in Cache.GetEpisodes(project.Id).Where(e => !e.Tasks.All(t => t.Done)))
@@ -41,27 +42,33 @@ namespace Nino.Services
                     var patchOperations = new List<PatchOperation>();
                     foreach (var abbreviation in CongaHelper.GetTardyTasks(project, episode))
                     {
-                        var keyStaff = project.KeyStaff.FirstOrDefault(ks => ks.Role.Abbreviation == abbreviation);
-                        if (keyStaff is null) continue;
+                        var staff = project.KeyStaff.Concat(Cache.GetEpisodes(project.Id)
+                                .SelectMany(e => e.AdditionalStaff))
+                                .FirstOrDefault(ks => ks.Role.Abbreviation == abbreviation);
+                        if (staff is null) continue;
 
-                        var staffMention = $"<@{keyStaff.UserId}>";
-                        var roleTitle = keyStaff.Role.Name;
+                        var staffMention = $"<@{staff.UserId}>";
+                        var roleTitle = staff.Role.Name;
                         if (prefixMode != CongaPrefixType.None)
                         {
                             // Using a switch expression in the middle of string interpolation is insane btw
                             reminderText.Append($"[{prefixMode switch {
                                 CongaPrefixType.Nickname => project.Nickname,
                                 CongaPrefixType.Title => project.Title,
-                                _ => string.Empty 
+                                _ => string.Empty
                             }}] ");
                         }
-                        reminderText.AppendLine(T("progress.done.conga.reminder", gLng, staffMention, episode.Number, roleTitle));
-                        
+
+                        reminderText.AppendLine(T("progress.done.conga.reminder", gLng, staffMention, episode.Number,
+                            roleTitle));
+
                         // Update database with new last-reminded time
-                        var taskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == abbreviation));
-                        patchOperations.Add(PatchOperation.Set($"/tasks/{taskIndex}/lastReminded", DateTimeOffset.UtcNow));
+                        var taskIndex = Array.IndexOf(episode.Tasks,
+                            episode.Tasks.Single(t => t.Abbreviation == abbreviation));
+                        patchOperations.Add(PatchOperation.Set($"/tasks/{taskIndex}/lastReminded",
+                            DateTimeOffset.UtcNow));
                     }
-                    
+
                     if (patchOperations.Count != 0)
                         await AzureHelper.PatchEpisodeAsync(episode, patchOperations);
                 }
@@ -69,7 +76,7 @@ namespace Nino.Services
                 if (reminderText.Length <= 0) continue;
                 await channel.SendMessageAsync(reminderText.ToString());
                 Log.Info($"Published conga reminders for {project}");
-                
+
                 await Cache.RebuildCacheForProject(project.Id);
             }
         }

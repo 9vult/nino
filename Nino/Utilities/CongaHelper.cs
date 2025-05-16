@@ -23,9 +23,9 @@ public static class CongaHelper
         {
             var prerequisites = graph.GetPrerequisitesFor(nextTask).ToList();
             if (prerequisites.Count == 0) continue;
-            
+
             // Check if all prereqs are complete and that the task exists
-            if (!prerequisites.All(p => taskLookup.TryGetValue(p.Abbreviation, out var pTask) && pTask.Done)) continue;
+            if (!prerequisites.All(p => p.Type == CongaNodeType.Special || (taskLookup.TryGetValue(p.Abbreviation, out var pTask) && pTask.Done))) continue;
             if (!taskLookup.TryGetValue(nextTask, out var task) || task.Done) continue;
             
             // We aren't checking the date here

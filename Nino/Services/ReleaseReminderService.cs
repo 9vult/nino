@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using System.Text;
+using Discord;
 using Discord.WebSocket;
 using Localizer;
 using Microsoft.Azure.Cosmos;
@@ -7,6 +8,7 @@ using Nino.Records.Enums;
 using Nino.Utilities;
 using NLog;
 using static Localizer.Localizer;
+using Task = System.Threading.Tasks.Task;
 
 namespace Nino.Services
 {
@@ -33,10 +35,11 @@ namespace Nino.Services
         private static async System.Threading.Tasks.Task CheckForReleases()
         {
             Dictionary<Guid, List<Episode>> marked = [];
-            foreach (var project in Cache.GetProjects().Where(p => p.AirReminderEnabled && p.AniListId is not null))
+            
+            foreach (var project in Cache.GetProjects().Where(p => p is { AirReminderEnabled: true, AniListId: not null }))
             {
                 var decimalNumber = 0m;
-                foreach (var episode in Cache.GetEpisodes(project.Id).Where(e => !e.Done && !e.ReminderPosted && Utils.EpisodeNumberIsNumber(e.Number, out decimalNumber)))
+                foreach (var episode in Cache.GetEpisodes(project.Id).Where(e => e is { Done: false, ReminderPosted: false } && Utils.EpisodeNumberIsNumber(e.Number, out decimalNumber)))
                 {
                     try
                     {
@@ -70,6 +73,9 @@ namespace Nino.Services
                             .Build();
                         await channel.SendMessageAsync(text: mention, embed: embed);
                         
+                        // Conga intervention!
+                        await DoReleaseConga(project, episode, gLng);
+                        
                         Log.Info($"Published release reminder for {project} episode {episode}");
                     }
                     catch (Exception e)
@@ -92,6 +98,69 @@ namespace Nino.Services
                 }
                 await batch.ExecuteAsync();
                 await Cache.RebuildCacheForProject(kvpair.Key);
+            }
+        }
+
+        /// <summary>
+        /// Helper function for $AIR conga reminders
+        /// </summary>
+        /// <param name="project">The project</param>
+        /// <param name="episode">The episode</param>
+        /// <param name="gLng">Guild language</param>
+        private static async Task DoReleaseConga(Project project, Episode episode, string gLng)
+        {
+            var prefixMode = Cache.GetConfig(project.GuildId)?.CongaPrefix ?? CongaPrefixType.None;
+            var reminderText = new StringBuilder();
+            if (project.CongaParticipants.Nodes.Count != 0)
+            {
+                var staff = project.KeyStaff.Concat(episode.AdditionalStaff).ToList();
+                var validTargets = new HashSet<string>(staff
+                    .Select(ks => ks.Role.Abbreviation)
+                    .Where(ks => episode.Tasks.FirstOrDefault(t => t.Abbreviation == ks) is { Done: false, LastReminded: null})
+                );
+
+                var nodes = project.CongaParticipants
+                    .GetDependentsOf("$AIR")
+                    .Where(c => validTargets.Contains(c.Abbreviation))
+                    .ToList();
+
+                var pingTargets = nodes
+                    .Select(c => staff.FirstOrDefault(ks => ks.Role.Abbreviation == c.Abbreviation))
+                    .Where(c => c?.UserId != project.AirReminderUserId) // Prevent double pings
+                    .ToList();
+                        
+                var patchOperations = nodes
+                    .Select(c => Array.FindIndex(episode.Tasks, t => t.Abbreviation == c.Abbreviation))
+                    .Where(index => index != -1)
+                    .Select(index => PatchOperation.Set($"/tasks/{index}/lastReminded", DateTimeOffset.UtcNow))
+                    .ToList();
+
+                if (patchOperations.Count == 0) return;
+                await AzureHelper.PatchEpisodeAsync(episode, patchOperations);
+                
+                // Time to send the conga message
+                if (await Nino.Client.GetChannelAsync((ulong)project.CongaReminderChannelId!) is not SocketTextChannel channel) return;
+
+                foreach (var target in pingTargets)
+                {
+                    if (target is null) continue;
+
+                    var staffMention = $"<@{target.UserId}>";
+                    var roleTitle = target.Role.Name;
+                    if (prefixMode != CongaPrefixType.None)
+                    {
+                        reminderText.Append($"[{prefixMode switch {
+                            CongaPrefixType.Nickname => project.Nickname,
+                            CongaPrefixType.Title => project.Title,
+                            _ => string.Empty
+                        }}] ");
+                    }
+                    reminderText.AppendLine(T("progress.done.conga", gLng, staffMention, episode.Number, roleTitle));
+                }
+                
+                if (reminderText.Length <= 0) return;
+                await channel.SendMessageAsync(reminderText.ToString());
+                Log.Info($"Published release conga reminders for {project} episode {episode}");
             }
         }
     }

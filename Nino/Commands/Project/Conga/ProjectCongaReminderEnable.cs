@@ -17,7 +17,7 @@ namespace Nino.Commands
             [SlashCommand("enable", "Enable conga reminders")]
             public async Task<RuntimeResult> Enable(
                 [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-                [Summary("days", "Reminder period")] int days,
+                [Summary("days", "Reminder period"), MinValue(1), MaxValue(90)] int days,
                 [Summary("channel", "Channel to post reminders in"), ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel channel
             )
             {
