@@ -18,7 +18,7 @@ namespace Nino.Records
         [JsonIgnore] public required ulong ReleaseChannelId;
         public required bool IsPrivate;
         public required bool IsArchived = false;
-        [JsonIgnore] public required CongaGraph CongaParticipants;
+        [JsonIgnore] public required CongaGraph CongaParticipants = new();
         public required string[] Aliases;
         public string? Motd;
         public int? AniListId;
@@ -119,9 +119,9 @@ namespace Nino.Records
         
         [JsonProperty("CongaParticipants")]
         [System.Text.Json.Serialization.JsonIgnore]
-        public List<CongaNodeDto> SerializationCongaGraph
+        public CongaNodeDto[] SerializationCongaGraph
         {
-            get => CongaParticipants.Serialize();
+            get => CongaParticipants.Serialize().ToArray();
             set => CongaParticipants = CongaGraph.Deserialize(value);
         }
 

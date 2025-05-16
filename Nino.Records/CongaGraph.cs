@@ -119,7 +119,7 @@ public class CongaGraph
     /// </summary>
     /// <param name="nodes">Flat list of nodes</param>
     /// <returns>Graph</returns>
-    public static CongaGraph Deserialize(List<CongaNodeDto> nodes)
+    public static CongaGraph Deserialize(CongaNodeDto[] nodes)
     {
         var graph = new CongaGraph();
         foreach (var participant in nodes)
