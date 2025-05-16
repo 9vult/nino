@@ -2,6 +2,7 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Localizer;
+using Nino.Records;
 using Nino.Utilities;
 
 namespace Nino.Handlers
@@ -198,6 +199,78 @@ namespace Nino.Handlers
                              || cn.Next.StartsWith(value, StringComparison.InvariantCultureIgnoreCase))
                 .Select(cn => new AutocompleteResult(cn.ToString(), cn.ToString()))
             );
+            return AutocompletionResult.FromSuccess(choices.Take(25));
+        }
+    }
+    
+    /// <summary>
+    /// Autocompletion for Current Conga targets
+    /// </summary>
+    public class CongaCurrentAutocompleteHandler : AutocompleteHandler
+    {
+        public override async Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
+        {
+            var interaction = (SocketAutocompleteInteraction)context.Interaction;
+            var focusedOption = interaction.Data.Current;
+            var userId = interaction.User.Id;
+
+            List<AutocompleteResult> choices = [];
+            var alias = ((string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")?.Value)?.Trim();
+            if (alias is null) return AutocompletionResult.FromSuccess([]);
+            
+            var cachedProject = Utils.ResolveAlias(alias, interaction);
+            if (cachedProject is null) return AutocompletionResult.FromSuccess([]);
+            if (!Utils.VerifyUser(userId, cachedProject)) return AutocompletionResult.FromSuccess([]);
+            
+            var value = ((string)focusedOption.Value).ToUpperInvariant();
+
+            // Generate list of targets
+
+            choices.AddRange(CongaGraph.CurrentSpecials // Current specials
+                .Concat(cachedProject.KeyStaff.Select(ks => ks.Role.Abbreviation))
+                .Concat(Cache.GetEpisodes(cachedProject.Id).SelectMany(e => e.AdditionalStaff)
+                    .Select(ks => ks.Role.Abbreviation)
+                )
+                .ToHashSet()
+                .Select(i => new AutocompleteResult(i, i))
+            );
+            
+            return AutocompletionResult.FromSuccess(choices.Take(25));
+        }
+    }
+    
+    /// <summary>
+    /// Autocompletion for Next Conga targets
+    /// </summary>
+    public class CongaNextAutocompleteHandler : AutocompleteHandler
+    {
+        public override async Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
+        {
+            var interaction = (SocketAutocompleteInteraction)context.Interaction;
+            var focusedOption = interaction.Data.Current;
+            var userId = interaction.User.Id;
+
+            List<AutocompleteResult> choices = [];
+            var alias = ((string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")?.Value)?.Trim();
+            if (alias is null) return AutocompletionResult.FromSuccess([]);
+            
+            var cachedProject = Utils.ResolveAlias(alias, interaction);
+            if (cachedProject is null) return AutocompletionResult.FromSuccess([]);
+            if (!Utils.VerifyUser(userId, cachedProject)) return AutocompletionResult.FromSuccess([]);
+            
+            var value = ((string)focusedOption.Value).ToUpperInvariant();
+
+            // Generate list of targets
+
+            choices.AddRange(CongaGraph.NextSpecials // Next specials
+                .Concat(cachedProject.KeyStaff.Select(ks => ks.Role.Abbreviation))
+                .Concat(Cache.GetEpisodes(cachedProject.Id).SelectMany(e => e.AdditionalStaff)
+                    .Select(ks => ks.Role.Abbreviation)
+                )
+                .ToHashSet()
+                .Select(i => new AutocompleteResult(i, i))
+            );
+            
             return AutocompletionResult.FromSuccess(choices.Take(25));
         }
     }

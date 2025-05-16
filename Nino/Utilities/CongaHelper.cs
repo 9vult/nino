@@ -1,5 +1,6 @@
 using System.Text;
 using Nino.Records;
+using Nino.Records.Enums;
 
 namespace Nino.Utilities;
 
@@ -42,22 +43,32 @@ public static class CongaHelper
         
         return nextTasks;
     }
-    
+
     /// <summary>
     /// Get an url-encoded dot graph format string for generating an image of the graph
     /// </summary>
     /// <param name="project">Project to generate the graph of</param>
+    /// <param name="forceAdditional">Force inclusion of additional staff</param>
     /// <returns>Url-encoded string</returns>
-    public static string GetDot(Project project)
+    public static string GetDot(Project project, bool forceAdditional = false)
     {
         var sb = new StringBuilder();
         sb.AppendLine("digraph {");
-        
-        foreach (var node in project.CongaParticipants.Nodes)
-        {
-            sb.AppendLine($"    \"{node.Abbreviation}\";");
 
-            foreach (var dependent in node.Dependents)
+        var nodes = forceAdditional
+            ? project.CongaParticipants.Nodes
+            : project.CongaParticipants.Nodes.Where(n => n.Type != CongaNodeType.AdditionalStaff);
+        
+        foreach (var node in nodes)
+        {
+            var shape = node.Type == CongaNodeType.Special ? "diamond" : "circle";
+            var style = node.Type == CongaNodeType.AdditionalStaff ? "filled,dashed" : "filled";
+            
+            sb.AppendLine($"    \"{node.Abbreviation}\" [style=\"{style}\" fillcolor=white, shape={shape}];");
+            
+            var dependents = forceAdditional ? node.Dependents : node.Dependents.Where(n => n.Type != CongaNodeType.AdditionalStaff);
+
+            foreach (var dependent in dependents)
             {
                 sb.AppendLine($"    \"{node.Abbreviation}\" -> \"{dependent.Abbreviation}\";");
             }
@@ -72,21 +83,38 @@ public static class CongaHelper
     /// </summary>
     /// <param name="project">Project to generate the graph of</param>
     /// <param name="episode">Episode to generate the graph for</param>
+    /// <param name="forceAdditional">Force inclusion of additional staff</param>
     /// <returns>Url-encoded string</returns>
-    public static string GetDot(Project project, Episode episode)
+    public static string GetDot(Project project, Episode episode, bool forceAdditional = false)
     {
         var sb = new StringBuilder();
         sb.AppendLine("digraph {");
-        sb.AppendLine("    node [style=filled];");
 
-        foreach (var node in project.CongaParticipants.Nodes)
+        // Filter nodes
+
+        var nodes = forceAdditional
+            ? project.CongaParticipants.Nodes
+            : project.CongaParticipants.Nodes.Where(n =>
+                n.Type != CongaNodeType.AdditionalStaff ||
+                episode.Tasks.Any(t => t.Abbreviation == n.Abbreviation));
+
+
+        foreach (var node in nodes)
         {
             var task = episode.Tasks.FirstOrDefault(t => t.Abbreviation == node.Abbreviation);
             var color = task is null ? "red" : task.Done ? "green" : "orange";
+            var shape = node.Type == CongaNodeType.Special ? "diamond" : "circle";
+            var style = node.Type == CongaNodeType.AdditionalStaff ? "filled,dashed" : "filled";
             
-            sb.AppendLine($"    \"{node.Abbreviation}\" [fillcolor={color}];");
+            sb.AppendLine($"    \"{node.Abbreviation}\" [style=\"{style}\" fillcolor={color}, shape={shape}];");
+            
+            var dependents = forceAdditional
+                ? node.Dependents
+                : node.Dependents.Where(n =>
+                    n.Type != CongaNodeType.AdditionalStaff ||
+                    episode.Tasks.Any(t => t.Abbreviation == n.Abbreviation));
 
-            foreach (var dependent in node.Dependents)
+            foreach (var dependent in dependents)
             {
                 sb.AppendLine($"    \"{node.Abbreviation}\" -> \"{dependent.Abbreviation}\";");
             }

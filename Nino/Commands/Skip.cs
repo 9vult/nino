@@ -154,7 +154,9 @@ namespace Nino.Commands
             // Helper method for doing the conga
             async Task DoTheConga()
             {
-                var congaCandidates = project.CongaParticipants.Get(abbreviation)?.Dependents ?? [];
+                // Get all conga participants that the current task can call out
+                var congaCandidates = project.CongaParticipants.Get(abbreviation)?.Dependents?
+                    .Where(dep => episode.Tasks.Any(t => t.Abbreviation == dep.Abbreviation)).ToList() ?? []; // Limit to tasks in the episode
                 if (congaCandidates.Count == 0) return;
                 
                 var prefixMode = Cache.GetConfig(project.GuildId)?.CongaPrefix ?? CongaPrefixType.None;
@@ -165,7 +167,8 @@ namespace Nino.Commands
                 
                 foreach (var candidate in congaCandidates)
                 {
-                    var prereqs = candidate.Prerequisites;
+                    var prereqs = candidate.Prerequisites
+                        .Where(dep => episode.Tasks.Any(t => t.Abbreviation == dep.Abbreviation)).ToList();
                     if (prereqs.Count == 1)
                     {
                         singleCandidates.Add(candidate);
@@ -196,7 +199,8 @@ namespace Nino.Commands
                 // Ping everyone to be pung
                 foreach (var candidate in multiCandidates.Concat(singleCandidates))
                 {
-                    var nextTask = project.KeyStaff.FirstOrDefault(ks => ks.Role.Abbreviation == candidate.Abbreviation);
+                    var nextTask = project.KeyStaff.Concat(episode.AdditionalStaff)
+                        .FirstOrDefault(ks => ks.Role.Abbreviation == candidate.Abbreviation);
                     if (nextTask is null) continue;
                     
                     // Skip task if already done

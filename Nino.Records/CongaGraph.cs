@@ -8,6 +8,16 @@ namespace Nino.Records;
 /// </summary>
 public class CongaGraph
 {
+    /// <summary>
+    /// Special nodes for the current position
+    /// </summary>
+    public static readonly string[] CurrentSpecials = ["$AIR"];
+    /// <summary>
+    /// Special nodes for the next position
+    /// </summary>
+    public static readonly string[] NextSpecials = [];
+    
+    
     private readonly Dictionary<string, CongaNode> _nodes = [];
 
     /// <summary>
@@ -20,10 +30,12 @@ public class CongaGraph
     /// </summary>
     /// <param name="current">Current task abbreviation</param>
     /// <param name="next">Next task abbreviation</param>
-    public void Add(string current, string next)
+    /// <param name="currentType">Type of the current node</param>
+    /// <param name="nextType">Type of the next node</param>
+    public void Add(string current, string next, CongaNodeType currentType = CongaNodeType.KeyStaff, CongaNodeType nextType = CongaNodeType.KeyStaff)
     {
-        var currentNode = GetOrCreateNode(current);
-        var nextNode = GetOrCreateNode(next);
+        var currentNode = GetOrCreateNode(current, currentType);
+        var nextNode = GetOrCreateNode(next, nextType);
         
         currentNode.Dependents.Add(nextNode);
         nextNode.Prerequisites.Add(currentNode);

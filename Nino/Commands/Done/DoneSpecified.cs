@@ -109,13 +109,15 @@ namespace Nino.Commands
             StringBuilder congaContent = new();
 
             // Get all conga participants that the current task can call out
-            var congaCandidates = project.CongaParticipants.Get(abbreviation)?.Dependents ?? [];
+            var congaCandidates = project.CongaParticipants.Get(abbreviation)?.Dependents?
+                .Where(dep => episode.Tasks.Any(t => t.Abbreviation == dep.Abbreviation)).ToList() ?? []; // Limit to tasks in the episode
 
             if (congaCandidates.Count > 0)
             {
                 foreach (var candidate in congaCandidates)
                 {
-                    var prereqs = candidate.Prerequisites;
+                    var prereqs = candidate.Prerequisites
+                        .Where(dep => episode.Tasks.Any(t => t.Abbreviation == dep.Abbreviation)).ToList();
                     var ping = true;
                     if (prereqs.Count > 1) // More than just this task
                     {
@@ -129,7 +131,8 @@ namespace Nino.Commands
 
                     if (!ping) continue;
                     
-                    var nextTask = project.KeyStaff.FirstOrDefault(ks => ks.Role.Abbreviation == candidate.Abbreviation);
+                    var nextTask = project.KeyStaff.Concat(episode.AdditionalStaff)
+                        .FirstOrDefault(ks => ks.Role.Abbreviation == candidate.Abbreviation);
                     if (nextTask == null) continue;
                     
                     // Skip task if task is done

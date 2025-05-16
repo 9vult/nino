@@ -15,7 +15,8 @@ namespace Nino.Commands
             [SlashCommand("list", "List all the Conga line participants")]
             public async Task<RuntimeResult> List(
                 [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-                [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string? episodeNumber = null
+                [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string? episodeNumber = null,
+                [Summary("force-additional", "Force inclusion of additional staff")] bool forceAdditional = false
             )
             {
                 var interaction = Context.Interaction;
@@ -52,7 +53,7 @@ namespace Nino.Commands
                     return ExecutionResult.Success;
                 }
 
-                var encodedDot = episode is null ? CongaHelper.GetDot(project) : CongaHelper.GetDot(project, episode);
+                var encodedDot = episode is null ? CongaHelper.GetDot(project, forceAdditional) : CongaHelper.GetDot(project, episode, forceAdditional);
                 var url = $"https://quickchart.io/graphviz?format=png&graph={encodedDot}";
 
                 // Send embed
