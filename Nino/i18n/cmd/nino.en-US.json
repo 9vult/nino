@@ -745,13 +745,9 @@
           "name": "project",
           "description": "Project nickname"
         },
-        "abbreviation": {
-          "name": "abbreviation",
-          "description": "Position shorthand"
-        },
-        "next": {
-          "name": "next",
-          "description": "Position to ping"
+        "link": {
+          "name": "link",
+          "description": "Link in the Conga graph"
         }
       }
     },
