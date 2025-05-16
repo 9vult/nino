@@ -27,4 +27,20 @@ public record CongaNodeDto
 {
     public required string Current { get; init; }
     public required string Next { get; init; }
+
+    public override string ToString()
+    {
+        return $"{Current} \u2192 {Next}";
+    }
+
+    public static CongaNodeDto FromString(string input)
+    {
+        var splits = input.Split("\u2192");
+        if (splits.Length != 2) throw new FormatException();
+        return new CongaNodeDto
+        {
+            Current = splits[0].Trim(),
+            Next = splits[1].Trim(),
+        };
+    }
 }

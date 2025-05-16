@@ -16,8 +16,7 @@ namespace Nino.Commands
             [SlashCommand("remove", "Remove a link from the Conga line")]
             public async Task<RuntimeResult> Remove(
                 [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-                [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(KeyStaffAutocompleteHandler))] string current,
-                [Summary("next", "Position to ping"), Autocomplete(typeof(KeyStaffAutocompleteHandler))] string next
+                [Summary("link", "Link in the Conga graph"), Autocomplete(typeof(CongaNodesAutocompleteHandler))] string nodeText
             )
             {
                 var interaction = Context.Interaction;
@@ -25,8 +24,17 @@ namespace Nino.Commands
 
                 // Sanitize inputs
                 alias = alias.Trim();
-                current = current.Trim().ToUpperInvariant();
-                next = next.Trim().ToUpperInvariant();
+                
+                // Verify node
+                CongaNodeDto node;
+                try
+                {
+                    node = CongaNodeDto.FromString(nodeText.Trim());
+                }
+                catch (Exception)
+                {
+                    return await Response.Fail(T("error.noSuchConga", lng), interaction);
+                }
 
                 // Verify project and user - Owner or Admin required
                 var project = Utils.ResolveAlias(alias, interaction);
@@ -37,22 +45,22 @@ namespace Nino.Commands
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
                 // Validate participant is in the conga line
-                if (!project.CongaParticipants.Contains(current) 
-                    || project.CongaParticipants.GetDependentsOf(current).All(c => c.Abbreviation != next))
-                    return await Response.Fail(T("error.noSuchConga", lng, current), interaction);
+                if (!project.CongaParticipants.Contains(node.Current) 
+                    || project.CongaParticipants.GetDependentsOf(node.Current).All(c => c.Abbreviation != node.Next))
+                    return await Response.Fail(T("error.noSuchConga", lng), interaction);
 
                 // Update database
-                project.CongaParticipants.Remove(current, next);
+                project.CongaParticipants.Remove(node.Current, node.Next);
                 await AzureHelper.PatchProjectAsync(project, [
                     PatchOperation.Set($"/congaParticipants", project.CongaParticipants.Serialize()),
                 ]);
 
-                Log.Info($"Removed {current} → {next} from the Conga line for {project}");
+                Log.Info($"Removed {node} from the Conga line for {project}");
 
                 // Send success embed
                 var embed = new EmbedBuilder()
                     .WithTitle(T("title.projectModification", lng))
-                    .WithDescription(T("project.conga.removed", lng, current, next))
+                    .WithDescription(T("project.conga.removed", lng, node.Current, node.Next))
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 

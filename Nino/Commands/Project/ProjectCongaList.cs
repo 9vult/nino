@@ -13,7 +13,7 @@ namespace Nino.Commands
         public partial class Conga
         {
             [SlashCommand("list", "List all the Conga line participants")]
-            public async Task<RuntimeResult> Remove(
+            public async Task<RuntimeResult> List(
                 [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
                 [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string? episodeNumber = null
             )

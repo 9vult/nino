@@ -157,6 +157,37 @@ namespace Nino.Handlers
             return AutocompletionResult.FromSuccess(choices.Take(25));
         }
     }
+    
+    /// <summary>
+    /// Autocompletion for Conga participants
+    /// </summary>
+    public class CongaNodesAutocompleteHandler : AutocompleteHandler
+    {
+        public override async Task<AutocompletionResult> GenerateSuggestionsAsync(IInteractionContext context, IAutocompleteInteraction autocompleteInteraction, IParameterInfo parameter, IServiceProvider services)
+        {
+            var interaction = (SocketAutocompleteInteraction)context.Interaction;
+            var commandName = interaction.Data.CommandName;
+            var focusedOption = interaction.Data.Current;
+            var guildId = interaction.GuildId ?? 0;
+            var userId = interaction.User.Id;
+
+            List<AutocompleteResult> choices = [];
+            var alias = ((string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")?.Value)?.Trim();
+            if (alias is not null)
+            {
+                var cachedProject = Utils.ResolveAlias(alias, interaction);
+                if (cachedProject is null) return AutocompletionResult.FromSuccess([]);
+                var value = ((string)focusedOption.Value).ToUpperInvariant();
+                // Return list of conga participants
+                choices.AddRange(cachedProject.CongaParticipants.Serialize()
+                    .Where(cn => cn.Current.StartsWith(value, StringComparison.InvariantCultureIgnoreCase)
+                                 || cn.Next.StartsWith(value, StringComparison.InvariantCultureIgnoreCase))
+                    .Select(cn => new AutocompleteResult(cn.ToString(), cn.ToString()))
+                );
+            }
+            return AutocompletionResult.FromSuccess(choices.Take(25));
+        }
+    }
 
     /// <summary>
     /// Autocompletion for Additional Staff
