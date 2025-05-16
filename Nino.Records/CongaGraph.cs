@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using Nino.Records.Enums;
 
 namespace Nino.Records;
 
@@ -90,40 +91,68 @@ public class CongaGraph
     /// </summary>
     /// <param name="abbreviation">Task to get or create</param>
     /// <returns>The node</returns>
-    private CongaNode GetOrCreateNode(string abbreviation)
+    private CongaNode GetOrCreateNode(string abbreviation, CongaNodeType type = CongaNodeType.KeyStaff)
     {
         if (_nodes.TryGetValue(abbreviation, out var node)) return node;
         
-        node = new CongaNode { Abbreviation = abbreviation };
+        node = new CongaNode { Abbreviation = abbreviation, Type = type };
         _nodes[abbreviation] = node;
         return node;
     }
 
     /// <summary>
-    /// Serialize the graph into a flat list
+    /// Get a list of the edges in the graph
     /// </summary>
-    /// <returns>Flat list</returns>
-    public List<CongaNodeDto> Serialize()
+    /// <returns>List of edges in the graph</returns>
+    public List<CongaEdge> GetEdges()
     {
-        var participants = new List<CongaNodeDto>();
+        var participants = new List<CongaEdge>();
         foreach (var node in Nodes)
         {
             participants.AddRange(node.Dependents.Select(dep => 
-                new CongaNodeDto { Current = node.Abbreviation, Next = dep.Abbreviation }));
+                new CongaEdge { Current = node.Abbreviation, Next = dep.Abbreviation }));
         }
         return participants;
+    }
+    
+    /// <summary>
+    /// Serialize the graph into a flat list
+    /// </summary>
+    /// <returns>Flat list</returns>
+    public CongaNodeDto[] Serialize()
+    {
+        return Nodes.Select(n => new CongaNodeDto
+        {
+            Abbreviation = n.Abbreviation,
+            Type = n.Type,
+            Dependents = n.Dependents.Select(d => d.Abbreviation).ToArray()
+        }).ToArray();
     }
 
     /// <summary>
     /// Deserialize a flat list to a graph
     /// </summary>
-    /// <param name="nodes">Flat list of nodes</param>
+    /// <param name="dtos">Flat list of nodes</param>
     /// <returns>Graph</returns>
-    public static CongaGraph Deserialize(CongaNodeDto[] nodes)
+    public static CongaGraph Deserialize(CongaNodeDto[] dtos)
     {
         var graph = new CongaGraph();
-        foreach (var participant in nodes)
-            graph.Add(participant.Current, participant.Next);
+        
+        // First pass: Create nodes
+        foreach (var dto in dtos)
+        {
+            graph.GetOrCreateNode(dto.Abbreviation, dto.Type);
+        }
+        
+        // Second pass: Create edges
+        foreach (var dto in dtos)
+        {
+            foreach (var dep in dto.Dependents)
+            {
+                graph.Add(dto.Abbreviation, dep);
+            }
+        }
+        
         return graph;
     }
 }

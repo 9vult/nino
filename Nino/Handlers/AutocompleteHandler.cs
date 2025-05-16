@@ -193,7 +193,7 @@ namespace Nino.Handlers
             var value = ((string)focusedOption.Value).ToUpperInvariant();
             
             // Return list of conga participants
-            choices.AddRange(cachedProject.CongaParticipants.Serialize()
+            choices.AddRange(cachedProject.CongaParticipants.GetEdges()
                 .Where(cn => cn.Current.StartsWith(value, StringComparison.InvariantCultureIgnoreCase)
                              || cn.Next.StartsWith(value, StringComparison.InvariantCultureIgnoreCase))
                 .Select(cn => new AutocompleteResult(cn.ToString(), cn.ToString()))

@@ -26,10 +26,10 @@ namespace Nino.Commands
                 alias = alias.Trim();
                 
                 // Verify node
-                CongaNodeDto node;
+                CongaEdge edge;
                 try
                 {
-                    node = CongaNodeDto.FromString(nodeText.Trim());
+                    edge = CongaEdge.FromString(nodeText.Trim());
                 }
                 catch (Exception)
                 {
@@ -45,22 +45,22 @@ namespace Nino.Commands
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
                 // Validate participant is in the conga line
-                if (!project.CongaParticipants.Contains(node.Current) 
-                    || project.CongaParticipants.GetDependentsOf(node.Current).All(c => c.Abbreviation != node.Next))
+                if (!project.CongaParticipants.Contains(edge.Current) 
+                    || project.CongaParticipants.GetDependentsOf(edge.Current).All(c => c.Abbreviation != edge.Next))
                     return await Response.Fail(T("error.noSuchConga", lng), interaction);
 
                 // Update database
-                project.CongaParticipants.Remove(node.Current, node.Next);
+                project.CongaParticipants.Remove(edge.Current, edge.Next);
                 await AzureHelper.PatchProjectAsync(project, [
                     PatchOperation.Set($"/congaParticipants", project.CongaParticipants.Serialize()),
                 ]);
 
-                Log.Info($"Removed {node} from the Conga line for {project}");
+                Log.Info($"Removed {edge} from the Conga line for {project}");
 
                 // Send success embed
                 var embed = new EmbedBuilder()
                     .WithTitle(T("title.projectModification", lng))
-                    .WithDescription(T("project.conga.removed", lng, node.Current, node.Next))
+                    .WithDescription(T("project.conga.removed", lng, edge.Current, edge.Next))
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 
