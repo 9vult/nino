@@ -41,8 +41,13 @@ If you have multiple projects to create, or you have a template you use often, y
   "UpdateChannelId": 803139525312249906,
   "ReleaseChannelId": 804434067000393769,
   "AniListId": 145728,
-  "Aliases": [ "spice", "holo" ],
-  "AdministratorIds": [ 134073223208763392 ],
+  "Aliases": [
+    "spice",
+    "holo"
+  ],
+  "AdministratorIds": [
+    134073223208763392
+  ],
   "FirstEpisode": 1,
   "KeyStaff": [
     {
@@ -74,8 +79,14 @@ If you have multiple projects to create, or you have a template you use often, y
   },
   "CongaParticipants": [
     {
-      "Current": "ED",
-      "Next": "QC"
+      "Abbreviation": "ED",
+      "Type": "KeyStaff",
+      "Dependents": ["QC"]
+    },
+    {
+      "Abbreviation": "QC",
+      "Type": "KeyStaff",
+      "Dependents": []
     }
   ]
 }
