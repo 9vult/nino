@@ -27,7 +27,7 @@ namespace Nino.Commands
             var memberId = member.Id;
             alias = alias.Trim();
             taskName = taskName.Trim();
-            abbreviation = abbreviation.Trim().ToUpperInvariant();
+            abbreviation = abbreviation.Trim().ToUpperInvariant().Replace("$", string.Empty);
             episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
 
             // Verify project and user - Owner or Admin required

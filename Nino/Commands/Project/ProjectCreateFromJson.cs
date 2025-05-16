@@ -88,8 +88,20 @@ namespace Nino.Commands
                 }
             }
             
-            // Populate data
+            // Sanitization
+            foreach (var ks in template.KeyStaff)
+            {
+                ks.Role.Abbreviation = ks.Role.Abbreviation.Trim().ToUpperInvariant().Replace("$", string.Empty);
+                ks.Role.Name = ks.Role.Name.Trim();
+            }
 
+            foreach (var ks in template.AdditionalStaff.Values.SelectMany(x => x))
+            {
+                ks.Role.Abbreviation = ks.Role.Abbreviation.Trim().ToUpperInvariant().Replace("$", string.Empty);
+                ks.Role.Name = ks.Role.Name.Trim();
+            }
+            
+            // Populate data
             var projectData = new Project
             {
                 Id = AzureHelper.CreateProjectId(),

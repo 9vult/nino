@@ -26,7 +26,7 @@ namespace Nino.Commands
             var memberId = member.Id;
             alias = alias.Trim();
             taskName = taskName.Trim();
-            abbreviation = abbreviation.Trim().ToUpperInvariant();
+            abbreviation = abbreviation.Trim().ToUpperInvariant().Replace("$", string.Empty);
 
             // Verify project and user - Owner or Admin required
             var project = Utils.ResolveAlias(alias, interaction);
