@@ -1,22 +1,11 @@
-using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
 using Fergun.Interactive;
-using Nino.Handlers;
-using Nino.Records;
-using Nino.Records.Enums;
-using Nino.Utilities;
 using NLog;
-using static Localizer.Localizer;
 
-namespace Nino.Commands
+namespace Nino.Commands.Release;
+
+[Group("release", "Release something to the world!")]
+public partial class Release(InteractiveService interactive) : InteractionModuleBase<SocketInteractionContext>
 {
-    [Group("release", "Release something to the world!")]
-    public partial class Release(InteractionHandler handler, InteractionService commands, InteractiveService interactive) : InteractionModuleBase<SocketInteractionContext>
-    {
-        public InteractionService Commands { get; private set; } = commands;
-        private readonly InteractionHandler _handler = handler;
-        private readonly InteractiveService _interactiveService = interactive;
-        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
-    }
+    private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 }

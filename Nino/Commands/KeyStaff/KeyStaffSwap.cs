@@ -3,64 +3,61 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
-using Nino.Records;
 using Nino.Utilities;
-
 using static Localizer.Localizer;
 
-namespace Nino.Commands
+namespace Nino.Commands.KeyStaff;
+
+public partial class KeyStaff
 {
-    public partial class KeyStaff
+    [SlashCommand("swap", "Swap a Key Staff into the whole project")]
+    public async Task<RuntimeResult> Swap(
+        [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+        [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(KeyStaffAutocompleteHandler))] string abbreviation,
+        [Summary("member", "Staff member")] SocketUser member
+    )
     {
-        [SlashCommand("swap", "Swap a Key Staff into the whole project")]
-        public async Task<RuntimeResult> Swap(
-            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-            [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(KeyStaffAutocompleteHandler))] string abbreviation,
-            [Summary("member", "Staff member")] SocketUser member
-        )
-        {
-            var interaction = Context.Interaction;
-            var lng = interaction.UserLocale;
+        var interaction = Context.Interaction;
+        var lng = interaction.UserLocale;
 
-            // Sanitize imputs
-            var memberId = member.Id;
-            alias = alias.Trim();
-            abbreviation = abbreviation.Trim().ToUpperInvariant();
+        // Sanitize inputs
+        var memberId = member.Id;
+        alias = alias.Trim();
+        abbreviation = abbreviation.Trim().ToUpperInvariant();
 
-            // Verify project and user - Owner or Admin required
-            var project = Utils.ResolveAlias(alias, interaction);
-            if (project == null)
-                return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+        // Verify project and user - Owner or Admin required
+        var project = Utils.ResolveAlias(alias, interaction);
+        if (project == null)
+            return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
-            if (!Utils.VerifyUser(interaction.User.Id, project))
-                return await Response.Fail(T("error.permissionDenied", lng), interaction);
+        if (!Utils.VerifyUser(interaction.User.Id, project))
+            return await Response.Fail(T("error.permissionDenied", lng), interaction);
                 
-            // Check if position exists
-            if (!project.KeyStaff.Any(ks => ks.Role.Abbreviation == abbreviation))
-                return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
+        // Check if position exists
+        if (project.KeyStaff.All(ks => ks.Role.Abbreviation != abbreviation))
+            return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
 
-            // Update user
-            var updatedStaff = project.KeyStaff.Single(k => k.Role.Abbreviation == abbreviation);
-            var ksIndex = Array.IndexOf(project.KeyStaff, updatedStaff);
+        // Update user
+        var updatedStaff = project.KeyStaff.Single(k => k.Role.Abbreviation == abbreviation);
+        var ksIndex = Array.IndexOf(project.KeyStaff, updatedStaff);
 
-            updatedStaff.UserId = memberId;
+        updatedStaff.UserId = memberId;
 
-            // Swap in database
-            await AzureHelper.PatchProjectAsync(project, [
-                PatchOperation.Replace($"/keyStaff/{ksIndex}", updatedStaff)
-            ]);
+        // Swap in database
+        await AzureHelper.PatchProjectAsync(project, [
+            PatchOperation.Replace($"/keyStaff/{ksIndex}", updatedStaff)
+        ]);
 
-            Log.Info($"Swapped M[{memberId} (@{member.Username})] in to {project} for {abbreviation}");
+        Log.Info($"Swapped M[{memberId} (@{member.Username})] in to {project} for {abbreviation}");
 
-            // Send success embed
-            var staffMention = $"<@{memberId}>";
-            var embed = new EmbedBuilder()
-                .WithTitle(T("title.projectModification", lng))
-                .WithDescription(T("keyStaff.swapped", lng, staffMention, abbreviation))
-                .Build();
-            await interaction.FollowupAsync(embed: embed);
+        // Send success embed
+        var staffMention = $"<@{memberId}>";
+        var embed = new EmbedBuilder()
+            .WithTitle(T("title.projectModification", lng))
+            .WithDescription(T("keyStaff.swapped", lng, staffMention, abbreviation))
+            .Build();
+        await interaction.FollowupAsync(embed: embed);
 
-            return ExecutionResult.Success;
-        }
+        return ExecutionResult.Success;
     }
 }

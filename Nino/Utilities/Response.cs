@@ -2,39 +2,37 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 
-namespace Nino.Utilities
+namespace Nino.Utilities;
+
+internal static class Response
 {
-    internal static class Response
+    public static async Task<RuntimeResult> Fail(string message, SocketInteraction interaction)
     {
-        public static async Task<RuntimeResult> Fail(string message, SocketInteraction interaction)
-        {
-            var embed = new EmbedBuilder()
-                .WithTitle("Baka.")
-                .WithDescription(message)
-                .WithColor(0xd797ff)
-                .Build();
-            await interaction.FollowupAsync(embed: embed);
-            return ExecutionResult.Failure;
-        }
+        var embed = new EmbedBuilder()
+            .WithTitle("Baka.")
+            .WithDescription(message)
+            .WithColor(0xd797ff)
+            .Build();
+        await interaction.FollowupAsync(embed: embed);
+        return ExecutionResult.Failure;
+    }
 
-        public static async Task<RuntimeResult> Info(string message, SocketInteraction interaction)
-        {
-            var embed = new EmbedBuilder()
-                .WithTitle("Info.")
-                .WithDescription(message)
-                .WithColor(0xd797ff)
-                .Build();
-            await interaction.FollowupAsync(embed: embed);
-            return ExecutionResult.Success;
-        }
+    public static async Task Info(string message, SocketInteraction interaction)
+    {
+        var embed = new EmbedBuilder()
+            .WithTitle("Info.")
+            .WithDescription(message)
+            .WithColor(0xd797ff)
+            .Build();
+        await interaction.FollowupAsync(embed: embed);
+    }
 
-        public static AllowedMentions GenerateAllowedMentions(List<ulong> users, List<ulong> roles)
+    public static AllowedMentions GenerateAllowedMentions(List<ulong> users, List<ulong> roles)
+    {
+        return new AllowedMentions
         {
-            return new AllowedMentions
-            {
-                UserIds = users,
-                RoleIds = roles
-            };
-        }
+            UserIds = users,
+            RoleIds = roles
+        };
     }
 }

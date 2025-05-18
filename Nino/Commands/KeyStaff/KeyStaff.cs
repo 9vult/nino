@@ -1,21 +1,13 @@
 ﻿using Discord.Interactions;
-using Nino.Handlers;
 using NLog;
 
-namespace Nino.Commands
+namespace Nino.Commands.KeyStaff;
+
+[Group("keystaff", "Key Staff for the whole project")]
+public partial class KeyStaff() : InteractionModuleBase<SocketInteractionContext>
 {
-    [Group("keystaff", "Key Staff for the whole project")]
-    public partial class KeyStaff(InteractionHandler handler, InteractionService commands) : InteractionModuleBase<SocketInteractionContext>
-    {
-        public InteractionService Commands { get; private set; } = commands;
-        private readonly InteractionHandler _handler = handler;
-        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+    private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         
-        [Group("pinch-hitter", "Key Staff pinch hitters")]
-        public partial class PinchHitterManagement(InteractionHandler handler, InteractionService commands) : InteractionModuleBase<SocketInteractionContext>
-        {
-            public InteractionService Commands { get; private set; } = commands;
-            private readonly InteractionHandler _handler = handler;
-        }
-    }
+    [Group("pinch-hitter", "Key Staff pinch hitters")]
+    public partial class PinchHitterManagement() : InteractionModuleBase<SocketInteractionContext>;
 }

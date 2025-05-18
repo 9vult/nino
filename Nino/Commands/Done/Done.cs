@@ -5,54 +5,49 @@ using Nino.Utilities;
 using NLog;
 using static Localizer.Localizer;
 
-namespace Nino.Commands
+namespace Nino.Commands.Done;
+
+public partial class Done(InteractiveService interactive) : InteractionModuleBase<SocketInteractionContext>
 {
-    public partial class Done(InteractionHandler handler, InteractionService commands, InteractiveService interactive) : InteractionModuleBase<SocketInteractionContext>
+    private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+
+    [SlashCommand("done", "Mark a position as done")]
+    public async Task<RuntimeResult> Handle(
+        [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+        [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(AbbreviationAutocompleteHandler))] string abbreviation,
+        [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string? episodeNumber = null
+    )
     {
-        public InteractionService Commands { get; private set; } = commands;
-        private readonly InteractionHandler _handler = handler;
-        private readonly InteractiveService _interactiveService = interactive;
-        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+        var interaction = Context.Interaction;
+        var lng = interaction.UserLocale;
 
-        [SlashCommand("done", "Mark a position as done")]
-        public async Task<RuntimeResult> Handle(
-            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-            [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(AbbreviationAutocompleteHandler))] string abbreviation,
-            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string? episodeNumber = null
-        )
-        {
-            var interaction = Context.Interaction;
-            var lng = interaction.UserLocale;
-
-            // Sanitize inputs
-            alias = alias.Trim();
-            abbreviation = abbreviation.Trim().ToUpperInvariant();
+        // Sanitize inputs
+        alias = alias.Trim();
+        abbreviation = abbreviation.Trim().ToUpperInvariant();
             
-            // Verify project
-            var project = Utils.ResolveAlias(alias, interaction);
-            if (project == null)
-                return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+        // Verify project
+        var project = Utils.ResolveAlias(alias, interaction);
+        if (project == null)
+            return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
-            if (project.IsArchived)
-                return await Response.Fail(T("error.archived", lng), interaction);
+        if (project.IsArchived)
+            return await Response.Fail(T("error.archived", lng), interaction);
 
-            // Check progress channel permissions
-            var goOn = await PermissionChecker.Precheck(_interactiveService, interaction, project, lng, false);
+        // Check progress channel permissions
+        var goOn = await PermissionChecker.Precheck(interactive, interaction, project, lng, false);
+        // Cancel
+        if (!goOn) return ExecutionResult.Success;
+            
+        // Check Conga permissions
+        if (project.CongaParticipants.Nodes.Count != 0)
+        {
+            goOn = await PermissionChecker.Precheck(interactive, interaction, project, lng, false, true);
             // Cancel
             if (!goOn) return ExecutionResult.Success;
-            
-            // Check Conga permissions
-            if (project.CongaParticipants.Nodes.Count != 0)
-            {
-                goOn = await PermissionChecker.Precheck(_interactiveService, interaction, project, lng, false, true);
-                // Cancel
-                if (!goOn) return ExecutionResult.Success;
-            }
-
-            if (episodeNumber != null)
-                return await HandleSpecified(interaction, project, abbreviation, Utils.CanonicalizeEpisodeNumber(episodeNumber));
-            else
-                return await HandleUnspecified(interaction, project, abbreviation, _interactiveService);
         }
+
+        if (episodeNumber != null)
+            return await HandleSpecified(interaction, project, abbreviation, Utils.CanonicalizeEpisodeNumber(episodeNumber));
+        return await HandleUnspecified(interaction, project, abbreviation, interactive);
     }
 }

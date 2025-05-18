@@ -24,7 +24,7 @@ namespace Nino.Commands
 
             var embed = new EmbedBuilder()
                 .WithTitle(T("title.about", lng))
-                .WithDescription(T("nino.about", lng, Utils.VERSION))
+                .WithDescription(T("nino.about", lng, Utils.Version))
                 .WithUrl("https://github.com/9vult/nino")
                 .Build();
             await interaction.FollowupAsync(embed: embed);
