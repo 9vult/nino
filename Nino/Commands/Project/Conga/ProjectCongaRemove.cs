@@ -51,6 +51,8 @@ namespace Nino.Commands
 
                 // Update database
                 project.CongaParticipants.Remove(edge.Current, edge.Next);
+                
+                
                 await AzureHelper.PatchProjectAsync(project, [
                     PatchOperation.Set($"/congaParticipants", project.CongaParticipants.Serialize()),
                 ]);

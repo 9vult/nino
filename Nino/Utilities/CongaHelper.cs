@@ -64,7 +64,7 @@ public static class CongaHelper
             var shape = node.Type == CongaNodeType.Special ? "diamond" : "circle";
             var style = node.Type == CongaNodeType.AdditionalStaff ? "filled,dashed" : "filled";
             
-            sb.AppendLine($"    \"{node.Abbreviation}\" [style=\"{style}\" fillcolor=white, shape={shape}];");
+            sb.AppendLine($"    \"{node.Abbreviation}\" [style=\"{style}\" fillcolor=white, shape={shape}, width=0.75];");
             
             var dependents = forceAdditional ? node.Dependents : node.Dependents.Where(n => n.Type != CongaNodeType.AdditionalStaff);
 
@@ -102,11 +102,11 @@ public static class CongaHelper
         foreach (var node in nodes)
         {
             var task = episode.Tasks.FirstOrDefault(t => t.Abbreviation == node.Abbreviation);
-            var color = task is null ? "red" : task.Done ? "green" : "orange";
+            var color = node.Type == CongaNodeType.Special ? "yellow" :  task is null ? "red" : task.Done ? "green" : "orange";
             var shape = node.Type == CongaNodeType.Special ? "diamond" : "circle";
             var style = node.Type == CongaNodeType.AdditionalStaff ? "filled,dashed" : "filled";
             
-            sb.AppendLine($"    \"{node.Abbreviation}\" [style=\"{style}\" fillcolor={color}, shape={shape}];");
+            sb.AppendLine($"    \"{node.Abbreviation}\" [style=\"{style}\" fillcolor={color}, shape={shape}, width=0.75];");
             
             var dependents = forceAdditional
                 ? node.Dependents

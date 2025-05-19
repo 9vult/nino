@@ -32,7 +32,7 @@ namespace Nino.Services
             _timer.Start();
         }
 
-        private static async System.Threading.Tasks.Task CheckForReleases()
+        private static async Task CheckForReleases()
         {
             Dictionary<Guid, List<Episode>> marked = [];
             
@@ -126,6 +126,7 @@ namespace Nino.Services
 
                 var pingTargets = nodes
                     .Select(c => staff.FirstOrDefault(ks => ks.Role.Abbreviation == c.Abbreviation))
+                    .Where(c => c is not null)
                     .Where(c => c?.UserId != project.AirReminderUserId) // Prevent double pings
                     .ToList();
                         
@@ -139,7 +140,7 @@ namespace Nino.Services
                 await AzureHelper.PatchEpisodeAsync(episode, patchOperations);
                 
                 // Time to send the conga message
-                if (await Nino.Client.GetChannelAsync((ulong)project.CongaReminderChannelId!) is not SocketTextChannel channel) return;
+                if (await Nino.Client.GetChannelAsync((ulong)project.AirReminderChannelId!) is not SocketTextChannel channel) return;
 
                 foreach (var target in pingTargets)
                 {

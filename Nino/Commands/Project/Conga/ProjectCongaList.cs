@@ -38,7 +38,7 @@ namespace Nino.Commands
                 if (episodeNumber is not null && !Getters.TryGetEpisode(project, episodeNumber, out episode))
                     return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
 
-                Log.Trace($"Listing {project}'s Conga graph (episode={episodeNumber ?? "null"},forced={forceAdditional}) for M[{interaction.User.Id} (@{interaction.User.Username})]");
+                Log.Trace($"Listing Conga graph for {project} (episode={episodeNumber ?? "null"},forced={forceAdditional}) for M[{interaction.User.Id} (@{interaction.User.Username})]");
 
                 // Process
 
