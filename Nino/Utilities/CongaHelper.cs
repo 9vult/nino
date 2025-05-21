@@ -102,7 +102,7 @@ public static class CongaHelper
         foreach (var node in nodes)
         {
             var task = episode.Tasks.FirstOrDefault(t => t.Abbreviation == node.Abbreviation);
-            var color = node.Type == CongaNodeType.Special ? "yellow" :  task is null ? "red" : task.Done ? "green" : "orange";
+            var color = node.Type == CongaNodeType.Special ? "yellow" : task is null ? "red" : task.Done ? "green" : "orange";
             var shape = node.Type == CongaNodeType.Special ? "diamond" : "circle";
             var style = node.Type == CongaNodeType.AdditionalStaff ? "filled,dashed" : "filled";
             

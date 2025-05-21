@@ -146,7 +146,8 @@ namespace Nino.Services
                 {
                     if (target is null) continue;
 
-                    var staffMention = $"<@{target.UserId}>";
+                    var userId = episode.PinchHitters.FirstOrDefault(t => t.Abbreviation == target.Role.Abbreviation)?.UserId ?? target.UserId;
+                    var staffMention = $"<@{userId}>";
                     var roleTitle = target.Role.Name;
                     if (prefixMode != CongaPrefixType.None)
                     {
