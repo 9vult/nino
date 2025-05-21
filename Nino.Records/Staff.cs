@@ -6,6 +6,7 @@ namespace Nino.Records
     {
         [JsonIgnore] public required ulong UserId;
         public required Role Role;
+        public required bool IsPseudo = false;
 
         [JsonProperty("UserId")]
         [System.Text.Json.Serialization.JsonIgnore]

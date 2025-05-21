@@ -12,12 +12,17 @@ namespace Nino.Utilities
         /// <param name="project">Project the episode is of</param>
         /// <param name="episode">Episode to generate the roster for</param>
         /// <param name="withWeight">Whether to include task weight values</param>
+        /// <param name="excludePseudo">Exclude pseudo-tasks</param>
         /// <returns>Properly-formatted roster</returns>
-        public static string GenerateRoster(Project project, Episode episode, bool withWeight)
+        public static string GenerateRoster(Project project, Episode episode, bool withWeight, bool excludePseudo = false)
         {
             StringBuilder sb = new();
 
-            foreach (var ks in project.KeyStaff.Concat(episode.AdditionalStaff).OrderBy(k => k.Role.Weight ?? 1000000))
+            var staff = project.KeyStaff.Concat(episode.AdditionalStaff)
+                .WhereIf(excludePseudo, k => !k.IsPseudo)
+                .OrderBy(k => k.Role.Weight ?? 1000000);
+            
+            foreach (var ks in staff)
             {
                 var task = episode.Tasks.First(t => t.Abbreviation == ks.Role.Abbreviation);
                 var userId = episode.PinchHitters.FirstOrDefault(k => k.Abbreviation == ks.Role.Abbreviation)?.UserId ?? ks.UserId;
@@ -36,12 +41,19 @@ namespace Nino.Utilities
         /// </summary>
         /// <param name="project">Project the episode is of</param>
         /// <param name="episode">Episode to generate the progress for</param>
+        /// <param name="updated">The updated task</param>
+        /// <param name="excludePseudo">Exclude pseudo-tasks</param>
         /// <returns>Properly-formatted progress string</returns>
-        public static string GenerateProgress(Project project, Episode episode, string? updated = null)
+        public static string GenerateProgress(Project project, Episode episode, string? updated = null, bool excludePseudo = true)
         {
             StringBuilder sb = new();
 
-            foreach (var ks in project.KeyStaff.Concat(episode.AdditionalStaff).OrderBy(k => k.Role.Weight ?? 1000000))
+            var staff = project.KeyStaff.Concat(episode.AdditionalStaff)
+                .WhereIf(excludePseudo, k => !k.IsPseudo)
+                .OrderBy(k => k.Role.Weight ?? 1000000);
+            
+            
+            foreach (var ks in staff)
             {
                 var task = episode.Tasks.First(t => t.Abbreviation == ks.Role.Abbreviation);
                 if (task.Abbreviation == updated)
@@ -60,16 +72,22 @@ namespace Nino.Utilities
         }
 
         /// <summary>
-        /// Generate an explanitory blame progress string
+        /// Generate explanatory blame progress string
         /// </summary>
         /// <param name="project">Project the episode is of</param>
         /// <param name="episode">Episode to generate the progress for</param>
-        /// <returns>Properly-formatted explanitory progress string</returns>
-        public static string GenerateExplainProgress(Project project, Episode episode, string lng, string? updated = null)
+        /// <param name="lng">Language code</param>
+        /// <param name="updated">The updated task</param>
+        /// <param name="excludePseudo">Exclude pseudo-tasks</param>
+        /// <returns>Properly-formatted explanatory progress string</returns>
+        public static string GenerateExplainProgress(Project project, Episode episode, string lng, string? updated = null, bool excludePseudo = true)
         {
             StringBuilder sb = new();
 
-            foreach (var ks in project.KeyStaff.Concat(episode.AdditionalStaff).OrderBy(k => k.Role.Weight ?? 1000000))
+            var staff = project.KeyStaff.Concat(episode.AdditionalStaff)
+                .WhereIf(excludePseudo, k => !k.IsPseudo)
+                .OrderBy(k => k.Role.Weight ?? 1000000);
+            foreach (var ks in staff)
             {
                 var task = episode.Tasks.First(t => t.Abbreviation == ks.Role.Abbreviation);
                 if (task.Abbreviation == updated)

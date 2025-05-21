@@ -28,6 +28,10 @@
       "full-name": {
         "name": "full-name",
         "description": "Full position name"
+      },
+      "is-pseudo": {
+        "name": "is-pseudo",
+        "description": "Position is a Pseudo-task"
       }
     },
     "remove": {
@@ -305,6 +309,10 @@
       "full-name": {
         "name": "full-name",
         "description": "Full position name"
+      },
+      "is-pseudo": {
+        "name": "is-pseudo",
+        "description": "Position is a Pseudo-task"
       }
     },
     "remove": {

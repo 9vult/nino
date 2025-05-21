@@ -5,82 +5,113 @@ using Fergun.Interactive;
 using Localizer;
 using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
-using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities;
 using NLog;
 using static Localizer.Localizer;
 
-namespace Nino.Commands
+namespace Nino.Commands;
+
+public partial class Undone(InteractiveService interactive) : InteractionModuleBase<SocketInteractionContext>
 {
-    public partial class Undone(InteractionHandler handler, InteractionService commands, InteractiveService interactive) : InteractionModuleBase<SocketInteractionContext>
+    private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+
+    [SlashCommand("undone", "Mark a position as not done")]
+    public async Task<RuntimeResult> Handle(
+        [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+        [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
+        [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(AbbreviationAutocompleteHandler))] string abbreviation
+    )
     {
-        public InteractionService Commands { get; private set; } = commands;
-        private readonly InteractionHandler _handler = handler;
-        private readonly InteractiveService _interactiveService = interactive;
-        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+        var interaction = Context.Interaction;
+        var lng = interaction.UserLocale;
+        var gLng = Cache.GetConfig(interaction.GuildId ?? 0)?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
 
-        [SlashCommand("undone", "Mark a position as not done")]
-        public async Task<RuntimeResult> Handle(
-            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
-            [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(AbbreviationAutocompleteHandler))] string abbreviation
-        )
-        {
-            var interaction = Context.Interaction;
-            var lng = interaction.UserLocale;
-            var gLng = Cache.GetConfig(interaction.GuildId ?? 0)?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
-
-            // Sanitize inputs
-            alias = alias.Trim();
-            abbreviation = abbreviation.Trim().ToUpperInvariant();
-            episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
+        // Sanitize inputs
+        alias = alias.Trim();
+        abbreviation = abbreviation.Trim().ToUpperInvariant();
+        episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
             
-            // Verify project
-            var project = Utils.ResolveAlias(alias, interaction);
-            if (project == null)
-                return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+        // Verify project
+        var project = Utils.ResolveAlias(alias, interaction);
+        if (project == null)
+            return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
-            if (project.IsArchived)
-                return await Response.Fail(T("error.archived", lng), interaction);
+        if (project.IsArchived)
+            return await Response.Fail(T("error.archived", lng), interaction);
 
-            // Check progress channel permissions
-            var goOn = await PermissionChecker.Precheck(_interactiveService, interaction, project, lng, false);
-            // Cancel
-            if (!goOn) return ExecutionResult.Success;
+        // Check progress channel permissions
+        var goOn = await PermissionChecker.Precheck(interactive, interaction, project, lng, false);
+        // Cancel
+        if (!goOn) return ExecutionResult.Success;
 
-            // Verify episode and task
-            if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
-                return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
-            if (episode.Tasks.All(t => t.Abbreviation != abbreviation))
-                return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
+        // Verify episode and task
+        if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
+            return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
+        if (episode.Tasks.All(t => t.Abbreviation != abbreviation))
+            return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
 
-            // Verify user
-            if (!Utils.VerifyTaskUser(interaction.User.Id, project, episode, abbreviation))
-                return await Response.Fail(T("error.permissionDenied", lng), interaction);
+        // Verify user
+        if (!Utils.VerifyTaskUser(interaction.User.Id, project, episode, abbreviation))
+            return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
-            // Verify task is complete
-            if (!episode.Tasks.First(t => t.Abbreviation == abbreviation).Done)
-                return await Response.Fail(T("error.progress.taskNotDone", lng, abbreviation), interaction);
+        // Verify task is complete
+        if (!episode.Tasks.First(t => t.Abbreviation == abbreviation).Done)
+            return await Response.Fail(T("error.progress.taskNotDone", lng, abbreviation), interaction);
+            
+        var task = episode.Tasks.Single(t => t.Abbreviation == abbreviation);
+        var staff = project.KeyStaff.Concat(episode.AdditionalStaff).First(ks => ks.Role.Abbreviation == abbreviation);
 
-            // Update database
-            var taskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == abbreviation));
-            await AzureHelper.PatchEpisodeAsync(episode, [
-                PatchOperation.Set($"/tasks/{taskIndex}/done", false),
-                PatchOperation.Set($"/tasks/{taskIndex}/updated", DateTimeOffset.UtcNow),
-                PatchOperation.Set($"/done", false),
-                PatchOperation.Set($"/updated", DateTimeOffset.UtcNow)
-            ]);
+        // Update database
+        var taskIndex = Array.IndexOf(episode.Tasks, task);
+        await AzureHelper.PatchEpisodeAsync(episode, [
+            PatchOperation.Set($"/tasks/{taskIndex}/done", false),
+            PatchOperation.Set($"/tasks/{taskIndex}/updated", DateTimeOffset.UtcNow),
+            PatchOperation.Set($"/done", false),
+            PatchOperation.Set($"/updated", DateTimeOffset.UtcNow)
+        ]);
 
-            // Update task for embeds
-            episode.Tasks.Single(t => t.Abbreviation == abbreviation).Done = false;
+        // Update task for embeds
+        task.Done = false;
 
-            var taskTitle = project.KeyStaff.Concat(episode.AdditionalStaff).First(ks => ks.Role.Abbreviation == abbreviation).Role.Name;
-            var title = T("title.progress", gLng, episodeNumber);
-            var status = Cache.GetConfig(project.GuildId)?.UpdateDisplay.Equals(UpdatesDisplayType.Extended) ?? false
-                ? StaffList.GenerateExplainProgress(project, episode, gLng, abbreviation) // Explanitory
-                : StaffList.GenerateProgress(project, episode, abbreviation); // Standard
+        var taskTitle = staff.Role.Name;
+        var title = T("title.progress", gLng, episodeNumber);
+        var status = Cache.GetConfig(project.GuildId)?.UpdateDisplay.Equals(UpdatesDisplayType.Extended) ?? false
+            ? StaffList.GenerateExplainProgress(project, episode, gLng, abbreviation) // Explanatory
+            : StaffList.GenerateProgress(project, episode, abbreviation); // Standard
 
+        // Skip published embeds for pseudo-tasks
+        if (!staff.IsPseudo) await PublishEmbeds();
+
+        // Send success embed
+        var replyStatus = StaffList.GenerateProgress(project, episode, abbreviation, excludePseudo: false);
+
+        var replyHeader = project.IsPrivate
+            ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
+            : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
+
+        var replyBody = Cache.GetConfig(project.GuildId)?.ProgressDisplay.Equals(ProgressDisplayType.Verbose) ?? false
+            ? $"{T("progress.undone", lng, episodeNumber, taskTitle)}\n\n{replyStatus}" // Verbose
+            : $"{T("progress.undone", lng, episodeNumber, taskTitle)}"; // Succinct (default)
+
+        var replyEmbed = new EmbedBuilder()
+            .WithAuthor(name: replyHeader, url: project.AniListUrl)
+            .WithTitle($"❌ {T("title.taskIncomplete", lng)}")
+            .WithDescription(replyBody)
+            .WithCurrentTimestamp()
+            .Build();
+        await interaction.FollowupAsync(embed: replyEmbed);
+            
+        Log.Info($"M[{interaction.User.Id} (@{interaction.User.Username})] marked task {abbreviation} undone for {episode}");
+
+        await Cache.RebuildCacheForProject(project.Id);
+        return ExecutionResult.Success;
+            
+        // -----
+            
+        // Helper method to publish embeds to the local progress channel and to observers
+        async Task PublishEmbeds()
+        {
             status = $"❌ **{taskTitle}**\n{status}";
 
             var publishEmbed = new EmbedBuilder()
@@ -106,30 +137,6 @@ namespace Nino.Commands
 
             // Publish to observers
             await ObserverPublisher.PublishProgress(project, publishEmbed);
-
-            // Send success embed
-            var replyStatus = StaffList.GenerateProgress(project, episode, abbreviation);
-
-            var replyHeader = project.IsPrivate
-                ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
-                : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
-
-            var replyBody = Cache.GetConfig(project.GuildId)?.ProgressDisplay.Equals(ProgressDisplayType.Verbose) ?? false
-                ? $"{T("progress.undone", lng, episodeNumber, taskTitle)}\n\n{replyStatus}" // Verbose
-                : $"{T("progress.undone", lng, episodeNumber, taskTitle)}"; // Succinct (default)
-
-            var replyEmbed = new EmbedBuilder()
-                .WithAuthor(name: replyHeader, url: project.AniListUrl)
-                .WithTitle($"❌ {T("title.taskIncomplete", lng)}")
-                .WithDescription(replyBody)
-                .WithCurrentTimestamp()
-                .Build();
-            await interaction.FollowupAsync(embed: replyEmbed);
-            
-            Log.Info($"M[{interaction.User.Id} (@{interaction.User.Username})] marked task {abbreviation} undone for {episode}");
-
-            await Cache.RebuildCacheForProject(project.Id);
-            return ExecutionResult.Success;
         }
     }
 }

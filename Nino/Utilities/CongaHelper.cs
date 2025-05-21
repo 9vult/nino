@@ -61,7 +61,9 @@ public static class CongaHelper
         
         foreach (var node in nodes)
         {
-            var shape = node.Type == CongaNodeType.Special ? "diamond" : "circle";
+            var isPseudo = project.KeyStaff.FirstOrDefault(t => t.Role.Abbreviation == node.Abbreviation)?.IsPseudo ?? false;
+            
+            var shape = node.Type == CongaNodeType.Special ? "diamond" : isPseudo ? "Mcircle" : "circle";
             var style = node.Type == CongaNodeType.AdditionalStaff ? "filled,dashed" : "filled";
             
             sb.AppendLine($"    \"{node.Abbreviation}\" [style=\"{style}\" fillcolor=white, shape={shape}, width=0.75];");
@@ -102,8 +104,10 @@ public static class CongaHelper
         foreach (var node in nodes)
         {
             var task = episode.Tasks.FirstOrDefault(t => t.Abbreviation == node.Abbreviation);
+            var isPseudo = project.KeyStaff.Concat(episode.AdditionalStaff)
+                .FirstOrDefault(t => t.Role.Abbreviation == node.Abbreviation)?.IsPseudo ?? false;
             var color = node.Type == CongaNodeType.Special ? "yellow" : task is null ? "red" : task.Done ? "green" : "orange";
-            var shape = node.Type == CongaNodeType.Special ? "diamond" : "circle";
+            var shape = node.Type == CongaNodeType.Special ? "diamond" : isPseudo ? "Mcircle" : "circle";
             var style = node.Type == CongaNodeType.AdditionalStaff ? "filled,dashed" : "filled";
             
             sb.AppendLine($"    \"{node.Abbreviation}\" [style=\"{style}\" fillcolor={color}, shape={shape}, width=0.75];");

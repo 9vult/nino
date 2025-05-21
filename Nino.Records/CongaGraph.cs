@@ -53,9 +53,9 @@ public class CongaGraph
         currentNode.Dependents.Remove(nextNode);
         nextNode.Prerequisites.Remove(currentNode);
         
-        if (currentNode.Dependents.Count == 0)
+        if (currentNode.Dependents.Count == 0 && currentNode.Prerequisites.Count == 0)
             _nodes.Remove(current);
-        if (nextNode.Prerequisites.Count == 0)
+        if (nextNode.Dependents.Count == 0 && nextNode.Prerequisites.Count == 0)
             _nodes.Remove(next);
     }
 

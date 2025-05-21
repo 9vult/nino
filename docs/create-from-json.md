@@ -55,14 +55,16 @@ If you have multiple projects to create, or you have a template you use often, y
       "Role": {
         "Abbreviation": "ED",
         "Name": "Editing"
-      }
+      },
+      "IsPseudo": false
     },
     {
       "UserId": 134073223208763392,
       "Role": {
         "Abbreviation": "QC",
         "Name": "Quality Checking"
-      }
+      },
+      "IsPseudo": false
     }
   ],
   "AdditionalStaff": {
@@ -73,7 +75,8 @@ If you have multiple projects to create, or you have a template you use often, y
           "Abbreviation": "KFX",
           "Name": "Song Styling",
           "Weight": 1.5
-        }
+        },
+        "IsPseudo": false
       }
     ]
   },

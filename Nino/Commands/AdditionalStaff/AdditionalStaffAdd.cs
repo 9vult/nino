@@ -17,7 +17,8 @@ namespace Nino.Commands
             [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
             [Summary("member", "Staff member")] SocketUser member,
             [Summary("abbreviation", "Position shorthand")] string abbreviation,
-            [Summary("fullName", "Full position name")] string taskName
+            [Summary("fullName", "Full position name")] string taskName,
+            [Summary("isPseudo", "Position is a Pseudo-task")]bool isPseudo = false
         )
         {
             var interaction = Context.Interaction;
@@ -55,7 +56,8 @@ namespace Nino.Commands
                     Abbreviation = abbreviation,
                     Name = taskName,
                     Weight = 1000000
-                }
+                },
+                IsPseudo = isPseudo
             };
 
             var newTask = new Records.Task
@@ -73,7 +75,7 @@ namespace Nino.Commands
             ]);
             await batch.ExecuteAsync();
 
-            Log.Info($"Added M[{memberId} (@{member.Username})] to {episode} for {abbreviation}");
+            Log.Info($"Added M[{memberId} (@{member.Username})] to {episode} for {abbreviation} (IsPseudo={isPseudo})");
 
             // Send success embed
             var staffMention = $"<@{memberId}>";
