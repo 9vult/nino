@@ -44,7 +44,7 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
 
             // Check if position already exists
-            if (episode.AdditionalStaff.Any(ks => ks.Role.Abbreviation == abbreviation))
+            if (project.KeyStaff.Concat(episode.AdditionalStaff).Any(ks => ks.Role.Abbreviation == abbreviation))
                 return await Response.Fail(T("error.positionExists", lng), interaction);
 
             // All good!

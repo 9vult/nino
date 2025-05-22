@@ -38,7 +38,8 @@ public partial class KeyStaff
             return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
         // Check if position already exists
-        if (project.KeyStaff.Any(ks => ks.Role.Abbreviation == abbreviation))
+        var additionalStaffs = Cache.GetEpisodes(project.Id).SelectMany(e => e.AdditionalStaff).ToHashSet();
+        if (project.KeyStaff.Concat(additionalStaffs).Any(ks => ks.Role.Abbreviation == abbreviation))
             return await Response.Fail(T("error.positionExists", lng), interaction);
 
         // All good!
