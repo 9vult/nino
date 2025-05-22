@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Text.Json.Serialization;
 using Nino.Records.Enums;
 
 namespace Nino.Records;
@@ -17,12 +18,12 @@ public class CongaGraph
     /// </summary>
     public static readonly string[] NextSpecials = [];
     
-    
     private readonly Dictionary<string, CongaNode> _nodes = [];
 
     /// <summary>
     /// All the nodes
     /// </summary>
+    [JsonIgnore]
     public ReadOnlyCollection<CongaNode> Nodes => _nodes.Values.ToList().AsReadOnly();
 
     /// <summary>

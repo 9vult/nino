@@ -1,107 +1,110 @@
-﻿using Newtonsoft.Json;
-using Nino.Records.Enums;
+﻿using Nino.Records.Enums;
+using NJsonIgnore = Newtonsoft.Json.JsonIgnoreAttribute;
+using NJsonPropertyName = Newtonsoft.Json.JsonPropertyAttribute;
+using STJsonIgnore = System.Text.Json.Serialization.JsonIgnoreAttribute;
+using STJsonPropertyName = System.Text.Json.Serialization.JsonPropertyNameAttribute;
 
 namespace Nino.Records
 {
     public record Project
     {
         public required Guid Id;
-        [JsonIgnore] public required ulong GuildId;
+        [NJsonIgnore] public required ulong GuildId;
         public required string Nickname;
         public required string Title;
-        [JsonIgnore] public required ulong OwnerId;
-        [JsonIgnore] public required ulong[] AdministratorIds;
+        [NJsonIgnore] public required ulong OwnerId;
+        [NJsonIgnore] public required ulong[] AdministratorIds;
         public required Staff[] KeyStaff;
         public required ProjectType Type;
         public required string PosterUri;
-        [JsonIgnore] public required ulong UpdateChannelId;
-        [JsonIgnore] public required ulong ReleaseChannelId;
+        [NJsonIgnore] public required ulong UpdateChannelId;
+        [NJsonIgnore] public required ulong ReleaseChannelId;
         public required bool IsPrivate;
         public required bool IsArchived = false;
-        [JsonIgnore] public required CongaGraph CongaParticipants = new();
+        [NJsonIgnore, STJsonIgnore] public required CongaGraph CongaParticipants = new();
         public required string[] Aliases;
         public string? Motd;
         public int? AniListId;
         public int? AniListOffset;
         public required bool AirReminderEnabled;
-        [JsonIgnore] public ulong? AirReminderChannelId;
-        [JsonIgnore] public ulong? AirReminderRoleId;
-        [JsonIgnore] public ulong? AirReminderUserId;
+        [NJsonIgnore] public ulong? AirReminderChannelId;
+        [NJsonIgnore] public ulong? AirReminderRoleId;
+        [NJsonIgnore] public ulong? AirReminderUserId;
         public required bool CongaReminderEnabled;
         public TimeSpan? CongaReminderPeriod;
-        [JsonIgnore] public ulong? CongaReminderChannelId;
+        [NJsonIgnore] public ulong? CongaReminderChannelId;
         public DateTimeOffset? Created;
 
         //
         // Serialization stuff because azure doesn't support ulong
         //
 
-        [JsonProperty("GuildId")]
-        [System.Text.Json.Serialization.JsonIgnore]
+        [STJsonIgnore]
+        [NJsonPropertyName("GuildId")]
         public string SerializationGuildId
         {
             get => GuildId.ToString();
             set => GuildId = ulong.Parse(value);
         }
 
-        [JsonProperty("OwnerId")]
-        [System.Text.Json.Serialization.JsonIgnore]
+        [STJsonIgnore]
+        [NJsonPropertyName("OwnerId")]
         public string SerializationOwnerId
         {
             get => OwnerId.ToString();
             set => OwnerId = ulong.Parse(value);
         }
 
-        [JsonProperty("AdministratorIds")]
-        [System.Text.Json.Serialization.JsonIgnore]
+        [STJsonIgnore]
+        [NJsonPropertyName("AdministratorIds")]
         public string[] SerializationAdministratorIds
         {
             get => AdministratorIds != null && AdministratorIds.Length != 0 ? AdministratorIds.Select(a => a.ToString()).ToArray() : [];
             set => AdministratorIds = value != null && value.Length != 0 ? value.Select(ulong.Parse).ToArray() : [];
         }
 
-        [JsonProperty("UpdateChannelId")]
-        [System.Text.Json.Serialization.JsonIgnore]
+        [STJsonIgnore]
+        [NJsonPropertyName("UpdateChannelId")]
         public string SerializationUpdateChannelId
         {
             get => UpdateChannelId.ToString();
             set => UpdateChannelId = ulong.Parse(value);
         }
 
-        [JsonProperty("ReleaseChannelId")]
-        [System.Text.Json.Serialization.JsonIgnore]
+        [STJsonIgnore]
+        [NJsonPropertyName("ReleaseChannelId")]
         public string SerializationReleaseChannelId
         {
             get => ReleaseChannelId.ToString();
             set => ReleaseChannelId = ulong.Parse(value);
         }
 
-        [JsonProperty("AirReminderChannelId")]
-        [System.Text.Json.Serialization.JsonIgnore]
+        [STJsonIgnore]
+        [NJsonPropertyName("AirReminderChannelId")]
         public string? SerializationAirReminderChannelId
         {
             get => AirReminderChannelId?.ToString();
             set => AirReminderChannelId = !string.IsNullOrEmpty(value) ? ulong.Parse(value) : null;
         }
 
-        [JsonProperty("AirReminderRoleId")]
-        [System.Text.Json.Serialization.JsonIgnore]
+        [STJsonIgnore]
+        [NJsonPropertyName("AirReminderRoleId")]
         public string? SerializationAirReminderRoleId
         {
             get => AirReminderRoleId?.ToString();
             set => AirReminderRoleId = !string.IsNullOrEmpty(value) ? ulong.Parse(value) : null;
         }
         
-        [JsonProperty("AirReminderUserId")]
-        [System.Text.Json.Serialization.JsonIgnore]
+        [STJsonIgnore]
+        [NJsonPropertyName("AirReminderUserId")]
         public string? SerializationAirReminderUserId
         {
             get => AirReminderUserId?.ToString();
             set => AirReminderUserId = !string.IsNullOrEmpty(value) ? ulong.Parse(value) : null;
         }
         
-        [JsonProperty("CongaReminderChannelId")]
-        [System.Text.Json.Serialization.JsonIgnore]
+        [STJsonIgnore]
+        [NJsonPropertyName("CongaReminderChannelId")]
         public string? SerializationCongaReminderChannelId
         {
             get => CongaReminderChannelId?.ToString();
@@ -111,14 +114,14 @@ namespace Nino.Records
         /// <summary>
         /// AniList URL. <see langword="null"/> if <see cref="AniListId"/> is <see langword="null"/>.
         /// </summary>
-        [System.Text.Json.Serialization.JsonIgnore]
+        [STJsonIgnore]
         public string? AniListUrl
         {
             get => AniListId is null ? null : $"https://anilist.co/anime/{AniListId}";
         }
         
-        [JsonProperty("CongaParticipants")]
-        [System.Text.Json.Serialization.JsonIgnore]
+        [STJsonPropertyName("CongaParticipants")]
+        [NJsonPropertyName("CongaParticipants")]
         public CongaNodeDto[] SerializationCongaGraph
         {
             get => CongaParticipants.Serialize().ToArray();
