@@ -1,5 +1,6 @@
 using Discord;
 using Discord.Interactions;
+using Discord.Rest;
 using Discord.WebSocket;
 using Nino.Utilities;
 
@@ -84,12 +85,21 @@ namespace Nino.Commands
 
             Log.Info($"M[{interaction.User.Id} (@{interaction.User.Username})] created new observer {observer.Id} from {guildId} observing {project}");
 
+            // If we have permission, then we want to delete the caller to avoid leaking webhook URLs
+            var canDelete = PermissionChecker.CheckDeletePermissions(interaction.ChannelId ?? 0);
+            RestFollowupMessage? tempReply = null;
+            if (canDelete) 
+                tempReply = await interaction.FollowupAsync("了解！");
+            
             // Send success embed
             var embed = new EmbedBuilder()
                 .WithTitle(T("title.observer", lng))
                 .WithDescription(T("observer.added", lng, project.Nickname, originGuild.Name))
                 .Build();
             await interaction.FollowupAsync(embed: embed);
+            
+            if (canDelete && tempReply is not null)
+                await tempReply.DeleteAsync();
 
             await Cache.RebuildObserverCache();
             return ExecutionResult.Success;
