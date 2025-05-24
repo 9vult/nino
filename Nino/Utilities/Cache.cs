@@ -23,7 +23,7 @@ namespace Nino.Utilities
             Log.Info($"Rebuilding cache for guild {guildId}...");
             
             // Remove outdated data
-            foreach (var project in ProjectCache[guildId])
+            foreach (var project in ProjectCache.GetValueOrDefault(guildId) ?? [])
                 EpisodeCache.Remove(project.Id);
             ProjectCache.Remove(guildId);
             
