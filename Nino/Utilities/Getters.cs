@@ -30,16 +30,13 @@ namespace Nino.Utilities
             // Local guild admins
             var guildAdmins = Cache.GetConfig(guildId)?.AdministratorIds ?? [];
 
-            // Filter
-            var filtered = projects.Where(
-                p => !p.IsPrivate || 
-                p.OwnerId == userId || 
-                p.AdministratorIds.Any(a => a == userId) ||
-                guildAdmins.Any(a => a == userId) ||
-                p.KeyStaff.Any(ks => ks.UserId == userId)).ToList();
-            // Not including Additional Staff here because that'd be a royal pita to get
-
-            return filtered.SelectMany(p => new[] { p.Nickname }.Concat(p.Aliases))
+            // Filter (Not including Additional Staff here because that'd be a royal pita to get)
+            return projects.Where(p => !p.IsPrivate ||
+                                       p.OwnerId == userId ||
+                                       p.AdministratorIds.Any(a => a == userId) ||
+                                       guildAdmins.Any(a => a == userId) ||
+                                       p.KeyStaff.Any(ks => ks.UserId == userId))
+                .SelectMany(p => new[] { p.Nickname }.Concat(p.Aliases))
                 .Where(a => a.StartsWith(query, StringComparison.InvariantCultureIgnoreCase)).ToList();
         }
 
