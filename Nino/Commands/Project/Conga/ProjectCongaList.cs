@@ -25,12 +25,12 @@ namespace Nino.Commands
                 // Sanitize inputs
                 alias = alias.Trim();
 
-                // Verify project and user - Owner or Admin required
+                // Verify project and user - minimum Key Staff required
                 var project = Utils.ResolveAlias(alias, interaction);
                 if (project == null)
                     return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
-                if (!Utils.VerifyUser(interaction.User.Id, project))
+                if (!Utils.VerifyUser(interaction.User.Id, project, includeKeyStaff: true))
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
                 
                 // Verify episode
