@@ -37,7 +37,9 @@ namespace Nino.Utilities
                                        guildAdmins.Any(a => a == userId) ||
                                        p.KeyStaff.Any(ks => ks.UserId == userId))
                 .SelectMany(p => new[] { p.Nickname }.Concat(p.Aliases))
-                .Where(a => a.StartsWith(query, StringComparison.InvariantCultureIgnoreCase)).ToList();
+                .Where(a => a.StartsWith(query, StringComparison.InvariantCultureIgnoreCase))
+                .Order()
+                .ToList();
         }
 
         /// <summary>
