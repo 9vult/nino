@@ -122,9 +122,9 @@
   "atme": {
     "name": "atme",
     "description": "What tasks are At Me?",
-    "filter": {
-      "name": "filter",
-      "description": "Filter results",
+    "type": {
+      "name": "type",
+      "description": "Calculation type",
       "Auto": {
         "name": "Auto"
       },
@@ -134,6 +134,10 @@
       "Incomplete": {
         "name": "Incomplete"
       }
+    },
+    "filter": {
+      "name": "filter",
+      "description": "Filter results"
     },
     "global": {
       "name": "global",

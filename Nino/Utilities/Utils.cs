@@ -91,6 +91,32 @@ namespace Nino.Utilities
         }
 
         /// <summary>
+        /// Verify the given user has sufficient permissions to use a command
+        /// </summary>
+        /// <param name="userId">ID of the user to check</param>
+        /// <param name="project">Project to verify against</param>
+        /// <param name="episode">Episode to verify against</param>
+        /// <param name="excludeAdmins">Should administrators be excluded?</param>
+        /// <returns>True if the user has sufficient permissions</returns>
+        public static bool VerifyEpisodeUser(ulong userId, Project project, Episode episode, bool excludeAdmins = false)
+        {
+            if (project.OwnerId == userId) return true;
+
+            if (!excludeAdmins)
+            {
+                if (project.AdministratorIds.Any(a => a == userId))
+                    return true;
+
+                if (Cache.GetConfig(project.GuildId)?.AdministratorIds?.Any(a => a == userId) ?? false)
+                    return true;
+            }
+            
+            return project.KeyStaff.Any(ks => ks.UserId == userId)
+                   || episode.AdditionalStaff.Any(ks => ks.UserId == userId)
+                   || episode.PinchHitters.Any(ks => ks.UserId == userId);
+        }
+
+        /// <summary>
         /// Verify a user has sufficient permissions to make progress on a task
         /// </summary>
         /// <param name="userId">ID of the user to check</param>
