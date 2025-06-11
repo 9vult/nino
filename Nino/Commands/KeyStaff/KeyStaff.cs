@@ -1,11 +1,12 @@
 ﻿using Discord.Interactions;
+using Fergun.Interactive;
 using Nino.Handlers;
 using NLog;
 
 namespace Nino.Commands;
 
 [Group("keystaff", "Key Staff for the whole project")]
-public partial class KeyStaff(InteractionService commands) : InteractionModuleBase<SocketInteractionContext>
+public partial class KeyStaff(InteractionService commands, InteractiveService interactive) : InteractionModuleBase<SocketInteractionContext>
 {
     public InteractionService Commands { get; private set; } = commands;
     private static readonly Logger Log = LogManager.GetCurrentClassLogger();

@@ -76,26 +76,31 @@ namespace Nino.Utilities
             var questionBodyKey = inconsequentialAction switch
             {
                 InconsequentialAction.PingCongaAfterSkip => "progress.skip.conga.question",
+                InconsequentialAction.MarkTaskDoneIfEpisodeIsDone => "keyStaff.add.markDone.question",
                 _ => throw new ArgumentOutOfRangeException(nameof(inconsequentialAction), inconsequentialAction, null)
             };
             var finalBodyKey = inconsequentialAction switch
             {
                 InconsequentialAction.PingCongaAfterSkip => string.Empty,
+                InconsequentialAction.MarkTaskDoneIfEpisodeIsDone => "keyStaff.add.markDone.response",
                 _ => throw new ArgumentOutOfRangeException(nameof(inconsequentialAction), inconsequentialAction, null)
             };
             var leftButton = inconsequentialAction switch
             {
                 InconsequentialAction.PingCongaAfterSkip => ("progress.skip.conga.no.button", ButtonStyle.Secondary),
+                InconsequentialAction.MarkTaskDoneIfEpisodeIsDone => ("keyStaff.add.markDone.no.button", ButtonStyle.Secondary),
                 _ => throw new ArgumentOutOfRangeException(nameof(inconsequentialAction), inconsequentialAction, null)
             };
             var rightButton = inconsequentialAction switch
             {
                 InconsequentialAction.PingCongaAfterSkip => ("progress.skip.conga.yes.button", ButtonStyle.Secondary),
+                InconsequentialAction.MarkTaskDoneIfEpisodeIsDone => ("keyStaff.add.markDone.yes.button", ButtonStyle.Secondary),
                 _ => throw new ArgumentOutOfRangeException(nameof(inconsequentialAction), inconsequentialAction, null)
             };
             var successOnTimeout = inconsequentialAction switch
             {
                 InconsequentialAction.PingCongaAfterSkip => true,
+                InconsequentialAction.MarkTaskDoneIfEpisodeIsDone => true,
                 _ => throw new ArgumentOutOfRangeException(nameof(inconsequentialAction), inconsequentialAction, null)
             };
 
@@ -151,6 +156,7 @@ namespace Nino.Utilities
         internal enum InconsequentialAction
         {
             PingCongaAfterSkip,
+            MarkTaskDoneIfEpisodeIsDone
         }
     }
 }

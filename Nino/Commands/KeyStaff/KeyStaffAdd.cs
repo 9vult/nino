@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
 using Nino.Records;
+using Nino.Records.Enums;
 using Nino.Utilities;
 using static Localizer.Localizer;
 
@@ -55,11 +56,46 @@ public partial class KeyStaff
             IsPseudo = isPseudo
         };
 
-        var newTask = new Records.Task
+        var newUndoneTask = new Records.Task
         {
             Abbreviation = abbreviation,
             Done = false
         };
+        
+        var newDoneTask = new Records.Task
+        {
+            Abbreviation = abbreviation,
+            Done = true
+        };
+
+        var projectEpisodes = Cache.GetEpisodes(project.Id);
+        var markDoneIfEpisodeIsDone = false;
+        
+        if (projectEpisodes.Any(e => e.Done))
+        {
+            var (response, finalBody, questionMessage) 
+                = await Ask.AboutAction(interactive, interaction, project, lng,  Ask.InconsequentialAction.MarkTaskDoneIfEpisodeIsDone);
+            
+            markDoneIfEpisodeIsDone = response;
+            
+            // Update the question embed to reflect the choice
+            if (questionMessage is not null)
+            {
+                var header = project.IsPrivate
+                    ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
+                    : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
+                var editedEmbed = new EmbedBuilder()
+                    .WithAuthor(header)
+                    .WithTitle($"❓ {T("progress.done.inTheDust.question", lng)}")
+                    .WithDescription(finalBody)
+                    .WithCurrentTimestamp()
+                    .Build();
+                await questionMessage.ModifyAsync(m => {
+                    m.Components = null;
+                    m.Embed = editedEmbed;
+                });
+            }
+        }
 
         // Add to database
         await AzureHelper.PatchProjectAsync(project, [
@@ -67,13 +103,16 @@ public partial class KeyStaff
         ]);
 
         var batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(project));
-        foreach (var e in Cache.GetEpisodes(project.Id))
+        foreach (var episode in projectEpisodes)
         {
-            batch.PatchItem(id: e.Id.ToString(), [
-                PatchOperation.Add("/tasks/-", newTask),
-                PatchOperation.Set("/done", false)
+            var taskDone = markDoneIfEpisodeIsDone && episode.Done;
+            
+            batch.PatchItem(id: episode.Id.ToString(), [
+                PatchOperation.Add("/tasks/-", taskDone ? newDoneTask : newUndoneTask),
+                PatchOperation.Set("/done", episode.Done && taskDone)
             ]);
         }
+        
         await batch.ExecuteAsync();
 
         Log.Info($"Added M[{memberId} (@{member.Username})] to {project} for {abbreviation} (IsPseudo={isPseudo})");
