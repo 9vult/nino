@@ -59,7 +59,7 @@ public static class CongaHelper
             ? project.CongaParticipants.Nodes
             : project.CongaParticipants.Nodes.Where(n => n.Type != CongaNodeType.AdditionalStaff);
         
-        foreach (var node in nodes)
+        foreach (var node in nodes.OrderBy(n => n.Abbreviation))
         {
             var isPseudo = project.KeyStaff.FirstOrDefault(t => t.Role.Abbreviation == node.Abbreviation)?.IsPseudo ?? false;
             
@@ -101,7 +101,7 @@ public static class CongaHelper
                 episode.Tasks.Any(t => t.Abbreviation == n.Abbreviation));
 
 
-        foreach (var node in nodes)
+        foreach (var node in nodes.OrderBy(n => n.Abbreviation))
         {
             var task = episode.Tasks.FirstOrDefault(t => t.Abbreviation == node.Abbreviation);
             var isPseudo = project.KeyStaff.Concat(episode.AdditionalStaff)
