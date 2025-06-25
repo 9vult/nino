@@ -46,6 +46,7 @@ Big thanks to everyone who's contributed!
 | Language | Contributor |
 | -------- | ----------- |
 | Russian  | astiob<br/>JohnnyZB |
+| Spanish (Spain) | Yoange |
 
 ## License
 

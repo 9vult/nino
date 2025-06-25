@@ -253,7 +253,19 @@
     "nino.stats.episodes.total": "- Из {episodeCount_1}, **{totalDonePercent_2}%** завершены.",
     "nino.stats.projects.details": "- {ongoingCount_1} и {archivedCount_2}.",
     "nino.stats.episodes.details": "- Среди проектов находящихся в работе, из {ongoingCount_1} завершены **{ongoingDonePercent_2}%**.",
-    "nino.stats.observers.total": "- {observerCount_1} за {projectCount_2}."
+    "nino.stats.observers.total": "- {observerCount_1} за {projectCount_2}.",
+    "error.databaseError": "Произошла ошибка базы данных.",
+    "choice.server.congaPrefixType.none": "Нет",
+    "choice.server.congaPrefixType.nickname": "Никнейм",
+    "choice.server.congaPrefixType.title": "Название",
+    "project.delete.question": "Действительно хочешь удалить `{project_1}`?\nЭто действие невозможно отменить.",
+    "keyStaff.add.markDone.response": "Считай что всё сделано!",
+    "keyStaff.add.markDone.no.button": "Нет",
+    "keyStaff.add.markDone.question": "Некоторые серии уже завершены.\nХочешь пометить задачу выполненной для этих эпизодов?",
+    "keyStaff.add.markDone.yes.button": "Да",
+    "progress.skip.conga.question": "Задача, которую ты пытаешься пропустить, является предварительным условием для других задач.\nПинговать те задачи как обычно?",
+    "progress.skip.conga.no.button": "Не пинговать",
+    "progress.skip.conga.yes.button": "Пинговать как обычно"
   },
   "plural": {
     "progress.done.inTheDust.doItNow": {
