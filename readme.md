@@ -8,6 +8,10 @@ Nino is a bot for tracking fansub progress on Discord.
 
 See the [Full Documentation](./docs/docs.md) for more information.
 
+## Using Nino
+
+You can [invite Nino to your server](https://discord.com/oauth2/authorize?client_id=803068578366095430), or you can follow the instructions below to self-host.
+
 ## Development
 
 Pull requests are always welcome.
@@ -32,6 +36,8 @@ or wherever the built executable is. For hosting, place it next to the executabl
     }
 }
 ```
+
+You can find the Azure Client Secret under Settings → Keys in the Azure portal.
 
 ## Localization
 
