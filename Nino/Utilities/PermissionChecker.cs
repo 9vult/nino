@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using System.Threading.Channels;
+using Discord;
 using Discord.WebSocket;
 using Fergun.Interactive;
 using Nino.Records;
@@ -18,7 +19,10 @@ internal static class PermissionChecker
     {
         var channel = Nino.Client.GetChannel(channelId);
         if (channel == null) return false;
-        if (channel.GetChannelType() != ChannelType.Text && channel.GetChannelType() != ChannelType.News) return false;
+        
+        var channelType = channel.GetChannelType();
+        List<ChannelType> validChannelTypes = [ChannelType.Text, ChannelType.News, ChannelType.PrivateThread, ChannelType.PublicThread];
+        if (channelType is null || !validChannelTypes.Contains(channelType.Value)) return false;
 
         var textChannel = (SocketTextChannel)channel;
         var perms = textChannel.Guild.GetUser(Nino.Client.CurrentUser.Id).GetPermissions(textChannel);
