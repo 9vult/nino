@@ -52,7 +52,9 @@
     "episode.add.cancel.response": "Okay, I won't add those.",
     "episode.added": "I added episode {number_1} to `{project_2}` for you.",
     "episode.displayListOfCandidates": "Please make sure these are the episodes you want to add:\n\n{candidates_1}",
+    "episode.displayListOfRemovalCandidates": "Please make sure these are the episodes you want to remove:\n\n{candidates_1}",
     "episode.lastUpdated": "Last updated {rel_1}",
+    "episode.remove.cancel.response": "Okay, I won't remove those.",
     "episode.removed": "I removed episode {number_1} from `{project_2}` for you.",
     "error.admin.alreadyAdmin": "{admin_1} is already an administrator!",
     "error.alias.inUse": "That alias is already in use in `{aliasproj_1}`.",
@@ -75,6 +77,7 @@
     "error.generic": "An Error Occured.",
     "error.incorrectBooleanFormat": "This value is a boolean and must be either 'true', 'false', 'yes', or 'no'",
     "error.incorrectIntegerFormat": "This value is an integer and must be a whole number",
+    "error.invalidEpisodeRange": "Invalid episode range [{start_1}, {end_2}]",
     "error.invalidTimeRange": "Invalid episode range",
     "error.invalidServerId": "Invalid server ID",
     "error.missingChannelPerms": "I do not have sufficient permissions for {channel_1}!\nPlease ensure I have `VIEW_CHANNEL`, `SEND_MESSAGES`, and `EMBED_LINKS` permissions in that channel!",
@@ -275,6 +278,14 @@
     "episode.added.bulk": {
       "one": "I added {number_1} episode to `{project_2}` for you.",
       "other": "I added {number_1} episodes to `{project_2}` for you."
+    },
+    "episode.remove.proceed.response": {
+      "one": "Alrighty! That {number_1} episode is headed to the gallows!",
+      "other": "Alrighty! Those {number_1} episodes are headed to the gallows!"
+    },
+    "episode.removed.bulk": {
+      "one": "I removed {number_1} episode from `{project_2}` for you.",
+      "other": "I removed {number_1} episodes from `{project_2}` for you."
     },
     "progress.done.inTheDust.doItNow": {
       "one": "{taskName_1} is now {count_2} episode ahead.",

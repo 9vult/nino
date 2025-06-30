@@ -70,7 +70,7 @@ namespace Nino.Commands
                     : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
                 
                 var component = new ComponentBuilder()
-                    .WithButton(T("progress.done.inTheDust.dontDoIt.button", lng), "ninoepisodeaddcancel", ButtonStyle.Danger)
+                    .WithButton(T("progress.done.inTheDust.dontDoIt.button", lng), "ninoepisodeaddcancel", ButtonStyle.Secondary)
                     .WithButton(T("progress.done.inTheDust.doItNow.button", lng), "ninoepisodeadproceed", ButtonStyle.Success)
                     .Build();
                 var questionEmbed = new EmbedBuilder()
