@@ -27,6 +27,7 @@ namespace Nino
                 new CosmosClientOptions
                 {
                     ApplicationName = "Nino",
+                    RequestTimeout = TimeSpan.FromSeconds(60),
                     SerializerOptions = new CosmosSerializationOptions
                     {
                         PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase
