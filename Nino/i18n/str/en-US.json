@@ -235,6 +235,7 @@
     "project.deleted": "Cleaned out the **{project_1}** project for you. 残念。",
     "project.edited": "I updated project `{project_1}`'s {task_2}.",
     "project.exported": "Here's everything I know about `{project_1}`!",
+    "project.imported": "I've imported project `{project_1}` for you. Some things to note:\n- Project administrators have been removed (`/project admin add`)\n- Air Reminders have been disabled (`/project air-reminder enable`)\n- Conga Reminders have been disabled (`/project conga-reminder enable`)\n\nI recommend making sure everything else looks good!",
     "project.list.episodeCount": "Episodes",
     "project.list.isArchived": "Archived",
     "project.list.isPrivate": "Private",
