@@ -1,7 +1,6 @@
-﻿
-namespace Nino.Records;
+namespace Nino.Records.Dtos;
 
-public class Task
+public record TaskDto
 {
     public required string Abbreviation { get; set; }
     public required bool Done { get; set; }

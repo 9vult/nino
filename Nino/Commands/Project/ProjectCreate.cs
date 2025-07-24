@@ -6,6 +6,8 @@ using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities;
 using System.Text;
+using Nino.Records.Dtos;
+using Nino.Records.Mappers;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
@@ -94,12 +96,12 @@ namespace Nino.Commands
             Log.Info($"Creating project {projectData} for M[{ownerId} (@{member.Username})] with {episodes.Count} episodes, starting with episode {firstEpisode}");
 
             // Add project and episodes to database
-            await AzureHelper.Projects!.UpsertItemAsync(projectData);
+            await AzureHelper.Projects!.UpsertItemAsync(projectData.ToDto());
 
             TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(projectData.Id.ToString()));
             foreach (var episode in episodes)
             {
-                batch.UpsertItem(episode);
+                batch.UpsertItem(episode.ToDto());
             }
             await batch.ExecuteAsync();
 
@@ -107,7 +109,7 @@ namespace Nino.Commands
             if (await Getters.GetConfiguration(guildId) == null)
             {
                 Log.Info($"Creating default configuration for guild {guildId}");
-                await AzureHelper.Configurations!.UpsertItemAsync(Configuration.CreateDefault(guildId));
+                await AzureHelper.Configurations!.UpsertItemAsync(Configuration.CreateDefault(guildId).ToDto());
             }
             
             var builder = new StringBuilder();

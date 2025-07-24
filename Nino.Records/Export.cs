@@ -1,8 +1,7 @@
-﻿namespace Nino.Records
+﻿namespace Nino.Records;
+
+public record Export
 {
-    public record Export
-    {
-        public required Project Project;
-        public required Episode[] Episodes;
-    }
+    public required Project Project;
+    public required Episode[] Episodes;
 }

@@ -3,6 +3,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Nino.Records;
 using Nino.Records.Enums;
+using Nino.Records.Mappers;
 using Nino.Utilities;
 using static Localizer.Localizer;
 
@@ -34,7 +35,7 @@ namespace Nino.Commands
                 // Apply change and upsert to database
                 config.ProgressDisplay = type;
 
-                await AzureHelper.Configurations!.UpsertItemAsync(config);
+                await AzureHelper.Configurations!.UpsertItemAsync(config.ToDto());
                 log.Info($"Updated configuration for guild {config.GuildId}, set Progress Display to {type.ToFriendlyString(lng)}");
 
                 // Send success embed

@@ -1,4 +1,6 @@
-﻿using Microsoft.Azure.Cosmos;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.Azure.Cosmos;
 using Nino.Records;
 using Nino.Utilities;
 using Task = System.Threading.Tasks.Task;
@@ -21,7 +23,7 @@ namespace Nino
 
         public static async Task Setup(string endpointUri, string primaryKey, string databaseName)
         {
-            _client = new(
+            _client = new CosmosClient(
                 endpointUri,
                 primaryKey,
                 new CosmosClientOptions
@@ -191,9 +193,9 @@ namespace Nino
         /// </summary>
         /// <param name="project">Project being accessed</param>
         /// <returns>Partition Key of the project's GuildId</returns>
-        public static PartitionKey ProjectPartitionKey(Records.Project project)
+        public static PartitionKey ProjectPartitionKey(Project project)
         {
-            return new PartitionKey(project.SerializationGuildId);
+            return new PartitionKey(project.GuildId.ToString());
         }
 
         /// <summary>
@@ -211,7 +213,7 @@ namespace Nino
         /// </summary>
         /// <param name="episode">Episode being accessed</param>
         /// <returns>Partition Key of the episode's ProjectId</returns>
-        public static PartitionKey EpisodePartitionKey(Records.Episode episode)
+        public static PartitionKey EpisodePartitionKey(Episode episode)
         {
             return new PartitionKey(episode.ProjectId.ToString());
         }
@@ -221,7 +223,7 @@ namespace Nino
         /// </summary>
         /// <param name="project">Project the episode being accessed is from</param>
         /// <returns>Partition Key of the project's id</returns>
-        public static PartitionKey EpisodePartitionKey(Records.Project project)
+        public static PartitionKey EpisodePartitionKey(Project project)
         {
             return new PartitionKey(project.Id.ToString());
         }
@@ -231,9 +233,9 @@ namespace Nino
         /// </summary>
         /// <param name="config">Configuration being accessed</param>
         /// <returns>Partition Key of the config's GuildId</returns>
-        public static PartitionKey ConfigurationPartitionKey(Records.Configuration config)
+        public static PartitionKey ConfigurationPartitionKey(Configuration config)
         {
-            return new PartitionKey(config.SerializationGuildId);
+            return new PartitionKey(config.GuildId.ToString());
         }
 
         /// <summary>
@@ -251,9 +253,9 @@ namespace Nino
         /// </summary>
         /// <param name="observer">Observer being accessed</param>
         /// <returns>Partition Key of the observer's OriginGuildId</returns>
-        public static PartitionKey ObserverPartitionKey(Records.Observer observer)
+        public static PartitionKey ObserverPartitionKey(Observer observer)
         {
-            return new PartitionKey(observer.SerializationOriginGuildId);
+            return new PartitionKey(observer.GuildId.ToString());
         }
 
         /// <summary>

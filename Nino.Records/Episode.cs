@@ -1,31 +1,20 @@
-﻿using Newtonsoft.Json;
+﻿namespace Nino.Records;
 
-namespace Nino.Records
+public class Episode
 {
-    public record Episode
+    public required Guid Id { get; set; }
+    public required Guid ProjectId { get; set; }
+    public required ulong GuildId { get; set; }
+    public required string Number { get; set; }
+    public required bool Done { get; set; }
+    public required bool ReminderPosted { get; set; }
+    public required Staff[] AdditionalStaff { get; set; }
+    public required PinchHitter[] PinchHitters { get; set; }
+    public required Task[] Tasks { get; set; }
+    public DateTimeOffset? Updated { get; set; }
+
+    public override string ToString()
     {
-        public required Guid Id;
-        public required Guid ProjectId;
-        [JsonIgnore] public required ulong GuildId;
-        public required string Number;
-        public required bool Done;
-        public required bool ReminderPosted;
-        public required Staff[] AdditionalStaff;
-        public required PinchHitter[] PinchHitters;
-        public required Task[] Tasks;
-        public DateTimeOffset? Updated;
-
-        [JsonProperty("GuildId")]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public string SerializationGuildId
-        {
-            get => GuildId.ToString();
-            set => GuildId = ulong.Parse(value);
-        }
-
-        public override string ToString ()
-        {
-            return $"E[{Id} ({Number})]";
-        }
+        return $"E[{Id} ({Number})]";
     }
 }

@@ -1,3 +1,4 @@
+using Nino.Records.Dtos;
 using Nino.Records.Enums;
 
 namespace Nino.Records;

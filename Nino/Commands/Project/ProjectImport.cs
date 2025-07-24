@@ -5,6 +5,7 @@ using Discord;
 using Discord.Interactions;
 using Microsoft.Azure.Cosmos;
 using Nino.Records;
+using Nino.Records.Mappers;
 using Nino.Utilities;
 
 using static Localizer.Localizer;
@@ -94,7 +95,7 @@ namespace Nino.Commands
             Log.Info($"Creating project {import.Project} for M[{import.Project.OwnerId} (@{member.Username})] from JSON file '{file.Filename}' with {import.Episodes.Length} episodes");
 
             // Add project and episodes to database
-            await AzureHelper.Projects!.UpsertItemAsync(import.Project);
+            await AzureHelper.Projects!.UpsertItemAsync(import.Project.ToDto());
             
             TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(import.Project.Id.ToString()));
             foreach (var episode in import.Episodes)
@@ -107,7 +108,7 @@ namespace Nino.Commands
             if (await Getters.GetConfiguration(guildId) is null)
             {
                 Log.Info($"Creating default configuration for guild {guildId}");
-                await AzureHelper.Configurations!.UpsertItemAsync(Configuration.CreateDefault(guildId));
+                await AzureHelper.Configurations!.UpsertItemAsync(Configuration.CreateDefault(guildId).ToDto());
             }
 
             // Send success embed

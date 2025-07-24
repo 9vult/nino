@@ -5,6 +5,7 @@ using Localizer;
 using Nino.Handlers;
 using Nino.Records;
 using Nino.Records.Enums;
+using Nino.Records.Mappers;
 using Nino.Utilities;
 using static Localizer.Localizer;
 
@@ -34,7 +35,7 @@ namespace Nino.Commands
             // Apply change and upsert to database
             config.Locale = locale;
 
-            await AzureHelper.Configurations!.UpsertItemAsync(config);
+            await AzureHelper.Configurations!.UpsertItemAsync(config.ToDto());
             log.Info($"Updated configuration for guild {config.GuildId}, set Locale to {locale.ToDiscordLocale() ?? "null"}");
 
             // Send success embed

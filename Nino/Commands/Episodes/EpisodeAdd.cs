@@ -5,6 +5,7 @@ using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
 using Nino.Records;
 using Nino.Records.Enums;
+using Nino.Records.Mappers;
 using Nino.Utilities;
 
 using static Localizer.Localizer;
@@ -51,7 +52,7 @@ namespace Nino.Commands
                 var newEpisode = CreateEpisode(project, episodeNumber);
 
                 // Add to database
-                await AzureHelper.Episodes!.UpsertItemAsync(newEpisode);
+                await AzureHelper.Episodes!.UpsertItemAsync(newEpisode.ToDto());
 
                 Log.Info($"Added episode {newEpisode} to {project}");
                 successDescription = T("episode.added", lng, episodeNumber, project.Nickname);

@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
+using Nino.Records.Dtos;
 using Nino.Records.Enums;
 
 namespace Nino.Records;
@@ -108,8 +109,9 @@ public class CongaGraph
     /// Gets or creates a node
     /// </summary>
     /// <param name="abbreviation">Task to get or create</param>
+    /// <param name="type">Type of node</param>
     /// <returns>The node</returns>
-    private CongaNode GetOrCreateNode(string abbreviation, CongaNodeType type = CongaNodeType.KeyStaff)
+    internal CongaNode GetOrCreateNode(string abbreviation, CongaNodeType type = CongaNodeType.KeyStaff)
     {
         if (_nodes.TryGetValue(abbreviation, out var node)) return node;
         
@@ -131,46 +133,5 @@ public class CongaGraph
                 new CongaEdge { Current = node.Abbreviation, Next = dep.Abbreviation }));
         }
         return participants;
-    }
-    
-    /// <summary>
-    /// Serialize the graph into a flat list
-    /// </summary>
-    /// <returns>Flat list</returns>
-    public CongaNodeDto[] Serialize()
-    {
-        return Nodes.Select(n => new CongaNodeDto
-        {
-            Abbreviation = n.Abbreviation,
-            Type = n.Type,
-            Dependents = n.Dependents.Select(d => d.Abbreviation).ToArray()
-        }).ToArray();
-    }
-
-    /// <summary>
-    /// Deserialize a flat list to a graph
-    /// </summary>
-    /// <param name="dtos">Flat list of nodes</param>
-    /// <returns>Graph</returns>
-    public static CongaGraph Deserialize(CongaNodeDto[] dtos)
-    {
-        var graph = new CongaGraph();
-        
-        // First pass: Create nodes
-        foreach (var dto in dtos)
-        {
-            graph.GetOrCreateNode(dto.Abbreviation, dto.Type);
-        }
-        
-        // Second pass: Create edges
-        foreach (var dto in dtos)
-        {
-            foreach (var dep in dto.Dependents)
-            {
-                graph.Add(dto.Abbreviation, dep);
-            }
-        }
-        
-        return graph;
     }
 }
