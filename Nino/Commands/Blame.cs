@@ -19,7 +19,8 @@ public class Blame : InteractionModuleBase<SocketInteractionContext>
     public async Task<RuntimeResult> Handle(
         [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
         [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string? episodeNumber = null,
-        [Summary("explain", "Explain what any of this means")] bool explain = false
+        [Summary("explain", "Explain what any of this means")] bool explain = false,
+        [Summary("includePseudo", "Include pseudo-tasks")] bool includePseudo = false
     )
     {
         var inputEpisodeNumber = episodeNumber;
@@ -49,6 +50,10 @@ public class Blame : InteractionModuleBase<SocketInteractionContext>
             
         if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
             return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
+
+        // Restrict display of pseudo-tasks to task owners
+        if (includePseudo && !Utils.VerifyEpisodeUser(interaction.User.Id, project, episode))
+            return await Response.Fail(T("error.permissionDenied", lng), interaction);
             
         Log.Trace($"Blaming {project} episode {episode} for M[{interaction.User.Id} (@{interaction.User.Username})]");
 
@@ -81,8 +86,8 @@ public class Blame : InteractionModuleBase<SocketInteractionContext>
         if (project.IsArchived)
             progress.AppendLine(T("blame.archived", lng));
 
-        progress.AppendLine(explain ? StaffList.GenerateExplainProgress(project, episode, lng)
-            : StaffList.GenerateProgress(project, episode));
+        progress.AppendLine(explain ? StaffList.GenerateExplainProgress(project, episode, lng, excludePseudo: !includePseudo)
+            : StaffList.GenerateProgress(project, episode, excludePseudo: !includePseudo));
 
         // Add any update information
         if (project.AniListId != null && !episode.Tasks.Any(t => t.Done) && Utils.EpisodeNumberIsNumber(episode.Number, out var decimalNumber))

@@ -23,7 +23,8 @@ public class BlameAll(InteractiveService interactive) : InteractionModuleBase<So
     public async Task<RuntimeResult> Handle(
         [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
         [Summary("filter", "Filter results")] BlameAllFilter filter = BlameAllFilter.All,
-        [Summary("type", "Display type")] BlameAllType type = BlameAllType.Normal
+        [Summary("type", "Display type")] BlameAllType type = BlameAllType.Normal,
+        [Summary("includePseudo", "Include pseudo-tasks")] bool includePseudo = false
     )
     {
         var interaction = Context.Interaction;
@@ -35,6 +36,10 @@ public class BlameAll(InteractiveService interactive) : InteractionModuleBase<So
         var project = Utils.ResolveAlias(alias, interaction, includeObservers: true);
         if (project is null)
             return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+        
+        // Restrict display of pseudo-tasks to Key Staff
+        if (includePseudo && !Utils.VerifyUser(interaction.User.Id, project, includeKeyStaff: true))
+            return await Response.Fail(T("error.permissionDenied", lng), interaction);
             
         Log.Trace($"Blame All-ing {project} for M[{interaction.User.Id} (@{interaction.User.Username})]");
 
@@ -66,7 +71,7 @@ public class BlameAll(InteractiveService interactive) : InteractionModuleBase<So
                 var length = (int)(pageLength + (page1 <= roundUp ? 1 : 0));
 
                 var pagedEpisodes = episodes.Skip(skip).Take(length);
-                var progress = await BuildProgress(pagedEpisodes, project, lng, type);
+                var progress = await BuildProgress(pagedEpisodes, project, lng, type, !includePseudo);
 
                 // Add the project's MOTD or archival notice, if applicable
                 if (!string.IsNullOrEmpty(project.Motd))
@@ -102,7 +107,7 @@ public class BlameAll(InteractiveService interactive) : InteractionModuleBase<So
         return ExecutionResult.Success;
     }
 
-    private static async Task<string> BuildProgress(IEnumerable<Episode> pagedEpisodes, Project project, string lng, BlameAllType type)
+    private static async Task<string> BuildProgress(IEnumerable<Episode> pagedEpisodes, Project project, string lng, BlameAllType type, bool excludePseudo)
     {
         StringBuilder sb = new ();
         foreach (var episode in pagedEpisodes)
@@ -116,7 +121,7 @@ public class BlameAll(InteractiveService interactive) : InteractionModuleBase<So
                 else if (episode.Tasks.Any(t => t.Done))
                 {
                     if (type == BlameAllType.Normal)
-                        sb.AppendLine(StaffList.GenerateProgress(project, episode));
+                        sb.AppendLine(StaffList.GenerateProgress(project, episode, excludePseudo: excludePseudo));
                     if (type == BlameAllType.StallCheck)
                         sb.AppendLine(T("episode.lastUpdated", lng, $"<t:{episode.Updated?.ToUnixTimeSeconds()}:R>"));
                 }
