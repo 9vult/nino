@@ -39,7 +39,7 @@ public class BlameAll(InteractiveService interactive) : InteractionModuleBase<So
         
         // Restrict display of pseudo-tasks to Key Staff
         if (includePseudo && !Utils.VerifyUser(interaction.User.Id, project, includeKeyStaff: true))
-            return await Response.Fail(T("error.permissionDenied", lng), interaction);
+            includePseudo = false;
             
         Log.Trace($"Blame All-ing {project} for M[{interaction.User.Id} (@{interaction.User.Username})]");
 
