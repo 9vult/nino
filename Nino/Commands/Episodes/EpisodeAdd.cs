@@ -125,13 +125,16 @@ namespace Nino.Commands
                     .Select(n => $"{n}")
                     .Select(n => CreateEpisode(project, n))
                     .ToList();
-                
-                TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.Id.ToString()));
-                foreach (var episode in bulkEpisodes)
+
+                foreach (var chunk in bulkEpisodes.Chunk(50))
                 {
-                    batch.UpsertItem(episode);
+                    var batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.Id.ToString()));
+                    foreach (var episode in chunk)
+                    {
+                        batch.UpsertItem(episode);
+                    }
+                    await batch.ExecuteAsync();
                 }
-                await batch.ExecuteAsync();
                 
                 Log.Info($"Added {bulkEpisodes.Count} episodes to {project}");
                 var replyDict = new Dictionary<string, object>

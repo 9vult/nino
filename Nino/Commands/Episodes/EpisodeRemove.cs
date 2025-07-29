@@ -126,13 +126,16 @@ namespace Nino.Commands
                 });
 
                 if (!fullSend) return ExecutionResult.Success;
-                
-                TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.Id.ToString()));
-                foreach (var e in bulkEpisodes)
+
+                foreach (var chunk in bulkEpisodes.Chunk(50))
                 {
-                    batch.DeleteItem(e.Id.ToString());
+                    var batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.Id.ToString()));
+                    foreach (var e in chunk)
+                    {
+                        batch.DeleteItem(e.Id.ToString());
+                    }
+                    await batch.ExecuteAsync();
                 }
-                await batch.ExecuteAsync();
                 
                 Log.Info($"Removed {bulkEpisodes.Count} episodes from {project}");
                 var replyDict = new Dictionary<string, object>

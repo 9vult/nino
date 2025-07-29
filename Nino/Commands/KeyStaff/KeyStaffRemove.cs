@@ -42,16 +42,19 @@ namespace Nino.Commands
                 PatchOperation.Remove($"/keyStaff/{ksIndex}")
             ]);
 
-            TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(project));
-            foreach (var e in Cache.GetEpisodes(project.Id))
+            foreach (var chunk in Cache.GetEpisodes(project.Id).Chunk(50))
             {
-                var taskIndex = Array.IndexOf(e.Tasks, e.Tasks.Single(t => t.Abbreviation == abbreviation));
-                batch.PatchItem(id: e.Id.ToString(), [
-                    PatchOperation.Remove($"/tasks/{taskIndex}"),
-                    PatchOperation.Set("/done", e.Tasks.Where(t => t.Abbreviation != abbreviation).All(t => t.Done))
-                ]);
+                var batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(project));
+                foreach (var e in chunk)
+                {
+                    var taskIndex = Array.IndexOf(e.Tasks, e.Tasks.Single(t => t.Abbreviation == abbreviation));
+                    batch.PatchItem(id: e.Id.ToString(), [
+                        PatchOperation.Remove($"/tasks/{taskIndex}"),
+                        PatchOperation.Set("/done", e.Tasks.Where(t => t.Abbreviation != abbreviation).All(t => t.Done))
+                    ]);
+                }
+                await batch.ExecuteAsync();
             }
-            await batch.ExecuteAsync();
 
             Log.Info($"Removed {abbreviation} from {project}");
 

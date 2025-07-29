@@ -43,26 +43,30 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
 
             // Remove from database
-            TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(episode));
-
             if (allEpisodes)
             {
-                foreach (var e in Cache.GetEpisodes(project.Id))
+                foreach (var chunk in Cache.GetEpisodes(project.Id).Chunk(50))
                 {
-                    if (e.AdditionalStaff.All(k => k.Role.Abbreviation != abbreviation)) continue;
+                    var batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(episode));
+                    foreach (var e in chunk)
+                    {
+                        if (e.AdditionalStaff.All(k => k.Role.Abbreviation != abbreviation)) continue;
 
-                    var asIndex = Array.IndexOf(e.AdditionalStaff, e.AdditionalStaff.Single(k => k.Role.Abbreviation == abbreviation));
-                    var taskIndex = Array.IndexOf(e.Tasks, e.Tasks.Single(t => t.Abbreviation == abbreviation));
+                        var asIndex = Array.IndexOf(e.AdditionalStaff, e.AdditionalStaff.Single(k => k.Role.Abbreviation == abbreviation));
+                        var taskIndex = Array.IndexOf(e.Tasks, e.Tasks.Single(t => t.Abbreviation == abbreviation));
 
-                    batch.PatchItem(id: e.Id.ToString(), [
-                        PatchOperation.Remove($"/additionalStaff/{asIndex}"),
-                        PatchOperation.Remove($"/tasks/{taskIndex}"),
-                        PatchOperation.Set("/done", e.Tasks.Where(t => t.Abbreviation != abbreviation).All(t => t.Done))
-                    ]);
+                        batch.PatchItem(id: e.Id.ToString(), [
+                            PatchOperation.Remove($"/additionalStaff/{asIndex}"),
+                            PatchOperation.Remove($"/tasks/{taskIndex}"),
+                            PatchOperation.Set("/done", e.Tasks.Where(t => t.Abbreviation != abbreviation).All(t => t.Done))
+                        ]);
+                    }
+                    await batch.ExecuteAsync();
                 }
             }  
             else
             {
+                var batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(episode));
                 var asIndex = Array.IndexOf(episode.AdditionalStaff, episode.AdditionalStaff.Single(k => k.Role.Abbreviation == abbreviation));
                 var taskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == abbreviation));
                 batch.PatchItem(id: episode.Id.ToString(), [
@@ -70,9 +74,9 @@ namespace Nino.Commands
                     PatchOperation.Remove($"/tasks/{taskIndex}"),
                     PatchOperation.Set("/done", episode.Tasks.Where(t => t.Abbreviation != abbreviation).All(t => t.Done))
                 ]);
+                await batch.ExecuteAsync();
             }
 
-            await batch.ExecuteAsync();
 
             if (allEpisodes) Log.Info($"Removed {abbreviation} from {episode}");
             else Log.Info($"Removed additionalstaff {abbreviation} from {project}");

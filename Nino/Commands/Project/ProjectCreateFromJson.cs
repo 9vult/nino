@@ -148,12 +148,15 @@ public partial class ProjectManagement
         // Add project and episodes to database
         await AzureHelper.Projects!.UpsertItemAsync(projectData);
 
-        TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(projectData.Id.ToString()));
-        foreach (var episode in episodes)
+        foreach (var chunk in episodes.Chunk(50))
         {
-            batch.UpsertItem(episode);
+            var batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(projectData.Id.ToString()));
+            foreach (var episode in chunk)
+            {
+                batch.UpsertItem(episode);
+            }
+            await batch.ExecuteAsync();
         }
-        await batch.ExecuteAsync();
 
         // Create configuration if the guild doesn't have one yet
         if (await Getters.GetConfiguration(guildId) == null)

@@ -61,12 +61,15 @@ namespace Nino.Commands
 
             if (episodes.Count > 0)
             {
-                TransactionalBatch episodeBatch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.Id.ToString()));
-                foreach (var episode in episodes)
+                foreach (var chunk in episodes.Chunk(50))
                 {
-                    episodeBatch.UpsertItem(episode);
+                    var episodeBatch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.Id.ToString()));
+                    foreach (var episode in chunk)
+                    {
+                        episodeBatch.UpsertItem(episode);
+                    }
+                    await episodeBatch.ExecuteAsync();
                 }
-                await episodeBatch.ExecuteAsync();
             }
             
             Log.Info($"Transfered project {project} from server {oldGuildId} to new server {newGuildId}");

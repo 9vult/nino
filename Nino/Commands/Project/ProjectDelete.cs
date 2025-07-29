@@ -58,23 +58,29 @@ namespace Nino.Commands
             // Remove from database
             await AzureHelper.Projects!.DeleteItemAsync<Project>(project.Id.ToString(), partitionKey: AzureHelper.ProjectPartitionKey(project));
 
-            TransactionalBatch episodeBatch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.Id.ToString()));
-            foreach (var e in Cache.GetEpisodes(project.Id))
+            foreach (var chunk in Cache.GetEpisodes(project.Id).Chunk(50))
             {
-                episodeBatch.DeleteItem(e.Id.ToString());
+                var episodeBatch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.Id.ToString()));
+                foreach (var e in chunk)
+                {
+                    episodeBatch.DeleteItem(e.Id.ToString());
+                }
+                await episodeBatch.ExecuteAsync();
             }
-            await episodeBatch.ExecuteAsync();
 
             // Remove observers from database
             var observers = Cache.GetObservers(project.GuildId);
             if (observers.Count > 0)
             {
-                TransactionalBatch observerBatch = AzureHelper.Observers!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.GuildId));
-                foreach (Records.Observer o in observers)
+                foreach (var chunk in observers.Chunk(50))
                 {
-                    observerBatch.DeleteItem(o.Id.ToString());
+                    var observerBatch = AzureHelper.Observers!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.GuildId));
+                    foreach (var o in chunk)
+                    {
+                        observerBatch.DeleteItem(o.Id.ToString());
+                    }
+                    await observerBatch.ExecuteAsync();
                 }
-                await observerBatch.ExecuteAsync();
             }
 
             // Send success embed

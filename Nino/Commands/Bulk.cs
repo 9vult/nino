@@ -70,33 +70,39 @@ public partial class Bulk(InteractiveService interactive) : InteractionModuleBas
             
         // Update database
         List<string> completedEpisodes = [];
-        var batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(project));
-        foreach (var e in Cache.GetEpisodes(project.Id)
-                     .Where(e => naturalSorter.Compare(e.Number, startEpisodeNumber) >= 0 
-                                 && naturalSorter.Compare(e.Number, endEpisodeNumber) <= 0))
+        var episodesToProcess = Cache.GetEpisodes(project.Id)
+            .Where(e => naturalSorter.Compare(e.Number, startEpisodeNumber) >= 0
+                        && naturalSorter.Compare(e.Number, endEpisodeNumber) <= 0);
+        
+        foreach (var chunk in episodesToProcess.Chunk(50))
         {
-            var taskIndex = Array.IndexOf(e.Tasks, e.Tasks.Single(t => t.Abbreviation == abbreviation));
-            var isDone = action is ProgressType.Done or ProgressType.Skipped;
+            var batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(project));
+            foreach (var e in chunk)
+            {
+                var taskIndex = Array.IndexOf(e.Tasks, e.Tasks.Single(t => t.Abbreviation == abbreviation));
+                var isDone = action is ProgressType.Done or ProgressType.Skipped;
 
-            // Check if episode will be done
-            var episodeDone = isDone && !e.Tasks.Any(t => t.Abbreviation != abbreviation && !t.Done);
-            if (episodeDone) completedEpisodes.Add(e.Number);
+                // Check if episode will be done
+                var episodeDone = isDone && !e.Tasks.Any(t => t.Abbreviation != abbreviation && !t.Done);
+                if (episodeDone) completedEpisodes.Add(e.Number);
 
-            if (taskIndex == -1) continue;
+                if (taskIndex == -1) continue;
                 
-            var processedConga = isDone 
-                ? ProcessCongaForEpisode(project, e, abbreviation, lng, prefixMode) 
-                : (string.Empty, []);
-            if (processedConga.Item1.Length > 0) congaContent.AppendLine(processedConga.Item1.Trim());
+                var processedConga = isDone 
+                    ? ProcessCongaForEpisode(project, e, abbreviation, lng, prefixMode) 
+                    : (string.Empty, []);
+                if (processedConga.Item1.Length > 0) congaContent.AppendLine(processedConga.Item1.Trim());
                     
-            batch.PatchItem(id: e.Id.ToString(), [
-                PatchOperation.Set($"/tasks/{taskIndex}/done", isDone),
-                PatchOperation.Set($"/done", episodeDone),
-                PatchOperation.Set($"/updated", DateTimeOffset.UtcNow),
-                ..processedConga.Item2
-            ]);
+                batch.PatchItem(id: e.Id.ToString(), [
+                    PatchOperation.Set($"/tasks/{taskIndex}/done", isDone),
+                    PatchOperation.Set($"/done", episodeDone),
+                    PatchOperation.Set($"/updated", DateTimeOffset.UtcNow),
+                    ..processedConga.Item2
+                ]);
+            }
+            await batch.ExecuteAsync();
         }
-        await batch.ExecuteAsync();
+        
 
         var staff = project.KeyStaff.Concat(startEpisode.AdditionalStaff).First(ks => ks.Role.Abbreviation == abbreviation);
         

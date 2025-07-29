@@ -87,17 +87,20 @@ namespace Nino.Services
             }
 
             // Update database
-            foreach (var kvpair in marked)
+            foreach (var chunk in marked.Chunk(50))
             {
-                TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(kvpair.Key.ToString()));
-                foreach (var episode in kvpair.Value)
+                foreach (var kvpair in chunk)
                 {
-                    batch.PatchItem(id: episode.Id.ToString(), [
-                        PatchOperation.Set("/reminderPosted", true)
-                    ]);
+                    var batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(kvpair.Key.ToString()));
+                    foreach (var episode in kvpair.Value)
+                    {
+                        batch.PatchItem(id: episode.Id.ToString(), [
+                            PatchOperation.Set("/reminderPosted", true)
+                        ]);
+                    }
+                    await batch.ExecuteAsync();
+                    await Cache.RebuildCacheForProject(kvpair.Key);
                 }
-                await batch.ExecuteAsync();
-                await Cache.RebuildCacheForProject(kvpair.Key);
             }
         }
 

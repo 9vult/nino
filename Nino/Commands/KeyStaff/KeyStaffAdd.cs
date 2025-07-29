@@ -102,18 +102,20 @@ public partial class KeyStaff
             PatchOperation.Add("/keyStaff/-", newStaff)
         ]);
 
-        var batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(project));
-        foreach (var episode in projectEpisodes)
+        foreach (var chunk in projectEpisodes.Chunk(50))
         {
-            var taskDone = markDoneIfEpisodeIsDone && episode.Done;
+            var batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(project));
+            foreach (var episode in chunk)
+            {
+                var taskDone = markDoneIfEpisodeIsDone && episode.Done;
             
-            batch.PatchItem(id: episode.Id.ToString(), [
-                PatchOperation.Add("/tasks/-", taskDone ? newDoneTask : newUndoneTask),
-                PatchOperation.Set("/done", episode.Done && taskDone)
-            ]);
+                batch.PatchItem(id: episode.Id.ToString(), [
+                    PatchOperation.Add("/tasks/-", taskDone ? newDoneTask : newUndoneTask),
+                    PatchOperation.Set("/done", episode.Done && taskDone)
+                ]);
+            }
+            await batch.ExecuteAsync();
         }
-        
-        await batch.ExecuteAsync();
 
         Log.Info($"Added M[{memberId} (@{member.Username})] to {project} for {abbreviation} (IsPseudo={isPseudo})");
 

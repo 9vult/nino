@@ -55,19 +55,22 @@ namespace Nino.Commands
                 PatchOperation.Replace($"/keyStaff/{ksIndex}", updatedStaff)
             ]);
 
-            TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(project));
-            foreach (var e in Cache.GetEpisodes(project.Id))
+            foreach (var chunk in Cache.GetEpisodes(project.Id).Chunk(50))
             {
-                var updatedTask = e.Tasks.Single(k => k.Abbreviation == abbreviation);
-                var taskIndex = Array.IndexOf(e.Tasks, updatedTask);
+                var batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(project));
+                foreach (var e in chunk)
+                {
+                    var updatedTask = e.Tasks.Single(k => k.Abbreviation == abbreviation);
+                    var taskIndex = Array.IndexOf(e.Tasks, updatedTask);
                 
-                updatedTask.Abbreviation = newAbbreviation;
+                    updatedTask.Abbreviation = newAbbreviation;
                 
-                batch.PatchItem(id: e.Id.ToString(), [
-                    PatchOperation.Replace($"/tasks/{taskIndex}", updatedTask),
-                ]);
+                    batch.PatchItem(id: e.Id.ToString(), [
+                        PatchOperation.Replace($"/tasks/{taskIndex}", updatedTask),
+                    ]);
+                }
+                await batch.ExecuteAsync();
             }
-            await batch.ExecuteAsync();
 
             Log.Info($"Renamed task {abbreviation} to {newAbbreviation} ({newTaskName}) in {project}");
 
