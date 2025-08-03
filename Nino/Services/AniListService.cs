@@ -28,7 +28,7 @@ namespace Nino.Services
         /// Get the AniList API response for the given ID, either cached or fresh
         /// </summary>
         /// <param name="anilistId">AniList ID</param>
-        /// <returns>API reponse</returns>
+        /// <returns>API response</returns>
         public static async Task<ApiResponse?> Get(int anilistId)
         {
             if (!AniListEnabled)
@@ -81,6 +81,10 @@ namespace Nino.Services
                     var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse>();
                     if (apiResponse is null)
                         return new ApiResponse { Error = "error.anilist.cache.malformed" };
+                    
+                    // Round to the nearest multiple of 30 minutes
+                    if (apiResponse.Data?.Media is not null)
+                        apiResponse.Data.Media.Duration = (int)Math.Ceiling((apiResponse.Data.Media.Duration ?? 0) / 30d) * 30;
 
                     await using var stream = File.OpenWrite(filename);
                     await JsonSerializer.SerializeAsync(stream, apiResponse);
@@ -127,7 +131,15 @@ namespace Nino.Services
         private static StringContent CreateQuery(int id) =>
             new(JsonSerializer.Serialize(new
             {
-                query = "query ($id: Int) { Media (id: $id) { startDate { year month day }, airingSchedule { nodes { episode, airingAt }}}}",
+                query = """
+                        query ($id: Int) {
+                            Media (id: $id) {
+                                startDate { year month day },
+                                airingSchedule { nodes { episode, airingAt }},
+                                duration
+                            }
+                        }
+                        """,
                 variables = new { id },
             }),
             Encoding.UTF8,
@@ -159,6 +171,8 @@ namespace Nino.Services
         [JsonIgnore]
         public DateTimeOffset? StartDate => Data?.Media?.StartDate;
         [JsonIgnore]
+        public int? Duration => Data?.Media?.Duration; 
+        [JsonIgnore]
         public string? Error { get; set; }
         [JsonIgnore]
         public DateTime SaveDate { get; set; }
@@ -175,6 +189,7 @@ namespace Nino.Services
 
         [JsonConverter(typeof(StartDateConverter))]
         public DateTimeOffset StartDate { get; set; }
+        public int? Duration { get; set; }
     }
 
     public class AiringSchedule

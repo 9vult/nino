@@ -109,7 +109,7 @@ namespace Nino.Services
             {
                 if (episode.Episode == episodeNumber)
                 {
-                    return DateTimeOffset.FromUnixTimeSeconds(episode.AiringAt);
+                    return DateTimeOffset.FromUnixTimeSeconds(episode.AiringAt).AddMinutes(response?.Duration ?? 0);
                 }
             }
             return null;
