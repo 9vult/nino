@@ -27,12 +27,12 @@ public static class ProjectMapper
             AniListId = domain.AniListId,
             AniListOffset = domain.AniListOffset,
             AirReminderEnabled = domain.AirReminderEnabled,
-            AirReminderChannelId = domain.AirReminderChannelId.ToString(),
-            AirReminderRoleId = domain.AirReminderRoleId.ToString(),
-            AirReminderUserId = domain.AirReminderUserId.ToString(),
+            AirReminderChannelId = domain.AirReminderChannelId?.ToString(),
+            AirReminderRoleId = domain.AirReminderRoleId?.ToString(),
+            AirReminderUserId = domain.AirReminderUserId?.ToString(),
             CongaReminderEnabled = domain.CongaReminderEnabled,
             CongaReminderPeriod = domain.CongaReminderPeriod,
-            CongaReminderChannelId = domain.CongaReminderChannelId.ToString(),
+            CongaReminderChannelId = domain.CongaReminderChannelId?.ToString(),
             Created = domain.Created,
         };
     }

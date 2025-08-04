@@ -96,7 +96,7 @@ namespace Nino.Commands
             Log.Info($"Creating project {projectData} for M[{ownerId} (@{member.Username})] with {episodes.Count} episodes, starting with episode {firstEpisode}");
 
             // Add project and episodes to database
-            await AzureHelper.Projects!.UpsertItemAsync(projectData);
+            await AzureHelper.Projects!.UpsertItemAsync(projectData.ToDto());
 
             foreach (var chunk in episodes.Chunk(50))
             {
