@@ -5,6 +5,7 @@ using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
 using Nino.Records;
 using Nino.Records.Enums;
+using Nino.Records.Mappers;
 using Nino.Utilities;
 using static Localizer.Localizer;
 
@@ -99,7 +100,7 @@ public partial class KeyStaff
 
         // Add to database
         await AzureHelper.PatchProjectAsync(project, [
-            PatchOperation.Add("/keyStaff/-", newStaff)
+            PatchOperation.Add("/keyStaff/-", newStaff.ToDto())
         ]);
 
         foreach (var chunk in projectEpisodes.Chunk(50))
@@ -110,7 +111,7 @@ public partial class KeyStaff
                 var taskDone = markDoneIfEpisodeIsDone && episode.Done;
             
                 batch.PatchItem(id: episode.Id.ToString(), [
-                    PatchOperation.Add("/tasks/-", taskDone ? newDoneTask : newUndoneTask),
+                    PatchOperation.Add("/tasks/-", taskDone ? newDoneTask.ToDto() : newUndoneTask.ToDto()),
                     PatchOperation.Set("/done", episode.Done && taskDone)
                 ]);
             }

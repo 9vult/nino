@@ -154,7 +154,7 @@ public partial class ProjectManagement
             var batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(projectData.Id.ToString()));
             foreach (var episode in chunk)
             {
-                batch.UpsertItem(episode);
+                batch.UpsertItem(episode.ToDto());
             }
             await batch.ExecuteAsync();
         }

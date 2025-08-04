@@ -2,6 +2,7 @@
 using Discord.Interactions;
 using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
+using Nino.Records.Mappers;
 using Nino.Utilities;
 
 using static Localizer.Localizer;
@@ -66,7 +67,7 @@ namespace Nino.Commands
                     updatedTask.Abbreviation = newAbbreviation;
                 
                     batch.PatchItem(id: e.Id.ToString(), [
-                        PatchOperation.Replace($"/tasks/{taskIndex}", updatedTask),
+                        PatchOperation.Replace($"/tasks/{taskIndex}", updatedTask.ToDto()),
                     ]);
                 }
                 await batch.ExecuteAsync();

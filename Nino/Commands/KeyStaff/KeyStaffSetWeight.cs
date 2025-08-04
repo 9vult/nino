@@ -3,6 +3,7 @@ using Discord.Interactions;
 using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
 using Nino.Records;
+using Nino.Records.Mappers;
 using Nino.Utilities;
 
 using static Localizer.Localizer;
@@ -45,7 +46,7 @@ namespace Nino.Commands
 
             // Swap in database
             await AzureHelper.PatchProjectAsync(project, [
-                PatchOperation.Replace($"/keyStaff/{ksIndex}", updatedStaff)
+                PatchOperation.Replace($"/keyStaff/{ksIndex}", updatedStaff.ToDto())
             ]);
 
             Log.Info($"Set {abbreviation} weight to {inputWeight} in {project}");

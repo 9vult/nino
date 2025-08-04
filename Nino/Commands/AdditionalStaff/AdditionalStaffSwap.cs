@@ -3,6 +3,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
+using Nino.Records.Mappers;
 using Nino.Utilities;
 using static Localizer.Localizer;
 
@@ -51,7 +52,7 @@ namespace Nino.Commands
             // Swap in database
             TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(episode));
             batch.PatchItem(id: episode.Id.ToString(), [
-                PatchOperation.Replace($"/additionalStaff/{asIndex}", updatedStaff)
+                PatchOperation.Replace($"/additionalStaff/{asIndex}", updatedStaff.ToDto())
             ]);
             await batch.ExecuteAsync();
 

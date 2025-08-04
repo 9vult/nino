@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
 using Nino.Records;
+using Nino.Records.Mappers;
 using Nino.Utilities;
 using static Localizer.Localizer;
 
@@ -58,7 +59,7 @@ namespace Nino.Commands
                 
                 var phIndex = Array.IndexOf(episode.PinchHitters, episode.PinchHitters.SingleOrDefault(k => k.Abbreviation == abbreviation));
                 batch.PatchItem(id: episode.Id.ToString(), [
-                    PatchOperation.Set($"/pinchHitters/{(phIndex != -1 ? phIndex : "-")}", hitter)
+                    PatchOperation.Set($"/pinchHitters/{(phIndex != -1 ? phIndex : "-")}", hitter.ToDto())
                 ]);
                 
                 await batch.ExecuteAsync();

@@ -132,7 +132,7 @@ namespace Nino.Commands
                     var batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.Id.ToString()));
                     foreach (var episode in chunk)
                     {
-                        batch.UpsertItem(episode);
+                        batch.UpsertItem(episode.ToDto());
                     }
                     await batch.ExecuteAsync();
                 }

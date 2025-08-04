@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
 using Nino.Records;
+using Nino.Records.Mappers;
 using Nino.Utilities;
 using static Localizer.Localizer;
 
@@ -64,8 +65,8 @@ namespace Nino.Commands
             
             // Swap in database
             await AzureHelper.PatchEpisodeAsync(episode, [
-                PatchOperation.Replace($"/additionalStaff/{ksIndex}", updatedStaff),
-                PatchOperation.Replace($"/tasks/{taskIndex}", updatedTask),
+                PatchOperation.Replace($"/additionalStaff/{ksIndex}", updatedStaff.ToDto()),
+                PatchOperation.Replace($"/tasks/{taskIndex}", updatedTask.ToDto()),
             ]);
 
             Log.Info($"Renamed task {abbreviation} for episode {episode} to {newAbbreviation} ({newTaskName})");

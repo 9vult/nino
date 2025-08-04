@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
 using Nino.Records;
+using Nino.Records.Mappers;
 using Nino.Utilities;
 using static Localizer.Localizer;
 
@@ -69,8 +70,8 @@ namespace Nino.Commands
             // Add to database
             TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(episode));
             batch.PatchItem(id: episode.Id.ToString(), [
-                PatchOperation.Add("/additionalStaff/-", newStaff),
-                PatchOperation.Add("/tasks/-", newTask),
+                PatchOperation.Add("/additionalStaff/-", newStaff.ToDto()),
+                PatchOperation.Add("/tasks/-", newTask.ToDto()),
                 PatchOperation.Set("/done", false)
             ]);
             await batch.ExecuteAsync();

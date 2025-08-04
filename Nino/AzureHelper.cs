@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using Microsoft.Azure.Cosmos;
 using Nino.Records;
+using Nino.Records.Dtos;
 using Nino.Utilities;
 using Task = System.Threading.Tasks.Task;
 
@@ -176,14 +177,14 @@ namespace Nino
         {
             var id = project.Id.ToString();
             var partitionKey = ProjectPartitionKey(project);
-            await Projects!.PatchItemAsync<Project>(id, partitionKey, patchOperations);
+            await Projects!.PatchItemAsync<ProjectDto>(id, partitionKey, patchOperations);
         }
         
         public static async Task PatchEpisodeAsync (Episode episode, IReadOnlyList<PatchOperation> patchOperations)
         {
             var id = episode.Id.ToString();
             var partitionKey = EpisodePartitionKey(episode);
-            await Episodes!.PatchItemAsync<Episode>(id, partitionKey, patchOperations);
+            await Episodes!.PatchItemAsync<EpisodeDto>(id, partitionKey, patchOperations);
         }
         
         #region Partition Keys
