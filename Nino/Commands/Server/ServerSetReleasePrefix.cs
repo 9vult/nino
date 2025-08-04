@@ -2,6 +2,7 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Nino.Records;
+using Nino.Records.Mappers;
 using Nino.Utilities;
 using static Localizer.Localizer;
 
@@ -34,7 +35,7 @@ namespace Nino.Commands
             // Apply change and upsert to database
             config.ReleasePrefix = prefix;
 
-            await AzureHelper.Configurations!.UpsertItemAsync(config);
+            await AzureHelper.Configurations!.UpsertItemAsync(config.ToDto());
             log.Info($"Updated configuration for guild {config.GuildId}, set ReleasePrefix to {prefix ?? "(empty)"}");
 
             // Send success embed

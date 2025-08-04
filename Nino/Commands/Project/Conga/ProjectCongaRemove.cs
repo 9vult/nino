@@ -3,6 +3,7 @@ using Discord.Interactions;
 using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
 using Nino.Records;
+using Nino.Records.Mappers;
 using Nino.Utilities;
 
 using static Localizer.Localizer;
@@ -54,7 +55,7 @@ namespace Nino.Commands
                 
                 
                 await AzureHelper.PatchProjectAsync(project, [
-                    PatchOperation.Set($"/congaParticipants", project.CongaParticipants.Serialize()),
+                    PatchOperation.Set($"/congaParticipants", project.CongaParticipants.ToDto()),
                 ]);
 
                 Log.Info($"Removed {edge} from the Conga line for {project}");

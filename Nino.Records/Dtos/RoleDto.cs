@@ -1,7 +1,6 @@
-﻿
-namespace Nino.Records;
+namespace Nino.Records.Dtos;
 
-public class Role
+public record RoleDto
 {
     public required string Abbreviation { get; set; }
     public required string Name { get; set; }

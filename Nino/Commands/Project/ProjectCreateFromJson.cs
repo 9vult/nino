@@ -8,6 +8,7 @@ using Nino.Utilities;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Nino.Records.Mappers;
 using static Localizer.Localizer;
 
 namespace Nino.Commands;
@@ -117,7 +118,7 @@ public partial class ProjectManagement
             CongaReminderEnabled = false,
             AdministratorIds = template.AdministratorIds ?? [],
             KeyStaff = template.KeyStaff,
-            CongaParticipants = CongaGraph.Deserialize(template.CongaParticipants ?? []) ,
+            CongaParticipants = (template.CongaParticipants?.ToList() ?? []).FromDto() ,
             Aliases = template.Aliases ?? [],
             AniListId = template.AniListId,
             Created = DateTimeOffset.UtcNow
@@ -146,7 +147,7 @@ public partial class ProjectManagement
         Log.Info($"Creating project {projectData} for M[{ownerId} (@{member.Username})] from JSON file '{file.Filename}' with {episodes.Count} episodes and {template.KeyStaff.Length} keystaff");
 
         // Add project and episodes to database
-        await AzureHelper.Projects!.UpsertItemAsync(projectData);
+        await AzureHelper.Projects!.UpsertItemAsync(projectData.ToDto());
 
         foreach (var chunk in episodes.Chunk(50))
         {
@@ -162,7 +163,7 @@ public partial class ProjectManagement
         if (await Getters.GetConfiguration(guildId) == null)
         {
             Log.Info($"Creating default configuration for guild {guildId}");
-            await AzureHelper.Configurations!.UpsertItemAsync(Configuration.CreateDefault(guildId));
+            await AzureHelper.Configurations!.UpsertItemAsync(Configuration.CreateDefault(guildId).ToDto());
         }
             
         var builder = new StringBuilder();

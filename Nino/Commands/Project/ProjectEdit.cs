@@ -2,7 +2,6 @@
 using Discord.Interactions;
 using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
-using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities;
 using System.Text.RegularExpressions;

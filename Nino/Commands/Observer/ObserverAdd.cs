@@ -2,6 +2,7 @@ using Discord;
 using Discord.Interactions;
 using Discord.Rest;
 using Discord.WebSocket;
+using Nino.Records.Mappers;
 using Nino.Utilities;
 
 using static Localizer.Localizer;
@@ -81,7 +82,7 @@ namespace Nino.Commands
             };
 
             // Add to database
-            await AzureHelper.Observers!.UpsertItemAsync(observer);
+            await AzureHelper.Observers!.UpsertItemAsync(observer.ToDto());
 
             Log.Info($"M[{interaction.User.Id} (@{interaction.User.Username})] created new observer {observer.Id} from {guildId} observing {project}");
 

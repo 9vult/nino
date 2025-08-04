@@ -1,6 +1,8 @@
 ﻿using Microsoft.Azure.Cosmos;
 using NaturalSort.Extension;
 using Nino.Records;
+using Nino.Records.Dtos;
+using Nino.Records.Mappers;
 using NLog;
 
 namespace Nino.Utilities
@@ -36,8 +38,8 @@ namespace Nino.Utilities
             ).WithParameter("@guildId", guildId.ToString());
 
             // Get new data
-            var rawProjects = await AzureHelper.QueryProjects<Project>(projectSql);
-            var allEpisodes = await AzureHelper.QueryEpisodes<Episode>(episodeSql);
+            var rawProjects = await AzureHelper.QueryProjects<ProjectDto>(projectSql);
+            var allEpisodes = await AzureHelper.QueryEpisodes<EpisodeDto>(episodeSql);
 
             // Transform data
             List<Project> cachedProjects = [];
@@ -47,9 +49,9 @@ namespace Nino.Utilities
                     .Where(e => e.ProjectId == project.Id)
                     .OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort())
                     .ToList();
-                EpisodeCache[project.Id] = episodes;
+                EpisodeCache[project.Id] = episodes.Select(EpisodeMapper.FromDto).ToList();
 
-                cachedProjects.Add(project);
+                cachedProjects.Add(project.FromDto());
             }
             ProjectCache[guildId] = cachedProjects;
             Log.Info(
@@ -74,12 +76,15 @@ namespace Nino.Utilities
             ).WithParameter("@projectId", projectId.ToString());
 
             // Get data
-            var project = (await AzureHelper.QueryProjects<Project>(projectSql)).Single();
-            var episodes = (await AzureHelper.QueryEpisodes<Episode>(episodeSql))
+            var projectDto = (await AzureHelper.QueryProjects<ProjectDto>(projectSql)).Single();
+            var episodeDtos = (await AzureHelper.QueryEpisodes<EpisodeDto>(episodeSql))
                 .OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort())
                 .ToList();
 
             // Transform data
+            var project = projectDto.FromDto();
+            var episodes = episodeDtos.Select(EpisodeMapper.FromDto).ToList();
+            
             var idx = ProjectCache[project.GuildId].FindIndex(p => p.Id == project.Id);
             ProjectCache[project.GuildId][idx] = project;
 
@@ -93,7 +98,9 @@ namespace Nino.Utilities
             Log.Info($"Rebuilding config cache...");
 
             var configSql = new QueryDefinition("SELECT * FROM c");
-            var configs = await AzureHelper.QueryConfigurations<Configuration>(configSql);
+            var configDtos = await AzureHelper.QueryConfigurations<ConfigurationDto>(configSql);
+            
+            var configs = configDtos.Select(ConfigurationMapper.FromDto).ToList();
 
             ConfigCache.Clear();
             foreach (var config in configs)
@@ -109,7 +116,9 @@ namespace Nino.Utilities
             Log.Info($"Rebuilding observer cache...");
 
             var configSql = new QueryDefinition("SELECT * FROM c");
-            var allObservers = await AzureHelper.QueryObservers<Observer>(configSql);
+            var allObserverDtos = await AzureHelper.QueryObservers<ObserverDto>(configSql);
+            
+            var allObservers = allObserverDtos.Select(ObserverMapper.FromDto).ToList();
 
             ObserverCache.Clear();
             foreach (var observer in allObservers)
