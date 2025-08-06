@@ -1,4 +1,3 @@
-using System;
 using Discord.Interactions;
 
 namespace Nino.Utilities

@@ -1,7 +1,5 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
-using Nino.Records;
 using Nino.Utilities;
 using static Localizer.Localizer;
 
@@ -24,18 +22,16 @@ namespace Nino.Commands
             if (!Utils.VerifyAdministrator(runner, guild, excludeServerAdmins: true))
                 return await Response.Fail(T("error.notPrivileged", lng), interaction);
 
-            var config = await Getters.GetConfiguration(guildId);
+            var config = db.GetConfig(guildId);
             if (config == null)
                 return await Response.Fail(T("error.noSuchConfig", lng), interaction);
 
             // Get inputs
             var prefix = newValue == "-" ? null : newValue;
-
-            // Apply change and upsert to database
+            
             config.ReleasePrefix = prefix;
-
-            await AzureHelper.Configurations!.UpsertItemAsync(config);
-            log.Info($"Updated configuration for guild {config.GuildId}, set ReleasePrefix to {prefix ?? "(empty)"}");
+            
+            Log.Info($"Updated configuration for guild {config.GuildId}, set ReleasePrefix to {prefix ?? "(empty)"}");
 
             // Send success embed
             var embed = new EmbedBuilder()
@@ -44,7 +40,7 @@ namespace Nino.Commands
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 
-            await Cache.RebuildConfigCache();
+            await db.SaveChangesAsync();
             return ExecutionResult.Success;
         }
     }

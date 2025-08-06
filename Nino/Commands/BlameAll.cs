@@ -15,7 +15,7 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands;
 
-public class BlameAll(InteractiveService interactive) : InteractionModuleBase<SocketInteractionContext>
+public class BlameAll(DataContext db, InteractiveService interactive) : InteractionModuleBase<SocketInteractionContext>
 {
     private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
@@ -29,11 +29,11 @@ public class BlameAll(InteractiveService interactive) : InteractionModuleBase<So
     {
         var interaction = Context.Interaction;
         var lng = interaction.UserLocale;
-        var gLng = Cache.GetConfig(interaction.GuildId ?? 0)?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
+        var gLng = db.GetConfig(interaction.GuildId ?? 0)?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
         alias = alias.Trim();
             
         // Verify project
-        var project = Utils.ResolveAlias(alias, interaction, includeObservers: true);
+        var project = db.ResolveAlias(alias, interaction, includeObservers: true);
         if (project is null)
             return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
         
@@ -49,10 +49,10 @@ public class BlameAll(InteractiveService interactive) : InteractionModuleBase<So
 
         var episodes = filter switch
         {
-            BlameAllFilter.All => Cache.GetEpisodes(project.Id).OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList(),
-            BlameAllFilter.InProgress => Cache.GetEpisodes(project.Id).Where(e => !e.Done && e.Tasks.Any(t => t.Done)).OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList(),
-            BlameAllFilter.Incomplete => Cache.GetEpisodes(project.Id).Where(e => !e.Done).OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList(),
-            _ => Cache.GetEpisodes(project.Id).OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList() // All
+            BlameAllFilter.All => project.Episodes.OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList(),
+            BlameAllFilter.InProgress => project.Episodes.Where(e => !e.Done && e.Tasks.Any(t => t.Done)).OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList(),
+            BlameAllFilter.Incomplete => project.Episodes.Where(e => !e.Done).OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList(),
+            _ => project.Episodes.OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList() // All
         };
 
         // Calculate pages

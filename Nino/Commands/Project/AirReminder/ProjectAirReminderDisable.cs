@@ -1,8 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
-using Nino.Records;
 using Nino.Utilities;
 
 using static Localizer.Localizer;
@@ -25,20 +23,17 @@ namespace Nino.Commands
                 alias = alias.Trim();
 
                 // Verify project and user - Owner or Admin required
-                var project = Utils.ResolveAlias(alias, interaction);
-                if (project == null)
+                var project = db.ResolveAlias(alias, interaction);
+                if (project is null)
                     return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
                 if (!Utils.VerifyUser(interaction.User.Id, project))
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
-                // Set in database
-                await AzureHelper.PatchProjectAsync(project, [
-                    PatchOperation.Set($"/airReminderEnabled", false),
-                    PatchOperation.Set<string?>($"/airReminderChannelId", null),
-                    PatchOperation.Set<string?>($"/airReminderRoleId", null),
-                    PatchOperation.Set<string?>($"/airReminderUserId", null)
-                ]);
+                project.AirReminderEnabled = false;
+                project.AirReminderChannelId = null;
+                project.AirReminderRoleId = null;
+                project.AirReminderUserId = null;
 
                 Log.Info($"Disabled air reminders for {project}");
 
@@ -49,7 +44,7 @@ namespace Nino.Commands
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 
-                await Cache.RebuildCacheForProject(project.Id);
+                await db.SaveChangesAsync();
                 return ExecutionResult.Success;
             }
         }

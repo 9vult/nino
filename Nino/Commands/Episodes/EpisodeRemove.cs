@@ -1,10 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
-using Microsoft.Azure.Cosmos;
 using NaturalSort.Extension;
 using Nino.Handlers;
-using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities;
 
@@ -24,7 +21,7 @@ namespace Nino.Commands
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
 
-            // Sanitize imputs
+            // Sanitize inputs
             alias = alias.Trim();
             episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
             
@@ -32,15 +29,15 @@ namespace Nino.Commands
                 lastEpisodeNumber = Utils.CanonicalizeEpisodeNumber(lastEpisodeNumber);
 
             // Verify project and user - Owner or Admin required
-            var project = Utils.ResolveAlias(alias, interaction);
-            if (project == null)
+            var project = db.ResolveAlias(alias, interaction);
+            if (project is null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
             if (!Utils.VerifyUser(interaction.User.Id, project))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Verify episode exists
-            if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
+            if (!project.TryGetEpisode(episodeNumber, out var episode))
                 return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
 
             string successDescription;
@@ -48,18 +45,19 @@ namespace Nino.Commands
             // Single episode removal
             if (lastEpisodeNumber is null)
             {
-                // Remove from database
-                await AzureHelper.Episodes!.DeleteItemAsync<Episode>(episode.Id.ToString(), AzureHelper.EpisodePartitionKey(episode));
+                project.Episodes.Remove(episode);
+                db.Episodes.Remove(episode);
+                
                 Log.Info($"Deleted episode {episode} from {project}");
                 successDescription = T("episode.removed", lng, episodeNumber, project.Nickname);
             }
             // Multiple episode removal
             else
             {
-                if (!Getters.TryGetEpisode(project, lastEpisodeNumber, out var lastEpisode))
+                if (!project.TryGetEpisode(lastEpisodeNumber, out _))
                     return await Response.Fail(T("error.noSuchEpisode", lng, lastEpisodeNumber), interaction);
 
-                var episodes = Cache.GetEpisodes(project.Id).OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList();
+                var episodes = project.Episodes.OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList();
                 var startIndex = episodes.FindIndex(ep => ep.Number == episodeNumber);
                 var endIndex = episodes.FindIndex(ep => ep.Number == lastEpisodeNumber);
                 
@@ -92,7 +90,7 @@ namespace Nino.Commands
                 });
                 
                 // Wait for response
-                var questionResult = await _interactiveService.NextMessageComponentAsync(
+                var questionResult = await interactive.NextMessageComponentAsync(
                     m => m.Message.Id == questionResponse.Id, timeout: TimeSpan.FromSeconds(60));
                 
                 var fullSend = false;
@@ -127,15 +125,8 @@ namespace Nino.Commands
 
                 if (!fullSend) return ExecutionResult.Success;
 
-                foreach (var chunk in bulkEpisodes.Chunk(50))
-                {
-                    var batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.Id.ToString()));
-                    foreach (var e in chunk)
-                    {
-                        batch.DeleteItem(e.Id.ToString());
-                    }
-                    await batch.ExecuteAsync();
-                }
+                project.Episodes.RemoveAll(e => bulkEpisodes.Contains(e));
+                db.Episodes.RemoveRange(bulkEpisodes);
                 
                 Log.Info($"Removed {bulkEpisodes.Count} episodes from {project}");
                 var replyDict = new Dictionary<string, object>
@@ -150,7 +141,7 @@ namespace Nino.Commands
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 
-            await Cache.RebuildCacheForProject(project.Id);
+            await db.SaveChangesAsync();
             return ExecutionResult.Success;
         }
     }

@@ -1,7 +1,5 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
-using Microsoft.Azure.Cosmos;
 using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities;
@@ -43,7 +41,7 @@ namespace Nino.Commands
             nickname = nickname.Trim().ToLowerInvariant().Replace(" ", string.Empty); // remove spaces
 
             // Verify data
-            if (Cache.GetProjects(guildId).Any(p => p.Nickname == nickname))
+            if (db.Projects.Any(p => p.GuildId == guildId && p.Nickname == nickname))
                 return await Response.Fail(T("error.project.nameInUse", lng, nickname), interaction);
 
             if (!Uri.TryCreate(posterUri, UriKind.Absolute, out Uri? _))
@@ -53,7 +51,7 @@ namespace Nino.Commands
 
             var projectData = new Project
             {
-                Id = AzureHelper.CreateProjectId(),
+                Id = Guid.NewGuid(),
                 GuildId = guildId,
                 Nickname = nickname,
                 Title = title,
@@ -66,10 +64,7 @@ namespace Nino.Commands
                 IsArchived = false,
                 AirReminderEnabled = false,
                 CongaReminderEnabled = false,
-                AdministratorIds = [],
-                KeyStaff = [],
                 CongaParticipants = new CongaGraph(),
-                Aliases = [],
                 AniListId = aniListId,
                 Created = DateTimeOffset.UtcNow
             };
@@ -79,7 +74,7 @@ namespace Nino.Commands
             {
                 episodes.Add(new Episode
                 {
-                    Id = AzureHelper.CreateEpisodeId(),
+                    Id = Guid.NewGuid(),
                     GuildId = guildId,
                     ProjectId = projectData.Id,
                     Number = $"{i}",
@@ -94,23 +89,14 @@ namespace Nino.Commands
             Log.Info($"Creating project {projectData} for M[{ownerId} (@{member.Username})] with {episodes.Count} episodes, starting with episode {firstEpisode}");
 
             // Add project and episodes to database
-            await AzureHelper.Projects!.UpsertItemAsync(projectData);
-
-            foreach (var chunk in episodes.Chunk(50))
-            {
-                var batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(projectData.Id.ToString()));
-                foreach (var episode in chunk)
-                {
-                    batch.UpsertItem(episode);
-                }
-                await batch.ExecuteAsync();
-            }
+            await db.Projects.AddAsync(projectData);
+            await db.Episodes.AddRangeAsync(episodes);
 
             // Create configuration if the guild doesn't have one yet
-            if (await Getters.GetConfiguration(guildId) == null)
+            if (db.GetConfig(guildId) == null)
             {
                 Log.Info($"Creating default configuration for guild {guildId}");
-                await AzureHelper.Configurations!.UpsertItemAsync(Configuration.CreateDefault(guildId));
+                await db.Configurations.AddAsync(Configuration.CreateDefault(guildId));
             }
             
             var builder = new StringBuilder();
@@ -135,7 +121,7 @@ namespace Nino.Commands
             if (!PermissionChecker.CheckReleasePermissions(releaseChannelId))
                 await Response.Info(T("error.missingChannelPermsRelease", lng, $"<#{releaseChannelId}>"), interaction);
 
-            await Cache.RebuildCacheForGuild(interaction.GuildId ?? 0);
+            await db.SaveChangesAsync();
             return ExecutionResult.Success;
         }
     }

@@ -11,7 +11,7 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands;
 
-public class Blame : InteractionModuleBase<SocketInteractionContext>
+public class Blame(DataContext db) : InteractionModuleBase<SocketInteractionContext>
 {
     private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
@@ -29,11 +29,11 @@ public class Blame : InteractionModuleBase<SocketInteractionContext>
         alias = alias.Trim();
             
         // Verify project
-        var project = Utils.ResolveAlias(alias, interaction, includeObservers: true);
-        if (project == null)
+        var project = db.ResolveAlias(alias, interaction, includeObservers: true);
+        if (project is null)
             return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
-        var episodes = Cache.GetEpisodes(project.Id).OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList();
+        var episodes = project.Episodes.OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList();
 
         // Verify or find episode
         if (episodeNumber == null)
@@ -48,7 +48,8 @@ public class Blame : InteractionModuleBase<SocketInteractionContext>
             episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
         }
             
-        if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
+        var episode = episodes.FirstOrDefault(e => e.Number == episodeNumber);
+        if (episode is null)
             return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
 
         // Restrict display of pseudo-tasks to task owners

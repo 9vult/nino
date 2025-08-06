@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
 using Nino.Utilities;
 using static Localizer.Localizer;
@@ -27,15 +26,15 @@ namespace Nino.Commands
                 episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
 
                 // Verify project and user - Owner or Admin required
-                var project = Utils.ResolveAlias(alias, interaction);
-                if (project == null)
+                var project = db.ResolveAlias(alias, interaction);
+                if (project is null)
                     return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
                 if (!Utils.VerifyUser(interaction.User.Id, project))
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
                 // Verify episode
-                if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
+                if (!project.TryGetEpisode(episodeNumber, out var episode))
                     return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
 
                 // Check if position exists
@@ -43,16 +42,12 @@ namespace Nino.Commands
                     return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
 
                 // Remove from database
-                TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(episode));
-
-                var phIndex = Array.IndexOf(episode.PinchHitters, episode.PinchHitters.SingleOrDefault(k => k.Abbreviation == abbreviation));
-                if (phIndex < 0)
+                
+                var ph = episode.PinchHitters.FirstOrDefault(p => p.Abbreviation == abbreviation);
+                if (ph is null)
                     return await Response.Fail(T("error.noSuchPinchHitter", lng, abbreviation), interaction);
                 
-                batch.PatchItem(id: episode.Id.ToString(), [
-                    PatchOperation.Remove($"/pinchHitters/{phIndex}")
-                ]);
-                await batch.ExecuteAsync();
+                episode.PinchHitters.Remove(ph);
                 Log.Info($"Removed pinch hitter for {abbreviation} from {episode}");
 
                 // Send success embed
@@ -62,7 +57,7 @@ namespace Nino.Commands
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 
-                await Cache.RebuildCacheForProject(episode.ProjectId);
+                await db.SaveChangesAsync();
                 return ExecutionResult.Success;
             }
         }

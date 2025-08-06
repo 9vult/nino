@@ -2,12 +2,13 @@
 using Discord;
 using Discord.WebSocket;
 using Localizer;
-using Microsoft.Azure.Cosmos;
+using Microsoft.EntityFrameworkCore;
 using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities;
 using NLog;
 using static Localizer.Localizer;
+using Configuration = Nino.Records.Configuration;
 using Task = System.Threading.Tasks.Task;
 
 namespace Nino.Services
@@ -19,7 +20,7 @@ namespace Nino.Services
         private const int FiveMinutes = 5 * 60 * 1000;
         private readonly System.Timers.Timer _timer;
 
-        public ReleaseReminderService()
+        public ReleaseReminderService(DataContext db)
         {
             _timer = new System.Timers.Timer
             {
@@ -27,19 +28,19 @@ namespace Nino.Services
             };
             _timer.Elapsed += async (_, _) =>
             {
-                await CheckForReleases();
+                await CheckForReleases(db);
             };
             _timer.Start();
         }
 
-        private static async Task CheckForReleases()
+        private static async Task CheckForReleases(DataContext db)
         {
             Dictionary<Guid, List<Episode>> marked = [];
             
-            foreach (var project in Cache.GetProjects().Where(p => p is { AirReminderEnabled: true, AniListId: not null }))
+            foreach (var project in db.Projects.Include(p => p.Episodes).Where(p => p.AirReminderEnabled && p.AniListId != null ))
             {
                 var decimalNumber = 0m;
-                foreach (var episode in Cache.GetEpisodes(project.Id).Where(e => e is { Done: false, ReminderPosted: false } && Utils.EpisodeNumberIsNumber(e.Number, out decimalNumber)))
+                foreach (var episode in project.Episodes.Where(e => e is { Done: false, ReminderPosted: false } && Utils.EpisodeNumberIsNumber(e.Number, out decimalNumber)))
                 {
                     try
                     {
@@ -48,7 +49,8 @@ namespace Nino.Services
                             continue;
 
                         if (await Nino.Client.GetChannelAsync((ulong)project.AirReminderChannelId!) is not SocketTextChannel channel) continue;
-                        var gLng = Cache.GetConfig(channel.Guild.Id)?.Locale?.ToDiscordLocale() ?? channel.Guild.PreferredLocale;
+                        var config = db.GetConfig(channel.Guild.Id);
+                        var gLng = config?.Locale?.ToDiscordLocale() ?? channel.Guild.PreferredLocale;
                         
                         if (!marked.TryGetValue(project.Id, out var markedList))
                         {
@@ -74,7 +76,7 @@ namespace Nino.Services
                         await channel.SendMessageAsync(text: mention, embed: embed);
                         
                         // Conga intervention!
-                        await DoReleaseConga(project, episode, gLng);
+                        await DoReleaseConga(project, episode, gLng, config);
                         
                         Log.Info($"Published release reminder for {project} episode {episode}");
                     }
@@ -87,21 +89,11 @@ namespace Nino.Services
             }
 
             // Update database
-            foreach (var chunk in marked.Chunk(50))
+            foreach (var episode in marked.SelectMany(kvp => kvp.Value))
             {
-                foreach (var kvpair in chunk)
-                {
-                    var batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(kvpair.Key.ToString()));
-                    foreach (var episode in kvpair.Value)
-                    {
-                        batch.PatchItem(id: episode.Id.ToString(), [
-                            PatchOperation.Set("/reminderPosted", true)
-                        ]);
-                    }
-                    await batch.ExecuteAsync();
-                    await Cache.RebuildCacheForProject(kvpair.Key);
-                }
+                episode.ReminderPosted = true;
             }
+            await db.SaveChangesAsync();
         }
 
         /// <summary>
@@ -110,9 +102,10 @@ namespace Nino.Services
         /// <param name="project">The project</param>
         /// <param name="episode">The episode</param>
         /// <param name="gLng">Guild language</param>
-        private static async Task DoReleaseConga(Project project, Episode episode, string gLng)
+        /// <param name="config">Configuration</param>
+        private static async Task DoReleaseConga(Project project, Episode episode, string gLng, Configuration? config)
         {
-            var prefixMode = Cache.GetConfig(project.GuildId)?.CongaPrefix ?? CongaPrefixType.None;
+            var prefixMode = config?.CongaPrefix ?? CongaPrefixType.None;
             var reminderText = new StringBuilder();
             if (project.CongaParticipants.Nodes.Count != 0)
             {
@@ -132,15 +125,13 @@ namespace Nino.Services
                     .Where(c => c is not null)
                     .Where(c => c?.UserId != project.AirReminderUserId) // Prevent double pings
                     .ToList();
-                        
-                var patchOperations = nodes
-                    .Select(c => Array.FindIndex(episode.Tasks, t => t.Abbreviation == c.Abbreviation))
-                    .Where(index => index != -1)
-                    .Select(index => PatchOperation.Set($"/tasks/{index}/lastReminded", DateTimeOffset.UtcNow))
-                    .ToList();
 
-                if (patchOperations.Count == 0) return;
-                await AzureHelper.PatchEpisodeAsync(episode, patchOperations);
+                foreach (var task in nodes
+                             .Select(n => episode.Tasks.FirstOrDefault(t => t.Abbreviation == n.Abbreviation))
+                             .Where(t => t is not null))
+                {
+                    task!.LastReminded = DateTimeOffset.UtcNow;
+                }
                 
                 // Time to send the conga message
                 if (await Nino.Client.GetChannelAsync((ulong)project.AirReminderChannelId!) is not SocketTextChannel channel) return;

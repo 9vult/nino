@@ -1,8 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Microsoft.Azure.Cosmos;
-using Nino.Records;
 using Nino.Utilities;
 
 using static Localizer.Localizer;
@@ -32,23 +30,18 @@ namespace Nino.Commands
                 if (!Utils.VerifyAdministrator(runner, guild, excludeServerAdmins: true))
                     return await Response.Fail(T("error.notPrivileged", lng), interaction);
 
-                var config = await Getters.GetConfiguration(guildId);
-                if (config == null)
+                var config = db.GetConfig(guildId);
+                if (config is null)
                     return await Response.Fail(T("error.noSuchConfig", lng), interaction);
 
                 // Validate user is an admin
-                if (!config.AdministratorIds.Any(a => a == memberId))
+                var admin = config.Administrators.FirstOrDefault(a => a.UserId == memberId);
+                if (admin is null)
                     return await Response.Fail(T("error.noSuchAdmin", lng, staffMention), interaction);
 
-                var adminIndex = Array.IndexOf(config.AdministratorIds, config.AdministratorIds.Single(a => a == memberId));
+                config.Administrators.Remove(admin);
 
-                // Remove from database
-                await AzureHelper.Configurations!.PatchItemAsync<Configuration>(id: config.Id, partitionKey: AzureHelper.ConfigurationPartitionKey(config),
-                    patchOperations: [
-                        PatchOperation.Remove($"/administratorIds/{adminIndex}")
-                ]);
-
-                log.Info($"Updated configuration for guild {config.GuildId}, removed {memberId} as an administrator");
+                Log.Info($"Updated configuration for guild {config.GuildId}, removed {memberId} as an administrator");
 
                 // Send success embed
                 var embed = new EmbedBuilder()
@@ -57,7 +50,7 @@ namespace Nino.Commands
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 
-                await Cache.RebuildConfigCache();
+                await db.SaveChangesAsync();
                 return ExecutionResult.Success;
             }
         }

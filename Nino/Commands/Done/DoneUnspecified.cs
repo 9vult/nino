@@ -12,13 +12,13 @@ namespace Nino.Commands
 {
     public partial class Done
     {
-        public static async Task<RuntimeResult> HandleUnspecified(SocketInteraction interaction, Project project, string abbreviation, InteractiveService interactiveService)
+        private async Task<RuntimeResult> HandleUnspecified(SocketInteraction interaction, Project project, string abbreviation, InteractiveService interactiveService)
         {
             Log.Info($"Handling unspecified /done by M[{interaction.User.Id} (@{interaction.User.Username})] for {project}");
             
             var lng = interaction.UserLocale;
 
-            var episodes = Cache.GetEpisodes(project.Id).OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList();
+            var episodes = project.Episodes.OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList();
 
             // Find the episode the team is working on
             var workingEpisodeNo = episodes.FirstOrDefault(e => !e.Done)?.Number ?? episodes.LastOrDefault()?.Number;
@@ -42,13 +42,12 @@ namespace Nino.Commands
             // We are working ahead
 
             // Verify user
-            Getters.TryGetEpisode(project, nextTaskEpisodeNo, out var nextTaskEpisode);
+            project.TryGetEpisode(nextTaskEpisodeNo, out var nextTaskEpisode);
 
             if (!Utils.VerifyTaskUser(interaction.User.Id, project, nextTaskEpisode!, abbreviation))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
-            var task = nextTaskEpisode!.Tasks.First(t => t.Abbreviation == abbreviation);
-            var role = project.KeyStaff.Concat(nextTaskEpisode.AdditionalStaff).First(ks => ks.Role.Abbreviation == abbreviation).Role;
+            var role = project.KeyStaff.Concat(nextTaskEpisode!.AdditionalStaff).First(ks => ks.Role.Abbreviation == abbreviation).Role;
 
             // How to proceed question embed
             var header = project.IsPrivate
@@ -72,8 +71,8 @@ namespace Nino.Commands
             var questionResult = await interactiveService.NextMessageComponentAsync(
                 m => m.Message.Id == questionResponse.Id, timeout: TimeSpan.FromSeconds(60));
 
-            bool fullSend = false;
-            string finalBody = string.Empty;
+            var fullSend = false;
+            string finalBody;
             if (!questionResult.IsSuccess)
                 finalBody = T("progress.done.inTheDust.timeout", lng);
             else

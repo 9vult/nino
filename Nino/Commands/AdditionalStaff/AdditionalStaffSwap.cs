@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
 using Nino.Utilities;
 using static Localizer.Localizer;
@@ -21,39 +20,30 @@ namespace Nino.Commands
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
 
-            // Sanitize imputs
+            // Sanitize inputs
             var memberId = member.Id;
             alias = alias.Trim();
             episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
 
             // Verify project and user - Owner or Admin required
-            var project = Utils.ResolveAlias(alias, interaction);
-            if (project == null)
+            var project = db.ResolveAlias(alias, interaction);
+            if (project is null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
             if (!Utils.VerifyUser(interaction.User.Id, project))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Verify episode
-            if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
+            if (!project.TryGetEpisode(episodeNumber, out var episode))
                 return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
 
             // Check if position exists
-            if (!episode.AdditionalStaff.Any(ks => ks.Role.Abbreviation == abbreviation))
+            if (episode.AdditionalStaff.All(ks => ks.Role.Abbreviation != abbreviation))
                 return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
 
             // Update user
-            var updatedStaff = episode.AdditionalStaff.Single(k => k.Role.Abbreviation == abbreviation);
-            var asIndex = Array.IndexOf(episode.AdditionalStaff, updatedStaff);
-
-            updatedStaff.UserId = memberId;
-
-            // Swap in database
-            TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(episode));
-            batch.PatchItem(id: episode.Id.ToString(), [
-                PatchOperation.Replace($"/additionalStaff/{asIndex}", updatedStaff)
-            ]);
-            await batch.ExecuteAsync();
+            var staff = episode.AdditionalStaff.Single(k => k.Role.Abbreviation == abbreviation);
+            staff.UserId = memberId;
 
             Log.Info($"Swapped M[{memberId} (@{member.Username})] in to {episode} for {abbreviation}");
 
@@ -65,6 +55,7 @@ namespace Nino.Commands
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 
+            await db.SaveChangesAsync();
             return ExecutionResult.Success;
         }
     }

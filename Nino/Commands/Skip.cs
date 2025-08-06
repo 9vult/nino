@@ -2,7 +2,6 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Fergun.Interactive;
-using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
 using Nino.Records.Enums;
 using Nino.Utilities;
@@ -15,7 +14,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Nino.Commands;
 
-public partial class Skip(InteractiveService interactive) : InteractionModuleBase<SocketInteractionContext>
+public partial class Skip(DataContext db, InteractiveService interactive) : InteractionModuleBase<SocketInteractionContext>
 {
     private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
@@ -28,7 +27,8 @@ public partial class Skip(InteractiveService interactive) : InteractionModuleBas
     {
         var interaction = Context.Interaction;
         var lng = interaction.UserLocale;
-        var gLng = Cache.GetConfig(interaction.GuildId ?? 0)?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
+        var config = db.GetConfig(interaction.GuildId ?? 0);
+        var gLng = config?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
 
         // Sanitize inputs
         alias = alias.Trim();
@@ -36,8 +36,8 @@ public partial class Skip(InteractiveService interactive) : InteractionModuleBas
         episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
             
         // Verify project
-        var project = Utils.ResolveAlias(alias, interaction);
-        if (project == null)
+        var project = db.ResolveAlias(alias, interaction);
+        if (project is null)
             return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
         if (project.IsArchived)
@@ -57,7 +57,7 @@ public partial class Skip(InteractiveService interactive) : InteractionModuleBas
         }
 
         // Verify episode and task
-        if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
+        if (!project.TryGetEpisode(episodeNumber, out var episode))
             return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
         if (episode.Tasks.All(t => t.Abbreviation != abbreviation))
             return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
@@ -76,22 +76,15 @@ public partial class Skip(InteractiveService interactive) : InteractionModuleBas
         var task = episode.Tasks.Single(t => t.Abbreviation == abbreviation);
         var staff = project.KeyStaff.Concat(episode.AdditionalStaff)
             .First(ks => ks.Role.Abbreviation == abbreviation);
-        
-        // Update database
-        var taskIndex = Array.IndexOf(episode.Tasks, task);
-        await AzureHelper.PatchEpisodeAsync(episode, [
-            PatchOperation.Set($"/tasks/{taskIndex}/done", true),
-            PatchOperation.Set($"/tasks/{taskIndex}/updated", DateTimeOffset.UtcNow),
-            PatchOperation.Set($"/done", episodeDone),
-            PatchOperation.Set($"/updated", DateTimeOffset.UtcNow)
-        ]);
 
-        // Update task for embeds
         task.Done = true;
+        task.Updated = DateTimeOffset.UtcNow;
+        episode.Done = episodeDone;
+        episode.Updated = DateTimeOffset.UtcNow;
 
         var taskTitle = staff.Role.Name;
         var title = T("title.progress", gLng, episodeNumber);
-        var status = Cache.GetConfig(project.GuildId)?.UpdateDisplay.Equals(UpdatesDisplayType.Extended) ?? false
+        var status = config?.UpdateDisplay.Equals(UpdatesDisplayType.Extended) ?? false
             ? StaffList.GenerateExplainProgress(project, episode, gLng, abbreviation) // Explanatory
             : StaffList.GenerateProgress(project, episode, abbreviation); // Standard
 
@@ -106,7 +99,7 @@ public partial class Skip(InteractiveService interactive) : InteractionModuleBas
             ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
             : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
 
-        var replyBody = Cache.GetConfig(project.GuildId)?.ProgressDisplay.Equals(ProgressDisplayType.Verbose) ?? false
+        var replyBody = config?.ProgressDisplay.Equals(ProgressDisplayType.Verbose) ?? false
             ? $"{T("progress.skipped", lng, taskTitle, episodeNumber)}\n\n{replyStatus}{episodeDoneText}" // Verbose
             : $"{T("progress.skipped", lng, taskTitle, episodeNumber)}{episodeDoneText}"; // Succinct (default)
 
@@ -123,8 +116,8 @@ public partial class Skip(InteractiveService interactive) : InteractionModuleBas
 
         // Everybody do the Conga!
         await DoTheConga();
-            
-        await Cache.RebuildCacheForProject(project.Id);
+
+        await db.SaveChangesAsync();
         return ExecutionResult.Success; 
             
         // -----
@@ -137,7 +130,7 @@ public partial class Skip(InteractiveService interactive) : InteractionModuleBas
                 .Where(dep => episode.Tasks.Any(t => t.Abbreviation == dep.Abbreviation)).ToList() ?? []; // Limit to tasks in the episode
             if (congaCandidates.Count == 0) return;
                 
-            var prefixMode = Cache.GetConfig(project.GuildId)?.CongaPrefix ?? CongaPrefixType.None;
+            var prefixMode = config?.CongaPrefix ?? CongaPrefixType.None;
             StringBuilder congaContent = new();
 
             var singleCandidates = new List<CongaNode>();
@@ -199,10 +192,9 @@ public partial class Skip(InteractiveService interactive) : InteractionModuleBas
                 congaContent.AppendLine(T("progress.done.conga", lng, staffMention, episode.Number, roleTitle));
                     
                 // Update database with new last-reminded time
-                var congaTaskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == nextTask.Role.Abbreviation));
-                await AzureHelper.PatchEpisodeAsync(episode, [
-                    PatchOperation.Set($"/tasks/{congaTaskIndex}/lastReminded", DateTimeOffset.UtcNow)
-                ]);
+                var congaTask = episode.Tasks.FirstOrDefault(t => t.Abbreviation == nextTask.Role.Abbreviation);
+                if (congaTask is not null)
+                    congaTask.LastReminded = DateTimeOffset.UtcNow;
             }
                 
             if (congaContent.Length > 0)
@@ -236,7 +228,7 @@ public partial class Skip(InteractiveService interactive) : InteractionModuleBas
             }
 
             // Publish to observers
-            await ObserverPublisher.PublishProgress(project, publishEmbed);
+            await ObserverPublisher.PublishProgress(project, publishEmbed, db);
         }
     }
 }

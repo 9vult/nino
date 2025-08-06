@@ -17,19 +17,21 @@ namespace Nino
 {
     public class Nino
     {
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         private static CmdLineOptions _cmdLineOptions = new();
-        private static readonly Logger log = LogManager.GetCurrentClassLogger();
         private static AppConfig? _config;
         private static IServiceProvider? _services;
-        private static DiscordSocketConfig _socketConfig = new()
+        
+        private static readonly DiscordSocketConfig SocketConfig = new()
         {
             GatewayIntents = GatewayIntents.AllUnprivileged ^ GatewayIntents.GuildScheduledEvents ^ GatewayIntents.GuildInvites
         };
 
         public static DiscordSocketClient Client => _services!.GetRequiredService<DiscordSocketClient>();
         public static AppConfig Config => _config!;
+        public static DataContext DataContext => _services!.GetRequiredService<DataContext>();
 
-        private static readonly InteractionServiceConfig _interactionServiceConfig = new()
+        private static readonly InteractionServiceConfig InteractionServiceConfig = new()
         {
             LocalizationManager = new JsonLocalizationManager("i18n/cmd", "nino")
         };
@@ -41,7 +43,7 @@ namespace Nino
             Console.OutputEncoding = Encoding.UTF8;
             LogHandler.SetupLogger();
 
-            log.Info($"Starting Nino {Utils.VERSION}");
+            Log.Info($"Starting Nino {Utils.Version}");
 
             // Read in environment variables
             IConfigurationRoot configBuilder = new ConfigurationBuilder()
@@ -56,29 +58,26 @@ namespace Nino
 
             // Set up services
             _services = new ServiceCollection()
+                .AddDbContext<DataContext>()
                 .AddSingleton(_config)
                 .AddSingleton(_cmdLineOptions)
-                .AddSingleton(_socketConfig)
+                .AddSingleton(SocketConfig)
                 .AddSingleton<DiscordSocketClient>()
-                .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>(), _interactionServiceConfig))
+                .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>(), InteractionServiceConfig))
                 .AddSingleton<InteractionHandler>()
                 .AddSingleton<InteractiveService>()
+                .AddSingleton<ReleaseReminderService>()
+                .AddSingleton<CongaReminderService>()
                 .BuildServiceProvider();
-
-            // Set up Azure database
-            await AzureHelper.Setup(_config.AzureCosmosEndpoint, _config.AzureClientSecret, _config.AzureCosmosDbName);
-
-            // Build initial cache
-            await Cache.BuildCache();
 
             // Start AniList service
             if (!_cmdLineOptions.DisableAniList)
-                _ = new ReleaseReminderService();
+                _ = _services.GetRequiredService<ReleaseReminderService>();
             else
                 AniListService.AniListEnabled = false;
 
             // Start Conga Reminder service
-            _ = new CongaReminderService();
+            _ = _services.GetRequiredService<CongaReminderService>();
 
             // Load localization files
             LoadLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/str")));

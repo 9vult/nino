@@ -1,7 +1,5 @@
 ﻿using Nino.Records;
-using Nino.Utilities;
 using System.Text.Json;
-using Task = System.Threading.Tasks.Task;
 
 namespace Nino.Services
 {
@@ -17,12 +15,10 @@ namespace Nino.Services
         {
             JsonSerializerOptions options = new() { IncludeFields = true, WriteIndented = prettyPrint };
 
-            var episodes = Cache.GetEpisodes(project.Id);
-
             var export = new Export
             {
                 Project = project,
-                Episodes = [.. episodes]
+                Episodes = [.. project.Episodes]
             };
             
             var stream = new MemoryStream();

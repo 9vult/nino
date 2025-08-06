@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
 using Nino.Records;
 using Nino.Utilities;
@@ -31,15 +30,15 @@ namespace Nino.Commands
                 episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
 
                 // Verify project and user - Owner or Admin required
-                var project = Utils.ResolveAlias(alias, interaction);
-                if (project == null)
+                var project = db.ResolveAlias(alias, interaction);
+                if (project is null)
                     return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
                 if (!Utils.VerifyUser(interaction.User.Id, project))
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
                 // Verify episode
-                if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
+                if (!project.TryGetEpisode(episodeNumber, out var episode))
                     return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
                 
                 // Check if position exists
@@ -49,19 +48,13 @@ namespace Nino.Commands
                 // All good!
                 var hitter = new PinchHitter
                 {
+                    Id = Guid.NewGuid(),
                     UserId = memberId,
                     Abbreviation = abbreviation
                 };
 
-                // Add to database
-                TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(episode));
-                
-                var phIndex = Array.IndexOf(episode.PinchHitters, episode.PinchHitters.SingleOrDefault(k => k.Abbreviation == abbreviation));
-                batch.PatchItem(id: episode.Id.ToString(), [
-                    PatchOperation.Set($"/pinchHitters/{(phIndex != -1 ? phIndex : "-")}", hitter)
-                ]);
-                
-                await batch.ExecuteAsync();
+                episode.PinchHitters.RemoveAll(p => p.Abbreviation == abbreviation);
+                episode.PinchHitters.Add(hitter);
 
                 Log.Info($"Set M[{memberId} (@{member.Username})] as pinch hitter for {abbreviation} for {episode}");
 
@@ -73,7 +66,7 @@ namespace Nino.Commands
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 
-                await Cache.RebuildCacheForProject(episode.ProjectId);
+                await db.SaveChangesAsync();
                 return ExecutionResult.Success;
             }
         }

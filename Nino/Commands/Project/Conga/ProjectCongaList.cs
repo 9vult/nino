@@ -26,8 +26,8 @@ namespace Nino.Commands
                 alias = alias.Trim();
 
                 // Verify project and user - minimum Key Staff required
-                var project = Utils.ResolveAlias(alias, interaction);
-                if (project == null)
+                var project = db.ResolveAlias(alias, interaction);
+                if (project is null)
                     return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
                 if (!Utils.VerifyUser(interaction.User.Id, project, includeKeyStaff: true))
@@ -35,7 +35,7 @@ namespace Nino.Commands
                 
                 // Verify episode
                 Episode? episode = null;
-                if (episodeNumber is not null && !Getters.TryGetEpisode(project, episodeNumber, out episode))
+                if (episodeNumber is not null && project.Episodes.All(e => e.Number != episodeNumber))
                     return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
 
                 Log.Trace($"Listing Conga graph for {project} (episode={episodeNumber ?? "null"},forced={forceAdditional}) for M[{interaction.User.Id} (@{interaction.User.Username})]");

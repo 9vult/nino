@@ -1,9 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
-using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
-using Nino.Records;
 using Nino.Utilities;
 
 using static Localizer.Localizer;
@@ -30,20 +27,17 @@ namespace Nino.Commands
                 var hours = days * 24;
 
                 // Verify project and user - Owner or Admin required
-                var project = Utils.ResolveAlias(alias, interaction);
-                if (project == null)
+                var project = db.ResolveAlias(alias, interaction);
+                if (project is null)
                     return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
                 if (!Utils.VerifyUser(interaction.User.Id, project))
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
-                // Set in database
-                await AzureHelper.PatchProjectAsync(project, [
-                    PatchOperation.Set($"/congaReminderEnabled", true),
-                    PatchOperation.Set($"/congaReminderChannelId", channelId.ToString()),
-                    PatchOperation.Set($"/congaReminderPeriod", TimeSpan.FromHours(hours))
-                ]);
-
+                project.CongaReminderEnabled = true;
+                project.CongaReminderChannelId = channelId;
+                project.CongaReminderPeriod = TimeSpan.FromHours(hours);
+                
                 Log.Info($"Enabled conga reminders for {project} with a period of {hours} hours.");
 
                 // Send success embed
@@ -57,7 +51,7 @@ namespace Nino.Commands
                 if (!PermissionChecker.CheckPermissions(channelId))
                     await Response.Info(T("error.missingChannelPerms", lng, $"<#{channelId}>"), interaction);
 
-                await Cache.RebuildCacheForProject(project.Id);
+                await db.SaveChangesAsync();
                 return ExecutionResult.Success;
             }
         }

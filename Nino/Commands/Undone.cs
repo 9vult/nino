@@ -3,7 +3,6 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Fergun.Interactive;
 using Localizer;
-using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
 using Nino.Records.Enums;
 using Nino.Utilities;
@@ -12,7 +11,7 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands;
 
-public partial class Undone(InteractiveService interactive) : InteractionModuleBase<SocketInteractionContext>
+public partial class Undone(DataContext db, InteractiveService interactive) : InteractionModuleBase<SocketInteractionContext>
 {
     private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
@@ -25,7 +24,8 @@ public partial class Undone(InteractiveService interactive) : InteractionModuleB
     {
         var interaction = Context.Interaction;
         var lng = interaction.UserLocale;
-        var gLng = Cache.GetConfig(interaction.GuildId ?? 0)?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
+        var config = db.GetConfig(interaction.GuildId ?? 0);
+        var gLng = config?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
 
         // Sanitize inputs
         alias = alias.Trim();
@@ -33,8 +33,8 @@ public partial class Undone(InteractiveService interactive) : InteractionModuleB
         episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
             
         // Verify project
-        var project = Utils.ResolveAlias(alias, interaction);
-        if (project == null)
+        var project = db.ResolveAlias(alias, interaction);
+        if (project is null)
             return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
         if (project.IsArchived)
@@ -46,7 +46,7 @@ public partial class Undone(InteractiveService interactive) : InteractionModuleB
         if (!goOn) return ExecutionResult.Success;
 
         // Verify episode and task
-        if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
+        if (!project.TryGetEpisode(episodeNumber, out var episode))
             return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
         if (episode.Tasks.All(t => t.Abbreviation != abbreviation))
             return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
@@ -62,21 +62,14 @@ public partial class Undone(InteractiveService interactive) : InteractionModuleB
         var task = episode.Tasks.Single(t => t.Abbreviation == abbreviation);
         var staff = project.KeyStaff.Concat(episode.AdditionalStaff).First(ks => ks.Role.Abbreviation == abbreviation);
 
-        // Update database
-        var taskIndex = Array.IndexOf(episode.Tasks, task);
-        await AzureHelper.PatchEpisodeAsync(episode, [
-            PatchOperation.Set($"/tasks/{taskIndex}/done", false),
-            PatchOperation.Set($"/tasks/{taskIndex}/updated", DateTimeOffset.UtcNow),
-            PatchOperation.Set($"/done", false),
-            PatchOperation.Set($"/updated", DateTimeOffset.UtcNow)
-        ]);
-
-        // Update task for embeds
         task.Done = false;
+        task.Updated = DateTimeOffset.UtcNow;
+        episode.Done = false;
+        episode.Updated = DateTimeOffset.UtcNow;
 
         var taskTitle = staff.Role.Name;
         var title = T("title.progress", gLng, episodeNumber);
-        var status = Cache.GetConfig(project.GuildId)?.UpdateDisplay.Equals(UpdatesDisplayType.Extended) ?? false
+        var status = config?.UpdateDisplay.Equals(UpdatesDisplayType.Extended) ?? false
             ? StaffList.GenerateExplainProgress(project, episode, gLng, abbreviation) // Explanatory
             : StaffList.GenerateProgress(project, episode, abbreviation); // Standard
 
@@ -90,7 +83,7 @@ public partial class Undone(InteractiveService interactive) : InteractionModuleB
             ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
             : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
 
-        var replyBody = Cache.GetConfig(project.GuildId)?.ProgressDisplay.Equals(ProgressDisplayType.Verbose) ?? false
+        var replyBody = config?.ProgressDisplay.Equals(ProgressDisplayType.Verbose) ?? false
             ? $"{T("progress.undone", lng, episodeNumber, taskTitle)}\n\n{replyStatus}" // Verbose
             : $"{T("progress.undone", lng, episodeNumber, taskTitle)}"; // Succinct (default)
 
@@ -104,7 +97,7 @@ public partial class Undone(InteractiveService interactive) : InteractionModuleB
             
         Log.Info($"M[{interaction.User.Id} (@{interaction.User.Username})] marked task {abbreviation} undone for {episode}");
 
-        await Cache.RebuildCacheForProject(project.Id);
+        await db.SaveChangesAsync();
         return ExecutionResult.Success;
             
         // -----
@@ -136,7 +129,7 @@ public partial class Undone(InteractiveService interactive) : InteractionModuleB
             }
 
             // Publish to observers
-            await ObserverPublisher.PublishProgress(project, publishEmbed);
+            await ObserverPublisher.PublishProgress(project, publishEmbed, db);
         }
     }
 }

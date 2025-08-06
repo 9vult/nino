@@ -3,7 +3,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Discord;
 using Discord.Interactions;
-using Microsoft.Azure.Cosmos;
 using Nino.Records;
 using Nino.Utilities;
 
@@ -63,7 +62,7 @@ namespace Nino.Commands
             import.Project.Nickname = import.Project.Nickname.Trim().ToLowerInvariant().Replace(" ", string.Empty); // remove spaces
 
             // Verify data
-            if (Cache.GetProjects(guildId).Any(p => p.Nickname == import.Project.Nickname))
+            if (db.Projects.Any(p => p.GuildId == guildId && p.Nickname == import.Project.Nickname))
                 return await Response.Fail(T("error.project.nameInUse", lng, import.Project.Nickname), interaction);
             
             if (!Uri.TryCreate(import.Project.PosterUri, UriKind.Absolute, out _))
@@ -72,13 +71,13 @@ namespace Nino.Commands
             // Set IDs
             import.Project.GuildId = guildId;
             import.Project.OwnerId = interaction.User.Id;
-            import.Project.Id = AzureHelper.CreateProjectId();
+            import.Project.Id = Guid.NewGuid();
             
             import.Project.UpdateChannelId = updateChannelId;
             import.Project.ReleaseChannelId = releaseChannelId;
             
             // Disable potentially problematic settings
-            import.Project.AdministratorIds = [];
+            import.Project.Administrators = [];
             import.Project.CongaReminderChannelId = null;
             import.Project.AirReminderChannelId = null;
             import.Project.CongaReminderEnabled = false;
@@ -88,26 +87,20 @@ namespace Nino.Commands
             {
                 episode.GuildId = guildId;
                 episode.ProjectId = import.Project.Id;
-                episode.Id = AzureHelper.CreateEpisodeId();
+                episode.Id = Guid.NewGuid();
             }
             
             Log.Info($"Creating project {import.Project} for M[{import.Project.OwnerId} (@{member.Username})] from JSON file '{file.Filename}' with {import.Episodes.Length} episodes");
 
             // Add project and episodes to database
-            await AzureHelper.Projects!.UpsertItemAsync(import.Project);
-            
-            TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(import.Project.Id.ToString()));
-            foreach (var episode in import.Episodes)
-            {
-                batch.UpsertItem(episode);
-            }
-            await batch.ExecuteAsync();
+            await db.Projects.AddAsync(import.Project);
+            await db.Episodes.AddRangeAsync(import.Episodes);
             
             // Create configuration if the guild doesn't have one yet
-            if (await Getters.GetConfiguration(guildId) is null)
+            if (db.GetConfig(guildId) == null)
             {
                 Log.Info($"Creating default configuration for guild {guildId}");
-                await AzureHelper.Configurations!.UpsertItemAsync(Configuration.CreateDefault(guildId));
+                await db.Configurations.AddAsync(Configuration.CreateDefault(guildId));
             }
 
             // Send success embed
@@ -123,8 +116,7 @@ namespace Nino.Commands
             if (!PermissionChecker.CheckReleasePermissions(releaseChannelId))
                 await Response.Info(T("error.missingChannelPermsRelease", lng, $"<#{releaseChannelId}>"), interaction);
 
-            await Cache.RebuildCacheForGuild(interaction.GuildId ?? 0);
-            
+            await db.SaveChangesAsync();
             return ExecutionResult.Success;
         }
     }

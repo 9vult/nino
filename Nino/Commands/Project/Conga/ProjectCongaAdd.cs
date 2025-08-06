@@ -1,9 +1,7 @@
 ﻿using System.Text;
 using Discord;
 using Discord.Interactions;
-using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
-using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities;
 
@@ -31,8 +29,8 @@ namespace Nino.Commands
                 next = next.Trim().ToUpperInvariant();
 
                 // Verify project and user - Owner or Admin required
-                var project = Utils.ResolveAlias(alias, interaction);
-                if (project == null)
+                var project = db.ResolveAlias(alias, interaction);
+                if (project is null)
                     return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
                 if (!Utils.VerifyUser(interaction.User.Id, project))
@@ -53,7 +51,7 @@ namespace Nino.Commands
                 {
                     if (project.KeyStaff.Any(ks => ks.Role.Abbreviation == current))
                         currentType = CongaNodeType.KeyStaff;
-                    else if (Cache.GetEpisodes(project.Id).SelectMany(e => e.AdditionalStaff).Any(ks => ks.Role.Abbreviation == current))
+                    else if (project.Episodes.SelectMany(e => e.AdditionalStaff).Any(ks => ks.Role.Abbreviation == current))
                         currentType = CongaNodeType.AdditionalStaff;
                     else
                         return await Response.Fail(T("error.noSuchTask", lng, current), interaction);
@@ -63,7 +61,7 @@ namespace Nino.Commands
                 {
                     if (project.KeyStaff.Any(ks => ks.Role.Abbreviation == next))
                         nextType = CongaNodeType.KeyStaff;
-                    else if (Cache.GetEpisodes(project.Id).SelectMany(e => e.AdditionalStaff).Any(ks => ks.Role.Abbreviation == next))
+                    else if (project.Episodes.SelectMany(e => e.AdditionalStaff).Any(ks => ks.Role.Abbreviation == next))
                         nextType = CongaNodeType.AdditionalStaff;
                     else
                         return await Response.Fail(T("error.noSuchTask", lng, next), interaction);
@@ -77,11 +75,6 @@ namespace Nino.Commands
                 
                 var prereqs = project.CongaParticipants.GetPrerequisitesFor(next).ToList();
                 var deps = project.CongaParticipants.GetDependentsOf(current).ToList();
-
-                // Add to database
-                await AzureHelper.PatchProjectAsync(project, [
-                    PatchOperation.Set("/congaParticipants", project.CongaParticipants.Serialize())
-                ]);
 
                 Log.Info($"Added {current} → {next} to the Conga line for {project}");
 
@@ -116,7 +109,7 @@ namespace Nino.Commands
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 
-                await Cache.RebuildCacheForProject(project.Id);
+                await db.SaveChangesAsync();
                 return ExecutionResult.Success;
             }
         }

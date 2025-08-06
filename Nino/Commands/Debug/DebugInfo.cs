@@ -1,17 +1,14 @@
-using Discord;
 using Discord.Interactions;
 using Newtonsoft.Json;
 using Nino.Handlers;
-using Nino.Records.Enums;
 using Nino.Utilities;
-using NLog;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
     public partial class Debug
     {
-        public class DebugInfo() : InteractionModuleBase<SocketInteractionContext>
+        public class DebugInfo(DataContext db) : InteractionModuleBase<SocketInteractionContext>
         {
             [SlashCommand("info", "Debugging Information")]
             public async Task<RuntimeResult> Handle(
@@ -25,7 +22,7 @@ namespace Nino.Commands
                 alias = alias.Trim();
                 
                 // Verify project and user - Owner or Admin required
-                var project = Utils.ResolveAlias(alias, interaction);
+                var project = db.ResolveAlias(alias, interaction);
                 if (project == null)
                     return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
@@ -34,7 +31,7 @@ namespace Nino.Commands
                 
                 Log.Trace($"Generating debug information for {project} for M[{interaction.User.Id} (@{interaction.User.Username})]");
 
-                if (project.KeyStaff.Length == 0)
+                if (project.KeyStaff.Count == 0)
                     return await Response.Fail(T("error.noRoster", lng), interaction);
 
                 var debugData = new

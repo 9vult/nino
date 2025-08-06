@@ -2,7 +2,6 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Localizer;
-using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
 using Nino.Records.Enums;
 using Nino.Utilities;
@@ -20,11 +19,11 @@ namespace Nino.Commands
         {
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
-            var gLng = Cache.GetConfig(interaction.GuildId ?? 0)?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
+            var gLng = db.GetConfig(interaction.GuildId ?? 0)?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
 
             // Verify project and user - Owner required
-            var project = Utils.ResolveAlias(alias, interaction);
-            if (project == null)
+            var project = db.ResolveAlias(alias, interaction);
+            if (project is null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
             if (!Utils.VerifyUser(interaction.User.Id, project, excludeAdmins: true))
@@ -34,21 +33,16 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.archived", lng), interaction);
 
             // Ask if the user is sure
-            var (goOn, finalBody) = await Ask.AboutIrreversibleAction(_interactiveService, interaction, project, lng,
+            var (goOn, finalBody) = await Ask.AboutIrreversibleAction(interactive, interaction, project, lng,
                 Ask.IrreversibleAction.Archive);
 
             if (goOn)
             {
                 Log.Info($"Archiving project {project}");
-
-                // Update database
-                List<string> emptyList = [];
-
-                await AzureHelper.PatchProjectAsync(project, [
-                    PatchOperation.Replace($"/aliases", emptyList), // Remove aliases
-                    PatchOperation.Set<string?>($"/motd", null), // Remove MOTD
-                    PatchOperation.Set($"/isArchived", true) // set as archived
-                ]);
+                
+                project.Aliases.Clear();
+                project.Motd = null;
+                project.IsArchived = true;
 
                 // Announce archival
                 var publishEmbed = new EmbedBuilder()
@@ -73,7 +67,7 @@ namespace Nino.Commands
                 }
 
                 // Publish to observers
-                await ObserverPublisher.PublishProgress(project, publishEmbed);
+                await ObserverPublisher.PublishProgress(project, publishEmbed, db);
             }
 
             // Send embed
@@ -86,7 +80,7 @@ namespace Nino.Commands
                 m.Components = null;
             });
 
-            await Cache.RebuildCacheForProject(project.Id);
+            await db.SaveChangesAsync();
             return ExecutionResult.Success;
         }
     }

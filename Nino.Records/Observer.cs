@@ -1,50 +1,19 @@
+using System.ComponentModel.DataAnnotations;
 
-using Newtonsoft.Json;
+namespace Nino.Records;
 
-namespace Nino.Records
+public class Observer
 {
-    public record Observer
-    {
-        public required Guid Id;
-        [JsonIgnore] public required ulong GuildId;
-        [JsonIgnore] public required ulong OriginGuildId;
-        [JsonIgnore] public required ulong OwnerId;
-        public required Guid ProjectId;
-        public required bool Blame;
-        [JsonIgnore] public ulong? RoleId;
-        public string? ProgressWebhook;
-        public string? ReleasesWebhook;
+    [Key]
+    public required Guid Id { get; set; }
+    public required ulong GuildId { get; set; }
+    public required ulong OriginGuildId { get; set; }
+    public required ulong OwnerId { get; set; }
+    public required Guid ProjectId { get; set; }
+    public required bool Blame { get; set; }
+    public ulong? RoleId { get; set; }
+    public string? ProgressWebhook { get; set; }
+    public string? ReleasesWebhook { get; set; }
 
-        [JsonProperty("GuildId")]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public string SerializationGuildId
-        {
-            get => GuildId.ToString();
-            set => GuildId = ulong.Parse(value);
-        }
-
-        [JsonProperty("OriginGuildId")]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public string SerializationOriginGuildId
-        {
-            get => OriginGuildId.ToString();
-            set => OriginGuildId = ulong.Parse(value);
-        }
-
-        [JsonProperty("OwnerId")]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public string SerializationOwnerId
-        {
-            get => OwnerId.ToString();
-            set => OwnerId = ulong.Parse(value);
-        }
-
-        [JsonProperty("RoleId")]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public string? SerializationRoleId
-        {
-            get => RoleId?.ToString();
-            set => RoleId = !string.IsNullOrEmpty(value) ? ulong.Parse(value) : null;
-        }
-    }
+    public Project Project { get; set; } = null!;
 }

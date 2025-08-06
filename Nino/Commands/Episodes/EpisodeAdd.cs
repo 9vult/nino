@@ -1,7 +1,5 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Fergun.Interactive;
-using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
 using Nino.Records;
 using Nino.Records.Enums;
@@ -16,14 +14,14 @@ namespace Nino.Commands
         [SlashCommand("add", "Add an episode")]
         public async Task<RuntimeResult> Add(
             [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-            [Summary("episode", "Episode number")] string episodeNumber,
+            [Summary("episode", "Episode number"), MaxLength(32)] string episodeNumber,
             [Summary("quantity", "Number of episodes to add"), MinValue(1)] int quantity = 1
         )
         {
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
 
-            // Sanitize imputs
+            // Sanitize inputs
             alias = alias.Trim();
             episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
 
@@ -31,15 +29,15 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.episode.notInteger", lng, alias), interaction);
 
             // Verify project and user - Owner or Admin required
-            var project = Utils.ResolveAlias(alias, interaction);
-            if (project == null)
+            var project = db.ResolveAlias(alias, interaction);
+            if (project is null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
             if (!Utils.VerifyUser(interaction.User.Id, project))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Verify episode doesn't exist
-            if (Getters.TryGetEpisode(project, episodeNumber, out _))
+            if (project.TryGetEpisode(episodeNumber, out _))
                 return await Response.Fail(T("error.episode.alreadyExists", lng, episodeNumber), interaction);
 
             string successDescription;
@@ -49,9 +47,7 @@ namespace Nino.Commands
             {
                 // Create episode
                 var newEpisode = CreateEpisode(project, episodeNumber);
-
-                // Add to database
-                await AzureHelper.Episodes!.UpsertItemAsync(newEpisode);
+                project.Episodes.Add(newEpisode);
 
                 Log.Info($"Added episode {newEpisode} to {project}");
                 successDescription = T("episode.added", lng, episodeNumber, project.Nickname);
@@ -59,9 +55,9 @@ namespace Nino.Commands
             // Bulk addition
             else
             {
-                var allEps = Cache.GetEpisodes(project.Id);
                 Utils.EpisodeNumberIsInteger(episodeNumber, out episodeNumberInt);
-                var episodeNumbersToAdd = Enumerable.Range(episodeNumberInt, quantity).Where(n => allEps.All(e => e.Number != $"{n}")).ToList();
+                var episodeNumbersToAdd = Enumerable.Range(episodeNumberInt, quantity)
+                    .Where(n => project.Episodes.All(e => e.Number != $"{n}")).ToList();
                 
                 // Verify user intent
                 var questionBody = T("episode.displayListOfCandidates", lng, $"[ {string.Join(", ", episodeNumbersToAdd)} ]");
@@ -86,7 +82,7 @@ namespace Nino.Commands
                 });
                 
                 // Wait for response
-                var questionResult = await _interactiveService.NextMessageComponentAsync(
+                var questionResult = await interactive.NextMessageComponentAsync(
                     m => m.Message.Id == questionResponse.Id, timeout: TimeSpan.FromSeconds(60));
                 
                 var fullSend = false;
@@ -125,16 +121,7 @@ namespace Nino.Commands
                     .Select(n => $"{n}")
                     .Select(n => CreateEpisode(project, n))
                     .ToList();
-
-                foreach (var chunk in bulkEpisodes.Chunk(50))
-                {
-                    var batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.Id.ToString()));
-                    foreach (var episode in chunk)
-                    {
-                        batch.UpsertItem(episode);
-                    }
-                    await batch.ExecuteAsync();
-                }
+                project.Episodes.AddRange(bulkEpisodes);
                 
                 Log.Info($"Added {bulkEpisodes.Count} episodes to {project}");
                 var replyDict = new Dictionary<string, object>
@@ -149,7 +136,7 @@ namespace Nino.Commands
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 
-            await Cache.RebuildCacheForProject(project.Id);
+            await db.SaveChangesAsync();
             return ExecutionResult.Success;
         }
         
@@ -163,7 +150,7 @@ namespace Nino.Commands
         {
             return new Episode
             {
-                Id = AzureHelper.CreateEpisodeId(),
+                Id = Guid.NewGuid(),
                 GuildId = project.GuildId,
                 ProjectId = project.Id,
                 Number = episodeNumber,
@@ -171,7 +158,7 @@ namespace Nino.Commands
                 ReminderPosted = false,
                 AdditionalStaff = [],
                 PinchHitters = [],
-                Tasks = project.KeyStaff.Select(ks => new Records.Task { Abbreviation = ks.Role.Abbreviation, Done = false }).ToArray()
+                Tasks = project.KeyStaff.Select(ks => new Records.Task { Id = Guid.NewGuid(), Abbreviation = ks.Role.Abbreviation, Done = false }).ToList()
             };
         }
     }

@@ -19,8 +19,8 @@ namespace Nino.Commands
             var lng = interaction.UserLocale;
 
             // Verify project and user - Owner required
-            var project = Utils.ResolveAlias(alias, interaction);
-            if (project == null)
+            var project = db.ResolveAlias(alias, interaction);
+            if (project is null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
             if (!Utils.VerifyUser(interaction.User.Id, project, excludeAdmins: true))

@@ -1,5 +1,4 @@
-﻿using System.Threading.Channels;
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
 using Fergun.Interactive;
 using Nino.Records;

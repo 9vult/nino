@@ -20,16 +20,17 @@ public partial class Release
         )
         {
             var interaction = Context.Interaction;
+            var config = db.GetConfig(interaction.GuildId ?? 0);
             var lng = interaction.UserLocale;
-            var gLng = Cache.GetConfig(interaction.GuildId ?? 0)?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
+            var gLng = config?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
 
             // Sanitize inputs
             alias = alias.Trim();
             var roleId = role?.Id;
 
             // Verify project and user - Owner or Admin required
-            var project = Utils.ResolveAlias(alias, interaction);
-            if (project == null)
+            var project = db.ResolveAlias(alias, interaction);
+            if (project is null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
             if (!Utils.VerifyUser(interaction.User.Id, project))
@@ -39,7 +40,7 @@ public partial class Release
                 return await Response.Fail(T("error.archived", lng), interaction);
 
             // Check progress channel permissions
-            var goOn = await PermissionChecker.Precheck(_interactiveService, interaction, project, lng, true);
+            var goOn = await PermissionChecker.Precheck(interactive, interaction, project, lng, true);
             // Cancel
             if (!goOn) return ExecutionResult.Success;
 
@@ -51,8 +52,8 @@ public partial class Release
             var publishBody = $"**{publishTitle}**\n{roleStr}{releaseUrl}";
             
             // Add prefix if needed
-            if (!string.IsNullOrEmpty(Cache.GetConfig(project.GuildId)?.ReleasePrefix))
-                publishBody = $"{Cache.GetConfig(project.GuildId)!.ReleasePrefix!} {publishBody}";
+            if (!string.IsNullOrEmpty(config?.ReleasePrefix))
+                publishBody = $"{config.ReleasePrefix!} {publishBody}";
 
             // Publish to local releases channel
             try
@@ -69,7 +70,7 @@ public partial class Release
             }
 
             // Publish to observers
-            await ObserverPublisher.PublishRelease(project, publishTitle, releaseUrl);
+            await ObserverPublisher.PublishRelease(project, publishTitle, releaseUrl, db);
             
             // Send success embed
             var replyHeader = project.IsPrivate

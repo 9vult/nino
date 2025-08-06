@@ -1,8 +1,6 @@
-using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Fergun.Interactive;
-using Microsoft.Azure.Cosmos;
 using NaturalSort.Extension;
 using Nino.Handlers;
 using Nino.Records;
@@ -12,10 +10,11 @@ using NLog;
 using System.Text;
 using Localizer;
 using static Localizer.Localizer;
+using EmbedBuilder = Discord.EmbedBuilder;
 
 namespace Nino.Commands;
 
-public partial class Bulk(InteractiveService interactive) : InteractionModuleBase<SocketInteractionContext>
+public partial class Bulk(DataContext db, InteractiveService interactive) : InteractionModuleBase<SocketInteractionContext>
 {
     private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
@@ -30,7 +29,7 @@ public partial class Bulk(InteractiveService interactive) : InteractionModuleBas
     {
         var interaction = Context.Interaction;
         var lng = interaction.UserLocale;
-        var gLng = Cache.GetConfig(interaction.GuildId ?? 0)?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
+        var gLng = db.GetConfig(interaction.GuildId ?? 0)?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
 
         // Sanitize inputs
         alias = alias.Trim();
@@ -43,8 +42,8 @@ public partial class Bulk(InteractiveService interactive) : InteractionModuleBas
             return await Response.Fail(T("error.invalidTimeRange", lng), interaction);
             
         // Verify project
-        var project = Utils.ResolveAlias(alias, interaction);
-        if (project == null)
+        var project = db.ResolveAlias(alias, interaction);
+        if (project is null)
             return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
         if (project.IsArchived)
@@ -56,7 +55,8 @@ public partial class Bulk(InteractiveService interactive) : InteractionModuleBas
         if (!goOn) return ExecutionResult.Success;
 
         // Verify episode and task
-        if (!Getters.TryGetEpisode(project, startEpisodeNumber, out var startEpisode))
+        var startEpisode = project.Episodes.FirstOrDefault(e => e.Number == startEpisodeNumber);
+        if (startEpisode is null)
             return await Response.Fail(T("error.noSuchEpisode", lng, startEpisodeNumber), interaction);
         if (startEpisode.Tasks.All(t => t.Abbreviation != abbreviation))
             return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
@@ -65,45 +65,39 @@ public partial class Bulk(InteractiveService interactive) : InteractionModuleBas
         if (!Utils.VerifyTaskUser(interaction.User.Id, project, startEpisode, abbreviation))
             return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
-        var prefixMode = Cache.GetConfig(project.GuildId)?.CongaPrefix ?? CongaPrefixType.None;
+        var prefixMode = db.GetConfig(project.GuildId)?.CongaPrefix ?? CongaPrefixType.None;
         StringBuilder congaContent = new();
             
         // Update database
         List<string> completedEpisodes = [];
-        var episodesToProcess = Cache.GetEpisodes(project.Id)
+        var episodesToProcess = project.Episodes
             .Where(e => naturalSorter.Compare(e.Number, startEpisodeNumber) >= 0
                         && naturalSorter.Compare(e.Number, endEpisodeNumber) <= 0);
-        
-        foreach (var chunk in episodesToProcess.Chunk(50))
+
+        foreach (var episode in episodesToProcess)
         {
-            var batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(project));
-            foreach (var e in chunk)
-            {
-                var taskIndex = Array.IndexOf(e.Tasks, e.Tasks.Single(t => t.Abbreviation == abbreviation));
-                var isDone = action is ProgressType.Done or ProgressType.Skipped;
+            var isDone = action is ProgressType.Done or ProgressType.Skipped;
+            var task = episode.Tasks.FirstOrDefault(t => t.Abbreviation == abbreviation);
+            
+            // Check if episode will be done
+            var episodeDone = isDone && !episode.Tasks.Any(t => t.Abbreviation != abbreviation && !t.Done);
+            if (episodeDone) completedEpisodes.Add(episode.Number);
+            
+            if (task is null)
+                continue;
+            
+            var processedConga = isDone 
+                ? ProcessCongaForEpisode(project, episode, abbreviation, lng, prefixMode) 
+                : string.Empty;
+            
+            if (processedConga.Length > 0)
+                congaContent.AppendLine(processedConga.Trim());
 
-                // Check if episode will be done
-                var episodeDone = isDone && !e.Tasks.Any(t => t.Abbreviation != abbreviation && !t.Done);
-                if (episodeDone) completedEpisodes.Add(e.Number);
-
-                if (taskIndex == -1) continue;
-                
-                var processedConga = isDone 
-                    ? ProcessCongaForEpisode(project, e, abbreviation, lng, prefixMode) 
-                    : (string.Empty, []);
-                if (processedConga.Item1.Length > 0) congaContent.AppendLine(processedConga.Item1.Trim());
-                    
-                batch.PatchItem(id: e.Id.ToString(), [
-                    PatchOperation.Set($"/tasks/{taskIndex}/done", isDone),
-                    PatchOperation.Set($"/done", episodeDone),
-                    PatchOperation.Set($"/updated", DateTimeOffset.UtcNow),
-                    ..processedConga.Item2
-                ]);
-            }
-            await batch.ExecuteAsync();
+            task.Done = isDone;
+            episode.Done = episodeDone;
+            episode.Updated = DateTimeOffset.UtcNow;
         }
         
-
         var staff = project.KeyStaff.Concat(startEpisode.AdditionalStaff).First(ks => ks.Role.Abbreviation == abbreviation);
         
         var taskTitle = staff.Role.Name;
@@ -144,7 +138,7 @@ public partial class Bulk(InteractiveService interactive) : InteractionModuleBas
             }
 
             // Publish to observers
-            await ObserverPublisher.PublishProgress(project, publishEmbed);
+            await ObserverPublisher.PublishProgress(project, publishEmbed, db);
         }
 
         // Send success embed
@@ -181,7 +175,7 @@ public partial class Bulk(InteractiveService interactive) : InteractionModuleBas
             
         Log.Info($"M[{interaction.User.Id} (@{interaction.User.Username})] batched {abbreviation} in {project} for {startEpisodeNumber}-{endEpisodeNumber}");
 
-        await Cache.RebuildCacheForProject(project.Id);
+        await db.SaveChangesAsync();
         return ExecutionResult.Success;
     }
 
@@ -193,17 +187,16 @@ public partial class Bulk(InteractiveService interactive) : InteractionModuleBas
     /// <param name="abbreviation">Task that was completed</param>
     /// <param name="lng">Language to return results in</param>
     /// <param name="prefixMode">Conga prefix type</param>
-    /// <returns>Tuple of StringBuilder and PatchOperation list</returns>
-    private static (string, List<PatchOperation>) ProcessCongaForEpisode (Project project, Episode episode, string abbreviation, string lng, CongaPrefixType prefixMode)
+    /// <returns>StringBuilder result</returns>
+    private static string ProcessCongaForEpisode (Project project, Episode episode, string abbreviation, string lng, CongaPrefixType prefixMode)
     {
         StringBuilder congaContent = new();
-        List<PatchOperation> operations = [];
             
         // Get all conga participants that the current task can call out
         var congaCandidates = project.CongaParticipants.Get(abbreviation)?.Dependents?
             .Where(dep => episode.Tasks.Any(t => t.Abbreviation == dep.Abbreviation)).ToList() ?? []; // Limit to tasks in the episode
-            
-        if (congaCandidates.Count == 0) return (string.Empty, operations); // Empty
+
+        if (congaCandidates.Count == 0) return string.Empty;
             
         foreach (var candidate in congaCandidates)
         {
@@ -241,11 +234,12 @@ public partial class Bulk(InteractiveService interactive) : InteractionModuleBas
                 }}] ");
             }
             congaContent.AppendLine(T("progress.done.conga", lng, staffMention, episode.Number, roleTitle));
-                        
-            var congaTaskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == nextTask.Role.Abbreviation));
-            operations.Add(PatchOperation.Set($"/tasks/{congaTaskIndex}/lastReminded", DateTimeOffset.UtcNow));
+            
+            var task = episode.Tasks.FirstOrDefault(t => t.Abbreviation == nextTask.Role.Abbreviation);
+            if (task is not null)
+                task.LastReminded = DateTimeOffset.UtcNow;
         }
             
-        return (congaContent.ToString(), operations);
+        return congaContent.ToString();
     }
 }

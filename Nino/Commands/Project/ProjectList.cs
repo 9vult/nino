@@ -24,7 +24,7 @@ namespace Nino.Commands
             Log.Trace($"Listing projects for {guildId}");
 
             // Get projects
-            var projects = Cache.GetProjects(guildId);
+            var projects = db.Projects.Where(p => p.GuildId == guildId).ToList();
 
             if (projects.Count == 0)
                 return await Response.Fail(T("error.noProjects", lng), interaction);
@@ -35,7 +35,7 @@ namespace Nino.Commands
                 [T("project.list.owner", lng)] = Nino.Client.GetUser(p.OwnerId)?.Username ?? $"<@{p.OwnerId}>",
                 [T("project.list.isPrivate", lng)] = p.IsPrivate ? T("observer.list.yes", lng) : T("observer.list.no", lng),
                 [T("project.list.isArchived", lng)] = p.IsArchived ? T("observer.list.yes", lng) : T("observer.list.no", lng),
-                [T("project.list.episodeCount", lng)] = Cache.GetEpisodes(p.Id).Count.ToString()
+                [T("project.list.episodeCount", lng)] = p.Episodes.Count.ToString()
             }).Chunk(10).ToList();
 
             foreach (var chunk in tblData)

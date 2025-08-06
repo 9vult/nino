@@ -12,7 +12,7 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands;
 
-public class AtMe(InteractiveService interactive) : InteractionModuleBase<SocketInteractionContext>
+public class AtMe(DataContext db, InteractiveService interactive) : InteractionModuleBase<SocketInteractionContext>
 {
     private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
@@ -26,17 +26,20 @@ public class AtMe(InteractiveService interactive) : InteractionModuleBase<Socket
     {
         var interaction = Context.Interaction;
         var lng = interaction.UserLocale;
-        var gLng = Cache.GetConfig(interaction.GuildId ?? 0)?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
+        var config = db.GetConfig(interaction.GuildId ?? 0);
+        var gLng = config?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
             
         var displayPrivate = displayPrivateInput ?? !global;
             
         Log.Trace($"Generating At Me for M[{interaction.User.Id} (@{interaction.User.Username})] {{ Type={type}, Global={global}, Private={displayPrivate}, Filter={filter ?? "<none>"} }}");
-
-        var projects = global ? Cache.GetProjects() : Cache.GetProjects(interaction.GuildId ?? 0);
+        
         var episodeCandidates = new Dictionary<Project, List<Episode>>();
-        var projectCandidates = (displayPrivate
-            ? projects.Where(p => !p.IsArchived)
-            : projects.Where(p => p is { IsArchived: false, IsPrivate: false })).ToList();
+
+        var projectCandidates = db.Projects
+            .WhereIf(!global, p => p.GuildId == interaction.GuildId)
+            .WhereIf(!displayPrivate, p => !p.IsPrivate)
+            .Where(p => !p.IsArchived)
+            .ToList();
 
         // Fuzzy filter project names
         if (filter is not null)
@@ -54,7 +57,7 @@ public class AtMe(InteractiveService interactive) : InteractionModuleBase<Socket
 
         foreach (var project in projectCandidates)
         {
-            var episodes = Cache.GetEpisodes(project.Id)
+            var episodes = project.Episodes
                 .Where(e => !e.Done)
                 .Where(e => Utils.VerifyEpisodeUser(interaction.User.Id, project, e, true)).ToList();
                 

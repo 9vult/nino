@@ -1,8 +1,8 @@
 using Nino.Records.Enums;
 
-namespace Nino.Records;
+namespace Nino.Records.Json;
 
-public record ProjectTemplate
+public class ProjectCreateDto
 {
     public required string Nickname;
     public required string Title;
@@ -19,6 +19,6 @@ public record ProjectTemplate
     public string[]? Aliases;
     public CongaNodeDto[]? CongaParticipants;
     
-    public required Staff[] KeyStaff;
-    public required Dictionary<string, Staff[]> AdditionalStaff;
+    public required StaffCreateDto[] KeyStaff;
+    public required Dictionary<string, StaffCreateDto[]> AdditionalStaff;
 }

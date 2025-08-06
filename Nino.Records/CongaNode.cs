@@ -5,7 +5,7 @@ namespace Nino.Records;
 /// <summary>
 /// A node in a conga graph
 /// </summary>
-public record CongaNode
+public class CongaNode
 {
     /// <summary>
     /// Abbreviation of the task represented by the node
@@ -30,7 +30,7 @@ public record CongaNode
 /// <summary>
 /// DTO for serializing the graph
 /// </summary>
-public record CongaNodeDto
+public class CongaNodeDto
 {
     public required string Abbreviation { get; init; }
     public required CongaNodeType Type { get; init; } = CongaNodeType.KeyStaff;
@@ -41,7 +41,7 @@ public record CongaNodeDto
 /// <summary>
 /// Edge in the Conga graph
 /// </summary>
-public record CongaEdge
+public class CongaEdge
 {
     public required string Current { get; init; }
     public required string Next { get; init; }

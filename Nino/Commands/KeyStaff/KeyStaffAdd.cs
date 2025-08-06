@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
 using Nino.Records;
 using Nino.Records.Enums;
@@ -16,8 +15,8 @@ public partial class KeyStaff
     public async Task<RuntimeResult> Add(
         [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
         [Summary("member", "Staff member")] SocketUser member,
-        [Summary("abbreviation", "Position shorthand")] string abbreviation,
-        [Summary("fullName", "Full position name")] string taskName,
+        [Summary("abbreviation", "Position shorthand"), MaxLength(16)] string abbreviation,
+        [Summary("fullName", "Full position name"), MaxLength(32)] string taskName,
         [Summary("isPseudo", "Position is a Pseudo-task")]bool isPseudo = false
     )
     {
@@ -31,15 +30,15 @@ public partial class KeyStaff
         abbreviation = abbreviation.Trim().ToUpperInvariant().Replace("$", string.Empty);
 
         // Verify project and user - Owner or Admin required
-        var project = Utils.ResolveAlias(alias, interaction);
-        if (project == null)
+        var project = db.ResolveAlias(alias, interaction);
+        if (project is null)
             return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
         if (!Utils.VerifyUser(interaction.User.Id, project))
             return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
         // Check if position already exists
-        var additionalStaffs = Cache.GetEpisodes(project.Id).SelectMany(e => e.AdditionalStaff).ToHashSet();
+        var additionalStaffs = project.Episodes.SelectMany(e => e.AdditionalStaff).ToHashSet();
         if (project.KeyStaff.Concat(additionalStaffs).Any(ks => ks.Role.Abbreviation == abbreviation))
             return await Response.Fail(T("error.positionExists", lng), interaction);
 
@@ -55,23 +54,10 @@ public partial class KeyStaff
             },
             IsPseudo = isPseudo
         };
-
-        var newUndoneTask = new Records.Task
-        {
-            Abbreviation = abbreviation,
-            Done = false
-        };
         
-        var newDoneTask = new Records.Task
-        {
-            Abbreviation = abbreviation,
-            Done = true
-        };
-
-        var projectEpisodes = Cache.GetEpisodes(project.Id);
         var markDoneIfEpisodeIsDone = false;
         
-        if (projectEpisodes.Any(e => e.Done))
+        if (project.Episodes.Any(e => e.Done))
         {
             var (response, finalBody, questionMessage) 
                 = await Ask.AboutAction(interactive, interaction, project, lng,  Ask.InconsequentialAction.MarkTaskDoneIfEpisodeIsDone);
@@ -98,23 +84,13 @@ public partial class KeyStaff
         }
 
         // Add to database
-        await AzureHelper.PatchProjectAsync(project, [
-            PatchOperation.Add("/keyStaff/-", newStaff)
-        ]);
+        project.KeyStaff.Add(newStaff);
 
-        foreach (var chunk in projectEpisodes.Chunk(50))
+        foreach (var episode in project.Episodes)
         {
-            var batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(project));
-            foreach (var episode in chunk)
-            {
-                var taskDone = markDoneIfEpisodeIsDone && episode.Done;
-            
-                batch.PatchItem(id: episode.Id.ToString(), [
-                    PatchOperation.Add("/tasks/-", taskDone ? newDoneTask : newUndoneTask),
-                    PatchOperation.Set("/done", episode.Done && taskDone)
-                ]);
-            }
-            await batch.ExecuteAsync();
+            var taskDone = markDoneIfEpisodeIsDone && episode.Done;
+            episode.Tasks.Add(taskDone ? NewDoneTask() : NewUndoneTask());
+            episode.Done = episode.Done && taskDone;
         }
 
         Log.Info($"Added M[{memberId} (@{member.Username})] to {project} for {abbreviation} (IsPseudo={isPseudo})");
@@ -127,7 +103,21 @@ public partial class KeyStaff
             .Build();
         await interaction.FollowupAsync(embed: embed);
 
-        await Cache.RebuildCacheForProject(project.Id);
+        await db.SaveChangesAsync();
         return ExecutionResult.Success;
+
+        Records.Task NewUndoneTask() => new()
+        {
+            Id = Guid.NewGuid(),
+            Abbreviation = abbreviation,
+            Done = false
+        };
+
+        Records.Task NewDoneTask() => new()
+        {
+            Id = Guid.NewGuid(),
+            Abbreviation = abbreviation,
+            Done = true
+        };
     }
 }

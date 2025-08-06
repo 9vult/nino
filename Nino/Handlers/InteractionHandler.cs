@@ -1,9 +1,7 @@
-using System;
 using System.Net;
 using System.Reflection;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Microsoft.Azure.Cosmos;
 using NLog;
 
 using static Localizer.Localizer;
@@ -62,15 +60,6 @@ namespace Nino.Handlers
 
                 var context = new SocketInteractionContext(_client, interaction);
                 await _handler.ExecuteCommandAsync(context, _services);
-            }
-            catch (CosmosException e)
-                when (e.StatusCode is
-                          HttpStatusCode.RequestTimeout or
-                          HttpStatusCode.InternalServerError or 
-                          HttpStatusCode.BadRequest)
-            {
-                Log.Error(e.Message);
-                await interaction.FollowupAsync(T("error.databaseError", interaction.UserLocale));
             }
             catch (Exception e)
             {

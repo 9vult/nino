@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
 using Nino.Utilities;
 
@@ -21,22 +20,23 @@ namespace Nino.Commands
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
 
-            // Sanitize imputs
+            // Sanitize inputs
             alias = alias.Trim();
             abbreviation = abbreviation.Trim().ToUpperInvariant();
             newAbbreviation = newAbbreviation.Trim().ToUpperInvariant();
             newTaskName = newTaskName.Trim();
 
             // Verify project and user - Owner or Admin required
-            var project = Utils.ResolveAlias(alias, interaction);
-            if (project == null)
+            var project = db.ResolveAlias(alias, interaction);
+            if (project is null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
             if (!Utils.VerifyUser(interaction.User.Id, project))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Check if position exists
-            if (project.KeyStaff.All(ks => ks.Role.Abbreviation != abbreviation))
+            var staff = project.KeyStaff.SingleOrDefault(k => k.Role.Abbreviation == abbreviation);
+            if (staff is null)
                 return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
             
             // Check if position already exists
@@ -44,32 +44,13 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.positionExists", lng), interaction);
 
             // Update user
-            var updatedStaff = project.KeyStaff.Single(k => k.Role.Abbreviation == abbreviation);
-            var ksIndex = Array.IndexOf(project.KeyStaff, updatedStaff);
-            
-            updatedStaff.Role.Abbreviation = newAbbreviation;
-            updatedStaff.Role.Name = newTaskName;
-            
-            // Swap in database
-            await AzureHelper.PatchProjectAsync(project, [
-                PatchOperation.Replace($"/keyStaff/{ksIndex}", updatedStaff)
-            ]);
+            staff.Role.Abbreviation = newAbbreviation;
+            staff.Role.Name = newTaskName;
 
-            foreach (var chunk in Cache.GetEpisodes(project.Id).Chunk(50))
+            foreach (var episode in project.Episodes)
             {
-                var batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(project));
-                foreach (var e in chunk)
-                {
-                    var updatedTask = e.Tasks.Single(k => k.Abbreviation == abbreviation);
-                    var taskIndex = Array.IndexOf(e.Tasks, updatedTask);
-                
-                    updatedTask.Abbreviation = newAbbreviation;
-                
-                    batch.PatchItem(id: e.Id.ToString(), [
-                        PatchOperation.Replace($"/tasks/{taskIndex}", updatedTask),
-                    ]);
-                }
-                await batch.ExecuteAsync();
+                var task = episode.Tasks.Single(t => t.Abbreviation == abbreviation);
+                task.Abbreviation = newAbbreviation;
             }
 
             Log.Info($"Renamed task {abbreviation} to {newAbbreviation} ({newTaskName}) in {project}");
@@ -81,7 +62,7 @@ namespace Nino.Commands
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 
-            await Cache.RebuildCacheForProject(project.Id);
+            await db.SaveChangesAsync();
             return ExecutionResult.Success;
         }
     }

@@ -1,9 +1,5 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
-using Microsoft.Azure.Cosmos;
-using Nino.Handlers;
-using Nino.Records;
 using Nino.Utilities;
 
 using static Localizer.Localizer;
@@ -39,37 +35,18 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.noSuchServer", lng), interaction);
 
             // Verify project and user - Owner required
-            var project = Utils.ResolveAlias(alias, interaction, observingGuildId: oldGuildId);
-            if (project == null)
+            var project = db.ResolveAlias(alias, interaction, observingGuildId: oldGuildId);
+            if (project is null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
             if (!Utils.VerifyUser(interaction.User.Id, project, excludeAdmins: true))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
-            // Get the episodes
-            var episodes = Cache.GetEpisodes(project.Id);
-
             // Modify the data
             project.GuildId = newGuildId;
-            foreach (var episode in episodes)
+            foreach (var episode in project.Episodes)
             {
                 episode.GuildId = newGuildId;
-            }
-
-            // Write new data to database
-            await AzureHelper.Projects!.UpsertItemAsync(project);
-
-            if (episodes.Count > 0)
-            {
-                foreach (var chunk in episodes.Chunk(50))
-                {
-                    var episodeBatch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.Id.ToString()));
-                    foreach (var episode in chunk)
-                    {
-                        episodeBatch.UpsertItem(episode);
-                    }
-                    await episodeBatch.ExecuteAsync();
-                }
             }
             
             Log.Info($"Transfered project {project} from server {oldGuildId} to new server {newGuildId}");
@@ -81,7 +58,7 @@ namespace Nino.Commands
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 
-            await Cache.BuildCache();
+            await db.SaveChangesAsync();
             return ExecutionResult.Success;
         }
     }

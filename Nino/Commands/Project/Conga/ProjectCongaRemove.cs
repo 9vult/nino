@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
 using Nino.Records;
 using Nino.Utilities;
@@ -37,8 +36,8 @@ namespace Nino.Commands
                 }
 
                 // Verify project and user - Owner or Admin required
-                var project = Utils.ResolveAlias(alias, interaction);
-                if (project == null)
+                var project = db.ResolveAlias(alias, interaction);
+                if (project is null)
                     return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
                 if (!Utils.VerifyUser(interaction.User.Id, project))
@@ -48,14 +47,8 @@ namespace Nino.Commands
                 if (!project.CongaParticipants.Contains(edge.Current) 
                     || project.CongaParticipants.GetDependentsOf(edge.Current).All(c => c.Abbreviation != edge.Next))
                     return await Response.Fail(T("error.noSuchConga", lng), interaction);
-
-                // Update database
+                
                 project.CongaParticipants.Remove(edge.Current, edge.Next);
-                
-                
-                await AzureHelper.PatchProjectAsync(project, [
-                    PatchOperation.Set($"/congaParticipants", project.CongaParticipants.Serialize()),
-                ]);
 
                 Log.Info($"Removed {edge} from the Conga line for {project}");
 
@@ -66,7 +59,7 @@ namespace Nino.Commands
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 
-                await Cache.RebuildCacheForProject(project.Id);
+                await db.SaveChangesAsync();
                 return ExecutionResult.Success;
             }
         }

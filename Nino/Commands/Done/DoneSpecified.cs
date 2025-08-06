@@ -1,7 +1,6 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Microsoft.Azure.Cosmos;
 using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities;
@@ -14,15 +13,16 @@ namespace Nino.Commands;
 
 public partial class Done
 {
-    public static async Task<RuntimeResult> HandleSpecified(SocketInteraction interaction, Project project, string abbreviation, string episodeNumber)
+    private async Task<RuntimeResult> HandleSpecified(SocketInteraction interaction, Project project, string abbreviation, string episodeNumber)
     {
         Log.Info($"Handling specified /done by M[{interaction.User.Id} (@{interaction.User.Username})] for {project} episode {episodeNumber}");
             
+        var config = db.GetConfig(interaction.GuildId ?? 0);
         var lng = interaction.UserLocale;
-        var gLng = Cache.GetConfig(interaction.GuildId ?? 0)?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
+        var gLng = config?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
 
         // Verify episode and task
-        if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
+        if (!project.TryGetEpisode(episodeNumber, out var episode))
             return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
         if (episode.Tasks.All(t => t.Abbreviation != abbreviation))
             return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
@@ -43,20 +43,14 @@ public partial class Done
             .First(ks => ks.Role.Abbreviation == abbreviation);
             
         // Update database
-        var taskIndex = Array.IndexOf(episode.Tasks, task);
-        await AzureHelper.PatchEpisodeAsync(episode, [
-            PatchOperation.Set($"/tasks/{taskIndex}/done", true),
-            PatchOperation.Set($"/tasks/{taskIndex}/updated", DateTimeOffset.UtcNow),
-            PatchOperation.Set($"/done", episodeDone),
-            PatchOperation.Set($"/updated", DateTimeOffset.UtcNow)
-        ]);
-            
-        // Update task for embeds
         task.Done = true;
+        task.Updated = DateTimeOffset.UtcNow;
+        episode.Done = episodeDone;
+        episode.Updated = DateTimeOffset.UtcNow;
             
         var taskTitle = staff.Role.Name;
         var title = T("title.progress", gLng, episodeNumber);
-        var status = Cache.GetConfig(project.GuildId)?.UpdateDisplay.Equals(UpdatesDisplayType.Extended) ?? false
+        var status = config?.UpdateDisplay.Equals(UpdatesDisplayType.Extended) ?? false
             ? StaffList.GenerateExplainProgress(project, episode, gLng, abbreviation) // Explanatory
             : StaffList.GenerateProgress(project, episode, abbreviation); // Standard
 
@@ -71,7 +65,7 @@ public partial class Done
             ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
             : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
 
-        var replyBody = Cache.GetConfig(project.GuildId)?.ProgressDisplay.Equals(ProgressDisplayType.Verbose) ?? false
+        var replyBody = config?.ProgressDisplay.Equals(ProgressDisplayType.Verbose) ?? false
             ? $"{T("progress.done", lng, taskTitle, episodeNumber)}\n\n{replyStatus}{episodeDoneText}" // Verbose
             : $"{T("progress.done", lng, taskTitle, episodeNumber)}{episodeDoneText}"; // Succinct (default)
 
@@ -89,7 +83,7 @@ public partial class Done
         // Everybody do the Conga!
         await DoTheConga();
 
-        await Cache.RebuildCacheForProject(project.Id);
+        await db.SaveChangesAsync();
         return ExecutionResult.Success;
         
         // -----
@@ -97,7 +91,7 @@ public partial class Done
         // Helper method for doing the conga
         async Task DoTheConga()
         {
-            var prefixMode = Cache.GetConfig(project.GuildId)?.CongaPrefix ?? CongaPrefixType.None;
+            var prefixMode = config?.CongaPrefix ?? CongaPrefixType.None;
             StringBuilder congaContent = new();
 
             // Get all conga participants that the current task can call out
@@ -145,11 +139,11 @@ public partial class Done
                     congaContent.AppendLine(T("progress.done.conga", lng, staffMention, episode.Number, roleTitle));
                             
                     // Update database with new last-reminded time
-                    var congaTaskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == nextTask.Role.Abbreviation));
-                    await AzureHelper.PatchEpisodeAsync(episode, [
-                        PatchOperation.Set($"/tasks/{congaTaskIndex}/lastReminded", DateTimeOffset.UtcNow)
-                    ]);
+
+                    var congaTask = episode.Tasks.Single(t => t.Abbreviation == nextTask.Role.Abbreviation);
+                    congaTask.LastReminded = DateTimeOffset.UtcNow;
                 }
+
                 if (congaContent.Length > 0)
                     await interaction.Channel.SendMessageAsync(congaContent.ToString());
             }
@@ -182,7 +176,7 @@ public partial class Done
             }
 
             // Publish to observers
-            await ObserverPublisher.PublishProgress(project, publishEmbed);
+            await ObserverPublisher.PublishProgress(project, publishEmbed, db);
         }
     }
 }

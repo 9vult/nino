@@ -1,9 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
-using Nino.Records;
 using Nino.Utilities;
 
 using static Localizer.Localizer;
@@ -29,23 +27,19 @@ namespace Nino.Commands
                 var staffMention = $"<@{memberId}>";
 
                 // Verify project and user - Owner required
-                var project = Utils.ResolveAlias(alias, interaction);
-                if (project == null)
+                var project = db.ResolveAlias(alias, interaction);
+                if (project is null)
                     return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
                 if (!Utils.VerifyUser(interaction.User.Id, project, excludeAdmins: true))
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
                 // Validate user is an admin
-                if (!project.AdministratorIds.Any(a => a == memberId))
+                var admin = project.Administrators.FirstOrDefault(a => a.UserId == memberId);
+                if (admin is null)
                     return await Response.Fail(T("error.noSuchAdmin", lng, staffMention), interaction);
 
-                var adminIndex = Array.IndexOf(project.AdministratorIds, project.AdministratorIds.Single(a => a == memberId));
-
-                // Remove from database
-                await AzureHelper.PatchProjectAsync(project, [
-                    PatchOperation.Remove($"/administratorIds/{adminIndex}")
-                ]);
+                project.Administrators.Remove(admin);
 
                 Log.Info($"Removed M[{memberId} (@{member.Username})] as an admin from {project}");
 
@@ -56,7 +50,7 @@ namespace Nino.Commands
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 
-                await Cache.RebuildCacheForProject(project.Id);
+                await db.SaveChangesAsync();
                 return ExecutionResult.Success;
             }
         }

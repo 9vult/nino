@@ -1,9 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
-using Nino.Records;
 using Nino.Utilities;
 
 using static Localizer.Localizer;
@@ -32,21 +30,18 @@ namespace Nino.Commands
                 var memberId = member?.Id;
 
                 // Verify project and user - Owner or Admin required
-                var project = Utils.ResolveAlias(alias, interaction);
-                if (project == null)
+                var project = db.ResolveAlias(alias, interaction);
+                if (project is null)
                     return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
                 if (!Utils.VerifyUser(interaction.User.Id, project))
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
-                // Set in database
-                await AzureHelper.PatchProjectAsync(project, [
-                    PatchOperation.Set($"/airReminderEnabled", true),
-                    PatchOperation.Set($"/airReminderChannelId", channelId.ToString()),
-                    PatchOperation.Set($"/airReminderRoleId", roleId?.ToString()),
-                    PatchOperation.Set($"/airReminderUserId", memberId?.ToString())
-                ]);
-
+                project.AirReminderEnabled = true;
+                project.AirReminderChannelId = channelId;
+                project.AirReminderRoleId = roleId;
+                project.AirReminderUserId = memberId;
+                
                 Log.Info($"Enabled air reminders for {project}");
 
                 // Send success embed
@@ -60,7 +55,7 @@ namespace Nino.Commands
                 if (!PermissionChecker.CheckPermissions(channelId))
                     await Response.Info(T("error.missingChannelPerms", lng, $"<#{channelId}>"), interaction);
 
-                await Cache.RebuildCacheForProject(project.Id);
+                await db.SaveChangesAsync();
                 return ExecutionResult.Success;
             }
         }

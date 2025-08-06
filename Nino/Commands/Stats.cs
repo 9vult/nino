@@ -2,17 +2,14 @@
 using System.Text;
 using Discord;
 using Discord.Interactions;
-using ICU4N;
-using Localizer;
 using Nino.Handlers;
-using Nino.Records.Enums;
 using Nino.Utilities;
 using NLog;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    public class Stats(InteractionHandler handler, InteractionService commands) : InteractionModuleBase<SocketInteractionContext>
+    public class Stats(DataContext db, InteractionHandler handler, InteractionService commands) : InteractionModuleBase<SocketInteractionContext>
     {
         public InteractionService Commands { get; private set; } = commands;
         private readonly InteractionHandler _handler = handler;
@@ -27,22 +24,22 @@ namespace Nino.Commands
             
             Log.Trace($"Displaying Stats for M[{interaction.User.Id} (@{interaction.User.Username})]");
             
-            var allowedOngoingProjects = Cache.GetProjects().Where(p => !p.IsArchived).Select(p => p.Id).ToList();
-            var archivedCount = Cache.GetProjects().Count(p => p.IsArchived);
+            var allowedOngoingProjects = db.Projects.Where(p => !p.IsArchived).Select(p => p.Id).ToList();
+            var archivedCount = db.Projects.Count(p => p.IsArchived);
             
-            var ongoing = Cache.GetEpisodes().GroupBy(e => e.ProjectId)
+            var ongoing = db.Episodes.GroupBy(e => e.ProjectId)
                 .Where(g => g.Any(e => !e.Done) && allowedOngoingProjects.Contains(g.Key))
                 .ToDictionary(g => g.Key, g => g.ToList());
             
-            var totalGuilds = Cache.GetProjectGuilds().Count;
-            var totalProjects = Cache.GetProjects().Count;
+            var totalGuilds = db.Projects.GroupBy(p => p.GuildId).Count();
+            var totalProjects = db.Projects.Count();
             var ongoingProjects = ongoing.Count;
-            var totalEpisodes = Cache.GetEpisodes().Count;
-            var totalDoneEpisodes = Cache.GetEpisodes().Count(ep => ep.Done);
+            var totalEpisodes = db.Episodes.Count();
+            var totalDoneEpisodes = db.Episodes.Count(ep => ep.Done);
             var ongoingProjectEpisodes = ongoing.Sum(kv => kv.Value.Count);
             var ongoingProjectDoneEpisodes = ongoing.Sum(kv => kv.Value.Count(ep => ep.Done));
-            var totalObservers = Cache.GetObservers().Count;
-            var uniqueObservers = Cache.GetObservers().GroupBy(o => o.ProjectId).Count();
+            var totalObservers = db.Observers.Count();
+            var uniqueObservers = db.Observers.GroupBy(o => o.ProjectId).Count();
             
             var totalDoneEpisodesPercent = Math.Round(totalDoneEpisodes / (decimal)totalEpisodes * 100.0m, 2);
             var totalDoneOngoingProjectEpisodesPercent = Math.Round(ongoingProjectDoneEpisodes / (decimal)ongoingProjectEpisodes * 100.0m, 2);

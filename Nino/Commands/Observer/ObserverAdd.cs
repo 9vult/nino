@@ -54,8 +54,8 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.noSuchServer", lng, originGuildIdStr), interaction);
 
             // Verify project and user access
-            var project = Utils.ResolveAlias(alias, interaction, observingGuildId: originGuildId, includeObservers: true);
-            if (project == null)
+            var project = db.ResolveAlias(alias, interaction, observingGuildId: originGuildId, includeObservers: true);
+            if (project is null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
             // Fake project existence if private
@@ -63,9 +63,9 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
             // Use existing observer ID, if it exists
-            var observerId = Cache.GetObservers().Where(o => o.GuildId == guildId)
+            var observerId = db.Observers.Where(o => o.GuildId == guildId)
                 .FirstOrDefault(o => o.OriginGuildId == originGuildId && o.ProjectId == project.Id)
-                ?.Id ?? AzureHelper.CreateObserverId();
+                ?.Id ?? Guid.NewGuid();
 
             var observer = new Records.Observer
             {
@@ -81,7 +81,7 @@ namespace Nino.Commands
             };
 
             // Add to database
-            await AzureHelper.Observers!.UpsertItemAsync(observer);
+            await db.Observers.AddAsync(observer);
 
             Log.Info($"M[{interaction.User.Id} (@{interaction.User.Username})] created new observer {observer.Id} from {guildId} observing {project}");
 
@@ -101,7 +101,7 @@ namespace Nino.Commands
             if (canDelete && tempReply is not null)
                 await tempReply.DeleteAsync();
 
-            await Cache.RebuildObserverCache();
+            await db.SaveChangesAsync();
             return ExecutionResult.Success;
         }
     }

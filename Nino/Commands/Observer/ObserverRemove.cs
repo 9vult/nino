@@ -35,18 +35,17 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.noSuchServer", lng), interaction);
 
             // Verify project and user access
-            var project = Utils.ResolveAlias(alias, interaction, observingGuildId: originGuildId);
-            if (project == null)
+            var project = db.ResolveAlias(alias, interaction, observingGuildId: originGuildId);
+            if (project is null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
             // Validate observer
-            var observer = Cache.GetObservers(originGuildId).SingleOrDefault(o => o.GuildId == guildId && o.ProjectId == project.Id);
-
-            if (observer == null)
+            var observer = db.Observers.Where(o => o.GuildId == guildId).SingleOrDefault(o => o.GuildId == guildId && o.ProjectId == project.Id);
+            if (observer is null)
                 return await Response.Fail(T("error.noSuchObserver", lng), interaction);
 
             // Remove from database
-            await AzureHelper.Observers!.DeleteItemAsync<Records.Observer>(observer.Id.ToString(), AzureHelper.ObserverPartitionKey(observer));
+            db.Observers.Remove(observer);
             Log.Info($"Deleted observer {observer.Id} from {guildId}");
 
             // Send success embed
@@ -56,7 +55,7 @@ namespace Nino.Commands
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 
-            await Cache.RebuildObserverCache();
+            await db.SaveChangesAsync();
             return ExecutionResult.Success;
         }
     }

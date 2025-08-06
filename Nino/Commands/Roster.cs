@@ -8,7 +8,7 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands;
 
-public class Roster : InteractionModuleBase<SocketInteractionContext>
+public class Roster(DataContext db) : InteractionModuleBase<SocketInteractionContext>
 {
     private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
@@ -27,20 +27,20 @@ public class Roster : InteractionModuleBase<SocketInteractionContext>
         episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
             
         // Verify project and user - minimum Key Staff required
-        var project = Utils.ResolveAlias(alias, interaction);
-        if (project == null)
+        var project = db.ResolveAlias(alias, interaction);
+        if (project is null)
             return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
         if (!Utils.VerifyUser(interaction.User.Id, project, includeKeyStaff: true))
             return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
         // Verify episode
-        if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
+        if (!project.TryGetEpisode(episodeNumber, out var episode))
             return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
             
         Log.Trace($"Generating roster for {project} episode {episode} for M[{interaction.User.Id} (@{interaction.User.Username})]");
 
-        if (project.KeyStaff.Length == 0)
+        if (project.KeyStaff.Count == 0)
             return await Response.Fail(T("error.noRoster", lng), interaction);
 
         var roster = StaffList.GenerateRoster(project, episode, withWeights, excludePseudo: false);

@@ -1,8 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
-using Nino.Records;
 using Nino.Utilities;
 
 using static Localizer.Localizer;
@@ -27,8 +25,8 @@ namespace Nino.Commands
                 input = input.Trim();
 
                 // Verify project and user - Owner or Admin required
-                var project = Utils.ResolveAlias(alias, interaction);
-                if (project == null)
+                var project = db.ResolveAlias(alias, interaction);
+                if (project is null)
                     return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
                 if (project.IsArchived)
@@ -38,15 +36,12 @@ namespace Nino.Commands
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
                 // Validate alias exists
-                if (!project.Aliases.Any(a => a == input))
+                var aliasToRemove = project.Aliases.FirstOrDefault(a => a == input);
+                if (aliasToRemove is null)
                     return await Response.Fail(T("error.noSuchAlias", lng, input, project.Nickname), interaction);
 
-                var aliasIndex = Array.IndexOf(project.Aliases, project.Aliases.Single(a => a == input));
-
                 // Remove from database
-                await AzureHelper.PatchProjectAsync(project, [
-                    PatchOperation.Remove($"/aliases/{aliasIndex}")
-                ]);
+                project.Aliases.Remove(aliasToRemove);
 
                 Log.Info($"Removed {input} as an alias from {project}");
 
@@ -57,7 +52,7 @@ namespace Nino.Commands
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 
-                await Cache.RebuildCacheForProject(project.Id);
+                await db.SaveChangesAsync();
                 return ExecutionResult.Success;
             }
         }

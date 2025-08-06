@@ -7,11 +7,8 @@ using static Localizer.Localizer;
 
 namespace Nino.Commands
 {
-    public partial class Done(InteractionHandler handler, InteractionService commands, InteractiveService interactive) : InteractionModuleBase<SocketInteractionContext>
+    public partial class Done(DataContext db, InteractiveService interactive) : InteractionModuleBase<SocketInteractionContext>
     {
-        public InteractionService Commands { get; private set; } = commands;
-        private readonly InteractionHandler _handler = handler;
-        private readonly InteractiveService _interactiveService = interactive;
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         [SlashCommand("done", "Mark a position as done")]
@@ -29,22 +26,22 @@ namespace Nino.Commands
             abbreviation = abbreviation.Trim().ToUpperInvariant();
             
             // Verify project
-            var project = Utils.ResolveAlias(alias, interaction);
-            if (project == null)
+            var project = db.ResolveAlias(alias, interaction);
+            if (project is null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
             if (project.IsArchived)
                 return await Response.Fail(T("error.archived", lng), interaction);
 
             // Check progress channel permissions
-            var goOn = await PermissionChecker.Precheck(_interactiveService, interaction, project, lng, false);
+            var goOn = await PermissionChecker.Precheck(interactive, interaction, project, lng, false);
             // Cancel
             if (!goOn) return ExecutionResult.Success;
             
             // Check Conga permissions
             if (project.CongaParticipants.Nodes.Count != 0)
             {
-                goOn = await PermissionChecker.Precheck(_interactiveService, interaction, project, lng, false, true);
+                goOn = await PermissionChecker.Precheck(interactive, interaction, project, lng, false, true);
                 // Cancel
                 if (!goOn) return ExecutionResult.Success;
             }
@@ -52,7 +49,7 @@ namespace Nino.Commands
             if (episodeNumber != null)
                 return await HandleSpecified(interaction, project, abbreviation, Utils.CanonicalizeEpisodeNumber(episodeNumber));
             else
-                return await HandleUnspecified(interaction, project, abbreviation, _interactiveService);
+                return await HandleUnspecified(interaction, project, abbreviation, interactive);
         }
     }
 }

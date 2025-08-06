@@ -2,12 +2,12 @@
 using System.Net.Http.Json;
 using Discord;
 using Discord.Interactions;
-using Microsoft.Azure.Cosmos;
 using Nino.Records;
 using Nino.Utilities;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Nino.Records.Json;
 using static Localizer.Localizer;
 
 namespace Nino.Commands;
@@ -30,12 +30,12 @@ public partial class ProjectManagement
         Log.Info($"Project creation from json file requested by M[{interaction.User.Id} (@{interaction.User.Username})]");
             
         // Parse the json
-        ProjectTemplate? template;
+        ProjectCreateDto? template;
         try
         {
             Log.Trace($"Attempting to get and parse JSON...");
             using var client = new HttpClient();
-            template = await client.GetFromJsonAsync<ProjectTemplate>(file.Url, new JsonSerializerOptions
+            template = await client.GetFromJsonAsync<ProjectCreateDto>(file.Url, new JsonSerializerOptions
             {
                 IncludeFields = true,
                 PropertyNameCaseInsensitive = true,
@@ -64,7 +64,7 @@ public partial class ProjectManagement
         template.Nickname = template.Nickname.Trim().ToLowerInvariant().Replace(" ", string.Empty); // remove spaces
 
         // Verify data
-        if (Cache.GetProjects(guildId).Any(p => p.Nickname == template.Nickname))
+        if (db.Projects.Any(p => p.GuildId == guildId && p.Nickname == template.Nickname))
             return await Response.Fail(T("error.project.nameInUse", lng, template.Nickname), interaction);
 
         if (!Uri.TryCreate(template.PosterUri, UriKind.Absolute, out var _))
@@ -102,7 +102,7 @@ public partial class ProjectManagement
         // Populate data
         var projectData = new Project
         {
-            Id = AzureHelper.CreateProjectId(),
+            Id = Guid.NewGuid(),
             GuildId = guildId,
             Nickname = template.Nickname,
             Title = template.Title,
@@ -115,10 +115,10 @@ public partial class ProjectManagement
             IsArchived = false,
             AirReminderEnabled = false,
             CongaReminderEnabled = false,
-            AdministratorIds = template.AdministratorIds ?? [],
-            KeyStaff = template.KeyStaff,
+            Administrators = template.AdministratorIds?.Select(i => new Administrator { Id = Guid.NewGuid(), UserId = i}).ToList() ?? [],
+            KeyStaff = template.KeyStaff.Select(s => new Staff { Id = Guid.NewGuid(), UserId = s.UserId, IsPseudo = s.IsPseudo, Role = s.Role }).ToList(),
             CongaParticipants = CongaGraph.Deserialize(template.CongaParticipants ?? []) ,
-            Aliases = template.Aliases ?? [],
+            Aliases = template.Aliases?.ToList() ?? [],
             AniListId = template.AniListId,
             Created = DateTimeOffset.UtcNow
         };
@@ -130,39 +130,31 @@ public partial class ProjectManagement
             template.AdditionalStaff.TryGetValue(stringNumber, out var additionalStaff);
             episodes.Add(new Episode
             {
-                Id = AzureHelper.CreateEpisodeId(),
+                Id = Guid.NewGuid(),
                 GuildId = guildId,
                 ProjectId = projectData.Id,
                 Number = stringNumber,
                 Done = false,
                 ReminderPosted = false,
-                AdditionalStaff = additionalStaff ?? [],
+                AdditionalStaff = additionalStaff?.Select(s => new Staff { Id = Guid.NewGuid(), UserId = s.UserId, IsPseudo = s.IsPseudo, Role = s.Role }).ToList() ?? [],
                 PinchHitters = [],
                 Tasks = template.KeyStaff.Concat(additionalStaff ?? [])
-                    .Select(ks => new Records.Task { Abbreviation = ks.Role.Abbreviation, Done = false }).ToArray(),
+                    .Select(ks => new Records.Task { Id = Guid.NewGuid(), Abbreviation = ks.Role.Abbreviation, Done = false })
+                    .ToList(),
             });
         }
 
         Log.Info($"Creating project {projectData} for M[{ownerId} (@{member.Username})] from JSON file '{file.Filename}' with {episodes.Count} episodes and {template.KeyStaff.Length} keystaff");
 
         // Add project and episodes to database
-        await AzureHelper.Projects!.UpsertItemAsync(projectData);
-
-        foreach (var chunk in episodes.Chunk(50))
-        {
-            var batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(projectData.Id.ToString()));
-            foreach (var episode in chunk)
-            {
-                batch.UpsertItem(episode);
-            }
-            await batch.ExecuteAsync();
-        }
+        await db.Projects.AddAsync(projectData);
+        await db.Episodes.AddRangeAsync(episodes);
 
         // Create configuration if the guild doesn't have one yet
-        if (await Getters.GetConfiguration(guildId) == null)
+        if (db.GetConfig(guildId) == null)
         {
             Log.Info($"Creating default configuration for guild {guildId}");
-            await AzureHelper.Configurations!.UpsertItemAsync(Configuration.CreateDefault(guildId));
+            await db.Configurations.AddAsync(Configuration.CreateDefault(guildId));
         }
             
         var builder = new StringBuilder();
@@ -187,7 +179,7 @@ public partial class ProjectManagement
         if (!PermissionChecker.CheckReleasePermissions(template.ReleaseChannelId))
             await Response.Info(T("error.missingChannelPermsRelease", lng, $"<#{template.ReleaseChannelId}>"), interaction);
 
-        await Cache.RebuildCacheForGuild(interaction.GuildId ?? 0);
+        await db.SaveChangesAsync();
         return ExecutionResult.Success;
     }
 }

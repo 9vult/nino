@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Microsoft.Azure.Cosmos;
 using Nino.Records;
 using Nino.Utilities;
 
@@ -32,21 +31,22 @@ namespace Nino.Commands
                 if (!Utils.VerifyAdministrator(runner, guild, excludeServerAdmins: true))
                     return await Response.Fail(T("error.notPrivileged", lng), interaction);
 
-                var config = await Getters.GetConfiguration(guildId);
-                if (config == null)
+                var config = db.GetConfig(guildId);
+                if (config is null)
                     return await Response.Fail(T("error.noSuchConfig", lng), interaction);
 
                 // Validate user isn't already an admin
-                if (config.AdministratorIds.Any(a => a == memberId))
+                if (config.Administrators.Any(a => a.UserId == memberId))
                     return await Response.Fail(T("error.admin.alreadyAdmin", lng, staffMention), interaction);
 
                 // Add to database
-                await AzureHelper.Configurations!.PatchItemAsync<Configuration>(id: config.Id, partitionKey: AzureHelper.ConfigurationPartitionKey(config),
-                    patchOperations: [
-                        PatchOperation.Add("/administratorIds/-", memberId.ToString())
-                ]);
+                config.Administrators.Add(new Administrator
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = memberId,
+                });
 
-                log.Info($"Updated configuration for guild {config.GuildId}, added {memberId} as an administrator");
+                Log.Info($"Updated configuration for guild {config.GuildId}, added {memberId} as an administrator");
 
                 // Send success embed
                 var embed = new EmbedBuilder()
@@ -55,7 +55,7 @@ namespace Nino.Commands
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 
-                await Cache.RebuildConfigCache();
+                await db.SaveChangesAsync();
                 return ExecutionResult.Success;
             }
         }

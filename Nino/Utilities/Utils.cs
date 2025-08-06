@@ -1,44 +1,14 @@
 ﻿using Discord;
 using Discord.WebSocket;
-using Microsoft.Azure.Cosmos;
 using Nino.Records;
 using NLog;
 using System.Globalization;
-using ICU4N.Globalization;
 
 namespace Nino.Utilities
 {
     internal static class Utils
     {
-        private static readonly Logger log = LogManager.GetCurrentClassLogger();
-        
-        /// <summary>
-        /// Resolve an alias to its project
-        /// </summary>
-        /// <param name="query">Alias to resolve</param>
-        /// <param name="interaction">Interaction requesting resolution</param>
-        /// <param name="observingGuildId">ID of the build being observed, if applicable</param>
-        /// <param name="includeObservers">Whether to include observers in the lookup</param>
-        /// <returns>Project the alias references to, or null</returns>
-        public static Project? ResolveAlias(string query, SocketInteraction interaction, ulong? observingGuildId = null, bool includeObservers = false)
-        {
-            var guildId = observingGuildId ?? interaction.GuildId ?? 0;
-            var cache = Cache.GetProjects(guildId);
-            if (cache is null) return null;
-
-            
-            var targets = !includeObservers ? cache
-                : cache.Concat(Cache.GetObservers()
-                    .Where(o => o.GuildId == guildId)
-                    .SelectMany(o => Cache.GetProjects().Where(p => p.Id == o.ProjectId)));
-
-            var result = targets.FirstOrDefault(p =>
-                string.Equals(p.Nickname, query, StringComparison.InvariantCultureIgnoreCase) ||
-                p.Aliases.Any(a => string.Equals(a, query, StringComparison.InvariantCultureIgnoreCase)));
-            
-            log.Trace($"Resolved alias {query} to {result?.ToString() ?? "<resolution failed>"}");
-            return result;
-        }
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// Verify the given user has administrative permissions
@@ -55,7 +25,7 @@ namespace Nino.Utilities
             if (excludeServerAdmins) return false;
 
             // Nino server-level admin
-            if (Cache.GetConfig(guild.Id)?.AdministratorIds?.Any(a => a == member.Id) ?? false)
+            if (Nino.DataContext.GetConfig(guild.Id)?.Administrators?.Any(a => a.UserId == member.Id) ?? false)
                 return true;
 
             return false;
@@ -75,10 +45,10 @@ namespace Nino.Utilities
 
             if (!excludeAdmins)
             {
-                if (project.AdministratorIds.Any(a => a == userId))
+                if (project.Administrators.Any(a => a.UserId == userId))
                     return true;
 
-                if (Cache.GetConfig(project.GuildId)?.AdministratorIds?.Any(a => a == userId) ?? false)
+                if (Nino.DataContext.GetConfig(project.GuildId)?.Administrators.Any(a => a.UserId == userId) ?? false)
                     return true;
             }
             if (includeKeyStaff)
@@ -104,10 +74,10 @@ namespace Nino.Utilities
 
             if (!excludeAdmins)
             {
-                if (project.AdministratorIds.Any(a => a == userId))
+                if (project.Administrators.Any(a => a.UserId == userId))
                     return true;
 
-                if (Cache.GetConfig(project.GuildId)?.AdministratorIds?.Any(a => a == userId) ?? false)
+                if (Nino.DataContext.GetConfig(project.GuildId)?.Administrators?.Any(a => a.UserId == userId) ?? false)
                     return true;
             }
             
@@ -128,9 +98,9 @@ namespace Nino.Utilities
         {
             if (project.OwnerId == userId)
                 return true;
-            if (project.AdministratorIds.Any(a => a == userId))
+            if (project.Administrators.Any(a => a.UserId == userId))
                 return true;
-            if (Cache.GetConfig(project.GuildId)?.AdministratorIds?.Any(a => a == userId) ?? false)
+            if (Nino.DataContext.GetConfig(project.GuildId)?.Administrators?.Any(a => a.UserId == userId) ?? false)
                 return true;
             if (episode.PinchHitters.Any(ph => ph.Abbreviation == abbreviation && ph.UserId == userId))
                 return true;
@@ -229,7 +199,7 @@ namespace Nino.Utilities
         /// <summary>
         /// The current version of Nino
         /// </summary>
-        public static string VERSION
+        public static string Version
         {
             get
             {
