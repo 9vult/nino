@@ -17,30 +17,26 @@ public static class DataContextExtensions
     /// <param name="interaction">Interaction requesting resolution</param>
     /// <param name="observingGuildId">ID of the build being observed, if applicable</param>
     /// <param name="includeObservers">Whether to include observers in the lookup</param>
-    /// <param name="includeEpisodes">Whether to include episodes in the resulting project</param>
     /// <returns>Project the alias references to, or null</returns>
     public static Project? ResolveAlias(
         this DataContext db,
         string query,
         SocketInteraction interaction,
         ulong? observingGuildId = null,
-        bool includeObservers = false,
-        bool includeEpisodes = true
+        bool includeObservers = false
     )
     {
         var guildId = observingGuildId ?? interaction.GuildId;
 
-        var q = db
-            .Projects.ConcatIf(
+        var q = db.Projects
+            .Include(p => p.Episodes)
+            .ConcatIf(
                 includeObservers,
                 db.Observers.Where(o => o.GuildId == guildId).Select(o => o.Project)
             )
             .AsQueryable();
 
-        if (includeEpisodes)
-            q = q.Include(p => p.Episodes);
-
-        var result = q.FirstOrDefault(p =>
+        var result = q.AsEnumerable().FirstOrDefault(p =>
             string.Equals(p.Nickname, query, StringComparison.InvariantCultureIgnoreCase)
             || p.Aliases.Any(a =>
                 string.Equals(a, query, StringComparison.InvariantCultureIgnoreCase)

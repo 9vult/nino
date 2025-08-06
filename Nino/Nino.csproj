@@ -39,6 +39,15 @@
     <ProjectReference Include="..\Nino.Records\Nino.Records.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="bin\Debug\net9.0\Discord.Net.Interactions.dll" />
+    <Content Include="bin\Debug\net9.0\Fergun.Interactive.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="bin\Debug\net9.0\nino-local.db" />
+  </ItemGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <ItemGroup>
         <LOCALIZATION Include="$(ProjectDir)i18n\**\*.*" />

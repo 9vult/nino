@@ -3,9 +3,9 @@ using System.Text.Json.Serialization;
 
 namespace Nino.Utilities
 {
-    internal class StartDateConverter : JsonConverter<DateTimeOffset>
+    internal class StartDateConverter : JsonConverter<DateTime>
     {
-        public override DateTimeOffset Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             // Read the object { "year": 2024, "month": 7, "day": 7 }
             if (reader.TokenType != JsonTokenType.StartObject)
@@ -38,10 +38,10 @@ namespace Nino.Utilities
                 }
             }
 
-            return new DateTimeOffset(year, month, day, 0, 0, 0, TimeSpan.Zero);
+            return new DateTime(year, month, day);
         }
 
-        public override void Write(Utf8JsonWriter writer, DateTimeOffset value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
         {
             writer.WriteStartObject();
             writer.WriteNumber("year", value.Year);

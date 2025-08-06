@@ -49,6 +49,7 @@ namespace Nino.Commands
             // All good!
             var newStaff = new Staff
             {
+                Id = Guid.NewGuid(),
                 UserId = memberId,
                 Role = new Role
                 {

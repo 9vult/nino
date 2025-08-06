@@ -169,7 +169,7 @@ namespace Nino.Services
         [JsonIgnore]
         public List<AiringScheduleNode>? Episodes => Data?.Media?.AiringSchedule?.Nodes;
         [JsonIgnore]
-        public DateTimeOffset? StartDate => Data?.Media?.StartDate;
+        public DateTime? StartDate => Data?.Media?.StartDate;
         [JsonIgnore]
         public int? Duration => Data?.Media?.Duration; 
         [JsonIgnore]
@@ -188,7 +188,7 @@ namespace Nino.Services
         public AiringSchedule? AiringSchedule { get; set; }
 
         [JsonConverter(typeof(StartDateConverter))]
-        public DateTimeOffset StartDate { get; set; }
+        public DateTime StartDate { get; set; }
         public int? Duration { get; set; }
     }
 

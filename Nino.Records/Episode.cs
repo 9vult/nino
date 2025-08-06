@@ -12,7 +12,7 @@ public class Episode
     public required string Number { get; set; }
     public required bool Done { get; set; }
     public required bool ReminderPosted { get; set; }
-    public DateTimeOffset? Updated { get; set; }
+    public DateTime? Updated { get; set; }
 
     public List<Task> Tasks { get; set; } = [];
     public List<Staff> AdditionalStaff { get; set; } = [];

@@ -45,6 +45,7 @@ public partial class KeyStaff
         // All good!
         var newStaff = new Staff
         {
+            Id = Guid.NewGuid(),
             UserId = memberId,
             Role = new Role
             {

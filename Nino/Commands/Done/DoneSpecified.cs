@@ -44,9 +44,9 @@ public partial class Done
             
         // Update database
         task.Done = true;
-        task.Updated = DateTimeOffset.UtcNow;
+        task.Updated = DateTime.UtcNow;
         episode.Done = episodeDone;
-        episode.Updated = DateTimeOffset.UtcNow;
+        episode.Updated = DateTime.UtcNow;
             
         var taskTitle = staff.Role.Name;
         var title = T("title.progress", gLng, episodeNumber);
@@ -141,7 +141,7 @@ public partial class Done
                     // Update database with new last-reminded time
 
                     var congaTask = episode.Tasks.Single(t => t.Abbreviation == nextTask.Role.Abbreviation);
-                    congaTask.LastReminded = DateTimeOffset.UtcNow;
+                    congaTask.LastReminded = DateTime.UtcNow;
                 }
 
                 if (congaContent.Length > 0)

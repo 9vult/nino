@@ -66,7 +66,7 @@ namespace Nino.Commands
                 CongaReminderEnabled = false,
                 CongaParticipants = new CongaGraph(),
                 AniListId = aniListId,
-                Created = DateTimeOffset.UtcNow
+                Created = DateTime.UtcNow
             };
 
             var episodes = new List<Episode>();

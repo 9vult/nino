@@ -40,6 +40,8 @@ public class DataContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        
+        // Project
 
         modelBuilder.Entity<Project>(entity =>
         {
@@ -78,7 +80,21 @@ public class DataContext : DbContext
                 b.Property(s => s.UserId)
                     .HasConversion(UlongStringConverter);
             });
+            
+            entity.HasMany(p => p.Episodes)
+                .WithOne(e => e.Project)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasMany(p => p.Observers)
+                .WithOne(o => o.Project)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            entity.Navigation(o => o.KeyStaff)
+                .AutoInclude();
+            entity.Navigation(o => o.Administrators)
+                .AutoInclude();
         });
+        
+        // Episode
 
         modelBuilder.Entity<Episode>(entity =>
         {
@@ -91,17 +107,14 @@ public class DataContext : DbContext
                 b.Property(s => s.UserId)
                     .HasConversion(UlongStringConverter);
             });
+            
+            entity.Navigation(e => e.AdditionalStaff)
+                .AutoInclude();
+            entity.Navigation(e => e.Tasks)
+                .AutoInclude();
         });
         
-        modelBuilder.Entity<Project>()
-            .HasMany(p => p.Episodes)
-            .WithOne(e => e.Project)
-            .OnDelete(DeleteBehavior.Cascade);
-        
-        modelBuilder.Entity<Project>()
-            .HasMany(p => p.Observers)
-            .WithOne(o => o.Project)
-            .OnDelete(DeleteBehavior.Cascade);
+        // Observer
 
         modelBuilder.Entity<Observer>(entity =>
         {
@@ -114,11 +127,20 @@ public class DataContext : DbContext
             
             entity.Property(o => o.RoleId)
                 .HasConversion(NullableUlongStringConverter);
+            
+            entity.Navigation(o => o.Project)
+                .AutoInclude();
         });
+        
+        // Configuration
 
         modelBuilder.Entity<Configuration>(entity =>
         {
-            entity.OwnsMany(c => c.Administrators);
+            entity.OwnsMany(c => c.Administrators, b =>
+            {
+                b.Property(s => s.UserId)
+                    .HasConversion(UlongStringConverter);
+            });
         });
     }
 }

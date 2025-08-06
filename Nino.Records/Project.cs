@@ -29,7 +29,7 @@ public class Project
     public required bool CongaReminderEnabled { get; set; }
     public TimeSpan? CongaReminderPeriod { get; set; }
     public ulong? CongaReminderChannelId { get; set; }
-    public DateTimeOffset? Created { get; set; }
+    public DateTime? Created { get; set; }
 
     public List<string> Aliases { get; set; } = [];
     public List<Staff> KeyStaff { get; set; } = [];

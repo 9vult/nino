@@ -58,6 +58,7 @@ namespace Nino
 
             // Set up services
             _services = new ServiceCollection()
+                .AddEntityFrameworkSqlite()
                 .AddDbContext<DataContext>()
                 .AddSingleton(_config)
                 .AddSingleton(_cmdLineOptions)
@@ -88,6 +89,9 @@ namespace Nino
             client.Log += LogHandler.Log;
 
             await _services.GetRequiredService<InteractionHandler>().InitializeAsync();
+            
+            var db = _services.GetRequiredService<DataContext>();
+            Log.Info($"Database initialized with {db.Projects.Count()} projects ({db.Episodes.Count()} episodes) from {db.Projects.GroupBy(p => p.GuildId).Count()} guilds");
 
             // Start the bot
             await client.LoginAsync(TokenType.Bot, _config.DiscordApiToken);

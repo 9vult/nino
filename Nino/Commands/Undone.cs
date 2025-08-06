@@ -63,9 +63,9 @@ public partial class Undone(DataContext db, InteractiveService interactive) : In
         var staff = project.KeyStaff.Concat(episode.AdditionalStaff).First(ks => ks.Role.Abbreviation == abbreviation);
 
         task.Done = false;
-        task.Updated = DateTimeOffset.UtcNow;
+        task.Updated = DateTime.UtcNow;
         episode.Done = false;
-        episode.Updated = DateTimeOffset.UtcNow;
+        episode.Updated = DateTime.UtcNow;
 
         var taskTitle = staff.Role.Name;
         var title = T("title.progress", gLng, episodeNumber);

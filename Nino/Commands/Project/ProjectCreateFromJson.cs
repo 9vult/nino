@@ -120,7 +120,7 @@ public partial class ProjectManagement
             CongaParticipants = CongaGraph.Deserialize(template.CongaParticipants ?? []) ,
             Aliases = template.Aliases?.ToList() ?? [],
             AniListId = template.AniListId,
-            Created = DateTimeOffset.UtcNow
+            Created = DateTime.UtcNow
         };
             
         var episodes = new List<Episode>();

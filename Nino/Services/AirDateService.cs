@@ -57,7 +57,7 @@ namespace Nino.Services
             }
         }
 
-        public static async Task<DateTimeOffset?> GetStartDate(int aniListId)
+        public static async Task<DateTime?> GetStartDate(int aniListId)
         {
             var response = await AniListService.Get(aniListId);
             if (!string.IsNullOrEmpty(response?.Error))
