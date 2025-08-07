@@ -83,11 +83,21 @@ namespace Nino.Commands
             import.Project.CongaReminderEnabled = false;
             import.Project.AirReminderEnabled = false;
             
+            foreach (var staff in import.Project.KeyStaff)
+                staff.Id = Guid.Empty;
+            
             foreach (var episode in import.Episodes)
             {
                 episode.GuildId = guildId;
                 episode.ProjectId = import.Project.Id;
-                episode.Id = Guid.NewGuid();
+                episode.Id = Guid.Empty;
+                
+                foreach (var ph in episode.PinchHitters)
+                    ph.Id = Guid.Empty;
+                foreach (var task in episode.Tasks)
+                    task.Id = Guid.Empty;
+                foreach (var staff in episode.AdditionalStaff)
+                    staff.Id = Guid.Empty;
             }
             
             Log.Info($"Creating project {import.Project} for M[{import.Project.OwnerId} (@{member.Username})] from JSON file '{file.Filename}' with {import.Episodes.Length} episodes");

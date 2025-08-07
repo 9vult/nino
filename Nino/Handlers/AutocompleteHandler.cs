@@ -3,6 +3,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Localizer;
 using Microsoft.EntityFrameworkCore;
+using NaturalSort.Extension;
 using Nino.Records;
 using Nino.Utilities;
 
@@ -107,6 +108,7 @@ namespace Nino.Handlers
                                 StringComparison.InvariantCultureIgnoreCase
                             )
                     )
+                    .OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort())
                     .Select(e => new AutocompleteResult(e.Number.ToString(), e.Number))
             );
             return AutocompletionResult.FromSuccess(choices.Take(25));

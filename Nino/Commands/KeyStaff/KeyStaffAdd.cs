@@ -45,7 +45,7 @@ public partial class KeyStaff
         // All good!
         var newStaff = new Staff
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.Empty,
             UserId = memberId,
             Role = new Role
             {
@@ -104,19 +104,25 @@ public partial class KeyStaff
             .Build();
         await interaction.FollowupAsync(embed: embed);
 
+        // Console.WriteLine(db.ChangeTracker.DebugView.ShortView);
+        // foreach (var entry in db.ChangeTracker.Entries())
+        // {
+        //     Console.WriteLine($"{entry.Entity.GetType().Name} - {entry.State}");
+        // }
         await db.SaveChangesAsync();
         return ExecutionResult.Success;
 
         Records.Task NewUndoneTask() => new()
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.Empty,
             Abbreviation = abbreviation,
-            Done = false
+            Done = false,
+            LastReminded = null
         };
 
         Records.Task NewDoneTask() => new()
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.Empty,
             Abbreviation = abbreviation,
             Done = true
         };

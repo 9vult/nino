@@ -5,7 +5,7 @@ namespace Nino.Records;
 public class Episode
 {
     [Key]
-    public required Guid Id { get; set; }
+    public Guid Id { get; set; }
     public required Guid ProjectId { get; set; }
     public required ulong GuildId { get; set; }
     [MaxLength(32)]

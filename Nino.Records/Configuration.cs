@@ -7,11 +7,12 @@ namespace Nino.Records;
 public class Configuration
 {
     [Key]
-    public required Guid Id { get; set; }
+    public Guid Id { get; set; }
     public required ulong GuildId { get; set; }
     public required UpdatesDisplayType UpdateDisplay { get; set; }
     public required ProgressDisplayType ProgressDisplay { get; set; }
     public required CongaPrefixType CongaPrefix { get; set; }
+    [MaxLength(128)]
     public string? ReleasePrefix { get; set; }
     public Locale? Locale { get; set; }
     
@@ -25,7 +26,6 @@ public class Configuration
     public static Configuration CreateDefault(ulong guildId) =>
         new()
         {
-            Id = Guid.NewGuid(),
             GuildId = guildId,
             UpdateDisplay = UpdatesDisplayType.Normal,
             ProgressDisplay = ProgressDisplayType.Succinct,

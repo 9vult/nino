@@ -42,6 +42,9 @@
   <ItemGroup>
     <Content Include="bin\Debug\net9.0\Discord.Net.Interactions.dll" />
     <Content Include="bin\Debug\net9.0\Fergun.Interactive.dll" />
+    <Content Include="bin\Debug\net9.0\Nino.Records.pdb" />
+    <Content Include="bin\Debug\net9.0\SQLitePCLRaw.core.dll" />
+    <Content Include="bin\Debug\net9.0\System.Text.Json.dll" />
   </ItemGroup>
 
   <ItemGroup>

@@ -115,8 +115,8 @@ public partial class ProjectManagement
             IsArchived = false,
             AirReminderEnabled = false,
             CongaReminderEnabled = false,
-            Administrators = template.AdministratorIds?.Select(i => new Administrator { Id = Guid.NewGuid(), UserId = i}).ToList() ?? [],
-            KeyStaff = template.KeyStaff.Select(s => new Staff { Id = Guid.NewGuid(), UserId = s.UserId, IsPseudo = s.IsPseudo, Role = s.Role }).ToList(),
+            Administrators = template.AdministratorIds?.Select(i => new Administrator { UserId = i}).ToList() ?? [],
+            KeyStaff = template.KeyStaff.Select(s => new Staff { UserId = s.UserId, IsPseudo = s.IsPseudo, Role = s.Role }).ToList(),
             CongaParticipants = CongaGraph.Deserialize(template.CongaParticipants ?? []) ,
             Aliases = template.Aliases?.ToList() ?? [],
             AniListId = template.AniListId,
@@ -130,16 +130,15 @@ public partial class ProjectManagement
             template.AdditionalStaff.TryGetValue(stringNumber, out var additionalStaff);
             episodes.Add(new Episode
             {
-                Id = Guid.NewGuid(),
                 GuildId = guildId,
                 ProjectId = projectData.Id,
                 Number = stringNumber,
                 Done = false,
                 ReminderPosted = false,
-                AdditionalStaff = additionalStaff?.Select(s => new Staff { Id = Guid.NewGuid(), UserId = s.UserId, IsPseudo = s.IsPseudo, Role = s.Role }).ToList() ?? [],
+                AdditionalStaff = additionalStaff?.Select(s => new Staff { UserId = s.UserId, IsPseudo = s.IsPseudo, Role = s.Role }).ToList() ?? [],
                 PinchHitters = [],
                 Tasks = template.KeyStaff.Concat(additionalStaff ?? [])
-                    .Select(ks => new Records.Task { Id = Guid.NewGuid(), Abbreviation = ks.Role.Abbreviation, Done = false })
+                    .Select(ks => new Records.Task { Abbreviation = ks.Role.Abbreviation, Done = false })
                     .ToList(),
             });
         }

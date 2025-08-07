@@ -150,7 +150,6 @@ namespace Nino.Commands
         {
             return new Episode
             {
-                Id = Guid.NewGuid(),
                 GuildId = project.GuildId,
                 ProjectId = project.Id,
                 Number = episodeNumber,
@@ -158,7 +157,7 @@ namespace Nino.Commands
                 ReminderPosted = false,
                 AdditionalStaff = [],
                 PinchHitters = [],
-                Tasks = project.KeyStaff.Select(ks => new Records.Task { Id = Guid.NewGuid(), Abbreviation = ks.Role.Abbreviation, Done = false }).ToList()
+                Tasks = project.KeyStaff.Select(ks => new Records.Task { Abbreviation = ks.Role.Abbreviation, Done = false }).ToList()
             };
         }
     }

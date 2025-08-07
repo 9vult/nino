@@ -65,7 +65,7 @@ namespace Nino.Commands
             // Use existing observer ID, if it exists
             var observerId = db.Observers.Where(o => o.GuildId == guildId)
                 .FirstOrDefault(o => o.OriginGuildId == originGuildId && o.ProjectId == project.Id)
-                ?.Id ?? Guid.NewGuid();
+                ?.Id ?? Guid.Empty;
 
             var observer = new Records.Observer
             {

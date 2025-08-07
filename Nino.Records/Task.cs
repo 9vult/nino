@@ -6,7 +6,7 @@ namespace Nino.Records;
 public record Task
 {
     [Key]
-    public required Guid Id { get; set; }
+    public Guid Id { get; set; }
     public required string Abbreviation { get; set; }
     public required bool Done { get; set; }
     public DateTime? Updated { get; set; }

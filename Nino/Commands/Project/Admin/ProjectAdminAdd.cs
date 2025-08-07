@@ -42,7 +42,6 @@ namespace Nino.Commands
                 // Add to database
                 project.Administrators.Add(new Administrator
                 {
-                    Id = Guid.NewGuid(),
                     UserId = memberId,
                 });
 

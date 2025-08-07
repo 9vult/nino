@@ -49,7 +49,6 @@ namespace Nino.Commands
             // All good!
             var newStaff = new Staff
             {
-                Id = Guid.NewGuid(),
                 UserId = memberId,
                 Role = new Role
                 {
@@ -62,7 +61,6 @@ namespace Nino.Commands
 
             var newTask = new Records.Task
             {
-                Id = Guid.NewGuid(),
                 Abbreviation = abbreviation,
                 Done = false
             };

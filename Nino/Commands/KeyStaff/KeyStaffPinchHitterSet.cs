@@ -48,7 +48,6 @@ namespace Nino.Commands
                 // All good!
                 var hitter = new PinchHitter
                 {
-                    Id = Guid.NewGuid(),
                     UserId = memberId,
                     Abbreviation = abbreviation
                 };

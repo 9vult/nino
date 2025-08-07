@@ -34,6 +34,7 @@ public class DataContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
         options.UseSqlite("Data Source=nino-local.db");
+        // options.LogTo(Console.WriteLine);
     }
     
     /// <inheritdoc />
@@ -98,10 +99,19 @@ public class DataContext : DbContext
 
         modelBuilder.Entity<Episode>(entity =>
         {
-            entity.Property(p => p.GuildId)
+            entity.Property(e => e.GuildId)
                 .HasConversion(UlongStringConverter);
+
+            entity.Property(e => e.Updated)
+                .HasColumnType("TEXT");
+
+            entity.OwnsMany(e => e.PinchHitters);
+            entity.OwnsMany(e => e.Tasks, b =>
+            {
+                b.Property(t => t.Updated).HasColumnType("TEXT");
+                b.Property(t => t.LastReminded).HasColumnType("TEXT");
+            });
             
-            entity.OwnsMany(e => e.Tasks);
             entity.OwnsMany(e => e.AdditionalStaff, b =>
             {
                 b.Property(s => s.UserId)
@@ -110,7 +120,11 @@ public class DataContext : DbContext
             
             entity.Navigation(e => e.AdditionalStaff)
                 .AutoInclude();
+            
             entity.Navigation(e => e.Tasks)
+                .AutoInclude();
+
+            entity.Navigation(e => e.PinchHitters)
                 .AutoInclude();
         });
         
