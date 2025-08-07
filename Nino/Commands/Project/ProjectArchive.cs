@@ -80,7 +80,7 @@ namespace Nino.Commands
                 m.Components = null;
             });
 
-            await db.SaveChangesAsync();
+            await db.TrySaveChangesAsync(interaction);
             return ExecutionResult.Success;
         }
     }

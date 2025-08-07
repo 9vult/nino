@@ -97,7 +97,7 @@ public partial class Undone(DataContext db, InteractiveService interactive) : In
             
         Log.Info($"M[{interaction.User.Id} (@{interaction.User.Username})] marked task {abbreviation} undone for {episode}");
 
-        await db.SaveChangesAsync();
+        await db.TrySaveChangesAsync(interaction);
         return ExecutionResult.Success;
             
         // -----

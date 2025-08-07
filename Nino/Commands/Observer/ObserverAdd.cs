@@ -101,7 +101,7 @@ namespace Nino.Commands
             if (canDelete && tempReply is not null)
                 await tempReply.DeleteAsync();
 
-            await db.SaveChangesAsync();
+            await db.TrySaveChangesAsync(interaction);
             return ExecutionResult.Success;
         }
     }

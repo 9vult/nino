@@ -117,7 +117,7 @@ public partial class Skip(DataContext db, InteractiveService interactive) : Inte
         // Everybody do the Conga!
         await DoTheConga();
 
-        await db.SaveChangesAsync();
+        await db.TrySaveChangesAsync(interaction);
         return ExecutionResult.Success; 
             
         // -----

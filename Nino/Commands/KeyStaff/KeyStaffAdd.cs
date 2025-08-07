@@ -109,7 +109,7 @@ public partial class KeyStaff
         // {
         //     Console.WriteLine($"{entry.Entity.GetType().Name} - {entry.State}");
         // }
-        await db.SaveChangesAsync();
+        await db.TrySaveChangesAsync(interaction);
         return ExecutionResult.Success;
 
         Records.Task NewUndoneTask() => new()

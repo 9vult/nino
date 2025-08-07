@@ -134,7 +134,7 @@ namespace Nino.Commands
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 
-            await db.SaveChangesAsync();
+            await db.TrySaveChangesAsync(interaction);
             return ExecutionResult.Success;
         }
     }

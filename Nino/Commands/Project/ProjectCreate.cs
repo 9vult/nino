@@ -120,7 +120,7 @@ namespace Nino.Commands
             if (!PermissionChecker.CheckReleasePermissions(releaseChannelId))
                 await Response.Info(T("error.missingChannelPermsRelease", lng, $"<#{releaseChannelId}>"), interaction);
 
-            await db.SaveChangesAsync();
+            await db.TrySaveChangesAsync(interaction);
             return ExecutionResult.Success;
         }
     }

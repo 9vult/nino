@@ -27,6 +27,17 @@ namespace Nino.Utilities
             await interaction.FollowupAsync(embed: embed);
             return ExecutionResult.Success;
         }
+        
+        public static async Task<RuntimeResult> DbError(string message, SocketInteraction interaction)
+        {
+            var embed = new EmbedBuilder()
+                .WithTitle("痛い！ Database error")
+                .WithDescription(message)
+                .WithColor(0xd797ff)
+                .Build();
+            await interaction.FollowupAsync(embed: embed);
+            return ExecutionResult.Success;
+        }
 
         public static AllowedMentions GenerateAllowedMentions(List<ulong> users, List<ulong> roles)
         {

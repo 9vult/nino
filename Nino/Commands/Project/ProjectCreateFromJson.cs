@@ -178,7 +178,7 @@ public partial class ProjectManagement
         if (!PermissionChecker.CheckReleasePermissions(template.ReleaseChannelId))
             await Response.Info(T("error.missingChannelPermsRelease", lng, $"<#{template.ReleaseChannelId}>"), interaction);
 
-        await db.SaveChangesAsync();
+        await db.TrySaveChangesAsync(interaction);
         return ExecutionResult.Success;
     }
 }

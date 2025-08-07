@@ -2,6 +2,7 @@ using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Nino.Records;
 using NLog;
+using Task = System.Threading.Tasks.Task;
 
 namespace Nino.Utilities;
 
@@ -50,5 +51,18 @@ public static class DataContextExtensions
     public static Configuration? GetConfig(this DataContext db, ulong guildId)
     {
         return db.Configurations.FirstOrDefault(c => c.GuildId == guildId);
+    }
+
+    public static async Task TrySaveChangesAsync(this DataContext db, SocketInteraction interaction)
+    {
+        try
+        {
+            await db.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex);
+            await Response.Fail($"Your changes were not saved:\n{ex.Message}\n\nPlease report this to <@{Nino.Config.OwnerId}>!", interaction);
+        }
     }
 }

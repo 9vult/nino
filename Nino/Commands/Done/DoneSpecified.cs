@@ -83,7 +83,7 @@ public partial class Done
         // Everybody do the Conga!
         await DoTheConga();
 
-        await db.SaveChangesAsync();
+        await db.TrySaveChangesAsync(interaction);
         return ExecutionResult.Success;
         
         // -----

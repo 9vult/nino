@@ -175,7 +175,7 @@ public partial class Bulk(DataContext db, InteractiveService interactive) : Inte
             
         Log.Info($"M[{interaction.User.Id} (@{interaction.User.Username})] batched {abbreviation} in {project} for {startEpisodeNumber}-{endEpisodeNumber}");
 
-        await db.SaveChangesAsync();
+        await db.TrySaveChangesAsync(interaction);
         return ExecutionResult.Success;
     }
 
