@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Discord;
 using Discord.Interactions;
+using Microsoft.EntityFrameworkCore;
 using Nino.Handlers;
 using Nino.Records.Enums;
 using Nino.Utilities;
@@ -109,6 +110,7 @@ namespace Nino.Commands
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 
+                db.Entry(project).Property(p => p.CongaParticipants).IsModified = true;
                 await db.TrySaveChangesAsync(interaction);
                 return ExecutionResult.Success;
             }

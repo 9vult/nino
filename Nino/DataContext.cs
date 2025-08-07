@@ -27,7 +27,7 @@ public class DataContext : DbContext
 
     private static readonly ValueConverter<CongaGraph, string> CongaGraphConverter = new(
         g => JsonSerializer.Serialize(g.Serialize(), JsonSerializerOptions),
-        json => CongaGraph.Deserialize(JsonSerializer.Deserialize<CongaNodeDto[]>(json, JsonSerializerOptions)!)
+        json => CongaGraph.Deserialize(JsonSerializer.Deserialize<CongaNodeDto[]>(json, JsonSerializerOptions) ?? Array.Empty<CongaNodeDto>())
     );
 
     /// <inheritdoc />

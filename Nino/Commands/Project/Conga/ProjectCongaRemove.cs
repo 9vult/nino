@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
+using Microsoft.EntityFrameworkCore;
 using Nino.Handlers;
 using Nino.Records;
 using Nino.Utilities;
@@ -58,7 +59,8 @@ namespace Nino.Commands
                     .WithDescription(T("project.conga.removed", lng, edge.Current, edge.Next))
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
-
+                
+                db.Entry(project).Property(p => p.CongaParticipants).IsModified = true;
                 await db.TrySaveChangesAsync(interaction);
                 return ExecutionResult.Success;
             }
