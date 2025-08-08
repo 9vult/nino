@@ -12,5 +12,4 @@ node_modules/*
 .DS_STORE
 *.user
 .idea/
-**/Migrations/
 *.db*
