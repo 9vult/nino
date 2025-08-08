@@ -18,6 +18,7 @@ namespace Nino.Services
         private static readonly Dictionary<int, ApiResponse> RamCache = new();
         
         public static bool AniListEnabled { get; set; } = true;
+        public const string FallbackPosterUri = "https://files.catbox.moe/j3qizm.png";
 
         private static readonly HttpClient Client = new(new HttpClientHandler
         {
@@ -136,7 +137,10 @@ namespace Nino.Services
                             Media (id: $id) {
                                 startDate { year month day },
                                 airingSchedule { nodes { episode, airingAt }},
-                                duration
+                                duration,
+                                coverImage {
+                                  extraLarge
+                                }
                             }
                         }
                         """,
@@ -176,6 +180,8 @@ namespace Nino.Services
         public string? Error { get; set; }
         [JsonIgnore]
         public DateTime SaveDate { get; set; }
+        [JsonIgnore]
+        public string? CoverImage => Data?.Media?.CoverImage?.ExtraLarge;
     }
 
     public class Data
@@ -190,6 +196,7 @@ namespace Nino.Services
         [JsonConverter(typeof(StartDateConverter))]
         public DateTime StartDate { get; set; }
         public int? Duration { get; set; }
+        public CoverImageNode? CoverImage { get; set; }
     }
 
     public class AiringSchedule
@@ -201,5 +208,10 @@ namespace Nino.Services
     {
         public int Episode { get; set; }
         public long AiringAt { get; set; }
+    }
+
+    public class CoverImageNode
+    {
+        public string? ExtraLarge { get; set; }
     }
 }
