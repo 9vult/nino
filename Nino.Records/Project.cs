@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 using Nino.Records.Enums;
 
 namespace Nino.Records;
@@ -34,8 +35,9 @@ public class Project
     public List<Alias> Aliases { get; set; } = [];
     public List<Staff> KeyStaff { get; set; } = [];
     public List<Administrator> Administrators { get; set; } = [];
+    [JsonIgnore]
     public ICollection<Episode> Episodes = new List<Episode>();
-    
+    [JsonIgnore]
     public ICollection<Observer> Observers = new List<Observer>();
         
     /// <summary>

@@ -8,17 +8,17 @@ If you have multiple projects to create, or you have a template you use often, y
 {
     // Required fields
     Nickname: string,
-    Title: string,
-    Type: "TV" | "Movie" | "BD" | "OVA" | "ONA",
-    Length: uint,
+    AniListId: int,
     IsPrivate: boolean,
     UpdateChannelId: ulong,
     ReleaseChannelId: ulong,
     KeyStaff: Staff[],
     AdditionalStaff: Map<string, Staff[]>,
-	AniListId: int,
 
     // Optional fields
+    Title: string,
+    Type: "TV" | "Movie" | "BD" | "OVA" | "ONA",
+    Length: uint,
     PosterUri: string,
     FirstEpisode: decimal,
     AdministratorIds: ulong[],

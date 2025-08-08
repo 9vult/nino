@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.Text.Json.Serialization;
 
 namespace Nino.Records;
 
@@ -19,6 +20,7 @@ public class Episode
     public List<Task> Tasks { get; set; } = [];
     public List<Staff> AdditionalStaff { get; set; } = [];
     public List<PinchHitter> PinchHitters { get; set; } = [];
+    [JsonIgnore]
     public Project Project { get; set; } = null!;
 
     /// <summary>

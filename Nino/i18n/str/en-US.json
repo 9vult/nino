@@ -62,6 +62,7 @@
     "error.anilist.404": "Could not fetch from AniList: Data does not exist! (404 Not Found)",
     "error.anilist.apiError": "Air date unknown: AniList API error",
     "error.anilist.cache.ioerror": "An I/O error occured while reading the AniList cache",
+    "error.anilist.create": "Failed to fetch from AniList!\nMake sure the AniListID is correct, or specify `title`, `length`, `type`, and/or `posterUri`!",
     "error.anilist.disabled": "AniList functionality is currently disabled!",
     "error.anilist.generic": "Air date unknown: AniList error",
     "error.anilist.malformed": "Air date unknown: Malformed JSON",

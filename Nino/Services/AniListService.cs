@@ -5,6 +5,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Nino.Records.Enums;
 
 namespace Nino.Services
 {
@@ -138,6 +139,11 @@ namespace Nino.Services
                                 startDate { year month day },
                                 airingSchedule { nodes { episode, airingAt }},
                                 duration,
+                                episodes,
+                                format,
+                                title {
+                                  romaji
+                                }
                                 coverImage {
                                   extraLarge
                                 }
@@ -180,6 +186,23 @@ namespace Nino.Services
         public string? Error { get; set; }
         [JsonIgnore]
         public DateTime SaveDate { get; set; }
+
+        [JsonIgnore]
+        public int? EpisodeCount => Data?.Media?.Episodes;
+        [JsonIgnore]
+        public string? Title => Data?.Media?.Title?.Romaji;
+        [JsonIgnore]
+        public ProjectType Type => Data?.Media?.Format is not null ? Data?.Media?.Format switch
+        {
+            "TV" => ProjectType.TV,
+            "TV_SHORT" => ProjectType.TV,
+            "MOVIE" => ProjectType.Movie,
+            "ONA" => ProjectType.ONA,
+            "OVA" => ProjectType.OVA,
+            "SPECIAL" => ProjectType.OVA,
+            "MUSIC" => ProjectType.OVA,
+            _ => ProjectType.TV,
+        } : ProjectType.TV;
         [JsonIgnore]
         public string? CoverImage => Data?.Media?.CoverImage?.ExtraLarge;
     }
@@ -196,7 +219,10 @@ namespace Nino.Services
         [JsonConverter(typeof(StartDateConverter))]
         public DateTime StartDate { get; set; }
         public int? Duration { get; set; }
-        public CoverImageNode? CoverImage { get; set; }
+        public int? Episodes { get; set; }
+        public string? Format { get; set; }
+        public Title? Title { get; set; }
+        public CoverImage? CoverImage { get; set; }
     }
 
     public class AiringSchedule
@@ -210,8 +236,13 @@ namespace Nino.Services
         public long AiringAt { get; set; }
     }
 
-    public class CoverImageNode
+    public class CoverImage
     {
         public string? ExtraLarge { get; set; }
+    }
+
+    public class Title
+    {
+        public string? Romaji { get; set; }
     }
 }

@@ -69,10 +69,31 @@ public partial class ProjectManagement
         if (db.Projects.Any(p => p.GuildId == guildId && p.Nickname == template.Nickname))
             return await Response.Fail(T("error.project.nameInUse", lng, template.Nickname), interaction);
 
+        var apiResponse = await AniListService.Get(template.AniListId);
+        if (apiResponse is not null && apiResponse.Error is null)
+        {
+            template.Title ??= apiResponse.Title;
+            template.Length ??= apiResponse.EpisodeCount;
+            template.Type ??= apiResponse.Type;
+                
+            if (template.Title is null || template.Length is null)
+            {
+                return await Response.Fail(
+                    T(apiResponse.Error ?? "error.anilist.create", lng),
+                    interaction
+                );
+            }
+        }
+        else
+        {
+            return await Response.Fail(
+                T(apiResponse?.Error ?? "error.anilist.create", lng),
+                interaction
+            );
+        }
+
         if (template.PosterUri is null || !Uri.TryCreate(template.PosterUri, UriKind.Absolute, out _))
         {
-            // await Response.Info(T("error.project.invalidPosterUrl", lng), interaction);
-            var apiResponse = await AniListService.Get(template.AniListId);
             template.PosterUri = apiResponse?.CoverImage ?? AniListService.FallbackPosterUri;
         }
 
@@ -111,9 +132,9 @@ public partial class ProjectManagement
             Id = Guid.NewGuid(),
             GuildId = guildId,
             Nickname = template.Nickname,
-            Title = template.Title,
+            Title = template.Title!,
             OwnerId = ownerId,
-            Type = template.Type,
+            Type = template.Type!.Value,
             PosterUri = template.PosterUri,
             UpdateChannelId = template.UpdateChannelId,
             ReleaseChannelId = template.ReleaseChannelId,
