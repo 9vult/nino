@@ -8,6 +8,8 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Nino.Records.Json;
+using Nino.Services;
+using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
 
 namespace Nino.Commands;
@@ -25,7 +27,7 @@ public partial class ProjectManagement
         var guildId = interaction.GuildId ?? 0;
         var guild = Nino.Client.GetGuild(guildId);
         var member = guild.GetUser(interaction.User.Id);
-        if (!Utils.VerifyAdministrator(member, guild)) return await Response.Fail(T("error.notPrivileged", lng), interaction);
+        if (!Utils.VerifyAdministrator(db, member, guild)) return await Response.Fail(T("error.notPrivileged", lng), interaction);
 
         Log.Info($"Project creation from json file requested by M[{interaction.User.Id} (@{interaction.User.Username})]");
             
@@ -67,8 +69,12 @@ public partial class ProjectManagement
         if (db.Projects.Any(p => p.GuildId == guildId && p.Nickname == template.Nickname))
             return await Response.Fail(T("error.project.nameInUse", lng, template.Nickname), interaction);
 
-        if (!Uri.TryCreate(template.PosterUri, UriKind.Absolute, out var _))
-            return await Response.Fail(T("error.project.invalidPosterUrl", lng), interaction);
+        if (template.PosterUri is null || !Uri.TryCreate(template.PosterUri, UriKind.Absolute, out _))
+        {
+            // await Response.Info(T("error.project.invalidPosterUrl", lng), interaction);
+            var apiResponse = await AniListService.Get(template.AniListId);
+            template.PosterUri = apiResponse?.CoverImage ?? AniListService.FallbackPosterUri;
+        }
 
         // Configure weights
         var idxWeight = 1;
@@ -118,7 +124,7 @@ public partial class ProjectManagement
             Administrators = template.AdministratorIds?.Select(i => new Administrator { UserId = i}).ToList() ?? [],
             KeyStaff = template.KeyStaff.Select(s => new Staff { UserId = s.UserId, IsPseudo = s.IsPseudo, Role = s.Role }).ToList(),
             CongaParticipants = CongaGraph.Deserialize(template.CongaParticipants ?? []) ,
-            Aliases = template.Aliases?.ToList() ?? [],
+            Aliases = template.Aliases?.Select(a => new Records.Alias { Value = a }).ToList() ?? [],
             AniListId = template.AniListId,
             Created = DateTime.UtcNow
         };

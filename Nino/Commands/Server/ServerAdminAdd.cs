@@ -3,7 +3,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Nino.Records;
 using Nino.Utilities;
-
+using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
@@ -28,7 +28,7 @@ namespace Nino.Commands
 
                 // Server administrator permissions required
                 var runner = guild.GetUser(interaction.User.Id);
-                if (!Utils.VerifyAdministrator(runner, guild, excludeServerAdmins: true))
+                if (!Utils.VerifyAdministrator(db, runner, guild, excludeServerAdmins: true))
                     return await Response.Fail(T("error.notPrivileged", lng), interaction);
 
                 var config = db.GetConfig(guildId);

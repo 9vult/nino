@@ -4,6 +4,7 @@ using Localizer;
 using Microsoft.EntityFrameworkCore;
 using Nino.Records.Enums;
 using Nino.Utilities;
+using Nino.Utilities.Extensions;
 using NLog;
 using static Localizer.Localizer;
 

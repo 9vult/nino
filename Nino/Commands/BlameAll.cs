@@ -10,6 +10,7 @@ using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Services;
 using Nino.Utilities;
+using Nino.Utilities.Extensions;
 using NLog;
 using static Localizer.Localizer;
 
@@ -33,12 +34,12 @@ public class BlameAll(DataContext db, InteractiveService interactive) : Interact
         alias = alias.Trim();
             
         // Verify project
-        var project = db.ResolveAlias(alias, interaction, includeObservers: true);
+        var project = await db.ResolveAlias(alias, interaction, includeObservers: true);
         if (project is null)
             return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
         
         // Restrict display of pseudo-tasks to Key Staff
-        if (includePseudo && !Utils.VerifyUser(interaction.User.Id, project, includeKeyStaff: true))
+        if (includePseudo && !project.VerifyUser(db, interaction.User.Id, includeKeyStaff: true))
             includePseudo = false;
             
         Log.Trace($"Blame All-ing {project} for M[{interaction.User.Id} (@{interaction.User.Username})]");
@@ -121,12 +122,12 @@ public class BlameAll(DataContext db, InteractiveService interactive) : Interact
                 else if (episode.Tasks.Any(t => t.Done))
                 {
                     if (type == BlameAllType.Normal)
-                        sb.AppendLine(StaffList.GenerateProgress(project, episode, excludePseudo: excludePseudo));
+                        sb.AppendLine(episode.GenerateProgress(excludePseudo: excludePseudo));
                     if (type == BlameAllType.StallCheck)
                         sb.AppendLine(T("episode.lastUpdated", lng, $"<t:{episode.Updated?.ToUnixTimeSeconds()}:R>"));
                 }
                 else if (project.AniListId is not null 
-                         && Utils.EpisodeNumberIsNumber(episode.Number, out var decimalNumber)
+                         && Episode.EpisodeNumberIsNumber(episode.Number, out var decimalNumber)
                          && await AirDateService.EpisodeAired((int)project.AniListId, decimalNumber + (project.AniListOffset ?? 0)) is false)
                 {
                     if (type == BlameAllType.Normal)

@@ -67,15 +67,16 @@ public class DataContext : DbContext
             entity.Property(p => p.CongaParticipants)
                 .HasConversion(CongaGraphConverter)
                 .HasColumnType("TEXT");
-
-            entity.Property(p => p.Aliases)
-                .HasConversion(
-                    v => JsonSerializer.Serialize(v, JsonSerializerOptions),
-                    v => JsonSerializer.Deserialize<List<string>>(v, JsonSerializerOptions) ?? new List<string>()
-                )
-                .HasColumnType("TEXT");
             
+            entity.Property(p => p.Nickname)
+                .UseCollation("NOCASE");
+
             entity.OwnsMany(p => p.Administrators);
+            entity.OwnsMany(p => p.Aliases, b =>
+            {
+                b.Property(a => a.Value)
+                    .UseCollation("NOCASE");
+            });
             entity.OwnsMany(p => p.KeyStaff, b =>
             {
                 b.Property(s => s.UserId)
@@ -92,6 +93,8 @@ public class DataContext : DbContext
             entity.Navigation(o => o.KeyStaff)
                 .AutoInclude();
             entity.Navigation(o => o.Administrators)
+                .AutoInclude();
+            entity.Navigation(o => o.Aliases)
                 .AutoInclude();
         });
         
@@ -155,6 +158,9 @@ public class DataContext : DbContext
                 b.Property(s => s.UserId)
                     .HasConversion(UlongStringConverter);
             });
+            
+            entity.Navigation(o => o.Administrators)
+                .AutoInclude();
         });
     }
 }

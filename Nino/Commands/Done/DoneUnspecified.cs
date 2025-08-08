@@ -6,6 +6,7 @@ using NaturalSort.Extension;
 using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities;
+using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
@@ -44,7 +45,7 @@ namespace Nino.Commands
             // Verify user
             project.TryGetEpisode(nextTaskEpisodeNo, out var nextTaskEpisode);
 
-            if (!Utils.VerifyTaskUser(interaction.User.Id, project, nextTaskEpisode!, abbreviation))
+            if (!nextTaskEpisode?.VerifyTaskUser(db, interaction.User.Id, abbreviation) ?? false)
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             var role = project.KeyStaff.Concat(nextTaskEpisode!.AdditionalStaff).First(ks => ks.Role.Abbreviation == abbreviation).Role;

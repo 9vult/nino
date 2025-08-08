@@ -4,7 +4,7 @@ using Nino.Records;
 using NLog;
 using Task = System.Threading.Tasks.Task;
 
-namespace Nino.Utilities;
+namespace Nino.Utilities.Extensions;
 
 public static class DataContextExtensions
 {
@@ -19,7 +19,7 @@ public static class DataContextExtensions
     /// <param name="observingGuildId">ID of the build being observed, if applicable</param>
     /// <param name="includeObservers">Whether to include observers in the lookup</param>
     /// <returns>Project the alias references to, or null</returns>
-    public static Project? ResolveAlias(
+    public static async Task<Project?> ResolveAlias(
         this DataContext db,
         string query,
         SocketInteraction interaction,
@@ -29,20 +29,16 @@ public static class DataContextExtensions
     {
         var guildId = observingGuildId ?? interaction.GuildId;
 
-        var q = db.Projects
+        var result = await db.Projects
             .Include(p => p.Episodes)
-            .ConcatIf(
-                includeObservers,
-                db.Observers.Where(o => o.GuildId == guildId).Select(o => o.Project)
+            .Where(p =>
+                p.GuildId == guildId
+                || (includeObservers && p.Observers.Any(o => o.GuildId == guildId))
             )
-            .AsQueryable();
-
-        var result = q.AsEnumerable().FirstOrDefault(p =>
-            string.Equals(p.Nickname, query, StringComparison.InvariantCultureIgnoreCase)
-            || p.Aliases.Any(a =>
-                string.Equals(a, query, StringComparison.InvariantCultureIgnoreCase)
-            )
-        );
+            .FirstOrDefaultAsync(p =>
+                p.Nickname == query ||
+                p.Aliases.Any(a => a.Value == query)
+            );
 
         Log.Trace($"Resolved alias {query} to {result?.ToString() ?? "<resolution failed>"}");
         return result;

@@ -4,10 +4,13 @@ using Discord.WebSocket;
 using Fergun.Interactive;
 using Localizer;
 using Nino.Handlers;
+using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities;
+using Nino.Utilities.Extensions;
 using NLog;
 using static Localizer.Localizer;
+using Task = System.Threading.Tasks.Task;
 
 namespace Nino.Commands;
 
@@ -30,10 +33,10 @@ public partial class Undone(DataContext db, InteractiveService interactive) : In
         // Sanitize inputs
         alias = alias.Trim();
         abbreviation = abbreviation.Trim().ToUpperInvariant();
-        episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
+        episodeNumber = Episode.CanonicalizeEpisodeNumber(episodeNumber);
             
         // Verify project
-        var project = db.ResolveAlias(alias, interaction);
+        var project = await db.ResolveAlias(alias, interaction);
         if (project is null)
             return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
@@ -52,7 +55,7 @@ public partial class Undone(DataContext db, InteractiveService interactive) : In
             return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
 
         // Verify user
-        if (!Utils.VerifyTaskUser(interaction.User.Id, project, episode, abbreviation))
+        if (!episode.VerifyTaskUser(db, interaction.User.Id, abbreviation))
             return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
         // Verify task is complete
@@ -70,14 +73,14 @@ public partial class Undone(DataContext db, InteractiveService interactive) : In
         var taskTitle = staff.Role.Name;
         var title = T("title.progress", gLng, episodeNumber);
         var status = config?.UpdateDisplay.Equals(UpdatesDisplayType.Extended) ?? false
-            ? StaffList.GenerateExplainProgress(project, episode, gLng, abbreviation) // Explanatory
-            : StaffList.GenerateProgress(project, episode, abbreviation); // Standard
+            ? episode.GenerateExplainProgress(gLng, abbreviation) // Explanatory
+            : episode.GenerateProgress(abbreviation); // Standard
 
         // Skip published embeds for pseudo-tasks
         if (!staff.IsPseudo) await PublishEmbeds();
 
         // Send success embed
-        var replyStatus = StaffList.GenerateProgress(project, episode, abbreviation, excludePseudo: false);
+        var replyStatus = episode.GenerateProgress(abbreviation, excludePseudo: false);
 
         var replyHeader = project.IsPrivate
             ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"

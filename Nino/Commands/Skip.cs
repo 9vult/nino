@@ -9,6 +9,7 @@ using NLog;
 using System.Text;
 using Localizer;
 using Nino.Records;
+using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
 using Task = System.Threading.Tasks.Task;
 
@@ -33,10 +34,10 @@ public partial class Skip(DataContext db, InteractiveService interactive) : Inte
         // Sanitize inputs
         alias = alias.Trim();
         abbreviation = abbreviation.Trim().ToUpperInvariant();
-        episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
+        episodeNumber = Episode.CanonicalizeEpisodeNumber(episodeNumber);
             
         // Verify project
-        var project = db.ResolveAlias(alias, interaction);
+        var project = await db.ResolveAlias(alias, interaction);
         if (project is null)
             return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
@@ -63,7 +64,7 @@ public partial class Skip(DataContext db, InteractiveService interactive) : Inte
             return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
 
         // Verify user
-        if (!Utils.VerifyTaskUser(interaction.User.Id, project, episode, abbreviation))
+        if (!episode.VerifyTaskUser(db, interaction.User.Id, abbreviation))
             return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
         // Verify task is incomplete
@@ -85,15 +86,15 @@ public partial class Skip(DataContext db, InteractiveService interactive) : Inte
         var taskTitle = staff.Role.Name;
         var title = T("title.progress", gLng, episodeNumber);
         var status = config?.UpdateDisplay.Equals(UpdatesDisplayType.Extended) ?? false
-            ? StaffList.GenerateExplainProgress(project, episode, gLng, abbreviation) // Explanatory
-            : StaffList.GenerateProgress(project, episode, abbreviation); // Standard
+            ? episode.GenerateExplainProgress(gLng, abbreviation) // Explanatory
+            : episode.GenerateProgress(abbreviation); // Standard
 
         // Skip published embeds for pseudo-tasks
         if (!staff.IsPseudo) await PublishEmbeds();
 
         // Prepare success embed
         var episodeDoneText = episodeDone ? $"\n{T("progress.episodeComplete", lng, episodeNumber)}" : string.Empty;
-        var replyStatus = StaffList.GenerateProgress(project, episode, abbreviation, excludePseudo: false);
+        var replyStatus = episode.GenerateProgress(abbreviation, excludePseudo: false);
 
         var replyHeader = project.IsPrivate
             ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"

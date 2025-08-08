@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Nino.Utilities;
-
+using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
@@ -25,7 +25,7 @@ namespace Nino.Commands
             // Check for guild administrator status
             var guild = Nino.Client.GetGuild(newGuildId);
             var member = guild.GetUser(interaction.User.Id);
-            if (!Utils.VerifyAdministrator(member, guild)) return await Response.Fail(T("error.notPrivileged", lng), interaction);
+            if (!Utils.VerifyAdministrator(db, member, guild)) return await Response.Fail(T("error.notPrivileged", lng), interaction);
 
             // Validate origin server
             if (!ulong.TryParse(originGuildIdStr, out var oldGuildId))
@@ -35,11 +35,11 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.noSuchServer", lng), interaction);
 
             // Verify project and user - Owner required
-            var project = db.ResolveAlias(alias, interaction, observingGuildId: oldGuildId);
+            var project = await db.ResolveAlias(alias, interaction, observingGuildId: oldGuildId);
             if (project is null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
-            if (!Utils.VerifyUser(interaction.User.Id, project, excludeAdmins: true))
+            if (!project.VerifyUser(db, interaction.User.Id, excludeAdmins: true))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Modify the data

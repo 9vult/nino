@@ -1,5 +1,4 @@
 ﻿using Discord.Interactions;
-using Nino.Handlers;
 using NLog;
 
 namespace Nino.Commands

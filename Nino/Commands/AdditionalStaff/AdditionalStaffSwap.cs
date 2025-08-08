@@ -2,7 +2,9 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Nino.Handlers;
+using Nino.Records;
 using Nino.Utilities;
+using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
@@ -23,14 +25,14 @@ namespace Nino.Commands
             // Sanitize inputs
             var memberId = member.Id;
             alias = alias.Trim();
-            episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
+            episodeNumber = Episode.CanonicalizeEpisodeNumber(episodeNumber);
 
             // Verify project and user - Owner or Admin required
-            var project = db.ResolveAlias(alias, interaction);
+            var project = await db.ResolveAlias(alias, interaction);
             if (project is null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
-            if (!Utils.VerifyUser(interaction.User.Id, project))
+            if (!project.VerifyUser(db, interaction.User.Id))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Verify episode

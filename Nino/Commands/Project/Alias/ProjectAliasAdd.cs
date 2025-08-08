@@ -2,7 +2,7 @@
 using Discord.Interactions;
 using Nino.Handlers;
 using Nino.Utilities;
-
+using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
@@ -25,22 +25,22 @@ namespace Nino.Commands
                 input = input.Trim();
 
                 // Verify project and user - Owner or Admin required
-                var project = db.ResolveAlias(alias, interaction);
+                var project = await db.ResolveAlias(alias, interaction);
                 if (project is null)
                     return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
                 if (project.IsArchived)
                     return await Response.Fail(T("error.archived", lng), interaction);
 
-                if (!Utils.VerifyUser(interaction.User.Id, project))
+                if (!project.VerifyUser(db, interaction.User.Id))
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
                 // Validate alias doesn't exist
-                var preexistingProject = db.ResolveAlias(input, interaction);
+                var preexistingProject = await db.ResolveAlias(input, interaction);
                 if (preexistingProject is not null)
                     return await Response.Fail(T("error.alias.inUse", lng, preexistingProject.Nickname), interaction);
                 
-                project.Aliases.Add(alias);
+                project.Aliases.Add(new Records.Alias { Value = input });
 
                 Log.Info($"Added {input} as an alias for {project}");
 

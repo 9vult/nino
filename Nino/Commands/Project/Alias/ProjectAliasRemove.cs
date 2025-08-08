@@ -2,7 +2,7 @@
 using Discord.Interactions;
 using Nino.Handlers;
 using Nino.Utilities;
-
+using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
@@ -25,18 +25,18 @@ namespace Nino.Commands
                 input = input.Trim();
 
                 // Verify project and user - Owner or Admin required
-                var project = db.ResolveAlias(alias, interaction);
+                var project = await db.ResolveAlias(alias, interaction);
                 if (project is null)
                     return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
                 if (project.IsArchived)
                     return await Response.Fail(T("error.archived", lng), interaction);
 
-                if (!Utils.VerifyUser(interaction.User.Id, project))
+                if (!project.VerifyUser(db, interaction.User.Id))
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
                 // Validate alias exists
-                var aliasToRemove = project.Aliases.FirstOrDefault(a => a == input);
+                var aliasToRemove = project.Aliases.FirstOrDefault(a => a.Value == input);
                 if (aliasToRemove is null)
                     return await Response.Fail(T("error.noSuchAlias", lng, input, project.Nickname), interaction);
 

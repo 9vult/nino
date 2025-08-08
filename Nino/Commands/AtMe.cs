@@ -7,6 +7,7 @@ using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Services;
 using Nino.Utilities;
+using Nino.Utilities.Extensions;
 using NLog;
 using static Localizer.Localizer;
 
@@ -59,7 +60,7 @@ public class AtMe(DataContext db, InteractiveService interactive) : InteractionM
         {
             var episodes = project.Episodes
                 .Where(e => !e.Done)
-                .Where(e => Utils.VerifyEpisodeUser(interaction.User.Id, project, e, true)).ToList();
+                .Where(e => e.VerifyEpisodeUser(db, interaction.User.Id, excludeAdmins: true)).ToList();
                 
             if (episodes.Count == 0)
                 continue;
@@ -72,7 +73,7 @@ public class AtMe(DataContext db, InteractiveService interactive) : InteractionM
                     if (airedEpisodeNumbers is not null)
                     {
                         episodes = episodes
-                            .Where(e => !Utils.EpisodeNumberIsNumber(e.Number, out var dNum)
+                            .Where(e => !Episode.EpisodeNumberIsNumber(e.Number, out var dNum)
                                         || airedEpisodeNumbers.Contains(dNum + (project.AniListOffset ?? 0))
                                         || dNum + (project.AniListOffset ?? 0) < airedEpisodeNumbers.Max()).ToList();
                     }

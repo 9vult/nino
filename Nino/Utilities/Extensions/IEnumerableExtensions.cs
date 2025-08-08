@@ -1,4 +1,4 @@
-namespace Nino.Utilities;
+namespace Nino.Utilities.Extensions;
 
 public static class EnumerableExtensions
 {

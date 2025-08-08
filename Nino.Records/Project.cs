@@ -31,7 +31,7 @@ public class Project
     public ulong? CongaReminderChannelId { get; set; }
     public DateTime? Created { get; set; }
 
-    public List<string> Aliases { get; set; } = [];
+    public List<Alias> Aliases { get; set; } = [];
     public List<Staff> KeyStaff { get; set; } = [];
     public List<Administrator> Administrators { get; set; } = [];
     public ICollection<Episode> Episodes = new List<Episode>();

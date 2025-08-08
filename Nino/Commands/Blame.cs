@@ -3,9 +3,11 @@ using Discord;
 using Discord.Interactions;
 using NaturalSort.Extension;
 using Nino.Handlers;
+using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Services;
 using Nino.Utilities;
+using Nino.Utilities.Extensions;
 using NLog;
 using static Localizer.Localizer;
 
@@ -29,7 +31,7 @@ public class Blame(DataContext db) : InteractionModuleBase<SocketInteractionCont
         alias = alias.Trim();
             
         // Verify project
-        var project = db.ResolveAlias(alias, interaction, includeObservers: true);
+        var project = await db.ResolveAlias(alias, interaction, includeObservers: true);
         if (project is null)
             return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
@@ -45,7 +47,7 @@ public class Blame(DataContext db) : InteractionModuleBase<SocketInteractionCont
         }
         else
         {
-            episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
+            episodeNumber = Episode.CanonicalizeEpisodeNumber(episodeNumber);
         }
             
         var episode = episodes.FirstOrDefault(e => e.Number == episodeNumber);
@@ -53,7 +55,7 @@ public class Blame(DataContext db) : InteractionModuleBase<SocketInteractionCont
             return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
 
         // Restrict display of pseudo-tasks to task owners
-        if (includePseudo && !Utils.VerifyEpisodeUser(interaction.User.Id, project, episode))
+        if (includePseudo && !episode.VerifyEpisodeUser(db, interaction.User.Id))
             includePseudo = false;
             
         Log.Trace($"Blaming {project} episode {episode} for M[{interaction.User.Id} (@{interaction.User.Username})]");
@@ -87,11 +89,11 @@ public class Blame(DataContext db) : InteractionModuleBase<SocketInteractionCont
         if (project.IsArchived)
             progress.AppendLine(T("blame.archived", lng));
 
-        progress.AppendLine(explain ? StaffList.GenerateExplainProgress(project, episode, lng, excludePseudo: !includePseudo)
-            : StaffList.GenerateProgress(project, episode, excludePseudo: !includePseudo));
+        progress.AppendLine(explain ? episode.GenerateExplainProgress(lng, excludePseudo: !includePseudo)
+            : episode.GenerateProgress(excludePseudo: !includePseudo));
 
         // Add any update information
-        if (project.AniListId != null && !episode.Tasks.Any(t => t.Done) && Utils.EpisodeNumberIsNumber(episode.Number, out var decimalNumber))
+        if (project.AniListId != null && !episode.Tasks.Any(t => t.Done) && Episode.EpisodeNumberIsNumber(episode.Number, out var decimalNumber))
         {
             var airStatus = await AirDateService.GetAirDateString((int)project.AniListId, decimalNumber + (project.AniListOffset ?? 0), lng);
             progress.AppendLine();

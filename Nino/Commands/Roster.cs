@@ -1,8 +1,10 @@
 using Discord;
 using Discord.Interactions;
 using Nino.Handlers;
+using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities;
+using Nino.Utilities.Extensions;
 using NLog;
 using static Localizer.Localizer;
 
@@ -24,14 +26,14 @@ public class Roster(DataContext db) : InteractionModuleBase<SocketInteractionCon
             
         // Sanitize inputs
         alias = alias.Trim();
-        episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
+        episodeNumber = Episode.CanonicalizeEpisodeNumber(episodeNumber);
             
         // Verify project and user - minimum Key Staff required
-        var project = db.ResolveAlias(alias, interaction);
+        var project = await db.ResolveAlias(alias, interaction);
         if (project is null)
             return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
-        if (!Utils.VerifyUser(interaction.User.Id, project, includeKeyStaff: true))
+        if (!project.VerifyUser(db, interaction.User.Id, includeKeyStaff: true))
             return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
         // Verify episode
@@ -43,7 +45,7 @@ public class Roster(DataContext db) : InteractionModuleBase<SocketInteractionCon
         if (project.KeyStaff.Count == 0)
             return await Response.Fail(T("error.noRoster", lng), interaction);
 
-        var roster = StaffList.GenerateRoster(project, episode, withWeights, excludePseudo: false);
+        var roster = episode.GenerateRoster(withWeights, excludePseudo: false);
         var title = project.IsPrivate
             ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
             : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";

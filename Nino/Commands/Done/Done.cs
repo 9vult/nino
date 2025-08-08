@@ -1,7 +1,9 @@
 using Discord.Interactions;
 using Fergun.Interactive;
 using Nino.Handlers;
+using Nino.Records;
 using Nino.Utilities;
+using Nino.Utilities.Extensions;
 using NLog;
 using static Localizer.Localizer;
 
@@ -26,7 +28,7 @@ namespace Nino.Commands
             abbreviation = abbreviation.Trim().ToUpperInvariant();
             
             // Verify project
-            var project = db.ResolveAlias(alias, interaction);
+            var project = await db.ResolveAlias(alias, interaction);
             if (project is null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
@@ -47,7 +49,7 @@ namespace Nino.Commands
             }
 
             if (episodeNumber != null)
-                return await HandleSpecified(interaction, project, abbreviation, Utils.CanonicalizeEpisodeNumber(episodeNumber));
+                return await HandleSpecified(interaction, project, abbreviation, Episode.CanonicalizeEpisodeNumber(episodeNumber));
             else
                 return await HandleUnspecified(interaction, project, abbreviation, interactive);
         }

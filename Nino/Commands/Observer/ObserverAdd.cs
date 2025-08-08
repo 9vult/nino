@@ -3,7 +3,7 @@ using Discord.Interactions;
 using Discord.Rest;
 using Discord.WebSocket;
 using Nino.Utilities;
-
+using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
@@ -32,7 +32,7 @@ namespace Nino.Commands
             // Check for guild administrator status
             var guild = Nino.Client.GetGuild(guildId);
             var member = guild.GetUser(interaction.User.Id);
-            if (!Utils.VerifyAdministrator(member, guild)) return await Response.Fail(T("error.notPrivileged", lng), interaction);
+            if (!Utils.VerifyAdministrator(db, member, guild)) return await Response.Fail(T("error.notPrivileged", lng), interaction);
 
             // Validate no-op condition
             if (!blame && updatesUrl is null && releasesUrl is null)
@@ -54,13 +54,15 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.noSuchServer", lng, originGuildIdStr), interaction);
 
             // Verify project and user access
-            var project = db.ResolveAlias(alias, interaction, observingGuildId: originGuildId, includeObservers: true);
+            var project = await db.ResolveAlias(alias, interaction, observingGuildId: originGuildId, includeObservers: true);
             if (project is null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
             // Fake project existence if private
-            if (project.IsPrivate && !Utils.VerifyUser(interaction.User.Id, project))
+            if (project.IsPrivate && !project.VerifyUser(db, interaction.User.Id))
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+            
+            await db.Entry(project).Collection(p => p.Observers).LoadAsync();
 
             // Use existing observer ID, if it exists
             var observerId = db.Observers.Where(o => o.GuildId == guildId)

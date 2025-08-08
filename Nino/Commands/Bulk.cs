@@ -9,6 +9,7 @@ using Nino.Utilities;
 using NLog;
 using System.Text;
 using Localizer;
+using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
 using EmbedBuilder = Discord.EmbedBuilder;
 
@@ -34,15 +35,15 @@ public partial class Bulk(DataContext db, InteractiveService interactive) : Inte
         // Sanitize inputs
         alias = alias.Trim();
         abbreviation = abbreviation.Trim().ToUpperInvariant();
-        startEpisodeNumber = Utils.CanonicalizeEpisodeNumber(startEpisodeNumber);
-        endEpisodeNumber = Utils.CanonicalizeEpisodeNumber(endEpisodeNumber);
+        startEpisodeNumber = Episode.CanonicalizeEpisodeNumber(startEpisodeNumber);
+        endEpisodeNumber = Episode.CanonicalizeEpisodeNumber(endEpisodeNumber);
 
         var naturalSorter = StringComparison.OrdinalIgnoreCase.WithNaturalSort();
         if (naturalSorter.Compare(endEpisodeNumber, startEpisodeNumber) <= 0)
             return await Response.Fail(T("error.invalidTimeRange", lng), interaction);
             
         // Verify project
-        var project = db.ResolveAlias(alias, interaction);
+        var project = await db.ResolveAlias(alias, interaction);
         if (project is null)
             return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
@@ -62,7 +63,7 @@ public partial class Bulk(DataContext db, InteractiveService interactive) : Inte
             return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
 
         // Verify user
-        if (!Utils.VerifyTaskUser(interaction.User.Id, project, startEpisode, abbreviation))
+        if (!startEpisode.VerifyTaskUser(db, interaction.User.Id, abbreviation))
             return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
         var prefixMode = db.GetConfig(project.GuildId)?.CongaPrefix ?? CongaPrefixType.None;

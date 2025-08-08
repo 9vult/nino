@@ -1,16 +1,17 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 using CommandLine;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Fergun.Interactive;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nino.Handlers;
 using Nino.Services;
 using Nino.Utilities;
 using NLog;
-using System.Globalization;
 using static Localizer.Localizer;
 
 namespace Nino
@@ -19,83 +20,101 @@ namespace Nino
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         private static CmdLineOptions _cmdLineOptions = new();
-        private static AppConfig? _config;
         private static IServiceProvider? _services;
-        
+
         private static readonly DiscordSocketConfig SocketConfig = new()
         {
-            GatewayIntents = GatewayIntents.AllUnprivileged ^ GatewayIntents.GuildScheduledEvents ^ GatewayIntents.GuildInvites
+            GatewayIntents =
+                GatewayIntents.AllUnprivileged
+                ^ GatewayIntents.GuildScheduledEvents
+                ^ GatewayIntents.GuildInvites,
         };
 
-        public static DiscordSocketClient Client => _services!.GetRequiredService<DiscordSocketClient>();
-        public static AppConfig Config => _config!;
-        public static DataContext DataContext => _services!.GetRequiredService<DataContext>();
+        public static DiscordSocketClient Client =>
+            _services!.GetRequiredService<DiscordSocketClient>();
+        public static AppConfig Config { get; private set; } = null!;
 
         private static readonly InteractionServiceConfig InteractionServiceConfig = new()
         {
-            LocalizationManager = new JsonLocalizationManager("i18n/cmd", "nino")
+            LocalizationManager = new JsonLocalizationManager("i18n/cmd", "nino"),
         };
 
-        public static async Task Main(string[] args)
+        private static void ConfigureServices()
         {
-            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-            
-            Console.OutputEncoding = Encoding.UTF8;
-            LogHandler.SetupLogger();
-
-            Log.Info($"Starting Nino {Utils.Version}");
-
-            // Read in environment variables
-            IConfigurationRoot configBuilder = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .Build();
-            _config = configBuilder.GetRequiredSection("Configuration").Get<AppConfig?>();
-            if (_config == null)
-                throw new Exception("Missing appsettings.json!");
-
-            // Read in command-line arguments
-            _cmdLineOptions = Parser.Default.ParseArguments<CmdLineOptions>(args).Value;
-
-            // Set up services
             _services = new ServiceCollection()
                 .AddEntityFrameworkSqlite()
                 .AddDbContext<DataContext>()
-                .AddSingleton(_config)
+                .AddSingleton(Config)
                 .AddSingleton(_cmdLineOptions)
                 .AddSingleton(SocketConfig)
                 .AddSingleton<DiscordSocketClient>()
-                .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>(), InteractionServiceConfig))
+                .AddSingleton(x => new InteractionService(
+                    x.GetRequiredService<DiscordSocketClient>(),
+                    InteractionServiceConfig
+                ))
                 .AddSingleton<InteractionHandler>()
                 .AddSingleton<InteractiveService>()
                 .AddSingleton<ReleaseReminderService>()
                 .AddSingleton<CongaReminderService>()
+                .AddSingleton<ObserverPublisher>()
                 .BuildServiceProvider();
+        }
 
-            // Start AniList service
-            if (!_cmdLineOptions.DisableAniList)
-                _ = _services.GetRequiredService<ReleaseReminderService>();
-            else
-                AniListService.AniListEnabled = false;
+        private static async Task InitializeDatabase()
+        {
+            var db = _services!.GetRequiredService<DataContext>();
+            await db.Database.MigrateAsync();
 
-            // Start Conga Reminder service
-            _ = _services.GetRequiredService<CongaReminderService>();
+            var projectCount = db.Projects.Count();
+            var episodeCount = db.Episodes.Count();
+            var guildCount = db.Projects.GroupBy(p => p.GuildId).Count();
+            
+            Log.Info(
+                $"Database initialized with {projectCount} projects ({episodeCount} episodes) from {guildCount} guilds"
+            );
+        }
+
+        private static async Task InitializeDiscordClient()
+        {
+            var client = _services!.GetRequiredService<DiscordSocketClient>();
+            client.Log += LogHandler.Log;
+            await _services!.GetRequiredService<InteractionHandler>().InitializeAsync();
+            await client.LoginAsync(TokenType.Bot, Config.DiscordApiToken);
+            await client.StartAsync();
+        }
+
+        public static async Task Main(string[] args)
+        {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            Console.OutputEncoding = Encoding.UTF8;
+            LogHandler.SetupLogger();
+            Log.Info($"Starting Nino {Utils.Version}");
+
+            // Read in environment variables and cmd-line options
+            var configBuilder = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+            Config =
+                configBuilder.GetRequiredSection("Configuration").Get<AppConfig?>()
+                ?? throw new Exception("Missing appsettings.json!");
+            
+            _cmdLineOptions = Parser.Default.ParseArguments<CmdLineOptions>(args).Value;
+            AniListService.AniListEnabled = !_cmdLineOptions.DisableAniList;
+
+            // Configure DI
+            ConfigureServices();
+
+            // Start required background services
+            if (!AniListService.AniListEnabled)
+                _ = _services!.GetRequiredService<ReleaseReminderService>();
+            _ = _services!.GetRequiredService<CongaReminderService>();
 
             // Load localization files
             LoadLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/str")));
-
-            // Set up client
-            var client = _services.GetRequiredService<DiscordSocketClient>();
-
-            client.Log += LogHandler.Log;
-
-            await _services.GetRequiredService<InteractionHandler>().InitializeAsync();
             
-            var db = _services.GetRequiredService<DataContext>();
-            Log.Info($"Database initialized with {db.Projects.Count()} projects ({db.Episodes.Count()} episodes) from {db.Projects.GroupBy(p => p.GuildId).Count()} guilds");
+            // Initialize database
+            await InitializeDatabase();
 
-            // Start the bot
-            await client.LoginAsync(TokenType.Bot, _config.DiscordApiToken);
-            await client.StartAsync();
+            // Initialize Discord client
+            await InitializeDiscordClient();
 
             await Task.Delay(-1);
         }

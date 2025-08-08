@@ -6,6 +6,7 @@ using Nino.Records.Enums;
 using Nino.Utilities;
 using System.Text;
 using Localizer;
+using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
 using Task = System.Threading.Tasks.Task;
 
@@ -28,7 +29,7 @@ public partial class Done
             return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
 
         // Verify user
-        if (!Utils.VerifyTaskUser(interaction.User.Id, project, episode, abbreviation))
+        if (!episode.VerifyTaskUser(db, interaction.User.Id, abbreviation))
             return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
         // Verify task is incomplete
@@ -51,15 +52,15 @@ public partial class Done
         var taskTitle = staff.Role.Name;
         var title = T("title.progress", gLng, episodeNumber);
         var status = config?.UpdateDisplay.Equals(UpdatesDisplayType.Extended) ?? false
-            ? StaffList.GenerateExplainProgress(project, episode, gLng, abbreviation) // Explanatory
-            : StaffList.GenerateProgress(project, episode, abbreviation); // Standard
+            ? episode.GenerateExplainProgress(gLng, abbreviation) // Explanatory
+            : episode.GenerateProgress(abbreviation); // Standard
 
         // Skip published embeds for pseudo-tasks
         if (!staff.IsPseudo) await PublishEmbeds();
 
         // Prepare success embed
         var episodeDoneText = episodeDone ? $"\n{T("progress.episodeComplete", lng, episodeNumber)}" : string.Empty;
-        var replyStatus = StaffList.GenerateProgress(project, episode, abbreviation, excludePseudo: false);
+        var replyStatus = episode.GenerateProgress(abbreviation, excludePseudo: false);
 
         var replyHeader = project.IsPrivate
             ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"

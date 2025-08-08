@@ -5,7 +5,7 @@ using Localizer;
 using Microsoft.EntityFrameworkCore;
 using Nino.Records;
 using Nino.Records.Enums;
-using Nino.Utilities;
+using Nino.Utilities.Extensions;
 using NLog;
 using static Localizer.Localizer;
 using Configuration = Nino.Records.Configuration;
@@ -40,7 +40,7 @@ namespace Nino.Services
             foreach (var project in db.Projects.Include(p => p.Episodes).Where(p => p.AirReminderEnabled && p.AniListId != null ))
             {
                 var decimalNumber = 0m;
-                foreach (var episode in project.Episodes.Where(e => e is { Done: false, ReminderPosted: false } && Utils.EpisodeNumberIsNumber(e.Number, out decimalNumber)))
+                foreach (var episode in project.Episodes.Where(e => e is { Done: false, ReminderPosted: false } && Episode.EpisodeNumberIsNumber(e.Number, out decimalNumber)))
                 {
                     try
                     {

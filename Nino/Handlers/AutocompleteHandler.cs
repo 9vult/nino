@@ -5,7 +5,7 @@ using Localizer;
 using Microsoft.EntityFrameworkCore;
 using NaturalSort.Extension;
 using Nino.Records;
-using Nino.Utilities;
+using Nino.Utilities.Extensions;
 
 namespace Nino.Handlers
 {
@@ -34,42 +34,45 @@ namespace Nino.Handlers
 
             List<AutocompleteResult> choices = [];
             var query = ((string)focusedOption.Value).Trim();
-
             var guildAdmins = db.GetConfig(guildId)?.Administrators ?? [];
 
-            List<Project> projects = [];
-
-            // Local guild projects
-            projects.AddRange(db.Projects.Where(p => p.GuildId == guildId));
-
-            // Observing guild projects
-            if (includeObservers)
-                projects.AddRange(
-                    db.Observers.Include(o => o.Project)
-                        .Where(o => o.GuildId == guildId)
-                        .Select(o => o.Project)
+            var baseQuery = db
+                .Projects.Include(p => p.Episodes)
+                .Where(p =>
+                    p.GuildId == guildId
+                    || (includeObservers && p.Observers.Any(o => o.GuildId == guildId))
                 );
 
             if (!includeArchived)
-                projects = projects.Where(p => !p.IsArchived).ToList();
+            {
+                baseQuery = baseQuery.Where(p => !p.IsArchived);
+            }
 
-            // Filter (Not including Additional Staff here because that'd be a royal pita to get)
-            var aliases = projects
-                .Where(p =>
+            if (guildAdmins.All(a => a.UserId != userId)) // Not a guild admin
+            {
+                baseQuery = baseQuery.Where(p =>
                     !p.IsPrivate
                     || p.OwnerId == userId
                     || p.Administrators.Any(a => a.UserId == userId)
-                    || guildAdmins.Any(a => a.UserId == userId)
-                    || p.KeyStaff.Any(ks => ks.UserId == userId)
-                )
-                .SelectMany(p => new[] { p.Nickname }.Concat(p.Aliases))
+                    || p.KeyStaff.Any(s => s.UserId == userId)
+                );
+            }
+
+            baseQuery = baseQuery.Where(p =>
+                p.Nickname.StartsWith(query) || p.Aliases.Any(a => a.Value.StartsWith(query))
+            );
+
+            var projects = await baseQuery.ToListAsync();
+
+            var aliases = projects
+                .SelectMany(p => new[] { p.Nickname }.Concat(p.Aliases.Select(a => a.Value)))
                 .Where(a => a.StartsWith(query, StringComparison.InvariantCultureIgnoreCase))
                 .Distinct()
-                .Order()
+                .Take(25)
                 .ToList();
 
             choices.AddRange(aliases.Select(m => new AutocompleteResult(m, m)));
-            return AutocompletionResult.FromSuccess(choices.Take(25));
+            return AutocompletionResult.FromSuccess(choices);
         }
     }
 
@@ -95,12 +98,12 @@ namespace Nino.Handlers
             if (alias is null)
                 return AutocompletionResult.FromSuccess([]);
 
-            var cachedProject = db.ResolveAlias(alias, interaction);
-            if (cachedProject is null)
+            var project = await db.ResolveAlias(alias, interaction);
+            if (project is null)
                 return AutocompletionResult.FromSuccess([]);
 
             choices.AddRange(
-                cachedProject
+                project
                     .Episodes.Where(e =>
                         e.Number.ToString()
                             .StartsWith(
@@ -137,31 +140,33 @@ namespace Nino.Handlers
             var episodeInput = interaction
                 .Data.Options.FirstOrDefault(o => o.Name == "episode")
                 ?.Value;
-            string? episodeNumber;
             if (alias is null)
                 return AutocompletionResult.FromSuccess([]);
 
-            var cachedProject = db.ResolveAlias(alias, interaction);
-            if (cachedProject is null)
+            var project = await db.ResolveAlias(alias, interaction);
+            if (project is null)
                 return AutocompletionResult.FromSuccess([]);
 
-            episodeNumber = episodeInput is null
-                ? cachedProject.Episodes.FirstOrDefault(e => !e.Done)?.Number
-                : Utils.CanonicalizeEpisodeNumber((string)episodeInput);
+            var episodeNumber = episodeInput is null
+                ? project.Episodes.FirstOrDefault(e => !e.Done)?.Number
+                : Episode.CanonicalizeEpisodeNumber((string)episodeInput);
 
             if (episodeNumber is null)
                 return AutocompletionResult.FromSuccess([]);
 
-            var cachedEpisode = cachedProject.Episodes.FirstOrDefault(e =>
-                e.Number == episodeNumber
-            );
-            if (cachedEpisode is null)
+            var value = (string)focusedOption.Value;
+            var episode = project.Episodes.FirstOrDefault(e => e.Number == episodeNumber);
+            if (episode is null)
             {
-                var value = ((string)focusedOption.Value).ToUpperInvariant();
                 // Return list of key staff
                 choices.AddRange(
-                    cachedProject
-                        .KeyStaff.Where(ks => ks.Role.Abbreviation.StartsWith(value))
+                    project
+                        .KeyStaff.Where(ks =>
+                            ks.Role.Abbreviation.StartsWith(
+                                value,
+                                StringComparison.InvariantCultureIgnoreCase
+                            )
+                        )
                         .Select(t => new AutocompleteResult(
                             t.Role.Abbreviation,
                             t.Role.Abbreviation
@@ -170,11 +175,15 @@ namespace Nino.Handlers
             }
             else
             {
-                var value = ((string)focusedOption.Value).ToUpperInvariant();
                 // Return list of episode tasks
                 choices.AddRange(
-                    cachedEpisode
-                        .Tasks.Where(t => t.Abbreviation.StartsWith(value))
+                    episode
+                        .Tasks.Where(t =>
+                            t.Abbreviation.StartsWith(
+                                value,
+                                StringComparison.InvariantCultureIgnoreCase
+                            )
+                        )
                         .Select(t => new AutocompleteResult(t.Abbreviation, t.Abbreviation))
                 );
             }
@@ -204,15 +213,20 @@ namespace Nino.Handlers
             if (alias is null)
                 return AutocompletionResult.FromSuccess([]);
 
-            var cachedProject = db.ResolveAlias(alias, interaction);
-            if (cachedProject is null)
+            var project = await db.ResolveAlias(alias, interaction);
+            if (project is null)
                 return AutocompletionResult.FromSuccess([]);
 
-            var value = ((string)focusedOption.Value).ToUpperInvariant();
             // Return list of key staff
+            var value = (string)focusedOption.Value;
             choices.AddRange(
-                cachedProject
-                    .KeyStaff.Where(ks => ks.Role.Abbreviation.StartsWith(value))
+                project
+                    .KeyStaff.Where(ks =>
+                        ks.Role.Abbreviation.StartsWith(
+                            value,
+                            StringComparison.InvariantCultureIgnoreCase
+                        )
+                    )
                     .Select(t => new AutocompleteResult(t.Role.Abbreviation, t.Role.Abbreviation))
             );
             return AutocompletionResult.FromSuccess(choices.Take(25));
@@ -243,22 +257,25 @@ namespace Nino.Handlers
             if (alias is null || episodeInput is null)
                 return AutocompletionResult.FromSuccess([]);
 
-            var episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeInput);
-            var cachedProject = db.ResolveAlias(alias, interaction);
-            if (cachedProject is null)
+            var episodeNumber = Episode.CanonicalizeEpisodeNumber(episodeInput);
+            var project = await db.ResolveAlias(alias, interaction);
+            if (project is null)
                 return AutocompletionResult.FromSuccess([]);
 
-            var cachedEpisode = cachedProject.Episodes.FirstOrDefault(e =>
-                e.Number == episodeNumber
-            );
-            if (cachedEpisode is null)
+            var episode = project.Episodes.FirstOrDefault(e => e.Number == episodeNumber);
+            if (episode is null)
                 return AutocompletionResult.FromSuccess([]);
 
-            var value = ((string)focusedOption.Value).ToUpperInvariant();
+            var value = ((string)focusedOption.Value);
             // Return list of additional staff
             choices.AddRange(
-                cachedEpisode
-                    .AdditionalStaff.Where(ks => ks.Role.Abbreviation.StartsWith(value))
+                episode
+                    .AdditionalStaff.Where(ks =>
+                        ks.Role.Abbreviation.StartsWith(
+                            value,
+                            StringComparison.InvariantCultureIgnoreCase
+                        )
+                    )
                     .Select(t => new AutocompleteResult(t.Role.Abbreviation, t.Role.Abbreviation))
             );
             return AutocompletionResult.FromSuccess(choices.Take(25));
@@ -288,17 +305,16 @@ namespace Nino.Handlers
             if (alias is null)
                 return AutocompletionResult.FromSuccess([]);
 
-            var cachedProject = db.ResolveAlias(alias, interaction);
-            if (cachedProject is null)
+            var project = await db.ResolveAlias(alias, interaction);
+            if (project is null)
                 return AutocompletionResult.FromSuccess([]);
-            if (!Utils.VerifyUser(userId, cachedProject))
+            if (!project.VerifyUser(db, userId))
                 return AutocompletionResult.FromSuccess([]);
-
-            var value = ((string)focusedOption.Value).ToUpperInvariant();
 
             // Return list of conga participants
+            var value = (string)focusedOption.Value;
             choices.AddRange(
-                cachedProject
+                project
                     .CongaParticipants.GetEdges()
                     .Where(cn =>
                         cn.Current.StartsWith(value, StringComparison.InvariantCultureIgnoreCase)
@@ -333,25 +349,24 @@ namespace Nino.Handlers
             if (alias is null)
                 return AutocompletionResult.FromSuccess([]);
 
-            var cachedProject = db.ResolveAlias(alias, interaction);
-            if (cachedProject is null)
+            var project = await db.ResolveAlias(alias, interaction);
+            if (project is null)
                 return AutocompletionResult.FromSuccess([]);
-            if (!Utils.VerifyUser(userId, cachedProject))
+            if (!project.VerifyUser(db, userId))
                 return AutocompletionResult.FromSuccess([]);
-
-            var value = ((string)focusedOption.Value).ToUpperInvariant();
 
             // Generate list of targets
-
+            var value = (string)focusedOption.Value;
             choices.AddRange(
                 CongaGraph
                     .CurrentSpecials // Current specials
-                    .Concat(cachedProject.KeyStaff.Select(ks => ks.Role.Abbreviation))
+                    .Concat(project.KeyStaff.Select(ks => ks.Role.Abbreviation))
                     .Concat(
-                        cachedProject
+                        project
                             .Episodes.SelectMany(e => e.AdditionalStaff)
                             .Select(ks => ks.Role.Abbreviation)
                     )
+                    .Where(t => t.StartsWith(value, StringComparison.InvariantCultureIgnoreCase))
                     .ToHashSet()
                     .Select(i => new AutocompleteResult(i, i))
             );
@@ -383,25 +398,24 @@ namespace Nino.Handlers
             if (alias is null)
                 return AutocompletionResult.FromSuccess([]);
 
-            var cachedProject = db.ResolveAlias(alias, interaction);
-            if (cachedProject is null)
+            var project = await db.ResolveAlias(alias, interaction);
+            if (project is null)
                 return AutocompletionResult.FromSuccess([]);
-            if (!Utils.VerifyUser(userId, cachedProject))
+            if (!project.VerifyUser(db, userId))
                 return AutocompletionResult.FromSuccess([]);
-
-            var value = ((string)focusedOption.Value).ToUpperInvariant();
 
             // Generate list of targets
-
+            var value = (string)focusedOption.Value;
             choices.AddRange(
                 CongaGraph
                     .NextSpecials // Next specials
-                    .Concat(cachedProject.KeyStaff.Select(ks => ks.Role.Abbreviation))
+                    .Concat(project.KeyStaff.Select(ks => ks.Role.Abbreviation))
                     .Concat(
-                        cachedProject
+                        project
                             .Episodes.SelectMany(e => e.AdditionalStaff)
                             .Select(ks => ks.Role.Abbreviation)
                     )
+                    .Where(t => t.StartsWith(value, StringComparison.InvariantCultureIgnoreCase))
                     .ToHashSet()
                     .Select(i => new AutocompleteResult(i, i))
             );

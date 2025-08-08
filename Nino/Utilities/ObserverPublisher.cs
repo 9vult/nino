@@ -3,11 +3,12 @@ using System.Text;
 using Discord;
 using Discord.Net;
 using Newtonsoft.Json;
+using Nino.Utilities.Extensions;
 using NLog;
 
 namespace Nino.Utilities
 {
-    internal static class ObserverPublisher
+    internal class ObserverPublisher(DataContext db)
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
@@ -16,9 +17,11 @@ namespace Nino.Utilities
         /// </summary>
         /// <param name="project">Project being updated</param>
         /// <param name="embed">Embed to send to observers</param>
+        /// <param name="db">DataContext</param>
         /// <returns></returns>
         public static async Task PublishProgress(Records.Project project, Embed embed, DataContext db)
         {
+            await db.Entry(project).Collection(p => p.Observers).LoadAsync();
             var observers = project.Observers;
             if (observers.Count != 0)
             {
@@ -34,7 +37,7 @@ namespace Nino.Utilities
                             username = "Nino",
                             avatar_url = "https://i.imgur.com/PWtteaY.png",
                             content = "",
-                            embeds = new[] { Utils.EmbedToJsonObject(embed) }
+                            embeds = new[] { embed.ToJsonObject() }
                         };
                         var data = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8,
                             "application/json");
@@ -69,6 +72,7 @@ namespace Nino.Utilities
         /// <returns></returns>
         public static async Task PublishRelease(Records.Project project, string publishTitle, string releaseUrl, DataContext db)
         {
+            await db.Entry(project).Collection(p => p.Observers).LoadAsync();
             var observers = project.Observers;
             if (observers.Count != 0)
             {
