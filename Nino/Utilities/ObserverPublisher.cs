@@ -8,7 +8,7 @@ using NLog;
 
 namespace Nino.Utilities
 {
-    internal class ObserverPublisher(DataContext db)
+    internal static class ObserverPublisher
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
@@ -21,7 +21,7 @@ namespace Nino.Utilities
         /// <returns></returns>
         public static async Task PublishProgress(Records.Project project, Embed embed, DataContext db)
         {
-            await db.Entry(project).Collection(p => p.Observers).LoadAsync();
+            await Nino.DataContext.Entry(project).Collection(p => p.Observers).LoadAsync();
             var observers = project.Observers;
             if (observers.Count != 0)
             {
@@ -72,7 +72,7 @@ namespace Nino.Utilities
         /// <returns></returns>
         public static async Task PublishRelease(Records.Project project, string publishTitle, string releaseUrl, DataContext db)
         {
-            await db.Entry(project).Collection(p => p.Observers).LoadAsync();
+            await Nino.DataContext.Entry(project).Collection(p => p.Observers).LoadAsync();
             var observers = project.Observers;
             if (observers.Count != 0)
             {

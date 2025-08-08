@@ -33,6 +33,7 @@ namespace Nino
         public static DiscordSocketClient Client =>
             _services!.GetRequiredService<DiscordSocketClient>();
         public static AppConfig Config { get; private set; } = null!;
+        public static DataContext DataContext => _services!.GetRequiredService<DataContext>();
 
         private static readonly InteractionServiceConfig InteractionServiceConfig = new()
         {
@@ -56,7 +57,6 @@ namespace Nino
                 .AddSingleton<InteractiveService>()
                 .AddSingleton<ReleaseReminderService>()
                 .AddSingleton<CongaReminderService>()
-                .AddSingleton<ObserverPublisher>()
                 .BuildServiceProvider();
         }
 

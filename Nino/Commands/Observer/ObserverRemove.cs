@@ -25,7 +25,7 @@ namespace Nino.Commands
             // Check for guild administrator status
             var guild = Nino.Client.GetGuild(guildId);
             var member = guild.GetUser(interaction.User.Id);
-            if (!Utils.VerifyAdministrator(db, member, guild)) return await Response.Fail(T("error.notPrivileged", lng), interaction);
+            if (!Utils.VerifyAdministrator(member, guild)) return await Response.Fail(T("error.notPrivileged", lng), interaction);
 
             // Validate observer server
             if (!ulong.TryParse(originGuildIdStr, out var originGuildId))
@@ -39,7 +39,7 @@ namespace Nino.Commands
             if (project is null)
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
             
-            await db.Entry(project).Collection(p => p.Observers).LoadAsync();
+            await Nino.DataContext.Entry(project).Collection(p => p.Observers).LoadAsync();
 
             // Validate observer
             var observer = db.Observers.Where(o => o.GuildId == guildId).SingleOrDefault(o => o.GuildId == guildId && o.ProjectId == project.Id);
