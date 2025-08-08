@@ -8,12 +8,12 @@ public class ProjectCreateDto
     public required string Title;
     public required ProjectType Type;
     public required uint Length;
-    public required string PosterUri;
     public required bool IsPrivate;
     public required ulong UpdateChannelId;
     public required ulong ReleaseChannelId;
     public int AniListId;
     
+    public required string? PosterUri;
     public decimal? FirstEpisode;
     public ulong[]? AdministratorIds;
     public string[]? Aliases;

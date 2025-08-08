@@ -11,7 +11,6 @@ If you have multiple projects to create, or you have a template you use often, y
     Title: string,
     Type: "TV" | "Movie" | "BD" | "OVA" | "ONA",
     Length: uint,
-    PosterUri: string,
     IsPrivate: boolean,
     UpdateChannelId: ulong,
     ReleaseChannelId: ulong,
@@ -20,6 +19,7 @@ If you have multiple projects to create, or you have a template you use often, y
 	AniListId: int,
 
     // Optional fields
+    PosterUri: string,
     FirstEpisode: decimal,
     AdministratorIds: ulong[],
     Aliases: string[],

@@ -52,7 +52,7 @@ namespace Nino.Commands
                     break;
 
                 case ProjectEditOption.Poster:
-                    if (!Uri.TryCreate(newValue, UriKind.Absolute, out Uri? _))
+                    if (!Uri.TryCreate(newValue, UriKind.Absolute, out _))
                         return await Response.Fail(T("error.project.invalidPosterUrl", lng), interaction);
 
                     project.PosterUri = newValue;

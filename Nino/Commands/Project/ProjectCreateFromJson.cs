@@ -9,7 +9,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Nino.Records.Json;
 using Nino.Services;
-using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
 
 namespace Nino.Commands;
