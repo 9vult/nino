@@ -2,6 +2,7 @@
 using System.Text;
 using Discord;
 using Discord.Interactions;
+using Microsoft.EntityFrameworkCore;
 using Nino.Handlers;
 using Nino.Utilities;
 using NLog;
@@ -24,22 +25,33 @@ namespace Nino.Commands
             
             Log.Trace($"Displaying Stats for M[{interaction.User.Id} (@{interaction.User.Username})]");
             
-            var allowedOngoingProjects = db.Projects.Where(p => !p.IsArchived).Select(p => p.Id).ToList();
-            var archivedCount = db.Projects.Count(p => p.IsArchived);
+            var allowedOngoingProjects = await db.Projects.Where(p => !p.IsArchived).Select(p => p.Id).ToListAsync();
+            var archivedCount = await db.Projects.CountAsync(p => p.IsArchived);
             
-            var ongoing = db.Episodes.GroupBy(e => e.ProjectId)
-                .Where(g => g.Any(e => !e.Done) && allowedOngoingProjects.Contains(g.Key))
+            var ongoingList = await (
+                    from e in db.Episodes
+                    join unfinished in db.Episodes
+                        on e.ProjectId equals unfinished.ProjectId
+                    where allowedOngoingProjects.Contains(e.ProjectId)
+                          && !unfinished.Done
+                    select e
+                )
+                .Distinct()
+                .ToListAsync();
+            
+            var ongoing = ongoingList
+                .GroupBy(e => e.ProjectId)
                 .ToDictionary(g => g.Key, g => g.ToList());
             
-            var totalGuilds = db.Projects.GroupBy(p => p.GuildId).Count();
-            var totalProjects = db.Projects.Count();
+            var totalGuilds = await db.Projects.GroupBy(p => p.GuildId).CountAsync();
+            var totalProjects = await db.Projects.CountAsync();
             var ongoingProjects = ongoing.Count;
-            var totalEpisodes = db.Episodes.Count();
-            var totalDoneEpisodes = db.Episodes.Count(ep => ep.Done);
+            var totalEpisodes = await db.Episodes.CountAsync ();
+            var totalDoneEpisodes = await db.Episodes.CountAsync(ep => ep.Done);
             var ongoingProjectEpisodes = ongoing.Sum(kv => kv.Value.Count);
             var ongoingProjectDoneEpisodes = ongoing.Sum(kv => kv.Value.Count(ep => ep.Done));
-            var totalObservers = db.Observers.Count();
-            var uniqueObservers = db.Observers.GroupBy(o => o.ProjectId).Count();
+            var totalObservers = await db.Observers.CountAsync();
+            var uniqueObservers = await db.Observers.GroupBy(o => o.ProjectId).CountAsync();
             
             var totalDoneEpisodesPercent = Math.Round(totalDoneEpisodes / (decimal)totalEpisodes * 100.0m, 2);
             var totalDoneOngoingProjectEpisodesPercent = Math.Round(ongoingProjectDoneEpisodes / (decimal)ongoingProjectEpisodes * 100.0m, 2);
