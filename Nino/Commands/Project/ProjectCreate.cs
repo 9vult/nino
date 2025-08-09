@@ -57,7 +57,7 @@ namespace Nino.Commands
                 length ??= apiResponse.EpisodeCount;
                 type ??= apiResponse.Type;
                 
-                if (title is null || length is null)
+                if (title is null || length is null || length < 1)
                 {
                     return await Response.Fail(
                         T(apiResponse.Error ?? "error.anilist.create", lng),

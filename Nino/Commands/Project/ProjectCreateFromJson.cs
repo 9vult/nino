@@ -76,7 +76,7 @@ public partial class ProjectManagement
             template.Length ??= apiResponse.EpisodeCount;
             template.Type ??= apiResponse.Type;
                 
-            if (template.Title is null || template.Length is null)
+            if (template.Title is null || template.Length is null || template.Length < 1)
             {
                 return await Response.Fail(
                     T(apiResponse.Error ?? "error.anilist.create", lng),
