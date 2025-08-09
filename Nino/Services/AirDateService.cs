@@ -5,10 +5,10 @@ namespace Nino.Services
 {
     internal static class AirDateService
     {
-        private static readonly Logger log = LogManager.GetCurrentClassLogger();
-        private const string LANG = "en-US";
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+        private const string Lang = "en-US";
 
-        public static async Task<string> GetAirDateString(int aniListId, decimal episodeNumber, string lng = LANG)
+        public static async Task<string> GetAirDateString(int aniListId, decimal episodeNumber, string lng = Lang)
         {
             try
             {

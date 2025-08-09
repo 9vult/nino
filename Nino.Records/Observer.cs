@@ -5,7 +5,7 @@ namespace Nino.Records;
 public class Observer
 {
     [Key]
-    public required Guid Id { get; set; }
+    public Guid Id { get; set; }
     public required ulong GuildId { get; set; }
     public required ulong OriginGuildId { get; set; }
     public required ulong OwnerId { get; set; }

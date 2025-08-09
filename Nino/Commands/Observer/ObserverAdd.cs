@@ -32,7 +32,7 @@ namespace Nino.Commands
             // Check for guild administrator status
             var guild = Nino.Client.GetGuild(guildId);
             var member = guild.GetUser(interaction.User.Id);
-            if (!Utils.VerifyAdministrator(member, guild)) return await Response.Fail(T("error.notPrivileged", lng), interaction);
+            if (!Utils.VerifyAdministrator(db, member, guild)) return await Response.Fail(T("error.notPrivileged", lng), interaction);
 
             // Validate no-op condition
             if (!blame && updatesUrl is null && releasesUrl is null)
@@ -59,31 +59,39 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
             // Fake project existence if private
-            if (project.IsPrivate && !project.VerifyUser(interaction.User.Id))
+            if (project.IsPrivate && !project.VerifyUser(db, interaction.User.Id))
                 return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
             
-            await Nino.DataContext.Entry(project).Collection(p => p.Observers).LoadAsync();
+            await db.Entry(project).Collection(p => p.Observers).LoadAsync();
 
             // Use existing observer ID, if it exists
-            var observerId = db.Observers.Where(o => o.GuildId == guildId)
-                .FirstOrDefault(o => o.OriginGuildId == originGuildId && o.ProjectId == project.Id)
-                ?.Id ?? Guid.Empty;
 
-            var observer = new Records.Observer
+            var observer = db.Observers.Where(o => o.GuildId == guildId)
+                .FirstOrDefault(o => o.OriginGuildId == originGuildId && o.ProjectId == project.Id);
+
+            if (observer is null)
             {
-                Id = observerId,
-                GuildId = guildId,
-                OriginGuildId = project.GuildId,
-                ProjectId = project.Id,
-                OwnerId = interaction.User.Id,
-                Blame = blame,
-                ProgressWebhook = updatesUrl,
-                ReleasesWebhook = releasesUrl,
-                RoleId = roleId
-            };
-
-            // Add to database
-            await db.Observers.AddAsync(observer);
+                observer = new Records.Observer
+                {
+                    GuildId = guildId,
+                    OriginGuildId = project.GuildId,
+                    ProjectId = project.Id,
+                    OwnerId = interaction.User.Id,
+                    Blame = blame,
+                    ProgressWebhook = updatesUrl,
+                    ReleasesWebhook = releasesUrl,
+                    RoleId = roleId
+                };
+                // Add to database
+                await db.Observers.AddAsync(observer);
+            }
+            else
+            {
+                observer.Blame = blame;
+                observer.ProgressWebhook = updatesUrl;
+                observer.ReleasesWebhook = releasesUrl;
+                observer.RoleId = roleId;
+            }
 
             Log.Info($"M[{interaction.User.Id} (@{interaction.User.Username})] created new observer {observer.Id} from {guildId} observing {project}");
 

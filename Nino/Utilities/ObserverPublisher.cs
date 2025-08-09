@@ -21,7 +21,7 @@ namespace Nino.Utilities
         /// <returns></returns>
         public static async Task PublishProgress(Records.Project project, Embed embed, DataContext db)
         {
-            await Nino.DataContext.Entry(project).Collection(p => p.Observers).LoadAsync();
+            await db.Entry(project).Collection(p => p.Observers).LoadAsync();
             var observers = project.Observers;
             if (observers.Count != 0)
             {
@@ -69,10 +69,11 @@ namespace Nino.Utilities
         /// <param name="project">Project being released</param>
         /// <param name="publishTitle">Title</param>
         /// <param name="releaseUrl">Release URL(s)</param>
+        /// <param name="db">DataContext</param>
         /// <returns></returns>
         public static async Task PublishRelease(Records.Project project, string publishTitle, string releaseUrl, DataContext db)
         {
-            await Nino.DataContext.Entry(project).Collection(p => p.Observers).LoadAsync();
+            await db.Entry(project).Collection(p => p.Observers).LoadAsync();
             var observers = project.Observers;
             if (observers.Count != 0)
             {
