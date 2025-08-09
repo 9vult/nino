@@ -39,7 +39,7 @@ public class BlameAll(DataContext db, InteractiveService interactive) : Interact
             return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
         
         // Restrict display of pseudo-tasks to Key Staff
-        if (includePseudo && !project.VerifyUser(db, interaction.User.Id, includeKeyStaff: true))
+        if (includePseudo && !project.VerifyUser(db, interaction.User.Id, includeStaff: true))
             includePseudo = false;
             
         Log.Trace($"Blame All-ing {project} for M[{interaction.User.Id} (@{interaction.User.Username})]");

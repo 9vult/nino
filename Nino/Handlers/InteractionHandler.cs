@@ -1,6 +1,7 @@
 using System.Reflection;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using NLog;
 
 using static Localizer.Localizer;

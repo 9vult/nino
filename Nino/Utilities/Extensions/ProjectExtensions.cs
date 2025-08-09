@@ -29,14 +29,14 @@ public static class ProjectExtensions
     /// <param name="db">DataContext</param>
     /// <param name="userId">ID of the user to check</param>
     /// <param name="excludeAdmins">Should administrators be excluded?</param>
-    /// <param name="includeKeyStaff">Should Key Staff be included?</param>
+    /// <param name="includeStaff">Should Staff be included?</param>
     /// <returns>True if the user has sufficient permissions</returns>
     public static bool VerifyUser(
         this Project project,
         DataContext db,
         ulong userId,
         bool excludeAdmins = false,
-        bool includeKeyStaff = false
+        bool includeStaff = false
     )
     {
         if (project.OwnerId == userId)
@@ -47,15 +47,17 @@ public static class ProjectExtensions
             if (project.Administrators.Any(a => a.UserId == userId))
                 return true;
 
-            if (
-                db.GetConfig(project.GuildId)
-                    ?.Administrators.Any(a => a.UserId == userId) ?? false
-            )
+            if (db.GetConfig(project.GuildId)?.Administrators.Any(a => a.UserId == userId) ?? false)
                 return true;
         }
 
-        if (!includeKeyStaff)
+        if (!includeStaff)
             return false;
-        return project.KeyStaff.Any(ks => ks.UserId == userId);
+        
+        return project.KeyStaff.Any(s => s.UserId == userId)
+            || project.Episodes.Any(e =>
+                e.AdditionalStaff.Any(s => s.UserId == userId)
+                || e.PinchHitters.Any(p => p.UserId == userId)
+            );
     }
 }

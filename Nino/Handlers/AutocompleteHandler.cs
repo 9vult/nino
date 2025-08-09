@@ -3,6 +3,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Localizer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using NaturalSort.Extension;
 using Nino.Records;
 using Nino.Utilities.Extensions;
@@ -13,7 +14,7 @@ namespace Nino.Handlers
     /// <summary>
     /// Autocompletion for project names/aliases
     /// </summary>
-    public class ProjectAutocompleteHandler(DataContext db) : AutocompleteHandler
+    public class ProjectAutocompleteHandler : AutocompleteHandler
     {
         public override async Task<AutocompletionResult> GenerateSuggestionsAsync(
             IInteractionContext context,
@@ -28,6 +29,8 @@ namespace Nino.Handlers
             var guildId = interaction.GuildId ?? 0;
             var userId = interaction.User.Id;
 
+            var db = services.GetRequiredService<DataContext>();
+            
             var includeObservers = commandName is "blame" or "blameall";
             var includeArchived =
                 includeObservers || interaction.Data.Options.FirstOrDefault()?.Name == "delete";
@@ -55,6 +58,10 @@ namespace Nino.Handlers
                     || p.OwnerId == userId
                     || p.Administrators.Any(a => a.UserId == userId)
                     || p.KeyStaff.Any(s => s.UserId == userId)
+                    || p.Episodes.Any(e =>
+                        e.AdditionalStaff.Any(s => s.UserId == userId)
+                        || e.PinchHitters.Any(h => h.UserId == userId)
+                    )
                 );
             }
 
@@ -79,7 +86,7 @@ namespace Nino.Handlers
     /// <summary>
     /// Autocompletion for episode numbers
     /// </summary>
-    public class EpisodeAutocompleteHandler(DataContext db) : AutocompleteHandler
+    public class EpisodeAutocompleteHandler : AutocompleteHandler
     {
         public override async Task<AutocompletionResult> GenerateSuggestionsAsync(
             IInteractionContext context,
@@ -93,7 +100,8 @@ namespace Nino.Handlers
             var includeObservers = commandName is "blame" or "blameall";
             var focusedOption = interaction.Data.Current;
             var guildId = interaction.GuildId ?? 0;
-            var userId = interaction.User.Id;
+            
+            var db = services.GetRequiredService<DataContext>();
 
             List<AutocompleteResult> choices = [];
             var alias = (
@@ -125,7 +133,7 @@ namespace Nino.Handlers
     /// <summary>
     /// Autocompletion for task abbreviations
     /// </summary>
-    public class AbbreviationAutocompleteHandler(DataContext db) : AutocompleteHandler
+    public class AbbreviationAutocompleteHandler : AutocompleteHandler
     {
         public override async Task<AutocompletionResult> GenerateSuggestionsAsync(
             IInteractionContext context,
@@ -136,6 +144,8 @@ namespace Nino.Handlers
         {
             var interaction = (SocketAutocompleteInteraction)context.Interaction;
             var focusedOption = interaction.Data.Current;
+            
+            var db = services.GetRequiredService<DataContext>();
 
             List<AutocompleteResult> choices = [];
             var alias = (
@@ -198,7 +208,7 @@ namespace Nino.Handlers
     /// <summary>
     /// Autocompletion for Key Staff
     /// </summary>
-    public class KeyStaffAutocompleteHandler(DataContext db) : AutocompleteHandler
+    public class KeyStaffAutocompleteHandler : AutocompleteHandler
     {
         public override async Task<AutocompletionResult> GenerateSuggestionsAsync(
             IInteractionContext context,
@@ -209,6 +219,8 @@ namespace Nino.Handlers
         {
             var interaction = (SocketAutocompleteInteraction)context.Interaction;
             var focusedOption = interaction.Data.Current;
+            
+            var db = services.GetRequiredService<DataContext>();
 
             List<AutocompleteResult> choices = [];
             var alias = (
@@ -240,7 +252,7 @@ namespace Nino.Handlers
     /// <summary>
     /// Autocompletion for Additional Staff
     /// </summary>
-    public class AdditionalStaffAutocompleteHandler(DataContext db) : AutocompleteHandler
+    public class AdditionalStaffAutocompleteHandler : AutocompleteHandler
     {
         public override async Task<AutocompletionResult> GenerateSuggestionsAsync(
             IInteractionContext context,
@@ -251,6 +263,8 @@ namespace Nino.Handlers
         {
             var interaction = (SocketAutocompleteInteraction)context.Interaction;
             var focusedOption = interaction.Data.Current;
+            
+            var db = services.GetRequiredService<DataContext>();
 
             List<AutocompleteResult> choices = [];
             var alias = (
@@ -270,7 +284,7 @@ namespace Nino.Handlers
             if (episode is null)
                 return AutocompletionResult.FromSuccess([]);
 
-            var value = ((string)focusedOption.Value);
+            var value = (string)focusedOption.Value;
             // Return list of additional staff
             choices.AddRange(
                 episode
@@ -289,7 +303,7 @@ namespace Nino.Handlers
     /// <summary>
     /// Autocompletion for Conga participants
     /// </summary>
-    public class CongaNodesAutocompleteHandler(DataContext db) : AutocompleteHandler
+    public class CongaNodesAutocompleteHandler : AutocompleteHandler
     {
         public override async Task<AutocompletionResult> GenerateSuggestionsAsync(
             IInteractionContext context,
@@ -301,6 +315,8 @@ namespace Nino.Handlers
             var interaction = (SocketAutocompleteInteraction)context.Interaction;
             var focusedOption = interaction.Data.Current;
             var userId = interaction.User.Id;
+            
+            var db = services.GetRequiredService<DataContext>();
 
             List<AutocompleteResult> choices = [];
             var alias = (
@@ -310,9 +326,7 @@ namespace Nino.Handlers
                 return AutocompletionResult.FromSuccess([]);
 
             var project = await db.ResolveAlias(alias, interaction);
-            if (project is null)
-                return AutocompletionResult.FromSuccess([]);
-            if (!project.VerifyUser(db, userId))
+            if (project is null || !project.VerifyUser(db, userId))
                 return AutocompletionResult.FromSuccess([]);
 
             // Return list of conga participants
@@ -333,7 +347,7 @@ namespace Nino.Handlers
     /// <summary>
     /// Autocompletion for Current Conga targets
     /// </summary>
-    public class CongaCurrentAutocompleteHandler(DataContext db) : AutocompleteHandler
+    public class CongaCurrentAutocompleteHandler : AutocompleteHandler
     {
         public override async Task<AutocompletionResult> GenerateSuggestionsAsync(
             IInteractionContext context,
@@ -345,6 +359,8 @@ namespace Nino.Handlers
             var interaction = (SocketAutocompleteInteraction)context.Interaction;
             var focusedOption = interaction.Data.Current;
             var userId = interaction.User.Id;
+            
+            var db = services.GetRequiredService<DataContext>();
 
             List<AutocompleteResult> choices = [];
             var alias = (
@@ -354,9 +370,7 @@ namespace Nino.Handlers
                 return AutocompletionResult.FromSuccess([]);
 
             var project = await db.ResolveAlias(alias, interaction);
-            if (project is null)
-                return AutocompletionResult.FromSuccess([]);
-            if (!project.VerifyUser(db, userId))
+            if (project is null || !project.VerifyUser(db, userId))
                 return AutocompletionResult.FromSuccess([]);
 
             // Generate list of targets
@@ -382,7 +396,7 @@ namespace Nino.Handlers
     /// <summary>
     /// Autocompletion for Next Conga targets
     /// </summary>
-    public class CongaNextAutocompleteHandler(DataContext db) : AutocompleteHandler
+    public class CongaNextAutocompleteHandler : AutocompleteHandler
     {
         public override async Task<AutocompletionResult> GenerateSuggestionsAsync(
             IInteractionContext context,
@@ -394,6 +408,8 @@ namespace Nino.Handlers
             var interaction = (SocketAutocompleteInteraction)context.Interaction;
             var focusedOption = interaction.Data.Current;
             var userId = interaction.User.Id;
+            
+            var db = services.GetRequiredService<DataContext>();
 
             List<AutocompleteResult> choices = [];
             var alias = (
@@ -403,9 +419,7 @@ namespace Nino.Handlers
                 return AutocompletionResult.FromSuccess([]);
 
             var project = await db.ResolveAlias(alias, interaction);
-            if (project is null)
-                return AutocompletionResult.FromSuccess([]);
-            if (!project.VerifyUser(db, userId))
+            if (project is null || !project.VerifyUser(db, userId))
                 return AutocompletionResult.FromSuccess([]);
 
             // Generate list of targets

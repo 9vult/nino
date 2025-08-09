@@ -33,7 +33,7 @@ public class Roster(DataContext db) : InteractionModuleBase<SocketInteractionCon
         if (project is null)
             return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
-        if (!project.VerifyUser(db, interaction.User.Id, includeKeyStaff: true))
+        if (!project.VerifyUser(db, interaction.User.Id, includeStaff: true))
             return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
         // Verify episode

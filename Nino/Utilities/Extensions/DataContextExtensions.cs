@@ -29,19 +29,25 @@ public static class DataContextExtensions
     {
         var guildId = observingGuildId ?? interaction.GuildId;
 
-        var result = await db.Projects
-            .Include(p => p.Episodes)
+        var result = await db
+            .Projects.Include(p => p.Episodes)
             .Where(p =>
                 p.GuildId == guildId
                 || (includeObservers && p.Observers.Any(o => o.GuildId == guildId))
             )
-            .FirstOrDefaultAsync(p =>
-                p.Nickname == query ||
-                p.Aliases.Any(a => a.Value == query)
-            );
+            .FirstOrDefaultAsync(p => p.Nickname == query || p.Aliases.Any(a => a.Value == query));
 
         Log.Trace($"Resolved alias {query} to {result?.ToString() ?? "<resolution failed>"}");
-        return result;
+
+        if (!result?.IsPrivate ?? true)
+            return result;
+        
+        // Verify the user has permission to view the project
+        if (result.VerifyUser(db, interaction.User.Id, includeStaff: true))
+            return result;
+        
+        Log.Trace($"Query for {result} rejected due to insufficient permissions");
+        return null;
     }
 
     public static Configuration? GetConfig(this DataContext db, ulong guildId)
@@ -58,7 +64,10 @@ public static class DataContextExtensions
         catch (Exception ex)
         {
             Log.Error(ex);
-            await Response.Fail($"Your changes were not saved:\n{ex.Message}\n\nPlease report this to <@{Nino.Config.OwnerId}>!", interaction);
+            await Response.Fail(
+                $"Your changes were not saved:\n{ex.Message}\n\nPlease report this to <@{Nino.Config.OwnerId}>!",
+                interaction
+            );
         }
     }
 }
