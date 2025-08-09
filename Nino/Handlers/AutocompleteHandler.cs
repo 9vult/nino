@@ -89,7 +89,11 @@ namespace Nino.Handlers
         )
         {
             var interaction = (SocketAutocompleteInteraction)context.Interaction;
+            var commandName = interaction.Data.CommandName;
+            var includeObservers = commandName is "blame" or "blameall";
             var focusedOption = interaction.Data.Current;
+            var guildId = interaction.GuildId ?? 0;
+            var userId = interaction.User.Id;
 
             List<AutocompleteResult> choices = [];
             var alias = (
@@ -98,7 +102,7 @@ namespace Nino.Handlers
             if (alias is null)
                 return AutocompletionResult.FromSuccess([]);
 
-            var project = await db.ResolveAlias(alias, interaction);
+            var project = await db.ResolveAlias(alias, interaction, observingGuildId: guildId, includeObservers);
             if (project is null)
                 return AutocompletionResult.FromSuccess([]);
 
