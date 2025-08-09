@@ -68,7 +68,7 @@ namespace Nino
             var projectCount = db.Projects.Count();
             var episodeCount = db.Episodes.Count();
             var guildCount = db.Projects.GroupBy(p => p.GuildId).Count();
-            
+
             Log.Info(
                 $"Database initialized with {projectCount} projects ({episodeCount} episodes) from {guildCount} guilds"
             );
@@ -95,7 +95,7 @@ namespace Nino
             Config =
                 configBuilder.GetRequiredSection("Configuration").Get<AppConfig?>()
                 ?? throw new Exception("Missing appsettings.json!");
-            
+
             _cmdLineOptions = Parser.Default.ParseArguments<CmdLineOptions>(args).Value;
             AniListService.AniListEnabled = !_cmdLineOptions.DisableAniList;
 
@@ -109,7 +109,7 @@ namespace Nino
 
             // Load localization files
             LoadLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/str")));
-            
+
             // Initialize database
             await InitializeDatabase();
 

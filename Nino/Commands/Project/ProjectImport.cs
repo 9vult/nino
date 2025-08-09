@@ -35,7 +35,7 @@ namespace Nino.Commands
             
             try
             {
-                Log.Trace($"Attempting to get and parse JSON...");
+                Log.Trace("Attempting to get and parse JSON...");
                 using var client = new HttpClient();
                 import = await client.GetFromJsonAsync<Export>(file.Url, new JsonSerializerOptions
                 {
@@ -46,15 +46,15 @@ namespace Nino.Commands
 
                 if (import is null)
                 {
-                    Log.Trace($"Project import failed (null)");
+                    Log.Trace("Project import failed (null)");
                     return await Response.Fail(T("error.generic", lng), interaction);
                 }
-                Log.Trace($"Getting and parsing JSON successful!");
+                Log.Trace("Getting and parsing JSON successful!");
             }
             catch (Exception e)
             {
                 Log.Error(e);
-                Log.Trace($"Project creation from json file failed");
+                Log.Trace("Project creation from json file failed");
                 return await Response.Fail(e.Message, interaction);
             }
             

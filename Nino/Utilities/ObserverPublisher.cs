@@ -47,7 +47,7 @@ namespace Nino.Utilities
                     {
                         Log.Error($"Progress webhook for observer {observer.Id} Not Found (404)!");
                         var guild = Nino.Client.GetGuild(observer.OriginGuildId);
-                        await Utils.AlertError($"An error occured while publishing to your observer: `404 NOT FOUND`. Your observer has been deleted to comply with Discord rate-limiting guidelines.", guild, project.Nickname, observer.OwnerId, "Observer/Progress");
+                        await Utils.AlertError("An error occured while publishing to your observer: `404 NOT FOUND`. Your observer has been deleted to comply with Discord rate-limiting guidelines.", guild, project.Nickname, observer.OwnerId, "Observer/Progress");
 
                         db.Observers.Remove(observer);
                         Log.Info($"Deleted observer {observer.Id} from {observer.OriginGuildId}");
@@ -102,7 +102,7 @@ namespace Nino.Utilities
                     {
                         Log.Error($"Releases webhook for observer {observer.Id} Not Found (404)!");
                         var guild = Nino.Client.GetGuild(observer.OriginGuildId);
-                        await Utils.AlertError($"An error occured while publishing to your observer: `404 NOT FOUND`. Your observer has been deleted to comply with Discord rate-limiting guidelines.", guild, project.Nickname, observer.OwnerId, "Observer/Releases");
+                        await Utils.AlertError("An error occured while publishing to your observer: `404 NOT FOUND`. Your observer has been deleted to comply with Discord rate-limiting guidelines.", guild, project.Nickname, observer.OwnerId, "Observer/Releases");
                         
                         db.Observers.Remove(observer);
                         Log.Info($"Deleted observer {observer.Id} from {observer.OriginGuildId}");

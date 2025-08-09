@@ -101,8 +101,8 @@ namespace Nino.Services
                 {
                     Error =
                         response.StatusCode == HttpStatusCode.NotFound
-                            ? $"error.anilist.404"
-                            : $"error.anilist.generic",
+                            ? "error.anilist.404"
+                            : "error.anilist.generic",
                 };
 
             }
@@ -126,7 +126,7 @@ namespace Nino.Services
             {
                 Log.Error($"Error getting Start Date for AniListId: {anilistId}");
                 Log.Error(e.Message);
-                return new ApiResponse { Error = $"error.anilist.generic" };
+                return new ApiResponse { Error = "error.anilist.generic" };
             }
         }
 

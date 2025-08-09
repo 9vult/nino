@@ -35,7 +35,7 @@ public partial class ProjectManagement
         ProjectCreateDto? template;
         try
         {
-            Log.Trace($"Attempting to get and parse JSON...");
+            Log.Trace("Attempting to get and parse JSON...");
             using var client = new HttpClient();
             template = await client.GetFromJsonAsync<ProjectCreateDto>(file.Url, new JsonSerializerOptions
             {
@@ -46,17 +46,17 @@ public partial class ProjectManagement
 
             if (template is null)
             {
-                Log.Trace($"Project creation from json file failed (null)");
+                Log.Trace("Project creation from json file failed (null)");
                 return await Response.Fail(T("error.generic", lng), interaction);
             }
 
-            template.FirstEpisode = template.FirstEpisode ?? 1;
-            Log.Trace($"Getting and parsing JSON successful!");
+            template.FirstEpisode ??= 1;
+            Log.Trace("Getting and parsing JSON successful!");
         }
         catch (Exception e)
         {
             Log.Error(e);
-            Log.Trace($"Project creation from json file failed");
+            Log.Trace("Project creation from json file failed");
             return await Response.Fail(e.Message, interaction);
         }
             
