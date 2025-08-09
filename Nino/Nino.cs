@@ -45,18 +45,6 @@ namespace Nino
             _services = new ServiceCollection()
                 .AddEntityFrameworkSqlite()
                 .AddDbContext<DataContext>()
-                .AddSingleton(Config)
-                .AddSingleton(_cmdLineOptions)
-                .AddSingleton(SocketConfig)
-                .AddSingleton<DiscordSocketClient>()
-                .AddSingleton(x => new InteractionService(
-                    x.GetRequiredService<DiscordSocketClient>(),
-                    InteractionServiceConfig
-                ))
-                .AddSingleton<InteractionHandler>()
-                .AddSingleton<InteractiveService>()
-                .AddSingleton<ReleaseReminderService>()
-                .AddSingleton<CongaReminderService>()
                 .BuildServiceProvider();
         }
 
@@ -74,47 +62,21 @@ namespace Nino
             );
         }
 
-        private static async Task InitializeDiscordClient()
-        {
-            var client = _services!.GetRequiredService<DiscordSocketClient>();
-            client.Log += LogHandler.Log;
-            await _services!.GetRequiredService<InteractionHandler>().InitializeAsync();
-            await client.LoginAsync(TokenType.Bot, Config.DiscordApiToken);
-            await client.StartAsync();
-        }
-
         public static async Task Main(string[] args)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             Console.OutputEncoding = Encoding.UTF8;
             LogHandler.SetupLogger();
-            Log.Info($"Starting Nino {Utils.Version}");
-
-            // Read in environment variables and cmd-line options
-            var configBuilder = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
-            Config =
-                configBuilder.GetRequiredSection("Configuration").Get<AppConfig?>()
-                ?? throw new Exception("Missing appsettings.json!");
-
-            _cmdLineOptions = Parser.Default.ParseArguments<CmdLineOptions>(args).Value;
-            AniListService.AniListEnabled = !_cmdLineOptions.DisableAniList;
+            Log.Info($"Starting Nino Migration Utility {Utils.Version}");
 
             // Configure DI
             ConfigureServices();
 
-            // Start required background services
-            if (!AniListService.AniListEnabled)
-                _ = _services!.GetRequiredService<ReleaseReminderService>();
-            _ = _services!.GetRequiredService<CongaReminderService>();
-
-            // Load localization files
-            LoadLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/str")));
-
             // Initialize database
             await InitializeDatabase();
-
-            // Initialize Discord client
-            await InitializeDiscordClient();
+            
+            var m = new Migrator(_services!.GetRequiredService<DataContext>());
+            await m.Migrate();
 
             await Task.Delay(-1);
         }
