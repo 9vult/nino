@@ -148,6 +148,8 @@ public class DataContext : DbContext
 
         modelBuilder.Entity<Configuration>(entity =>
         {
+            entity.Property(o => o.GuildId).HasConversion(UlongStringConverter);
+            
             entity.OwnsMany(
                 c => c.Administrators,
                 b =>
