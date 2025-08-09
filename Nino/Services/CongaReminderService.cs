@@ -66,7 +66,7 @@ namespace Nino.Services
 
                         // Update database with new last-reminded time
                         var task = episode.Tasks.Single(t => t.Abbreviation == abbreviation);
-                        task.LastReminded = DateTime.UtcNow;
+                        task.LastReminded = DateTimeOffset.UtcNow;
                     }
                 }
 

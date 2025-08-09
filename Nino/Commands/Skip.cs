@@ -79,9 +79,9 @@ public partial class Skip(DataContext db, InteractiveService interactive) : Inte
             .First(ks => ks.Role.Abbreviation == abbreviation);
 
         task.Done = true;
-        task.Updated = DateTime.UtcNow;
+        task.Updated = DateTimeOffset.UtcNow;
         episode.Done = episodeDone;
-        episode.Updated = DateTime.UtcNow;
+        episode.Updated = DateTimeOffset.UtcNow;
 
         var taskTitle = staff.Role.Name;
         var title = T("title.progress", gLng, episodeNumber);
@@ -195,7 +195,7 @@ public partial class Skip(DataContext db, InteractiveService interactive) : Inte
                 // Update database with new last-reminded time
                 var congaTask = episode.Tasks.FirstOrDefault(t => t.Abbreviation == nextTask.Role.Abbreviation);
                 if (congaTask is not null)
-                    congaTask.LastReminded = DateTime.UtcNow;
+                    congaTask.LastReminded = DateTimeOffset.UtcNow;
             }
                 
             if (congaContent.Length > 0)

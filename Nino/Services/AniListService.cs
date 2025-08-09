@@ -41,7 +41,7 @@ namespace Nino.Services
             // Check if it's in the RAM cache
             if (RamCache.TryGetValue(anilistId, out var ramValue))
             {
-                if (DateTime.UtcNow - ramValue.SaveDate.ToUniversalTime() < OneDay)
+                if (DateTimeOffset.UtcNow - ramValue.SaveDate.ToUniversalTime() < OneDay)
                     return ramValue;
             }
             
@@ -54,7 +54,7 @@ namespace Nino.Services
             {
                 // Check if the file exists and is younger than a day old
                 var fileInfo = new FileInfo(filename);
-                if (fileInfo.Exists && (DateTime.UtcNow - fileInfo.LastWriteTimeUtc < OneDay))
+                if (fileInfo.Exists && (DateTimeOffset.UtcNow - fileInfo.LastWriteTimeUtc < OneDay))
                 {
                     // Use the cached version
                     await using var stream = File.OpenRead(filename);
@@ -91,7 +91,7 @@ namespace Nino.Services
                     await using var stream = File.OpenWrite(filename);
                     await JsonSerializer.SerializeAsync(stream, apiResponse);
                     
-                    apiResponse.SaveDate = DateTime.UtcNow;
+                    apiResponse.SaveDate = DateTimeOffset.UtcNow;
                     RamCache[anilistId] = apiResponse;
                     return apiResponse;
                 }
@@ -179,13 +179,13 @@ namespace Nino.Services
         [JsonIgnore]
         public List<AiringScheduleNode>? Episodes => Data?.Media?.AiringSchedule?.Nodes;
         [JsonIgnore]
-        public DateTime? StartDate => Data?.Media?.StartDate;
+        public DateTimeOffset? StartDate => Data?.Media?.StartDate;
         [JsonIgnore]
         public int? Duration => Data?.Media?.Duration; 
         [JsonIgnore]
         public string? Error { get; set; }
         [JsonIgnore]
-        public DateTime SaveDate { get; set; }
+        public DateTimeOffset SaveDate { get; set; }
 
         [JsonIgnore]
         public int? EpisodeCount => Data?.Media?.Episodes;
@@ -217,7 +217,7 @@ namespace Nino.Services
         public AiringSchedule? AiringSchedule { get; set; }
 
         [JsonConverter(typeof(StartDateConverter))]
-        public DateTime StartDate { get; set; }
+        public DateTimeOffset StartDate { get; set; }
         public int? Duration { get; set; }
         public int? Episodes { get; set; }
         public string? Format { get; set; }

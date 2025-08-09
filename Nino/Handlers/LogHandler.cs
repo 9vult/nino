@@ -44,7 +44,7 @@ namespace Nino.Handlers
             var fileTarget = new FileTarget("logfile")
             {
                 Layout = "${longdate} [${level}] ${message}",
-                FileName = Path.Combine("logs", $"{DateTime.Now:yyyy-MM-dd}.log")
+                FileName = Path.Combine("logs", $"{DateTimeOffset.Now:yyyy-MM-dd}.log")
             };
 
             config.AddTarget(consoleTarget);

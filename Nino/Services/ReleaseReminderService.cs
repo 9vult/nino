@@ -45,7 +45,7 @@ namespace Nino.Services
                     try
                     {
                         var airTime = await AirDateService.GetAirDate((int)project.AniListId!, decimalNumber + (project.AniListOffset ?? 0));
-                        if (airTime is null || DateTime.UtcNow < airTime)
+                        if (airTime is null || DateTimeOffset.UtcNow < airTime)
                             continue;
 
                         if (await Nino.Client.GetChannelAsync((ulong)project.AirReminderChannelId!) is not SocketTextChannel channel) continue;
@@ -130,7 +130,7 @@ namespace Nino.Services
                              .Select(n => episode.Tasks.FirstOrDefault(t => t.Abbreviation == n.Abbreviation))
                              .Where(t => t is not null))
                 {
-                    task!.LastReminded = DateTime.UtcNow;
+                    task!.LastReminded = DateTimeOffset.UtcNow;
                 }
                 
                 // Time to send the conga message

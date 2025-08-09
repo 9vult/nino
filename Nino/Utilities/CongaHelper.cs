@@ -37,7 +37,7 @@ public static class CongaHelper
             
             // Add to the list if the task is indeed tardy
             if (!taskLookup.TryGetValue(nextTask, out var candidate) || candidate.LastReminded is null) continue;
-            if (candidate.LastReminded?.AddMinutes(-2) < DateTime.UtcNow - project.CongaReminderPeriod)
+            if (candidate.LastReminded?.AddMinutes(-2) < DateTimeOffset.UtcNow - project.CongaReminderPeriod)
                 nextTasks.Add(nextTask);
         }
         

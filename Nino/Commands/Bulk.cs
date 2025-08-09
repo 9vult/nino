@@ -96,7 +96,7 @@ public partial class Bulk(DataContext db, InteractiveService interactive) : Inte
 
             task.Done = isDone;
             episode.Done = episodeDone;
-            episode.Updated = DateTime.UtcNow;
+            episode.Updated = DateTimeOffset.UtcNow;
         }
         
         var staff = project.KeyStaff.Concat(startEpisode.AdditionalStaff).First(ks => ks.Role.Abbreviation == abbreviation);
@@ -238,7 +238,7 @@ public partial class Bulk(DataContext db, InteractiveService interactive) : Inte
             
             var task = episode.Tasks.FirstOrDefault(t => t.Abbreviation == nextTask.Role.Abbreviation);
             if (task is not null)
-                task.LastReminded = DateTime.UtcNow;
+                task.LastReminded = DateTimeOffset.UtcNow;
         }
             
         return congaContent.ToString();
