@@ -3,6 +3,7 @@ using Discord.Interactions;
 using Fergun.Interactive;
 using Fergun.Interactive.Pagination;
 using Localizer;
+using Microsoft.EntityFrameworkCore;
 using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Services;
@@ -36,11 +37,12 @@ public class AtMe(DataContext db, InteractiveService interactive) : InteractionM
         
         var episodeCandidates = new Dictionary<Project, List<Episode>>();
 
-        var projectCandidates = db.Projects
+        var projectCandidates = await db.Projects
+            .Include(p => p.Episodes)
             .WhereIf(!global, p => p.GuildId == interaction.GuildId)
             .WhereIf(!displayPrivate, p => !p.IsPrivate)
             .Where(p => !p.IsArchived)
-            .ToList();
+            .ToListAsync();
 
         // Fuzzy filter project names
         if (filter is not null)
