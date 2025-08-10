@@ -50,6 +50,14 @@ namespace Nino.Commands
                     interaction
                 );
 
+            var defaultFieldNames = string.Join(", ", new[] { nameof(title), nameof(length), nameof(type), nameof(posterUri) }
+                .Zip(new object?[] { title, length, type, posterUri })
+                .Where(p => p.Second is null)
+                .Select(p => p.First));
+            
+            if (defaultFieldNames.Length > 0)
+                Log.Info($"AniList will be used in the construction of project '{nickname}' for the following fields: {defaultFieldNames}");
+
             var apiResponse = await AniListService.Get(aniListId);
             if (apiResponse is not null && apiResponse.Error is null)
             {
@@ -75,7 +83,7 @@ namespace Nino.Commands
 
             if (posterUri is null || !Uri.TryCreate(posterUri, UriKind.Absolute, out _))
             {
-                posterUri = apiResponse?.CoverImage ?? AniListService.FallbackPosterUri;
+                posterUri = apiResponse.CoverImage ?? AniListService.FallbackPosterUri;
             }
 
             // Populate data
@@ -118,10 +126,6 @@ namespace Nino.Commands
                 );
             }
 
-            Log.Info(
-                $"Creating project {projectData} for M[{ownerId} (@{member.Username})] with {episodes.Count} episodes, starting with episode {firstEpisode}"
-            );
-
             // Add project and episodes to database
             await db.Projects.AddAsync(projectData);
             await db.Episodes.AddRangeAsync(episodes);
@@ -132,6 +136,10 @@ namespace Nino.Commands
                 Log.Info($"Creating default configuration for guild {guildId}");
                 await db.Configurations.AddAsync(Configuration.CreateDefault(guildId));
             }
+            
+            Log.Info(
+                $"Creating project {projectData} for M[{ownerId} (@{member.Username})] with {episodes.Count} episodes, starting with episode {firstEpisode}"
+            );
 
             var builder = new StringBuilder();
             builder.AppendLine(T("project.created", lng, nickname));

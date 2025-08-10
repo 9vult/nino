@@ -68,6 +68,14 @@ public partial class ProjectManagement
         // Verify data
         if (db.Projects.Any(p => p.GuildId == guildId && p.Nickname == template.Nickname))
             return await Response.Fail(T("error.project.nameInUse", lng, template.Nickname), interaction);
+        
+        var defaultFieldNames = string.Join(", ", new[] { nameof(template.Title), nameof(template.Length), nameof(template.Type), nameof(template.PosterUri) }
+            .Zip(new object?[] { template.Title, template.Length, template.Type, template.PosterUri })
+            .Where(p => p.Second is null)
+            .Select(p => p.First));
+            
+        if (defaultFieldNames.Length > 0)
+            Log.Info($"AniList will be used in the construction of project '{template.Nickname}' for the following fields: {defaultFieldNames}");
 
         var apiResponse = await AniListService.Get(template.AniListId);
         if (apiResponse is not null && apiResponse.Error is null)
