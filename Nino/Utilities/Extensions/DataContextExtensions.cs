@@ -39,7 +39,7 @@ public static class DataContextExtensions
 
         Log.Trace($"Resolved alias {query} to {result?.ToString() ?? "<resolution failed>"}");
 
-        if (!result?.IsPrivate ?? true)
+        if (result is null || !result.IsPrivate)
             return result;
         
         // Verify the user has permission to view the project
