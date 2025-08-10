@@ -2,6 +2,7 @@
 using Discord.Interactions;
 using Nino.Utilities;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Tababular;
 using static Localizer.Localizer;
 
@@ -24,7 +25,7 @@ namespace Nino.Commands
             Log.Trace($"Listing observers for {guildId}");
 
             // Get observers
-            var observers = db.Observers.Where(o => o.GuildId == guildId).ToList();
+            var observers = await db.Observers.Where(o => o.GuildId == guildId).ToListAsync();
 
             if (observers.Count == 0)
                 return await Response.Fail(T("error.noObservers", lng), interaction);

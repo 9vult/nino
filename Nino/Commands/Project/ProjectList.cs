@@ -2,6 +2,7 @@
 using Discord.Interactions;
 using Nino.Utilities;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Tababular;
 using static Localizer.Localizer;
 
@@ -24,7 +25,9 @@ namespace Nino.Commands
             Log.Trace($"Listing projects for {guildId}");
 
             // Get projects
-            var projects = db.Projects.Where(p => p.GuildId == guildId).ToList();
+            var projects = await db.Projects
+                .Include(p => p.Episodes)
+                .Where(p => p.GuildId == guildId).ToListAsync();
 
             if (projects.Count == 0)
                 return await Response.Fail(T("error.noProjects", lng), interaction);

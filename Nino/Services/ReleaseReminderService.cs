@@ -36,8 +36,12 @@ namespace Nino.Services
         private static async Task CheckForReleases(DataContext db)
         {
             Dictionary<Guid, List<Episode>> marked = [];
-            
-            foreach (var project in db.Projects.Include(p => p.Episodes).Where(p => p.AirReminderEnabled && p.AniListId != null ))
+
+            var targets = await db.Projects
+                .Include(p => p.Episodes)
+                .Where(p => p.AirReminderEnabled && p.AniListId != null)
+                .ToListAsync();
+            foreach (var project in targets)
             {
                 var decimalNumber = 0m;
                 foreach (var episode in project.Episodes.Where(e => e is { Done: false, ReminderPosted: false } && Episode.EpisodeNumberIsNumber(e.Number, out decimalNumber)))

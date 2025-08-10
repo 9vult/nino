@@ -27,9 +27,13 @@ namespace Nino.Services
             _timer.Start();
         }
 
-        private static async System.Threading.Tasks.Task RemindTardyTasks(DataContext db)
+        private static async Task RemindTardyTasks(DataContext db)
         {
-            foreach (var project in db.Projects.Include(p => p.Episodes).Where(p => p.CongaReminderEnabled && !p.IsArchived))
+            var targets = await db.Projects
+                .Include(p => p.Episodes)
+                .Where(p => p.CongaReminderEnabled && !p.IsArchived)
+                .ToListAsync();
+            foreach (var project in targets)
             {
                 if (await Nino.Client.GetChannelAsync((ulong)project.CongaReminderChannelId!) is not SocketTextChannel channel)
                     continue;
