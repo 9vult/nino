@@ -4,6 +4,7 @@ using Fergun.Interactive;
 using Fergun.Interactive.Pagination;
 using Localizer;
 using Microsoft.EntityFrameworkCore;
+using NaturalSort.Extension;
 using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Services;
@@ -116,7 +117,6 @@ public class AtMe(DataContext db, InteractiveService interactive) : InteractionM
             empty = true;
             results.Add(T("atMe.empty", lng));
         }
-            
 
         // Calculate pages
         // Thanks to petzku and astiob for their contributions to this algorithm
@@ -163,6 +163,7 @@ public class AtMe(DataContext db, InteractiveService interactive) : InteractionM
         // Get results based on Conga
         void GetCongaResults ()
         {
+            var congaResults = new List<AtMeResult>();
             foreach (var (project, episodes) in episodeCandidates)
             {
                 foreach (var episode in episodes)
@@ -177,18 +178,25 @@ public class AtMe(DataContext db, InteractiveService interactive) : InteractionM
 
                     var tardyTasks = CongaHelper.GetTardyTasks(project, episode, false)
                         .Where(t => abbreviations.Contains(t))
+                        .OrderBy(t => t)
                         .Select(t => $"`{t}`")
                         .ToList();
                         
                     if (tardyTasks.Count == 0) continue;
-                    results.Add(T("atMe.entry", lng, project.Nickname, episode.Number, string.Join(", ", tardyTasks)));
+                    congaResults.Add(new AtMeResult { ProjectName = project.Nickname, EpisodeNumber = episode.Number, Tasks = string.Join(", ", tardyTasks) });
                 }
             }
+            results.AddRange(congaResults
+                .OrderBy(r => r.ProjectName)
+                .ThenBy(r => r.EpisodeNumber, StringComparison.OrdinalIgnoreCase.WithNaturalSort())
+                .Select(r => T("atMe.entry", lng, r.ProjectName, r.EpisodeNumber, r.Tasks))
+            );
         }
             
         // Get results based on incomplete tasks
         void GetIncompleteResults ()
         {
+            var incompleteResults = new List<AtMeResult>();
             foreach (var (project, episodes) in episodeCandidates)
             {
                 foreach (var episode in episodes)
@@ -201,13 +209,26 @@ public class AtMe(DataContext db, InteractiveService interactive) : InteractionM
 
                     var tardyTasks = episode.Tasks
                         .Where(t => !t.Done && abbreviations.Contains(t.Abbreviation))
+                        .OrderBy(t => t.Abbreviation)
                         .Select(t => $"`{t.Abbreviation}`")
                         .ToList();
                         
                     if (tardyTasks.Count == 0) continue;
-                    results.Add(T("atMe.entry", lng, project.Nickname, episode.Number, string.Join(", ", tardyTasks)));
+                    incompleteResults.Add(new AtMeResult { ProjectName = project.Nickname, EpisodeNumber = episode.Number, Tasks = string.Join(", ", tardyTasks) });
                 }
             }
+            results.AddRange(incompleteResults
+                .OrderBy(r => r.ProjectName)
+                .ThenBy(r => r.EpisodeNumber, StringComparison.OrdinalIgnoreCase.WithNaturalSort())
+                .Select(r => T("atMe.entry", lng, r.ProjectName, r.EpisodeNumber, r.Tasks))
+            );
         }
     }
+}
+
+file class AtMeResult
+{
+    public required string ProjectName { get; set; }
+    public required string EpisodeNumber { get; set; }
+    public required string Tasks { get; set; }
 }
