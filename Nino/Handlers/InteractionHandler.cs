@@ -9,7 +9,8 @@ namespace Nino.Handlers
     public class InteractionHandler(
         DiscordSocketClient client,
         InteractionService handler,
-        IServiceProvider services
+        IServiceProvider services,
+        CmdLineOptions cmdLineOptions
     )
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
@@ -34,10 +35,10 @@ namespace Nino.Handlers
             await handler.RegisterCommandsGloballyAsync();
             Log.Info("Slash commands deployed");
 #else
-            if (_cmdLineOptions.DeployCommands)
+            if (cmdLineOptions.DeployCommands)
             {
                 Log.Info("--deploy-commands is set. Deploying slash commands...");
-                await _handler.RegisterCommandsGloballyAsync();
+                await handler.RegisterCommandsGloballyAsync();
                 Log.Info("Slash commands deployed");
             }
 #endif
