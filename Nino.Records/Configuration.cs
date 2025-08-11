@@ -12,10 +12,11 @@ public class Configuration
     public required UpdatesDisplayType UpdateDisplay { get; set; }
     public required ProgressDisplayType ProgressDisplay { get; set; }
     public required CongaPrefixType CongaPrefix { get; set; }
+
     [MaxLength(128)]
     public string? ReleasePrefix { get; set; }
     public Locale? Locale { get; set; }
-    
+
     public ICollection<Administrator> Administrators = new List<Administrator>();
 
     /// <summary>
@@ -30,6 +31,6 @@ public class Configuration
             UpdateDisplay = UpdatesDisplayType.Normal,
             ProgressDisplay = ProgressDisplayType.Succinct,
             CongaPrefix = CongaPrefixType.None,
-            ReleasePrefix = null
+            ReleasePrefix = null,
         };
 }

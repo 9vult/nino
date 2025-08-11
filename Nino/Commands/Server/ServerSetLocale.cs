@@ -12,7 +12,7 @@ namespace Nino.Commands
     {
         [SlashCommand("set-locale", "Set the locale for this server")]
         public async Task<RuntimeResult> SetLocale(
-            [Summary("newValue", "New Value"), Autocomplete(typeof(LocaleAutocompleteHandler))] Locale locale
+            [Autocomplete(typeof(LocaleAutocompleteHandler))] Locale locale
         )
         {
             var interaction = Context.Interaction;
@@ -28,10 +28,12 @@ namespace Nino.Commands
             var config = db.GetConfig(guildId);
             if (config == null)
                 return await Response.Fail(T("error.noSuchConfig", lng), interaction);
-            
+
             config.Locale = locale;
-            
-            Log.Info($"Updated configuration for guild {config.GuildId}, set Locale to {locale.ToDiscordLocale() ?? "null"}");
+
+            Log.Info(
+                $"Updated configuration for guild {config.GuildId}, set Locale to {locale.ToDiscordLocale()}"
+            );
 
             // Send success embed
             var embed = new EmbedBuilder()

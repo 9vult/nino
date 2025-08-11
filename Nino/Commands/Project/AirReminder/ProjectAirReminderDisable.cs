@@ -13,7 +13,7 @@ namespace Nino.Commands
         {
             [SlashCommand("disable", "Disable airing reminders")]
             public async Task<RuntimeResult> Disable(
-                [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias
+                [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias
             )
             {
                 var interaction = Context.Interaction;
@@ -25,7 +25,10 @@ namespace Nino.Commands
                 // Verify project and user - Owner or Admin required
                 var project = await db.ResolveAlias(alias, interaction);
                 if (project is null)
-                    return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+                    return await Response.Fail(
+                        T("error.alias.resolutionFailed", lng, alias),
+                        interaction
+                    );
 
                 if (!project.VerifyUser(db, interaction.User.Id))
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);

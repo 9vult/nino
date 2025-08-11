@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿#nullable disable
 
-#nullable disable
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Nino.Migrations
 {
@@ -16,7 +16,8 @@ namespace Nino.Migrations
                 type: "TEXT",
                 nullable: false,
                 oldClrType: typeof(ulong),
-                oldType: "INTEGER");
+                oldType: "INTEGER"
+            );
         }
 
         /// <inheritdoc />
@@ -28,7 +29,8 @@ namespace Nino.Migrations
                 type: "INTEGER",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "TEXT");
+                oldType: "TEXT"
+            );
         }
     }
 }

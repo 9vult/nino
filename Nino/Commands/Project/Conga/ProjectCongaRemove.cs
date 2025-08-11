@@ -14,8 +14,8 @@ namespace Nino.Commands
         {
             [SlashCommand("remove", "Remove a link from the Conga line")]
             public async Task<RuntimeResult> Remove(
-                [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-                [Summary("link", "Link in the Conga graph"), Autocomplete(typeof(CongaNodesAutocompleteHandler))] string nodeText
+                [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+                [Autocomplete(typeof(CongaNodesAutocompleteHandler))] string link
             )
             {
                 var interaction = Context.Interaction;
@@ -23,12 +23,12 @@ namespace Nino.Commands
 
                 // Sanitize inputs
                 alias = alias.Trim();
-                
+
                 // Verify node
                 CongaEdge edge;
                 try
                 {
-                    edge = CongaEdge.FromString(nodeText.Trim());
+                    edge = CongaEdge.FromString(link.Trim());
                 }
                 catch (Exception)
                 {
@@ -38,16 +38,23 @@ namespace Nino.Commands
                 // Verify project and user - Owner or Admin required
                 var project = await db.ResolveAlias(alias, interaction);
                 if (project is null)
-                    return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+                    return await Response.Fail(
+                        T("error.alias.resolutionFailed", lng, alias),
+                        interaction
+                    );
 
                 if (!project.VerifyUser(db, interaction.User.Id))
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
                 // Validate participant is in the conga line
-                if (!project.CongaParticipants.Contains(edge.Current) 
-                    || project.CongaParticipants.GetDependentsOf(edge.Current).All(c => c.Abbreviation != edge.Next))
+                if (
+                    !project.CongaParticipants.Contains(edge.Current)
+                    || project
+                        .CongaParticipants.GetDependentsOf(edge.Current)
+                        .All(c => c.Abbreviation != edge.Next)
+                )
                     return await Response.Fail(T("error.noSuchConga", lng), interaction);
-                
+
                 project.CongaParticipants.Remove(edge.Current, edge.Next);
 
                 Log.Info($"Removed {edge} from the Conga line for {project}");
@@ -58,7 +65,7 @@ namespace Nino.Commands
                     .WithDescription(T("project.conga.removed", lng, edge.Current, edge.Next))
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
-                
+
                 db.Entry(project).Property(p => p.CongaParticipants).IsModified = true;
                 await db.TrySaveChangesAsync(interaction);
                 return ExecutionResult.Success;

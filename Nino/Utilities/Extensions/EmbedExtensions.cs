@@ -13,16 +13,11 @@ public static class EmbedExtensions
     {
         return new
         {
-            author = new {
-                name = embed.Author?.Name,
-                url = embed.Author?.Url,
-            },
+            author = new { name = embed.Author?.Name, url = embed.Author?.Url },
             title = embed.Title,
             description = embed.Description,
-            thumbnail = new {
-                url = embed.Thumbnail?.Url
-            },
-            timestamp = embed.Timestamp?.ToString("yyyy-MM-ddTHH:mm:ss.ffffffzzz")
+            thumbnail = new { url = embed.Thumbnail?.Url },
+            timestamp = embed.Timestamp?.ToString("yyyy-MM-ddTHH:mm:ss.ffffffzzz"),
         };
     }
 }

@@ -6,6 +6,7 @@ using Nino.Records.Enums;
 using Nino.Utilities;
 using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
+using Task = Nino.Records.Task;
 
 namespace Nino.Commands
 {
@@ -13,9 +14,9 @@ namespace Nino.Commands
     {
         [SlashCommand("add", "Add an episode")]
         public async Task<RuntimeResult> Add(
-            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-            [Summary("episode", "Episode number"), MaxLength(32)] string episodeNumber,
-            [Summary("quantity", "Number of episodes to add"), MinValue(1)] int quantity = 1
+            [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+            [MaxLength(32)] string episodeNumber,
+            [MinValue(1)] int quantity = 1
         )
         {
             var interaction = Context.Interaction;
@@ -25,23 +26,35 @@ namespace Nino.Commands
             alias = alias.Trim();
             episodeNumber = Episode.CanonicalizeEpisodeNumber(episodeNumber);
 
-            if (quantity != 1 && (!Episode.EpisodeNumberIsInteger(episodeNumber, out var episodeNumberInt) || episodeNumberInt < 0))
+            if (
+                quantity != 1
+                && (
+                    !Episode.EpisodeNumberIsInteger(episodeNumber, out var episodeNumberInt)
+                    || episodeNumberInt < 0
+                )
+            )
                 return await Response.Fail(T("error.episode.notInteger", lng, alias), interaction);
 
             // Verify project and user - Owner or Admin required
             var project = await db.ResolveAlias(alias, interaction);
             if (project is null)
-                return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+                return await Response.Fail(
+                    T("error.alias.resolutionFailed", lng, alias),
+                    interaction
+                );
 
             if (!project.VerifyUser(db, interaction.User.Id))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Verify episode doesn't exist
             if (project.TryGetEpisode(episodeNumber, out _))
-                return await Response.Fail(T("error.episode.alreadyExists", lng, episodeNumber), interaction);
+                return await Response.Fail(
+                    T("error.episode.alreadyExists", lng, episodeNumber),
+                    interaction
+                );
 
             string successDescription;
-            
+
             // Single episode
             if (quantity == 1)
             {
@@ -56,18 +69,32 @@ namespace Nino.Commands
             else
             {
                 Episode.EpisodeNumberIsInteger(episodeNumber, out episodeNumberInt);
-                var episodeNumbersToAdd = Enumerable.Range(episodeNumberInt, quantity)
-                    .Where(n => project.Episodes.All(e => e.Number != $"{n}")).ToList();
-                
+                var episodeNumbersToAdd = Enumerable
+                    .Range(episodeNumberInt, quantity)
+                    .Where(n => project.Episodes.All(e => e.Number != $"{n}"))
+                    .ToList();
+
                 // Verify user intent
-                var questionBody = T("episode.displayListOfCandidates", lng, $"[ {string.Join(", ", episodeNumbersToAdd)} ]");
+                var questionBody = T(
+                    "episode.displayListOfCandidates",
+                    lng,
+                    $"[ {string.Join(", ", episodeNumbersToAdd)} ]"
+                );
                 var header = project.IsPrivate
                     ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
                     : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
-                
+
                 var component = new ComponentBuilder()
-                    .WithButton(T("progress.done.inTheDust.dontDoIt.button", lng), "ninoepisodeaddcancel", ButtonStyle.Secondary)
-                    .WithButton(T("progress.done.inTheDust.doItNow.button", lng), "ninoepisodeadproceed", ButtonStyle.Success)
+                    .WithButton(
+                        T("progress.done.inTheDust.dontDoIt.button", lng),
+                        "ninoepisodeaddcancel",
+                        ButtonStyle.Secondary
+                    )
+                    .WithButton(
+                        T("progress.done.inTheDust.doItNow.button", lng),
+                        "ninoepisodeadproceed",
+                        ButtonStyle.Success
+                    )
                     .Build();
                 var questionEmbed = new EmbedBuilder()
                     .WithAuthor(header)
@@ -75,19 +102,22 @@ namespace Nino.Commands
                     .WithDescription(questionBody)
                     .WithCurrentTimestamp()
                     .Build();
-                
-                var questionResponse = await interaction.ModifyOriginalResponseAsync(m => {
+
+                var questionResponse = await interaction.ModifyOriginalResponseAsync(m =>
+                {
                     m.Embed = questionEmbed;
                     m.Components = component;
                 });
-                
+
                 // Wait for response
                 var questionResult = await interactive.NextMessageComponentAsync(
-                    m => m.Message.Id == questionResponse.Id, timeout: TimeSpan.FromSeconds(60));
-                
+                    m => m.Message.Id == questionResponse.Id,
+                    timeout: TimeSpan.FromSeconds(60)
+                );
+
                 var fullSend = false;
                 string finalBody;
-                
+
                 if (!questionResult.IsSuccess)
                     finalBody = T("progress.done.inTheDust.timeout", lng);
                 else
@@ -97,11 +127,14 @@ namespace Nino.Commands
                     else
                     {
                         fullSend = true;
-                        var bodyDict = new Dictionary<string, object>() { ["number"] = episodeNumbersToAdd.Count };
+                        var bodyDict = new Dictionary<string, object>
+                        {
+                            ["number"] = episodeNumbersToAdd.Count,
+                        };
                         finalBody = T("episode.add.proceed.response", lng, bodyDict);
                     }
                 }
-                
+
                 // Update the question embed to reflect the choice
                 var editedEmbed = new EmbedBuilder()
                     .WithAuthor(header)
@@ -109,23 +142,28 @@ namespace Nino.Commands
                     .WithDescription(finalBody)
                     .WithCurrentTimestamp()
                     .Build();
-                
-                await questionResponse.ModifyAsync(m => {
+
+                await questionResponse.ModifyAsync(m =>
+                {
                     m.Components = null;
                     m.Embed = editedEmbed;
                 });
 
-                if (!fullSend) return ExecutionResult.Success;
+                if (!fullSend)
+                    return ExecutionResult.Success;
 
                 var bulkEpisodes = episodeNumbersToAdd
                     .Select(n => $"{n}")
                     .Select(n => CreateEpisode(project, n))
                     .ToList();
                 project.Episodes.AddRange(bulkEpisodes);
-                
+
                 Log.Info($"Added {bulkEpisodes.Count} episodes to {project}");
                 var replyDict = new Dictionary<string, object>
-                    { ["number"] = bulkEpisodes.Count, ["project"] = project.Nickname };
+                {
+                    ["number"] = bulkEpisodes.Count,
+                    ["project"] = project.Nickname,
+                };
                 successDescription = T("episode.added.bulk", lng, replyDict);
             }
 
@@ -139,14 +177,14 @@ namespace Nino.Commands
             await db.TrySaveChangesAsync(interaction);
             return ExecutionResult.Success;
         }
-        
+
         /// <summary>
         /// Episode factory method
         /// </summary>
         /// <param name="project">Project the episode is for</param>
         /// <param name="episodeNumber">Episode number</param>
         /// <returns>New episode</returns>
-        private static Episode CreateEpisode (Project project, string episodeNumber)
+        private static Episode CreateEpisode(Project project, string episodeNumber)
         {
             return new Episode
             {
@@ -157,7 +195,13 @@ namespace Nino.Commands
                 ReminderPosted = false,
                 AdditionalStaff = [],
                 PinchHitters = [],
-                Tasks = project.KeyStaff.Select(ks => new Records.Task { Abbreviation = ks.Role.Abbreviation, Done = false }).ToList()
+                Tasks = project
+                    .KeyStaff.Select(ks => new Task
+                    {
+                        Abbreviation = ks.Role.Abbreviation,
+                        Done = false,
+                    })
+                    .ToList(),
             };
         }
     }

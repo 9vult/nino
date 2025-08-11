@@ -53,7 +53,7 @@ public static class ProjectExtensions
 
         if (!includeStaff)
             return false;
-        
+
         return project.KeyStaff.Any(s => s.UserId == userId)
             || project.Episodes.Any(e =>
                 e.AdditionalStaff.Any(s => s.UserId == userId)

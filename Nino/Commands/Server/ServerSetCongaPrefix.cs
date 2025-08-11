@@ -10,9 +10,7 @@ namespace Nino.Commands
     public partial class ServerManagement
     {
         [SlashCommand("conga-prefix", "Set a prefix for Conga notifications")]
-        public async Task<RuntimeResult> SetCongaPrefix(
-            [Summary("type", "Prefix type")] CongaPrefixType type
-        )
+        public async Task<RuntimeResult> SetCongaPrefix(CongaPrefixType type)
         {
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
@@ -29,7 +27,9 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.noSuchConfig", lng), interaction);
 
             config.CongaPrefix = type;
-            Log.Info($"Updated configuration for guild {config.GuildId}, set Conga Prefix to {type.ToFriendlyString(lng)}");
+            Log.Info(
+                $"Updated configuration for guild {config.GuildId}, set Conga Prefix to {type.ToFriendlyString(lng)}"
+            );
 
             // Send success embed
             var embed = new EmbedBuilder()

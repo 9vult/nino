@@ -11,8 +11,8 @@ namespace Nino.Commands
     {
         [SlashCommand("remove", "Remove a Key Staff from the whole project")]
         public async Task<RuntimeResult> Remove(
-            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-            [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(KeyStaffAutocompleteHandler))] string abbreviation
+            [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+            [Autocomplete(typeof(KeyStaffAutocompleteHandler))] string abbreviation
         )
         {
             var interaction = Context.Interaction;
@@ -25,7 +25,10 @@ namespace Nino.Commands
             // Verify project and user - Owner or Admin required
             var project = await db.ResolveAlias(alias, interaction);
             if (project is null)
-                return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+                return await Response.Fail(
+                    T("error.alias.resolutionFailed", lng, alias),
+                    interaction
+                );
 
             if (!project.VerifyUser(db, interaction.User.Id))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);

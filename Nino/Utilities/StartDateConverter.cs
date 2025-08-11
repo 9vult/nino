@@ -5,13 +5,19 @@ namespace Nino.Utilities
 {
     internal class StartDateConverter : JsonConverter<DateTimeOffset>
     {
-        public override DateTimeOffset Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override DateTimeOffset Read(
+            ref Utf8JsonReader reader,
+            Type typeToConvert,
+            JsonSerializerOptions options
+        )
         {
             // Read the object { "year": 2024, "month": 7, "day": 7 }
             if (reader.TokenType != JsonTokenType.StartObject)
                 throw new JsonException();
 
-            int year = 0, month = 0, day = 0;
+            int year = 0,
+                month = 0,
+                day = 0;
 
             while (reader.Read())
             {
@@ -41,7 +47,11 @@ namespace Nino.Utilities
             return new DateTimeOffset(year, month, day, 0, 0, 0, TimeSpan.Zero);
         }
 
-        public override void Write(Utf8JsonWriter writer, DateTimeOffset value, JsonSerializerOptions options)
+        public override void Write(
+            Utf8JsonWriter writer,
+            DateTimeOffset value,
+            JsonSerializerOptions options
+        )
         {
             writer.WriteStartObject();
             writer.WriteNumber("year", value.Year);
@@ -49,16 +59,15 @@ namespace Nino.Utilities
             writer.WriteNumber("day", value.Day);
             writer.WriteEndObject();
         }
-        
+
         private int? ReadNullableInt(ref Utf8JsonReader reader)
         {
             return reader.TokenType switch
             {
                 JsonTokenType.Null => null,
                 JsonTokenType.Number when reader.TryGetInt32(out var value) => value,
-                _ => throw new JsonException("Expected a null or integer value.")
+                _ => throw new JsonException("Expected a null or integer value."),
             };
         }
-
     }
 }

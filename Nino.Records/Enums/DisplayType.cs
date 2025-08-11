@@ -5,13 +5,13 @@ namespace Nino.Records.Enums
     public enum ProgressDisplayType
     {
         Succinct = 0,
-        Verbose = 1
+        Verbose = 1,
     }
 
     public enum UpdatesDisplayType
     {
         Normal = 0,
-        Extended = 1
+        Extended = 1,
     }
 
     public static class ProgressDisplayTypeExtensions
@@ -27,7 +27,7 @@ namespace Nino.Records.Enums
         }
     }
 
-        public static class UpdatesisplayTypeExtensions
+    public static class UpdatesisplayTypeExtensions
     {
         public static string ToFriendlyString(this UpdatesDisplayType type, string lng)
         {

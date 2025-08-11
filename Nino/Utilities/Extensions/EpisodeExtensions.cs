@@ -29,10 +29,7 @@ public static class EpisodeExtensions
             if (episode.Project.Administrators.Any(a => a.UserId == userId))
                 return true;
 
-            if (
-                db.GetConfig(episode.GuildId)
-                    ?.Administrators?.Any(a => a.UserId == userId) ?? false
-            )
+            if (db.GetConfig(episode.GuildId)?.Administrators.Any(a => a.UserId == userId) ?? false)
                 return true;
         }
 
@@ -49,16 +46,18 @@ public static class EpisodeExtensions
     /// <param name="userId">ID of the user to check</param>
     /// <param name="abbreviation">Abbreviation to check</param>
     /// <returns>True if the user has permission</returns>
-    public static bool VerifyTaskUser(this Episode episode, DataContext db, ulong userId, string abbreviation)
+    public static bool VerifyTaskUser(
+        this Episode episode,
+        DataContext db,
+        ulong userId,
+        string abbreviation
+    )
     {
         if (episode.Project.OwnerId == userId)
             return true;
         if (episode.Project.Administrators.Any(a => a.UserId == userId))
             return true;
-        if (
-            db.GetConfig(episode.GuildId)
-                ?.Administrators?.Any(a => a.UserId == userId) ?? false
-        )
+        if (db.GetConfig(episode.GuildId)?.Administrators.Any(a => a.UserId == userId) ?? false)
             return true;
         if (episode.PinchHitters.Any(ph => ph.Abbreviation == abbreviation && ph.UserId == userId))
             return true;

@@ -13,9 +13,7 @@ namespace Nino.Commands
         public partial class Admin
         {
             [SlashCommand("add", "Add an administrator to this server")]
-            public async Task<RuntimeResult> Add(
-                [Summary("member", "Staff member")] SocketGuildUser member
-            )
+            public async Task<RuntimeResult> Add(SocketGuildUser member)
             {
                 var interaction = Context.Interaction;
                 var lng = interaction.UserLocale;
@@ -37,15 +35,17 @@ namespace Nino.Commands
 
                 // Validate user isn't already an admin
                 if (config.Administrators.Any(a => a.UserId == memberId))
-                    return await Response.Fail(T("error.admin.alreadyAdmin", lng, staffMention), interaction);
+                    return await Response.Fail(
+                        T("error.admin.alreadyAdmin", lng, staffMention),
+                        interaction
+                    );
 
                 // Add to database
-                config.Administrators.Add(new Administrator
-                {
-                    UserId = memberId,
-                });
+                config.Administrators.Add(new Administrator { UserId = memberId });
 
-                Log.Info($"Updated configuration for guild {config.GuildId}, added {memberId} as an administrator");
+                Log.Info(
+                    $"Updated configuration for guild {config.GuildId}, added {memberId} as an administrator"
+                );
 
                 // Send success embed
                 var embed = new EmbedBuilder()

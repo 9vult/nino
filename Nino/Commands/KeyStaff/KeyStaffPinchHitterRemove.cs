@@ -14,9 +14,9 @@ namespace Nino.Commands
         {
             [SlashCommand("remove", "Remove a pinch hitter from an episode")]
             public async Task<RuntimeResult> Remove(
-                [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-                [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
-                [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(KeyStaffAutocompleteHandler))] string abbreviation
+                [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+                [Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
+                [Autocomplete(typeof(KeyStaffAutocompleteHandler))] string abbreviation
             )
             {
                 var interaction = Context.Interaction;
@@ -30,32 +30,46 @@ namespace Nino.Commands
                 // Verify project and user - Owner or Admin required
                 var project = await db.ResolveAlias(alias, interaction);
                 if (project is null)
-                    return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+                    return await Response.Fail(
+                        T("error.alias.resolutionFailed", lng, alias),
+                        interaction
+                    );
 
                 if (!project.VerifyUser(db, interaction.User.Id))
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
                 // Verify episode
                 if (!project.TryGetEpisode(episodeNumber, out var episode))
-                    return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
+                    return await Response.Fail(
+                        T("error.noSuchEpisode", lng, episodeNumber),
+                        interaction
+                    );
 
                 // Check if position exists
                 if (project.KeyStaff.All(ks => ks.Role.Abbreviation != abbreviation))
-                    return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
+                    return await Response.Fail(
+                        T("error.noSuchTask", lng, abbreviation),
+                        interaction
+                    );
 
                 // Remove from database
-                
+
                 var ph = episode.PinchHitters.FirstOrDefault(p => p.Abbreviation == abbreviation);
                 if (ph is null)
-                    return await Response.Fail(T("error.noSuchPinchHitter", lng, abbreviation), interaction);
-                
+                    return await Response.Fail(
+                        T("error.noSuchPinchHitter", lng, abbreviation),
+                        interaction
+                    );
+
                 episode.PinchHitters.Remove(ph);
                 Log.Info($"Removed pinch hitter for {abbreviation} from {episode}");
 
                 // Send success embed
                 var embed = new EmbedBuilder()
                     .WithTitle(T("title.projectModification", lng))
-                    .WithDescription(T("keyStaff.pinchHitter.removed", lng, episode.Number, abbreviation))
+                    .WithDescription(
+                        T("keyStaff.pinchHitter.removed", lng, episode.Number, abbreviation)
+                    )
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 

@@ -4,7 +4,8 @@ using NLog;
 namespace Nino.Commands
 {
     [Group("server", "Server-wide options")]
-    public partial class ServerManagement(DataContext db) : InteractionModuleBase<SocketInteractionContext>
+    public partial class ServerManagement(DataContext db)
+        : InteractionModuleBase<SocketInteractionContext>
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 

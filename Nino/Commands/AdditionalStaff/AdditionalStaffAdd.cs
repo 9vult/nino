@@ -6,6 +6,7 @@ using Nino.Records;
 using Nino.Utilities;
 using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
+using Task = Nino.Records.Task;
 
 namespace Nino.Commands
 {
@@ -13,12 +14,12 @@ namespace Nino.Commands
     {
         [SlashCommand("add", "Add additional staff to an episode")]
         public async Task<RuntimeResult> Add(
-            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
-            [Summary("member", "Staff member")] SocketUser member,
-            [Summary("abbreviation", "Position shorthand"), MaxLength(16)] string abbreviation,
-            [Summary("fullName", "Full position name"), MaxLength(32)] string taskName,
-            [Summary("isPseudo", "Position is a Pseudo-task")]bool isPseudo = false
+            [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+            [Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
+            SocketUser member,
+            [MaxLength(16)] string abbreviation,
+            [MaxLength(32)] string fullName,
+            bool isPseudo = false
         )
         {
             var interaction = Context.Interaction;
@@ -27,24 +28,34 @@ namespace Nino.Commands
             // Sanitize inputs
             var memberId = member.Id;
             alias = alias.Trim();
-            taskName = taskName.Trim();
+            fullName = fullName.Trim();
             abbreviation = abbreviation.Trim().ToUpperInvariant().Replace("$", string.Empty);
             episodeNumber = Episode.CanonicalizeEpisodeNumber(episodeNumber);
 
             // Verify project and user - Owner or Admin required
             var project = await db.ResolveAlias(alias, interaction);
             if (project is null)
-                return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+                return await Response.Fail(
+                    T("error.alias.resolutionFailed", lng, alias),
+                    interaction
+                );
 
             if (!project.VerifyUser(db, interaction.User.Id))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Verify episode
             if (!project.TryGetEpisode(episodeNumber, out var episode))
-                return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
+                return await Response.Fail(
+                    T("error.noSuchEpisode", lng, episodeNumber),
+                    interaction
+                );
 
             // Check if position already exists
-            if (project.KeyStaff.Concat(episode.AdditionalStaff).Any(ks => ks.Role.Abbreviation == abbreviation))
+            if (
+                project
+                    .KeyStaff.Concat(episode.AdditionalStaff)
+                    .Any(ks => ks.Role.Abbreviation == abbreviation)
+            )
                 return await Response.Fail(T("error.positionExists", lng), interaction);
 
             // All good!
@@ -54,17 +65,13 @@ namespace Nino.Commands
                 Role = new Role
                 {
                     Abbreviation = abbreviation,
-                    Name = taskName,
-                    Weight = 1000000
+                    Name = fullName,
+                    Weight = 1000000,
                 },
-                IsPseudo = isPseudo
+                IsPseudo = isPseudo,
             };
 
-            var newTask = new Records.Task
-            {
-                Abbreviation = abbreviation,
-                Done = false
-            };
+            var newTask = new Task { Abbreviation = abbreviation, Done = false };
 
             // Add to database
 
@@ -72,13 +79,17 @@ namespace Nino.Commands
             episode.Tasks.Add(newTask);
             episode.Done = false;
 
-            Log.Info($"Added M[{memberId} (@{member.Username})] to {episode} for {abbreviation} (IsPseudo={isPseudo})");
+            Log.Info(
+                $"Added M[{memberId} (@{member.Username})] to {episode} for {abbreviation} (IsPseudo={isPseudo})"
+            );
 
             // Send success embed
             var staffMention = $"<@{memberId}>";
             var embed = new EmbedBuilder()
                 .WithTitle(T("title.projectCreation", lng))
-                .WithDescription(T("additionalStaff.added", lng, staffMention, abbreviation, episode.Number))
+                .WithDescription(
+                    T("additionalStaff.added", lng, staffMention, abbreviation, episode.Number)
+                )
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 

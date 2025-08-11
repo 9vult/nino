@@ -13,29 +13,47 @@ namespace Nino.Commands
 {
     public partial class Done
     {
-        private async Task<RuntimeResult> HandleUnspecified(SocketInteraction interaction, Project project, string abbreviation, InteractiveService interactiveService)
+        private async Task<RuntimeResult> HandleUnspecified(
+            SocketInteraction interaction,
+            Project project,
+            string abbreviation,
+            InteractiveService interactiveService
+        )
         {
-            Log.Info($"Handling unspecified /done by M[{interaction.User.Id} (@{interaction.User.Username})] for {project}");
-            
+            Log.Info(
+                $"Handling unspecified /done by M[{interaction.User.Id} (@{interaction.User.Username})] for {project}"
+            );
+
             var lng = interaction.UserLocale;
 
-            var episodes = project.Episodes.OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList();
+            var episodes = project
+                .Episodes.OrderBy(
+                    e => e.Number,
+                    StringComparison.OrdinalIgnoreCase.WithNaturalSort()
+                )
+                .ToList();
 
             // Find the episode the team is working on
-            var workingEpisodeNo = episodes.FirstOrDefault(e => !e.Done)?.Number ?? episodes.LastOrDefault()?.Number;
+            var workingEpisodeNo =
+                episodes.FirstOrDefault(e => !e.Done)?.Number ?? episodes.LastOrDefault()?.Number;
             if (workingEpisodeNo == null)
                 return await Response.Fail(T("error.noIncompleteEpisodes", lng), interaction);
 
             // Find the next episode awaiting this task's completion
-            var nextTaskEpisodeNo = episodes.FirstOrDefault(e => e.Tasks.Any(t => t.Abbreviation == abbreviation && !t.Done))?.Number;
+            var nextTaskEpisodeNo = episodes
+                .FirstOrDefault(e => e.Tasks.Any(t => t.Abbreviation == abbreviation && !t.Done))
+                ?.Number;
             if (nextTaskEpisodeNo == null)
             {
                 // We do a little research
                 if (episodes.Any(e => e.Tasks.Any(t => t.Abbreviation == abbreviation)))
-                    return await Response.Fail(T("error.taskCompleteAllEpisodes", lng), interaction);
+                    return await Response.Fail(
+                        T("error.taskCompleteAllEpisodes", lng),
+                        interaction
+                    );
                 return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
             }
-            
+
             // Are they the same? Then hand it off to the Specified handler
             if (nextTaskEpisodeNo == workingEpisodeNo)
                 return await HandleSpecified(interaction, project, abbreviation, workingEpisodeNo);
@@ -48,14 +66,23 @@ namespace Nino.Commands
             if (!nextTaskEpisode?.VerifyTaskUser(db, interaction.User.Id, abbreviation) ?? false)
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
-            var role = project.KeyStaff.Concat(nextTaskEpisode!.AdditionalStaff).First(ks => ks.Role.Abbreviation == abbreviation).Role;
+            var role = project
+                .KeyStaff.Concat(nextTaskEpisode!.AdditionalStaff)
+                .First(ks => ks.Role.Abbreviation == abbreviation)
+                .Role;
 
             // How to proceed question embed
             var header = project.IsPrivate
                 ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
                 : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
 
-            var questionBody = T("progress.done.inTheDust", lng, workingEpisodeNo, role.Name, nextTaskEpisodeNo);
+            var questionBody = T(
+                "progress.done.inTheDust",
+                lng,
+                workingEpisodeNo,
+                role.Name,
+                nextTaskEpisodeNo
+            );
             var questionEmbed = new EmbedBuilder()
                 .WithAuthor(header)
                 .WithTitle($"❓ {T("progress.done.inTheDust.question", lng)}")
@@ -63,14 +90,27 @@ namespace Nino.Commands
                 .WithCurrentTimestamp()
                 .Build();
             var component = new ComponentBuilder()
-                .WithButton(T("progress.done.inTheDust.dontDoIt.button", lng), "ninodonecancel", ButtonStyle.Danger)
-                .WithButton(T("progress.done.inTheDust.doItNow.button", lng), "ninodoneproceed", ButtonStyle.Success)
+                .WithButton(
+                    T("progress.done.inTheDust.dontDoIt.button", lng),
+                    "ninodonecancel",
+                    ButtonStyle.Danger
+                )
+                .WithButton(
+                    T("progress.done.inTheDust.doItNow.button", lng),
+                    "ninodoneproceed",
+                    ButtonStyle.Success
+                )
                 .Build();
-            var questionResponse = await interaction.FollowupAsync(embed: questionEmbed, components: component);
+            var questionResponse = await interaction.FollowupAsync(
+                embed: questionEmbed,
+                components: component
+            );
 
             // Wait for response
             var questionResult = await interactiveService.NextMessageComponentAsync(
-                m => m.Message.Id == questionResponse.Id, timeout: TimeSpan.FromSeconds(60));
+                m => m.Message.Id == questionResponse.Id,
+                timeout: TimeSpan.FromSeconds(60)
+            );
 
             var fullSend = false;
             string finalBody;
@@ -86,8 +126,17 @@ namespace Nino.Commands
                     var nextTaskIndex = episodes.FindIndex(e => e.Number == nextTaskEpisodeNo);
                     var workingIndex = episodes.FindIndex(e => e.Number == workingEpisodeNo);
                     var diff = nextTaskIndex - workingIndex;
-                    Dictionary<string, object> map = new() { ["taskName"] = role.Name, ["count"] = diff };
-                    finalBody = T("progress.done.inTheDust.doItNow", lng, args: map, pluralName: "count");
+                    Dictionary<string, object> map = new()
+                    {
+                        ["taskName"] = role.Name,
+                        ["count"] = diff,
+                    };
+                    finalBody = T(
+                        "progress.done.inTheDust.doItNow",
+                        lng,
+                        args: map,
+                        pluralName: "count"
+                    );
                 }
             }
 
@@ -99,7 +148,8 @@ namespace Nino.Commands
                 .WithCurrentTimestamp()
                 .Build();
 
-            await questionResponse.ModifyAsync(m => {
+            await questionResponse.ModifyAsync(m =>
+            {
                 m.Components = null;
                 m.Embed = editedEmbed;
             });
@@ -107,8 +157,8 @@ namespace Nino.Commands
             // If we're continuing, hand off processing to the Specified handler
             if (fullSend)
                 return await HandleSpecified(interaction, project, abbreviation, nextTaskEpisodeNo);
-            
-            return ExecutionResult.Success;     
+
+            return ExecutionResult.Success;
         }
     }
 }

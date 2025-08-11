@@ -13,10 +13,10 @@ namespace Nino.Commands
     {
         [SlashCommand("swap", "Swap additional staff into an episode")]
         public async Task<RuntimeResult> Swap(
-            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
-            [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(AdditionalStaffAutocompleteHandler))] string abbreviation,
-            [Summary("member", "Staff member")] SocketUser member
+            [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+            [Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
+            [Autocomplete(typeof(AdditionalStaffAutocompleteHandler))] string abbreviation,
+            SocketUser member
         )
         {
             var interaction = Context.Interaction;
@@ -30,14 +30,20 @@ namespace Nino.Commands
             // Verify project and user - Owner or Admin required
             var project = await db.ResolveAlias(alias, interaction);
             if (project is null)
-                return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+                return await Response.Fail(
+                    T("error.alias.resolutionFailed", lng, alias),
+                    interaction
+                );
 
             if (!project.VerifyUser(db, interaction.User.Id))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Verify episode
             if (!project.TryGetEpisode(episodeNumber, out var episode))
-                return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
+                return await Response.Fail(
+                    T("error.noSuchEpisode", lng, episodeNumber),
+                    interaction
+                );
 
             // Check if position exists
             if (episode.AdditionalStaff.All(ks => ks.Role.Abbreviation != abbreviation))
@@ -47,13 +53,17 @@ namespace Nino.Commands
             var staff = episode.AdditionalStaff.Single(k => k.Role.Abbreviation == abbreviation);
             staff.UserId = memberId;
 
-            Log.Info($"Swapped M[{memberId} (@{member.Username})] in to {episode} for {abbreviation}");
+            Log.Info(
+                $"Swapped M[{memberId} (@{member.Username})] in to {episode} for {abbreviation}"
+            );
 
             // Send success embed
             var staffMention = $"<@{memberId}>";
             var embed = new EmbedBuilder()
                 .WithTitle(T("title.projectCreation", lng))
-                .WithDescription(T("additionalStaff.swapped", lng, staffMention, abbreviation, episode.Number))
+                .WithDescription(
+                    T("additionalStaff.swapped", lng, staffMention, abbreviation, episode.Number)
+                )
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 

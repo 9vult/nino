@@ -1,8 +1,8 @@
-﻿using Discord;
+﻿using System.Text;
+using Discord;
 using Discord.Interactions;
-using Nino.Utilities;
-using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Nino.Utilities;
 using Tababular;
 using static Localizer.Localizer;
 
@@ -20,8 +20,9 @@ namespace Nino.Commands
             // Check for guild administrator status
             var guild = Nino.Client.GetGuild(guildId);
             var member = guild.GetUser(interaction.User.Id);
-            if (!Utils.VerifyAdministrator(db, member, guild)) return await Response.Fail(T("error.notPrivileged", lng), interaction);
-            
+            if (!Utils.VerifyAdministrator(db, member, guild))
+                return await Response.Fail(T("error.notPrivileged", lng), interaction);
+
             Log.Trace($"Listing observers for {guildId}");
 
             // Get observers
@@ -30,15 +31,27 @@ namespace Nino.Commands
             if (observers.Count == 0)
                 return await Response.Fail(T("error.noObservers", lng), interaction);
 
-            var tblData = observers.Select(o => new Dictionary<string, string>
-            {
-                [T("observer.list.server", lng)] = o.OriginGuildId.ToString(),
-                [T("observer.list.project", lng)] = db.Projects.FirstOrDefault(p => p.Id == o.ProjectId)?.Nickname ?? "Unknown",
-                [T("observer.list.blame", lng)] = o.Blame ? T("observer.list.yes", lng) : T("observer.list.no", lng),
-                [T("observer.list.updates", lng)] = !string.IsNullOrEmpty(o.ProgressWebhook) ? T("observer.list.yes", lng) : T("observer.list.no", lng),
-                [T("observer.list.releases", lng)] = !string.IsNullOrEmpty(o.ReleasesWebhook) ? T("observer.list.yes", lng) : T("observer.list.no", lng),
-                [T("observer.list.role", lng)] = o.RoleId is not null ? T("observer.list.yes", lng) : T("observer.list.no", lng),
-            }).Chunk(10).ToList();
+            var tblData = observers
+                .Select(o => new Dictionary<string, string>
+                {
+                    [T("observer.list.server", lng)] = o.OriginGuildId.ToString(),
+                    [T("observer.list.project", lng)] =
+                        db.Projects.FirstOrDefault(p => p.Id == o.ProjectId)?.Nickname ?? "Unknown",
+                    [T("observer.list.blame", lng)] = o.Blame
+                        ? T("observer.list.yes", lng)
+                        : T("observer.list.no", lng),
+                    [T("observer.list.updates", lng)] = !string.IsNullOrEmpty(o.ProgressWebhook)
+                        ? T("observer.list.yes", lng)
+                        : T("observer.list.no", lng),
+                    [T("observer.list.releases", lng)] = !string.IsNullOrEmpty(o.ReleasesWebhook)
+                        ? T("observer.list.yes", lng)
+                        : T("observer.list.no", lng),
+                    [T("observer.list.role", lng)] = o.RoleId is not null
+                        ? T("observer.list.yes", lng)
+                        : T("observer.list.no", lng),
+                })
+                .Chunk(10)
+                .ToList();
 
             foreach (var chunk in tblData)
             {
@@ -48,7 +61,10 @@ namespace Nino.Commands
                 sb.AppendLine("```");
 
                 // Send table
-                await interaction.FollowupAsync(text: sb.ToString(), allowedMentions: new AllowedMentions(AllowedMentionTypes.None));
+                await interaction.FollowupAsync(
+                    text: sb.ToString(),
+                    allowedMentions: new AllowedMentions(AllowedMentionTypes.None)
+                );
             }
 
             return ExecutionResult.Success;

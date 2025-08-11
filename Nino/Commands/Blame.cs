@@ -19,28 +19,31 @@ public class Blame(DataContext db) : InteractionModuleBase<SocketInteractionCont
 
     [SlashCommand("blame", "Check the status of a project")]
     public async Task<RuntimeResult> Handle(
-        [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-        [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string? episodeNumber = null,
-        [Summary("explain", "Explain what any of this means")] bool explain = false,
-        [Summary("includePseudo", "Include pseudo-tasks")] bool includePseudo = false
+        [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+        [Autocomplete(typeof(EpisodeAutocompleteHandler))] string? episodeNumber = null,
+        bool explain = false,
+        bool includePseudo = false
     )
     {
         var inputEpisodeNumber = episodeNumber;
         var interaction = Context.Interaction;
         var lng = interaction.UserLocale;
         alias = alias.Trim();
-            
+
         // Verify project
         var project = await db.ResolveAlias(alias, interaction, includeObservers: true);
         if (project is null)
             return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
-        var episodes = project.Episodes.OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList();
+        var episodes = project
+            .Episodes.OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort())
+            .ToList();
 
         // Verify or find episode
         if (episodeNumber == null)
         {
-            var nextNumber = episodes.FirstOrDefault(e => !e.Done)?.Number ?? episodes.LastOrDefault()?.Number;
+            var nextNumber =
+                episodes.FirstOrDefault(e => !e.Done)?.Number ?? episodes.LastOrDefault()?.Number;
             if (nextNumber == null)
                 return await Response.Fail(T("error.noEpisodes", lng), interaction);
             episodeNumber = nextNumber;
@@ -49,7 +52,7 @@ public class Blame(DataContext db) : InteractionModuleBase<SocketInteractionCont
         {
             episodeNumber = Episode.CanonicalizeEpisodeNumber(episodeNumber);
         }
-            
+
         var episode = episodes.FirstOrDefault(e => e.Number == episodeNumber);
         if (episode is null)
             return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
@@ -57,8 +60,10 @@ public class Blame(DataContext db) : InteractionModuleBase<SocketInteractionCont
         // Restrict display of pseudo-tasks to task owners
         if (includePseudo && !episode.VerifyEpisodeUser(db, interaction.User.Id))
             includePseudo = false;
-            
-        Log.Trace($"Blaming {project} episode {episode} for M[{interaction.User.Id} (@{interaction.User.Username})]");
+
+        Log.Trace(
+            $"Blaming {project} episode {episode} for M[{interaction.User.Id} (@{interaction.User.Username})]"
+        );
 
         var title = project.IsPrivate
             ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
@@ -89,20 +94,33 @@ public class Blame(DataContext db) : InteractionModuleBase<SocketInteractionCont
         if (project.IsArchived)
             progress.AppendLine(T("blame.archived", lng));
 
-        progress.AppendLine(explain ? episode.GenerateExplainProgress(lng, excludePseudo: !includePseudo)
-            : episode.GenerateProgress(excludePseudo: !includePseudo));
+        progress.AppendLine(
+            explain
+                ? episode.GenerateExplainProgress(lng, excludePseudo: !includePseudo)
+                : episode.GenerateProgress(excludePseudo: !includePseudo)
+        );
 
         // Add any update information
-        if (project.AniListId != null && !episode.Tasks.Any(t => t.Done) && Episode.EpisodeNumberIsNumber(episode.Number, out var decimalNumber))
+        if (
+            project.AniListId != null
+            && !episode.Tasks.Any(t => t.Done)
+            && Episode.EpisodeNumberIsNumber(episode.Number, out var decimalNumber)
+        )
         {
-            var airStatus = await AirDateService.GetAirDateString((int)project.AniListId, decimalNumber + (project.AniListOffset ?? 0), lng);
+            var airStatus = await AirDateService.GetAirDateString(
+                (int)project.AniListId,
+                decimalNumber + (project.AniListOffset ?? 0),
+                lng
+            );
             progress.AppendLine();
             progress.AppendLine(airStatus);
         }
         else if (episode.Updated != null)
         {
             progress.AppendLine();
-            progress.AppendLine(T("episode.lastUpdated", lng, $"<t:{episode.Updated?.ToUnixTimeSeconds()}:R>"));
+            progress.AppendLine(
+                T("episode.lastUpdated", lng, $"<t:{episode.Updated?.ToUnixTimeSeconds()}:R>")
+            );
         }
 
         var resultEmbed = new EmbedBuilder()

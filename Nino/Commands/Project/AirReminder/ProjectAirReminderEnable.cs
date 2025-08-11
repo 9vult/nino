@@ -14,10 +14,10 @@ namespace Nino.Commands
         {
             [SlashCommand("enable", "Enable airing reminders")]
             public async Task<RuntimeResult> Enable(
-                [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-                [Summary("channel", "Channel to post reminders in"), ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel channel,
-                [Summary("role", "Role to ping for reminders")] SocketRole? role = null,
-                [Summary("member", "Member to ping for reminders")] SocketUser? member = null
+                [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+                [ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel channel,
+                SocketRole? role = null,
+                SocketUser? member = null
             )
             {
                 var interaction = Context.Interaction;
@@ -32,7 +32,10 @@ namespace Nino.Commands
                 // Verify project and user - Owner or Admin required
                 var project = await db.ResolveAlias(alias, interaction);
                 if (project is null)
-                    return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+                    return await Response.Fail(
+                        T("error.alias.resolutionFailed", lng, alias),
+                        interaction
+                    );
 
                 if (!project.VerifyUser(db, interaction.User.Id))
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
@@ -41,7 +44,7 @@ namespace Nino.Commands
                 project.AirReminderChannelId = channelId;
                 project.AirReminderRoleId = roleId;
                 project.AirReminderUserId = memberId;
-                
+
                 Log.Info($"Enabled air reminders for {project}");
 
                 // Send success embed
@@ -53,7 +56,10 @@ namespace Nino.Commands
 
                 // Check reminder channel permissions
                 if (!PermissionChecker.CheckPermissions(channelId))
-                    await Response.Info(T("error.missingChannelPerms", lng, $"<#{channelId}>"), interaction);
+                    await Response.Info(
+                        T("error.missingChannelPerms", lng, $"<#{channelId}>"),
+                        interaction
+                    );
 
                 await db.TrySaveChangesAsync(interaction);
                 return ExecutionResult.Success;

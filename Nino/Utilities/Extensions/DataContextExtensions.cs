@@ -41,11 +41,11 @@ public static class DataContextExtensions
 
         if (result is null || !result.IsPrivate)
             return result;
-        
+
         // Verify the user has permission to view the project
         if (result.VerifyUser(db, interaction.User.Id, includeStaff: true))
             return result;
-        
+
         Log.Trace($"Query for {result} rejected due to insufficient permissions");
         return null;
     }

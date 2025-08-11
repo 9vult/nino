@@ -5,7 +5,7 @@ namespace Nino.Records.Enums
     public enum BlameAllType
     {
         Normal,
-        StallCheck
+        StallCheck,
     }
 
     public static class BlameAllTypeExtensions

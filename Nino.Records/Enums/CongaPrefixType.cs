@@ -6,7 +6,7 @@ namespace Nino.Records.Enums
     {
         None = 0,
         Nickname = 1,
-        Title = 2
+        Title = 2,
     }
 
     public static class CongaPrefixTypeExtensions

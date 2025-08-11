@@ -13,9 +13,9 @@ namespace Nino.Commands
         {
             [SlashCommand("enable", "Enable conga reminders")]
             public async Task<RuntimeResult> Enable(
-                [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-                [Summary("days", "Reminder period"), MinValue(1), MaxValue(90)] int days,
-                [Summary("channel", "Channel to post reminders in"), ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel channel
+                [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+                [MinValue(1), MaxValue(90)] int days,
+                [ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel channel
             )
             {
                 var interaction = Context.Interaction;
@@ -29,7 +29,10 @@ namespace Nino.Commands
                 // Verify project and user - Owner or Admin required
                 var project = await db.ResolveAlias(alias, interaction);
                 if (project is null)
-                    return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+                    return await Response.Fail(
+                        T("error.alias.resolutionFailed", lng, alias),
+                        interaction
+                    );
 
                 if (!project.VerifyUser(db, interaction.User.Id))
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
@@ -37,19 +40,24 @@ namespace Nino.Commands
                 project.CongaReminderEnabled = true;
                 project.CongaReminderChannelId = channelId;
                 project.CongaReminderPeriod = TimeSpan.FromHours(hours);
-                
+
                 Log.Info($"Enabled conga reminders for {project} with a period of {hours} hours.");
 
                 // Send success embed
                 var embed = new EmbedBuilder()
                     .WithTitle(T("title.projectModification", lng))
-                    .WithDescription(T("project.congareminder.enabled", lng, project.Nickname, hours))
+                    .WithDescription(
+                        T("project.congareminder.enabled", lng, project.Nickname, hours)
+                    )
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 
                 // Check reminder channel permissions
                 if (!PermissionChecker.CheckPermissions(channelId))
-                    await Response.Info(T("error.missingChannelPerms", lng, $"<#{channelId}>"), interaction);
+                    await Response.Info(
+                        T("error.missingChannelPerms", lng, $"<#{channelId}>"),
+                        interaction
+                    );
 
                 await db.TrySaveChangesAsync(interaction);
                 return ExecutionResult.Success;

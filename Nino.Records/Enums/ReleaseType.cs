@@ -7,7 +7,7 @@ namespace Nino.Records.Enums
         Episode = 0,
         Volume = 1,
         Batch = 2,
-        Custom = 3
+        Custom = 3,
     }
 
     public static class ReleaseTypeExtensions

@@ -15,8 +15,8 @@ namespace Nino.Commands
         {
             [SlashCommand("add", "Add an administrator to this project")]
             public async Task<RuntimeResult> Add(
-                [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-                [Summary("member", "Staff member")] SocketUser member
+                [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+                SocketUser member
             )
             {
                 var interaction = Context.Interaction;
@@ -30,22 +30,27 @@ namespace Nino.Commands
                 // Verify project and user - Owner required
                 var project = await db.ResolveAlias(alias, interaction);
                 if (project is null)
-                    return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+                    return await Response.Fail(
+                        T("error.alias.resolutionFailed", lng, alias),
+                        interaction
+                    );
 
                 if (!project.VerifyUser(db, interaction.User.Id, excludeAdmins: true))
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
                 // Validate user isn't already an admin
                 if (project.Administrators.Any(a => a.UserId == memberId))
-                    return await Response.Fail(T("error.admin.alreadyAdmin", lng, staffMention), interaction);
+                    return await Response.Fail(
+                        T("error.admin.alreadyAdmin", lng, staffMention),
+                        interaction
+                    );
 
                 // Add to database
-                project.Administrators.Add(new Administrator
-                {
-                    UserId = memberId,
-                });
+                project.Administrators.Add(new Administrator { UserId = memberId });
 
-                Log.Info($"Added M[{memberId} (@{member.Username})] as an administrator for {project}");
+                Log.Info(
+                    $"Added M[{memberId} (@{member.Username})] as an administrator for {project}"
+                );
 
                 // Send success embed
                 var embed = new EmbedBuilder()

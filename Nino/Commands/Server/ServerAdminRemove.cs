@@ -12,9 +12,7 @@ namespace Nino.Commands
         public partial class Admin
         {
             [SlashCommand("remove", "Remove an administrator from this server")]
-            public async Task<RuntimeResult> Remove(
-                [Summary("member", "Staff member")] SocketGuildUser member
-            )
+            public async Task<RuntimeResult> Remove(SocketGuildUser member)
             {
                 var interaction = Context.Interaction;
                 var lng = interaction.UserLocale;
@@ -37,11 +35,16 @@ namespace Nino.Commands
                 // Validate user is an admin
                 var admin = config.Administrators.FirstOrDefault(a => a.UserId == memberId);
                 if (admin is null)
-                    return await Response.Fail(T("error.noSuchAdmin", lng, staffMention), interaction);
+                    return await Response.Fail(
+                        T("error.noSuchAdmin", lng, staffMention),
+                        interaction
+                    );
 
                 config.Administrators.Remove(admin);
 
-                Log.Info($"Updated configuration for guild {config.GuildId}, removed {memberId} as an administrator");
+                Log.Info(
+                    $"Updated configuration for guild {config.GuildId}, removed {memberId} as an administrator"
+                );
 
                 // Send success embed
                 var embed = new EmbedBuilder()

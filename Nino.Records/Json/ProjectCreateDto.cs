@@ -9,7 +9,7 @@ public class ProjectCreateDto
     public required bool IsPrivate;
     public required ulong UpdateChannelId;
     public required ulong ReleaseChannelId;
-    
+
     public string? Title;
     public ProjectType? Type;
     public int? Length;
@@ -18,7 +18,7 @@ public class ProjectCreateDto
     public ulong[]? AdministratorIds;
     public string[]? Aliases;
     public CongaNodeDto[]? CongaParticipants;
-    
+
     public required StaffCreateDto[] KeyStaff;
     public required Dictionary<string, StaffCreateDto[]> AdditionalStaff;
 }

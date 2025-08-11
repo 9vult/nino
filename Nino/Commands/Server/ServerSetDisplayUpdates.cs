@@ -12,9 +12,7 @@ namespace Nino.Commands
         public partial class Display
         {
             [SlashCommand("updates", "Control how progress updates should look")]
-            public async Task<RuntimeResult> SetUpdates(
-                [Summary("type", "Display type")] UpdatesDisplayType type
-            )
+            public async Task<RuntimeResult> SetUpdates(UpdatesDisplayType type)
             {
                 var interaction = Context.Interaction;
                 var lng = interaction.UserLocale;
@@ -29,10 +27,12 @@ namespace Nino.Commands
                 var config = db.GetConfig(guildId);
                 if (config == null)
                     return await Response.Fail(T("error.noSuchConfig", lng), interaction);
-                
+
                 config.UpdateDisplay = type;
-                
-                Log.Info($"Updated configuration for guild {config.GuildId}, set Update Display to {type.ToFriendlyString(lng)}");
+
+                Log.Info(
+                    $"Updated configuration for guild {config.GuildId}, set Update Display to {type.ToFriendlyString(lng)}"
+                );
 
                 // Send success embed
                 var embed = new EmbedBuilder()

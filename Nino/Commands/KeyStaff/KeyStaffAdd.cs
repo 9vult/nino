@@ -7,6 +7,7 @@ using Nino.Records.Enums;
 using Nino.Utilities;
 using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
+using Task = Nino.Records.Task;
 
 namespace Nino.Commands;
 
@@ -14,11 +15,11 @@ public partial class KeyStaff
 {
     [SlashCommand("add", "Add a new Key Staff to the whole project")]
     public async Task<RuntimeResult> Add(
-        [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-        [Summary("member", "Staff member")] SocketUser member,
-        [Summary("abbreviation", "Position shorthand"), MaxLength(16)] string abbreviation,
-        [Summary("fullName", "Full position name"), MaxLength(32)] string taskName,
-        [Summary("isPseudo", "Position is a Pseudo-task")]bool isPseudo = false
+        [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+        SocketUser member,
+        [MaxLength(16)] string abbreviation,
+        [MaxLength(32)] string fullName,
+        bool isPseudo = false
     )
     {
         var interaction = Context.Interaction;
@@ -27,7 +28,7 @@ public partial class KeyStaff
         // Sanitize inputs
         var memberId = member.Id;
         alias = alias.Trim();
-        taskName = taskName.Trim();
+        fullName = fullName.Trim();
         abbreviation = abbreviation.Trim().ToUpperInvariant().Replace("$", string.Empty);
 
         // Verify project and user - Owner or Admin required
@@ -40,7 +41,11 @@ public partial class KeyStaff
 
         // Check if position already exists
         var additionalStaffs = project.Episodes.SelectMany(e => e.AdditionalStaff).ToHashSet();
-        if (project.KeyStaff.Concat(additionalStaffs).Any(ks => ks.Role.Abbreviation == abbreviation))
+        if (
+            project
+                .KeyStaff.Concat(additionalStaffs)
+                .Any(ks => ks.Role.Abbreviation == abbreviation)
+        )
             return await Response.Fail(T("error.positionExists", lng), interaction);
 
         // All good!
@@ -51,21 +56,26 @@ public partial class KeyStaff
             Role = new Role
             {
                 Abbreviation = abbreviation,
-                Name = taskName,
-                Weight = (project.KeyStaff.Max(ks => ks.Role.Weight) ?? 0) + 1
+                Name = fullName,
+                Weight = (project.KeyStaff.Max(ks => ks.Role.Weight) ?? 0) + 1,
             },
-            IsPseudo = isPseudo
+            IsPseudo = isPseudo,
         };
-        
+
         var markDoneIfEpisodeIsDone = false;
-        
+
         if (project.Episodes.Any(e => e.Done))
         {
-            var (response, finalBody, questionMessage) 
-                = await Ask.AboutAction(interactive, interaction, project, lng,  Ask.InconsequentialAction.MarkTaskDoneIfEpisodeIsDone);
-            
+            var (response, finalBody, questionMessage) = await Ask.AboutAction(
+                interactive,
+                interaction,
+                project,
+                lng,
+                Ask.InconsequentialAction.MarkTaskDoneIfEpisodeIsDone
+            );
+
             markDoneIfEpisodeIsDone = response;
-            
+
             // Update the question embed to reflect the choice
             if (questionMessage is not null)
             {
@@ -78,7 +88,8 @@ public partial class KeyStaff
                     .WithDescription(finalBody)
                     .WithCurrentTimestamp()
                     .Build();
-                await questionMessage.ModifyAsync(m => {
+                await questionMessage.ModifyAsync(m =>
+                {
                     m.Components = null;
                     m.Embed = editedEmbed;
                 });
@@ -95,7 +106,9 @@ public partial class KeyStaff
             episode.Done = episode.Done && taskDone;
         }
 
-        Log.Info($"Added M[{memberId} (@{member.Username})] to {project} for {abbreviation} (IsPseudo={isPseudo})");
+        Log.Info(
+            $"Added M[{memberId} (@{member.Username})] to {project} for {abbreviation} (IsPseudo={isPseudo})"
+        );
 
         // Send success embed
         var staffMention = $"<@{memberId}>";
@@ -113,19 +126,21 @@ public partial class KeyStaff
         await db.TrySaveChangesAsync(interaction);
         return ExecutionResult.Success;
 
-        Records.Task NewUndoneTask() => new()
-        {
-            Id = Guid.Empty,
-            Abbreviation = abbreviation,
-            Done = false,
-            LastReminded = null
-        };
+        Task NewUndoneTask() =>
+            new()
+            {
+                Id = Guid.Empty,
+                Abbreviation = abbreviation,
+                Done = false,
+                LastReminded = null,
+            };
 
-        Records.Task NewDoneTask() => new()
-        {
-            Id = Guid.Empty,
-            Abbreviation = abbreviation,
-            Done = true
-        };
+        Task NewDoneTask() =>
+            new()
+            {
+                Id = Guid.Empty,
+                Abbreviation = abbreviation,
+                Done = true,
+            };
     }
 }

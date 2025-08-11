@@ -14,16 +14,16 @@ namespace Nino.Commands
     {
         [SlashCommand("create", "Create a new project")]
         public async Task<RuntimeResult> Create(
-            [Summary("nickname", "Short project nickname (no spaces)")] string nickname,
-            [Summary("anilistId", "AniList ID")] int aniListId,
-            [Summary("private", "Is this project private?")] bool isPrivate,
-            [Summary("updateChannel", "Channel to post updates to"), ChannelTypes(ChannelType.Text, ChannelType.News)]IMessageChannel updateChannel,
-            [Summary("releaseChannel", "Channel to post releases to"), ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel releaseChannel,
-            [Summary("title", "Full series title")] string? title = null,
-            [Summary("type", "Project type")] ProjectType? type = null,
-            [Summary("length", "Number of episodes"), MinValue(1)] int? length = null,
-            [Summary("firstEpisode", "First episode number")] decimal firstEpisode = 1,
-            [Summary("poster", "Poster image URL")] string? posterUri = null
+            string nickname,
+            int anilistId,
+            bool isPrivate,
+            [ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel updateChannel,
+            [ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel releaseChannel,
+            string? title = null,
+            ProjectType? type = null,
+            [MinValue(1)] int? length = null,
+            string? posterUri = null,
+            decimal firstEpisode = 1
         )
         {
             var interaction = Context.Interaction;
@@ -50,21 +50,26 @@ namespace Nino.Commands
                     interaction
                 );
 
-            var defaultFieldNames = string.Join(", ", new[] { nameof(title), nameof(length), nameof(type), nameof(posterUri) }
-                .Zip(new object?[] { title, length, type, posterUri })
-                .Where(p => p.Second is null)
-                .Select(p => p.First));
-            
-            if (defaultFieldNames.Length > 0)
-                Log.Info($"AniList will be used in the construction of project '{nickname}' for the following fields: {defaultFieldNames}");
+            var defaultFieldNames = string.Join(
+                ", ",
+                new[] { nameof(title), nameof(length), nameof(type), nameof(posterUri) }
+                    .Zip(new object?[] { title, length, type, posterUri })
+                    .Where(p => p.Second is null)
+                    .Select(p => p.First)
+            );
 
-            var apiResponse = await AniListService.Get(aniListId);
+            if (defaultFieldNames.Length > 0)
+                Log.Info(
+                    $"AniList will be used in the construction of project '{nickname}' for the following fields: {defaultFieldNames}"
+                );
+
+            var apiResponse = await AniListService.Get(anilistId);
             if (apiResponse is not null && apiResponse.Error is null)
             {
                 title ??= apiResponse.Title;
                 length ??= apiResponse.EpisodeCount;
                 type ??= apiResponse.Type;
-                
+
                 if (title is null || length is null || length < 1)
                 {
                     return await Response.Fail(
@@ -104,7 +109,7 @@ namespace Nino.Commands
                 AirReminderEnabled = false,
                 CongaReminderEnabled = false,
                 CongaParticipants = new CongaGraph(),
-                AniListId = aniListId,
+                AniListId = anilistId,
                 Created = DateTimeOffset.UtcNow,
             };
 
@@ -136,7 +141,7 @@ namespace Nino.Commands
                 Log.Info($"Creating default configuration for guild {guildId}");
                 await db.Configurations.AddAsync(Configuration.CreateDefault(guildId));
             }
-            
+
             Log.Info(
                 $"Creating project {projectData} for M[{ownerId} (@{member.Username})] with {episodes.Count} episodes, starting with episode {firstEpisode}"
             );

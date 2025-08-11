@@ -8,6 +8,7 @@ public class Role
 {
     [MaxLength(16)]
     public required string Abbreviation { get; set; }
+
     [MaxLength(32)]
     public required string Name { get; set; }
     public decimal? Weight { get; set; }

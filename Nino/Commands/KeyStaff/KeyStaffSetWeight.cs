@@ -11,9 +11,9 @@ namespace Nino.Commands
     {
         [SlashCommand("set-weight", "Set the weight of a Key Staff position")]
         public async Task<RuntimeResult> SetWeight(
-            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-            [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(KeyStaffAutocompleteHandler))] string abbreviation,
-            [Summary("weight", "Weight")] decimal inputWeight
+            [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+            [Autocomplete(typeof(KeyStaffAutocompleteHandler))] string abbreviation,
+            decimal weight
         )
         {
             var interaction = Context.Interaction;
@@ -26,7 +26,10 @@ namespace Nino.Commands
             // Verify project and user - Owner or Admin required
             var project = await db.ResolveAlias(alias, interaction);
             if (project is null)
-                return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+                return await Response.Fail(
+                    T("error.alias.resolutionFailed", lng, alias),
+                    interaction
+                );
 
             if (!project.VerifyUser(db, interaction.User.Id))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
@@ -37,14 +40,14 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
 
             // Update user
-            staff.Role.Weight = inputWeight;
-            
-            Log.Info($"Set {abbreviation} weight to {inputWeight} in {project}");
+            staff.Role.Weight = weight;
+
+            Log.Info($"Set {abbreviation} weight to {weight} in {project}");
 
             // Send success embed
             var embed = new EmbedBuilder()
                 .WithTitle(T("title.projectModification", lng))
-                .WithDescription(T("keyStaff.weight.updated", lng, abbreviation, inputWeight))
+                .WithDescription(T("keyStaff.weight.updated", lng, abbreviation, weight))
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 

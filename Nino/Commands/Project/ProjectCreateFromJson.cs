@@ -1,25 +1,24 @@
 ﻿using System.Globalization;
 using System.Net.Http.Json;
-using Discord;
-using Discord.Interactions;
-using Nino.Records;
-using Nino.Utilities;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Discord;
+using Discord.Interactions;
+using Nino.Records;
 using Nino.Records.Json;
 using Nino.Services;
+using Nino.Utilities;
 using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
+using Task = Nino.Records.Task;
 
 namespace Nino.Commands;
 
 public partial class ProjectManagement
 {
     [SlashCommand("create-from-json", "Create a project using a json file")]
-    public async Task<RuntimeResult> CreateFromJson (
-        [Summary("file", "Project Template")] IAttachment file
-    )
+    public async Task<RuntimeResult> CreateFromJson(IAttachment file)
     {
         var interaction = Context.Interaction;
         var lng = interaction.UserLocale;
@@ -27,22 +26,28 @@ public partial class ProjectManagement
         var guildId = interaction.GuildId ?? 0;
         var guild = Nino.Client.GetGuild(guildId);
         var member = guild.GetUser(interaction.User.Id);
-        if (!Utils.VerifyAdministrator(db, member, guild)) return await Response.Fail(T("error.notPrivileged", lng), interaction);
+        if (!Utils.VerifyAdministrator(db, member, guild))
+            return await Response.Fail(T("error.notPrivileged", lng), interaction);
 
-        Log.Info($"Project creation from json file requested by M[{interaction.User.Id} (@{interaction.User.Username})]");
-            
+        Log.Info(
+            $"Project creation from json file requested by M[{interaction.User.Id} (@{interaction.User.Username})]"
+        );
+
         // Parse the json
         ProjectCreateDto? template;
         try
         {
             Log.Trace("Attempting to get and parse JSON...");
             using var client = new HttpClient();
-            template = await client.GetFromJsonAsync<ProjectCreateDto>(file.Url, new JsonSerializerOptions
-            {
-                IncludeFields = true,
-                PropertyNameCaseInsensitive = true,
-                Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
-            });
+            template = await client.GetFromJsonAsync<ProjectCreateDto>(
+                file.Url,
+                new JsonSerializerOptions
+                {
+                    IncludeFields = true,
+                    PropertyNameCaseInsensitive = true,
+                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
+                }
+            );
 
             if (template is null)
             {
@@ -59,7 +64,7 @@ public partial class ProjectManagement
             Log.Trace("Project creation from json file failed");
             return await Response.Fail(e.Message, interaction);
         }
-            
+
         var ownerId = interaction.User.Id;
 
         // Sanitize input
@@ -67,15 +72,37 @@ public partial class ProjectManagement
 
         // Verify data
         if (db.Projects.Any(p => p.GuildId == guildId && p.Nickname == template.Nickname))
-            return await Response.Fail(T("error.project.nameInUse", lng, template.Nickname), interaction);
-        
-        var defaultFieldNames = string.Join(", ", new[] { nameof(template.Title), nameof(template.Length), nameof(template.Type), nameof(template.PosterUri) }
-            .Zip(new object?[] { template.Title, template.Length, template.Type, template.PosterUri })
-            .Where(p => p.Second is null)
-            .Select(p => p.First));
-            
+            return await Response.Fail(
+                T("error.project.nameInUse", lng, template.Nickname),
+                interaction
+            );
+
+        var defaultFieldNames = string.Join(
+            ", ",
+            new[]
+            {
+                nameof(template.Title),
+                nameof(template.Length),
+                nameof(template.Type),
+                nameof(template.PosterUri),
+            }
+                .Zip(
+                    new object?[]
+                    {
+                        template.Title,
+                        template.Length,
+                        template.Type,
+                        template.PosterUri,
+                    }
+                )
+                .Where(p => p.Second is null)
+                .Select(p => p.First)
+        );
+
         if (defaultFieldNames.Length > 0)
-            Log.Info($"AniList will be used in the construction of project '{template.Nickname}' for the following fields: {defaultFieldNames}");
+            Log.Info(
+                $"AniList will be used in the construction of project '{template.Nickname}' for the following fields: {defaultFieldNames}"
+            );
 
         var apiResponse = await AniListService.Get(template.AniListId);
         if (apiResponse is not null && apiResponse.Error is null)
@@ -83,7 +110,7 @@ public partial class ProjectManagement
             template.Title ??= apiResponse.Title;
             template.Length ??= apiResponse.EpisodeCount;
             template.Type ??= apiResponse.Type;
-                
+
             if (template.Title is null || template.Length is null || template.Length < 1)
             {
                 return await Response.Fail(
@@ -100,9 +127,12 @@ public partial class ProjectManagement
             );
         }
 
-        if (template.PosterUri is null || !Uri.TryCreate(template.PosterUri, UriKind.Absolute, out _))
+        if (
+            template.PosterUri is null
+            || !Uri.TryCreate(template.PosterUri, UriKind.Absolute, out _)
+        )
         {
-            template.PosterUri = apiResponse?.CoverImage ?? AniListService.FallbackPosterUri;
+            template.PosterUri = apiResponse.CoverImage ?? AniListService.FallbackPosterUri;
         }
 
         // Configure weights
@@ -120,20 +150,26 @@ public partial class ProjectManagement
                 ks.Role.Weight ??= idxWeight++;
             }
         }
-            
+
         // Sanitization
         foreach (var ks in template.KeyStaff)
         {
-            ks.Role.Abbreviation = ks.Role.Abbreviation.Trim().ToUpperInvariant().Replace("$", string.Empty);
+            ks.Role.Abbreviation = ks
+                .Role.Abbreviation.Trim()
+                .ToUpperInvariant()
+                .Replace("$", string.Empty);
             ks.Role.Name = ks.Role.Name.Trim();
         }
 
         foreach (var ks in template.AdditionalStaff.Values.SelectMany(x => x))
         {
-            ks.Role.Abbreviation = ks.Role.Abbreviation.Trim().ToUpperInvariant().Replace("$", string.Empty);
+            ks.Role.Abbreviation = ks
+                .Role.Abbreviation.Trim()
+                .ToUpperInvariant()
+                .Replace("$", string.Empty);
             ks.Role.Name = ks.Role.Name.Trim();
         }
-            
+
         // Populate data
         var projectData = new Project
         {
@@ -150,35 +186,61 @@ public partial class ProjectManagement
             IsArchived = false,
             AirReminderEnabled = false,
             CongaReminderEnabled = false,
-            Administrators = template.AdministratorIds?.Select(i => new Administrator { UserId = i}).ToList() ?? [],
-            KeyStaff = template.KeyStaff.Select(s => new Staff { UserId = s.UserId, IsPseudo = s.IsPseudo, Role = s.Role }).ToList(),
-            CongaParticipants = CongaGraph.Deserialize(template.CongaParticipants ?? []) ,
+            Administrators =
+                template.AdministratorIds?.Select(i => new Administrator { UserId = i }).ToList()
+                ?? [],
+            KeyStaff = template
+                .KeyStaff.Select(s => new Staff
+                {
+                    UserId = s.UserId,
+                    IsPseudo = s.IsPseudo,
+                    Role = s.Role,
+                })
+                .ToList(),
+            CongaParticipants = CongaGraph.Deserialize(template.CongaParticipants ?? []),
             Aliases = template.Aliases?.Select(a => new Records.Alias { Value = a }).ToList() ?? [],
             AniListId = template.AniListId,
-            Created = DateTimeOffset.UtcNow
+            Created = DateTimeOffset.UtcNow,
         };
-            
+
         var episodes = new List<Episode>();
         for (var i = template.FirstEpisode; i < template.FirstEpisode + template.Length; i++)
         {
             var stringNumber = i.Value.ToString(CultureInfo.InvariantCulture);
             template.AdditionalStaff.TryGetValue(stringNumber, out var additionalStaff);
-            episodes.Add(new Episode
-            {
-                GuildId = guildId,
-                ProjectId = projectData.Id,
-                Number = stringNumber,
-                Done = false,
-                ReminderPosted = false,
-                AdditionalStaff = additionalStaff?.Select(s => new Staff { UserId = s.UserId, IsPseudo = s.IsPseudo, Role = s.Role }).ToList() ?? [],
-                PinchHitters = [],
-                Tasks = template.KeyStaff.Concat(additionalStaff ?? [])
-                    .Select(ks => new Records.Task { Abbreviation = ks.Role.Abbreviation, Done = false })
-                    .ToList(),
-            });
+            episodes.Add(
+                new Episode
+                {
+                    GuildId = guildId,
+                    ProjectId = projectData.Id,
+                    Number = stringNumber,
+                    Done = false,
+                    ReminderPosted = false,
+                    AdditionalStaff =
+                        additionalStaff
+                            ?.Select(s => new Staff
+                            {
+                                UserId = s.UserId,
+                                IsPseudo = s.IsPseudo,
+                                Role = s.Role,
+                            })
+                            .ToList() ?? [],
+                    PinchHitters = [],
+                    Tasks = template
+                        .KeyStaff.Concat(additionalStaff ?? [])
+                        .Select(ks => new Task
+                        {
+                            Abbreviation = ks.Role.Abbreviation,
+                            Done = false,
+                        })
+                        .ToList(),
+                }
+            );
         }
 
-        Log.Info($"Creating project {projectData} for M[{ownerId} (@{member.Username})] from JSON file '{file.Filename}' with {episodes.Count} episodes and {template.KeyStaff.Length} keystaff");
+        Log.Info(
+            $"Creating project {projectData} for M[{ownerId} (@{member.Username})] from JSON file '{file.Filename}' with {episodes.Count} episodes and {template.KeyStaff.Length} keystaff"
+        );
 
         // Add project and episodes to database
         await db.Projects.AddAsync(projectData);
@@ -190,7 +252,7 @@ public partial class ProjectManagement
             Log.Info($"Creating default configuration for guild {guildId}");
             await db.Configurations.AddAsync(Configuration.CreateDefault(guildId));
         }
-            
+
         var builder = new StringBuilder();
         builder.AppendLine(T("project.created", lng, template.Nickname));
 
@@ -209,9 +271,15 @@ public partial class ProjectManagement
 
         // Check progress channel permissions
         if (!PermissionChecker.CheckPermissions(template.UpdateChannelId))
-            await Response.Info(T("error.missingChannelPerms", lng, $"<#{template.UpdateChannelId}>"), interaction);
+            await Response.Info(
+                T("error.missingChannelPerms", lng, $"<#{template.UpdateChannelId}>"),
+                interaction
+            );
         if (!PermissionChecker.CheckReleasePermissions(template.ReleaseChannelId))
-            await Response.Info(T("error.missingChannelPermsRelease", lng, $"<#{template.ReleaseChannelId}>"), interaction);
+            await Response.Info(
+                T("error.missingChannelPermsRelease", lng, $"<#{template.ReleaseChannelId}>"),
+                interaction
+            );
 
         await db.TrySaveChangesAsync(interaction);
         return ExecutionResult.Success;

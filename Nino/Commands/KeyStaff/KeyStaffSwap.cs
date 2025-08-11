@@ -12,9 +12,9 @@ namespace Nino.Commands
     {
         [SlashCommand("swap", "Swap a Key Staff into the whole project")]
         public async Task<RuntimeResult> Swap(
-            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-            [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(KeyStaffAutocompleteHandler))] string abbreviation,
-            [Summary("member", "Staff member")] SocketUser member
+            [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+            [Autocomplete(typeof(KeyStaffAutocompleteHandler))] string abbreviation,
+            SocketUser member
         )
         {
             var interaction = Context.Interaction;
@@ -28,11 +28,14 @@ namespace Nino.Commands
             // Verify project and user - Owner or Admin required
             var project = await db.ResolveAlias(alias, interaction);
             if (project is null)
-                return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+                return await Response.Fail(
+                    T("error.alias.resolutionFailed", lng, alias),
+                    interaction
+                );
 
             if (!project.VerifyUser(db, interaction.User.Id))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
-                
+
             // Check if position exists
             var staff = project.KeyStaff.SingleOrDefault(s => s.Role.Abbreviation == abbreviation);
             if (staff is null)
@@ -41,7 +44,9 @@ namespace Nino.Commands
             // Update user
             staff.UserId = memberId;
 
-            Log.Info($"Swapped M[{memberId} (@{member.Username})] in to {project} for {abbreviation}");
+            Log.Info(
+                $"Swapped M[{memberId} (@{member.Username})] in to {project} for {abbreviation}"
+            );
 
             // Send success embed
             var staffMention = $"<@{memberId}>";

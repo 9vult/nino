@@ -14,8 +14,8 @@ namespace Nino.Commands
         {
             [SlashCommand("remove", "Remove an administrator from this project")]
             public async Task<RuntimeResult> Remove(
-                [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-                [Summary("member", "Staff member")] SocketUser member
+                [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+                SocketUser member
             )
             {
                 var interaction = Context.Interaction;
@@ -29,7 +29,10 @@ namespace Nino.Commands
                 // Verify project and user - Owner required
                 var project = await db.ResolveAlias(alias, interaction);
                 if (project is null)
-                    return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+                    return await Response.Fail(
+                        T("error.alias.resolutionFailed", lng, alias),
+                        interaction
+                    );
 
                 if (!project.VerifyUser(db, interaction.User.Id, excludeAdmins: true))
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
@@ -37,7 +40,10 @@ namespace Nino.Commands
                 // Validate user is an admin
                 var admin = project.Administrators.FirstOrDefault(a => a.UserId == memberId);
                 if (admin is null)
-                    return await Response.Fail(T("error.noSuchAdmin", lng, staffMention), interaction);
+                    return await Response.Fail(
+                        T("error.noSuchAdmin", lng, staffMention),
+                        interaction
+                    );
 
                 project.Administrators.Remove(admin);
 
@@ -46,7 +52,9 @@ namespace Nino.Commands
                 // Send success embed
                 var embed = new EmbedBuilder()
                     .WithTitle(T("title.projectModification", lng))
-                    .WithDescription(T("project.admin.removed", lng, staffMention, project.Nickname))
+                    .WithDescription(
+                        T("project.admin.removed", lng, staffMention, project.Nickname)
+                    )
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 

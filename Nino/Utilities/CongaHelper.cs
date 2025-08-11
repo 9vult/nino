@@ -13,34 +13,53 @@ public static class CongaHelper
     /// <param name="episode">The episode to check</param>
     /// <param name="checkDate">Check if the task needs to be reminded</param>
     /// <returns>A list of tardy task abbreviations</returns>
-    public static List<string> GetTardyTasks(Project project, Episode episode, bool checkDate = true)
+    public static List<string> GetTardyTasks(
+        Project project,
+        Episode episode,
+        bool checkDate = true
+    )
     {
         var taskLookup = episode.Tasks.ToDictionary(t => t.Abbreviation, t => t);
         var graph = project.CongaParticipants;
         var nextTasks = new List<string>();
-        
+
         foreach (var nextTask in taskLookup.Keys)
         {
             var prerequisites = graph.GetPrerequisitesFor(nextTask).ToList();
-            if (prerequisites.Count == 0) continue;
+            if (prerequisites.Count == 0)
+                continue;
 
             // Check if all prereqs are complete and that the task exists
-            if (!prerequisites.All(p => p.Type == CongaNodeType.Special || (taskLookup.TryGetValue(p.Abbreviation, out var pTask) && pTask.Done))) continue;
-            if (!taskLookup.TryGetValue(nextTask, out var task) || task.Done) continue;
-            
+            if (
+                !prerequisites.All(p =>
+                    p.Type == CongaNodeType.Special
+                    || (taskLookup.TryGetValue(p.Abbreviation, out var pTask) && pTask.Done)
+                )
+            )
+                continue;
+            if (!taskLookup.TryGetValue(nextTask, out var task) || task.Done)
+                continue;
+
             // We aren't checking the date here
             if (!checkDate)
             {
                 nextTasks.Add(nextTask);
                 continue;
             }
-            
+
             // Add to the list if the task is indeed tardy
-            if (!taskLookup.TryGetValue(nextTask, out var candidate) || candidate.LastReminded is null) continue;
-            if (candidate.LastReminded?.AddMinutes(-2) < DateTimeOffset.UtcNow - project.CongaReminderPeriod)
+            if (
+                !taskLookup.TryGetValue(nextTask, out var candidate)
+                || candidate.LastReminded is null
+            )
+                continue;
+            if (
+                candidate.LastReminded?.AddMinutes(-2)
+                < DateTimeOffset.UtcNow - project.CongaReminderPeriod
+            )
                 nextTasks.Add(nextTask);
         }
-        
+
         return nextTasks;
     }
 
@@ -58,17 +77,27 @@ public static class CongaHelper
         var nodes = forceAdditional
             ? project.CongaParticipants.Nodes
             : project.CongaParticipants.Nodes.Where(n => n.Type != CongaNodeType.AdditionalStaff);
-        
+
         foreach (var node in nodes.OrderBy(n => n.Abbreviation))
         {
-            var isPseudo = project.KeyStaff.FirstOrDefault(t => t.Role.Abbreviation == node.Abbreviation)?.IsPseudo ?? false;
-            
-            var shape = node.Type == CongaNodeType.Special ? "diamond" : isPseudo ? "Mcircle" : "circle";
+            var isPseudo =
+                project
+                    .KeyStaff.FirstOrDefault(t => t.Role.Abbreviation == node.Abbreviation)
+                    ?.IsPseudo ?? false;
+
+            var shape =
+                node.Type == CongaNodeType.Special ? "diamond"
+                : isPseudo ? "Mcircle"
+                : "circle";
             var style = node.Type == CongaNodeType.AdditionalStaff ? "filled,dashed" : "filled";
-            
-            sb.AppendLine($"    \"{node.Abbreviation}\" [style=\"{style}\" fillcolor=white, shape={shape}, width=0.75];");
-            
-            var dependents = forceAdditional ? node.Dependents : node.Dependents.Where(n => n.Type != CongaNodeType.AdditionalStaff);
+
+            sb.AppendLine(
+                $"    \"{node.Abbreviation}\" [style=\"{style}\" fillcolor=white, shape={shape}, width=0.75];"
+            );
+
+            var dependents = forceAdditional
+                ? node.Dependents
+                : node.Dependents.Where(n => n.Type != CongaNodeType.AdditionalStaff);
 
             foreach (var dependent in dependents)
             {
@@ -97,33 +126,46 @@ public static class CongaHelper
         var nodes = forceAdditional
             ? project.CongaParticipants.Nodes
             : project.CongaParticipants.Nodes.Where(n =>
-                n.Type != CongaNodeType.AdditionalStaff ||
-                episode.Tasks.Any(t => t.Abbreviation == n.Abbreviation));
-
+                n.Type != CongaNodeType.AdditionalStaff
+                || episode.Tasks.Any(t => t.Abbreviation == n.Abbreviation)
+            );
 
         foreach (var node in nodes.OrderBy(n => n.Abbreviation))
         {
             var task = episode.Tasks.FirstOrDefault(t => t.Abbreviation == node.Abbreviation);
-            var isPseudo = project.KeyStaff.Concat(episode.AdditionalStaff)
-                .FirstOrDefault(t => t.Role.Abbreviation == node.Abbreviation)?.IsPseudo ?? false;
-            var color = node.Type == CongaNodeType.Special ? "yellow" : task is null ? "red" : task.Done ? "green" : "orange";
-            var shape = node.Type == CongaNodeType.Special ? "diamond" : isPseudo ? "Mcircle" : "circle";
+            var isPseudo =
+                project
+                    .KeyStaff.Concat(episode.AdditionalStaff)
+                    .FirstOrDefault(t => t.Role.Abbreviation == node.Abbreviation)
+                    ?.IsPseudo ?? false;
+            var color =
+                node.Type == CongaNodeType.Special ? "yellow"
+                : task is null ? "red"
+                : task.Done ? "green"
+                : "orange";
+            var shape =
+                node.Type == CongaNodeType.Special ? "diamond"
+                : isPseudo ? "Mcircle"
+                : "circle";
             var style = node.Type == CongaNodeType.AdditionalStaff ? "filled,dashed" : "filled";
-            
-            sb.AppendLine($"    \"{node.Abbreviation}\" [style=\"{style}\" fillcolor={color}, shape={shape}, width=0.75];");
-            
+
+            sb.AppendLine(
+                $"    \"{node.Abbreviation}\" [style=\"{style}\" fillcolor={color}, shape={shape}, width=0.75];"
+            );
+
             var dependents = forceAdditional
                 ? node.Dependents
                 : node.Dependents.Where(n =>
-                    n.Type != CongaNodeType.AdditionalStaff ||
-                    episode.Tasks.Any(t => t.Abbreviation == n.Abbreviation));
+                    n.Type != CongaNodeType.AdditionalStaff
+                    || episode.Tasks.Any(t => t.Abbreviation == n.Abbreviation)
+                );
 
             foreach (var dependent in dependents)
             {
                 sb.AppendLine($"    \"{node.Abbreviation}\" -> \"{dependent.Abbreviation}\";");
             }
         }
-        
+
         sb.AppendLine("}");
         return Uri.EscapeDataString(sb.ToString());
     }

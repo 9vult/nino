@@ -10,20 +10,25 @@ namespace Nino.Utilities
 {
     internal static class Ask
     {
-        public static async Task<(bool, string)> AboutIrreversibleAction(InteractiveService interactive,
-            SocketInteraction interaction, Project project, string lng, IrreversibleAction action)
+        public static async Task<(bool, string)> AboutIrreversibleAction(
+            InteractiveService interactive,
+            SocketInteraction interaction,
+            Project project,
+            string lng,
+            IrreversibleAction action
+        )
         {
             var questionBodyKey = action switch
             {
                 IrreversibleAction.Archive => "project.archive.question",
                 IrreversibleAction.Delete => "project.delete.question",
-                _ => throw new ArgumentOutOfRangeException(nameof(action), action, null)
+                _ => throw new ArgumentOutOfRangeException(nameof(action), action, null),
             };
             var finalBodyKey = action switch
             {
                 IrreversibleAction.Archive => "project.archive.done",
                 IrreversibleAction.Delete => "project.deleted",
-                _ => throw new ArgumentOutOfRangeException(nameof(action), action, null)
+                _ => throw new ArgumentOutOfRangeException(nameof(action), action, null),
             };
 
             var header = project.IsPrivate
@@ -31,8 +36,16 @@ namespace Nino.Utilities
                 : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
 
             var component = new ComponentBuilder()
-                .WithButton(T("project.archive.cancel.button", lng), "ninoarchivecancel", ButtonStyle.Danger)
-                .WithButton(T("project.archive.continue.button", lng), "ninoarchivecontinue", ButtonStyle.Secondary)
+                .WithButton(
+                    T("project.archive.cancel.button", lng),
+                    "ninoarchivecancel",
+                    ButtonStyle.Danger
+                )
+                .WithButton(
+                    T("project.archive.continue.button", lng),
+                    "ninoarchivecontinue",
+                    ButtonStyle.Secondary
+                )
                 .Build();
             var questionEmbed = new EmbedBuilder()
                 .WithAuthor(header)
@@ -49,7 +62,9 @@ namespace Nino.Utilities
 
             // Wait for response
             var questionResult = await interactive.NextMessageComponentAsync(
-                m => m.Message.Id == questionResponse.Id, timeout: TimeSpan.FromSeconds(60));
+                m => m.Message.Id == questionResponse.Id,
+                timeout: TimeSpan.FromSeconds(60)
+            );
 
             var goOn = false;
             string finalBody;
@@ -69,39 +84,78 @@ namespace Nino.Utilities
 
             return (goOn, finalBody);
         }
-        
-        public static async Task<(bool, string, RestFollowupMessage?)> AboutAction(InteractiveService interactive,
-            SocketInteraction interaction, Project project, string lng, InconsequentialAction inconsequentialAction)
+
+        public static async Task<(bool, string, RestFollowupMessage?)> AboutAction(
+            InteractiveService interactive,
+            SocketInteraction interaction,
+            Project project,
+            string lng,
+            InconsequentialAction inconsequentialAction
+        )
         {
             var questionBodyKey = inconsequentialAction switch
             {
                 InconsequentialAction.PingCongaAfterSkip => "progress.skip.conga.question",
-                InconsequentialAction.MarkTaskDoneIfEpisodeIsDone => "keyStaff.add.markDone.question",
-                _ => throw new ArgumentOutOfRangeException(nameof(inconsequentialAction), inconsequentialAction, null)
+                InconsequentialAction.MarkTaskDoneIfEpisodeIsDone =>
+                    "keyStaff.add.markDone.question",
+                _ => throw new ArgumentOutOfRangeException(
+                    nameof(inconsequentialAction),
+                    inconsequentialAction,
+                    null
+                ),
             };
             var finalBodyKey = inconsequentialAction switch
             {
                 InconsequentialAction.PingCongaAfterSkip => string.Empty,
-                InconsequentialAction.MarkTaskDoneIfEpisodeIsDone => "keyStaff.add.markDone.response",
-                _ => throw new ArgumentOutOfRangeException(nameof(inconsequentialAction), inconsequentialAction, null)
+                InconsequentialAction.MarkTaskDoneIfEpisodeIsDone =>
+                    "keyStaff.add.markDone.response",
+                _ => throw new ArgumentOutOfRangeException(
+                    nameof(inconsequentialAction),
+                    inconsequentialAction,
+                    null
+                ),
             };
             var leftButton = inconsequentialAction switch
             {
-                InconsequentialAction.PingCongaAfterSkip => ("progress.skip.conga.no.button", ButtonStyle.Secondary),
-                InconsequentialAction.MarkTaskDoneIfEpisodeIsDone => ("keyStaff.add.markDone.no.button", ButtonStyle.Secondary),
-                _ => throw new ArgumentOutOfRangeException(nameof(inconsequentialAction), inconsequentialAction, null)
+                InconsequentialAction.PingCongaAfterSkip => (
+                    "progress.skip.conga.no.button",
+                    ButtonStyle.Secondary
+                ),
+                InconsequentialAction.MarkTaskDoneIfEpisodeIsDone => (
+                    "keyStaff.add.markDone.no.button",
+                    ButtonStyle.Secondary
+                ),
+                _ => throw new ArgumentOutOfRangeException(
+                    nameof(inconsequentialAction),
+                    inconsequentialAction,
+                    null
+                ),
             };
             var rightButton = inconsequentialAction switch
             {
-                InconsequentialAction.PingCongaAfterSkip => ("progress.skip.conga.yes.button", ButtonStyle.Secondary),
-                InconsequentialAction.MarkTaskDoneIfEpisodeIsDone => ("keyStaff.add.markDone.yes.button", ButtonStyle.Secondary),
-                _ => throw new ArgumentOutOfRangeException(nameof(inconsequentialAction), inconsequentialAction, null)
+                InconsequentialAction.PingCongaAfterSkip => (
+                    "progress.skip.conga.yes.button",
+                    ButtonStyle.Secondary
+                ),
+                InconsequentialAction.MarkTaskDoneIfEpisodeIsDone => (
+                    "keyStaff.add.markDone.yes.button",
+                    ButtonStyle.Secondary
+                ),
+                _ => throw new ArgumentOutOfRangeException(
+                    nameof(inconsequentialAction),
+                    inconsequentialAction,
+                    null
+                ),
             };
             var successOnTimeout = inconsequentialAction switch
             {
                 InconsequentialAction.PingCongaAfterSkip => true,
                 InconsequentialAction.MarkTaskDoneIfEpisodeIsDone => true,
-                _ => throw new ArgumentOutOfRangeException(nameof(inconsequentialAction), inconsequentialAction, null)
+                _ => throw new ArgumentOutOfRangeException(
+                    nameof(inconsequentialAction),
+                    inconsequentialAction,
+                    null
+                ),
             };
 
             var header = project.IsPrivate
@@ -119,11 +173,16 @@ namespace Nino.Utilities
                 .WithCurrentTimestamp()
                 .Build();
 
-            var questionResponse = await interaction.FollowupAsync(embed: questionEmbed, components: component);
+            var questionResponse = await interaction.FollowupAsync(
+                embed: questionEmbed,
+                components: component
+            );
 
             // Wait for response
             var questionResult = await interactive.NextMessageComponentAsync(
-                m => m.Message.Id == questionResponse.Id, timeout: TimeSpan.FromSeconds(60));
+                m => m.Message.Id == questionResponse.Id,
+                timeout: TimeSpan.FromSeconds(60)
+            );
 
             var goOn = false;
             var finalBody = string.Empty;
@@ -150,13 +209,13 @@ namespace Nino.Utilities
         internal enum IrreversibleAction
         {
             Archive,
-            Delete
+            Delete,
         }
-        
+
         internal enum InconsequentialAction
         {
             PingCongaAfterSkip,
-            MarkTaskDoneIfEpisodeIsDone
+            MarkTaskDoneIfEpisodeIsDone,
         }
     }
 }

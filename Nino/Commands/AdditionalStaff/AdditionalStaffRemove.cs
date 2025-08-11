@@ -12,10 +12,10 @@ namespace Nino.Commands
     {
         [SlashCommand("remove", "Remove additional staff from an episode")]
         public async Task<RuntimeResult> Remove(
-            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-            [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
-            [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(AdditionalStaffAutocompleteHandler))] string abbreviation,
-            [Summary("allEpisodes", "Remove this position from all episodes that have it?"), Autocomplete(typeof(AdditionalStaffAutocompleteHandler))] bool allEpisodes = false
+            [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+            [Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
+            [Autocomplete(typeof(AdditionalStaffAutocompleteHandler))] string abbreviation,
+            bool allEpisodes = false
         )
         {
             var interaction = Context.Interaction;
@@ -29,14 +29,20 @@ namespace Nino.Commands
             // Verify project and user - Owner or Admin required
             var project = await db.ResolveAlias(alias, interaction);
             if (project is null)
-                return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+                return await Response.Fail(
+                    T("error.alias.resolutionFailed", lng, alias),
+                    interaction
+                );
 
             if (!project.VerifyUser(db, interaction.User.Id))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             // Verify episode
             if (!project.TryGetEpisode(episodeNumber, out var episode))
-                return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
+                return await Response.Fail(
+                    T("error.noSuchEpisode", lng, episodeNumber),
+                    interaction
+                );
 
             // Check if position exists
             if (episode.AdditionalStaff.All(ks => ks.Role.Abbreviation != abbreviation))
@@ -51,7 +57,7 @@ namespace Nino.Commands
                     e.Tasks.RemoveAll(t => t.Abbreviation == abbreviation);
                     e.Done = e.Tasks.All(t => t.Done);
                 }
-            }  
+            }
             else
             {
                 episode.AdditionalStaff.RemoveAll(s => s.Role.Abbreviation == abbreviation);
@@ -59,13 +65,14 @@ namespace Nino.Commands
                 episode.Done = episode.Tasks.All(t => t.Done);
             }
 
+            Log.Info(
+                allEpisodes
+                    ? $"Removed {abbreviation} from {episode}"
+                    : $"Removed additionalStaff {abbreviation} from {project}"
+            );
 
-            Log.Info(allEpisodes
-                ? $"Removed {abbreviation} from {episode}"
-                : $"Removed additionalStaff {abbreviation} from {project}");
-
-            var description = allEpisodes 
-                ? T("additionalStaff.removed.all", lng, abbreviation) 
+            var description = allEpisodes
+                ? T("additionalStaff.removed.all", lng, abbreviation)
                 : T("additionalStaff.removed", lng, abbreviation, episode.Number);
 
             // Send success embed

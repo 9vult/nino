@@ -9,10 +9,7 @@ namespace Nino.Commands
     public partial class ProjectManagement
     {
         [SlashCommand("transfer-server", "Transfer a project from another server to here")]
-        public async Task<RuntimeResult> TransferServer(
-            [Summary("serverId", "ID of the server the project is currently in")] string serverId,
-            [Summary("project", "Project nickname")] string alias
-        )
+        public async Task<RuntimeResult> TransferServer(string serverId, string alias)
         {
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
@@ -25,7 +22,8 @@ namespace Nino.Commands
             // Check for guild administrator status
             var guild = Nino.Client.GetGuild(newGuildId);
             var member = guild.GetUser(interaction.User.Id);
-            if (!Utils.VerifyAdministrator(db, member, guild)) return await Response.Fail(T("error.notPrivileged", lng), interaction);
+            if (!Utils.VerifyAdministrator(db, member, guild))
+                return await Response.Fail(T("error.notPrivileged", lng), interaction);
 
             // Validate origin server
             if (!ulong.TryParse(originGuildIdStr, out var oldGuildId))
@@ -37,7 +35,10 @@ namespace Nino.Commands
             // Verify project and user - Owner required
             var project = await db.ResolveAlias(alias, interaction, observingGuildId: oldGuildId);
             if (project is null)
-                return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+                return await Response.Fail(
+                    T("error.alias.resolutionFailed", lng, alias),
+                    interaction
+                );
 
             if (!project.VerifyUser(db, interaction.User.Id, excludeAdmins: true))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
@@ -48,8 +49,10 @@ namespace Nino.Commands
             {
                 episode.GuildId = newGuildId;
             }
-            
-            Log.Info($"Transfered project {project} from server {oldGuildId} to new server {newGuildId}");
+
+            Log.Info(
+                $"Transfered project {project} from server {oldGuildId} to new server {newGuildId}"
+            );
 
             // Send success embed
             var embed = new EmbedBuilder()

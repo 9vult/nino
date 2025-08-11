@@ -12,9 +12,7 @@ namespace Nino.Commands
         public partial class Display
         {
             [SlashCommand("progress", "Control how progress command responses should look")]
-            public async Task<RuntimeResult> SetProgress(
-                [Summary("type", "Display type")] ProgressDisplayType type
-            )
+            public async Task<RuntimeResult> SetProgress(ProgressDisplayType type)
             {
                 var interaction = Context.Interaction;
                 var lng = interaction.UserLocale;
@@ -29,10 +27,12 @@ namespace Nino.Commands
                 var config = db.GetConfig(guildId);
                 if (config is null)
                     return await Response.Fail(T("error.noSuchConfig", lng), interaction);
-                
+
                 config.ProgressDisplay = type;
 
-                Log.Info($"Updated configuration for guild {config.GuildId}, set Progress Display to {type.ToFriendlyString(lng)}");
+                Log.Info(
+                    $"Updated configuration for guild {config.GuildId}, set Progress Display to {type.ToFriendlyString(lng)}"
+                );
 
                 // Send success embed
                 var embed = new EmbedBuilder()

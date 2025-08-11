@@ -11,8 +11,8 @@ namespace Nino.Commands
     {
         [SlashCommand("export", "Export a project to JSON")]
         public async Task<RuntimeResult> Export(
-            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-            [Summary("prettyPrint", "Pretty-print?")] bool prettyPrint = true
+            [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+            bool prettyPrint = true
         )
         {
             var interaction = Context.Interaction;
@@ -21,7 +21,10 @@ namespace Nino.Commands
             // Verify project and user - Owner required
             var project = await db.ResolveAlias(alias, interaction);
             if (project is null)
-                return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+                return await Response.Fail(
+                    T("error.alias.resolutionFailed", lng, alias),
+                    interaction
+                );
 
             if (!project.VerifyUser(db, interaction.User.Id, excludeAdmins: true))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
@@ -32,8 +35,12 @@ namespace Nino.Commands
             var file = ExportService.ExportProject(project, prettyPrint);
 
             // Respond
-            await interaction.FollowupWithFileAsync(file, $"{project.Id}.json", T("project.exported", lng, project.Nickname));
-            
+            await interaction.FollowupWithFileAsync(
+                file,
+                $"{project.Id}.json",
+                T("project.exported", lng, project.Nickname)
+            );
+
             return ExecutionResult.Success;
         }
     }

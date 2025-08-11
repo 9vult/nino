@@ -6,7 +6,7 @@ namespace Nino.Records.Enums
     {
         Done = 0,
         Undone = 1,
-        Skipped = 2
+        Skipped = 2,
     }
 
     public static class ProgressTypeExtensions

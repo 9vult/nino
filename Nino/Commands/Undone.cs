@@ -14,15 +14,16 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Nino.Commands;
 
-public partial class Undone(DataContext db, InteractiveService interactive) : InteractionModuleBase<SocketInteractionContext>
+public class Undone(DataContext db, InteractiveService interactive)
+    : InteractionModuleBase<SocketInteractionContext>
 {
     private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
     [SlashCommand("undone", "Mark a position as not done")]
     public async Task<RuntimeResult> Handle(
-        [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-        [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
-        [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(AbbreviationAutocompleteHandler))] string abbreviation
+        [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+        [Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
+        [Autocomplete(typeof(AbbreviationAutocompleteHandler))] string abbreviation
     )
     {
         var interaction = Context.Interaction;
@@ -34,7 +35,7 @@ public partial class Undone(DataContext db, InteractiveService interactive) : In
         alias = alias.Trim();
         abbreviation = abbreviation.Trim().ToUpperInvariant();
         episodeNumber = Episode.CanonicalizeEpisodeNumber(episodeNumber);
-            
+
         // Verify project
         var project = await db.ResolveAlias(alias, interaction);
         if (project is null)
@@ -44,9 +45,10 @@ public partial class Undone(DataContext db, InteractiveService interactive) : In
             return await Response.Fail(T("error.archived", lng), interaction);
 
         // Check progress channel permissions
-        var goOn = await PermissionChecker.Precheck(interactive, interaction, project, lng, false);
+        var goOn = await PermissionChecker.Precheck(interactive, interaction, project, lng);
         // Cancel
-        if (!goOn) return ExecutionResult.Success;
+        if (!goOn)
+            return ExecutionResult.Success;
 
         // Verify episode and task
         if (!project.TryGetEpisode(episodeNumber, out var episode))
@@ -60,10 +62,15 @@ public partial class Undone(DataContext db, InteractiveService interactive) : In
 
         // Verify task is complete
         if (!episode.Tasks.First(t => t.Abbreviation == abbreviation).Done)
-            return await Response.Fail(T("error.progress.taskNotDone", lng, abbreviation), interaction);
-            
+            return await Response.Fail(
+                T("error.progress.taskNotDone", lng, abbreviation),
+                interaction
+            );
+
         var task = episode.Tasks.Single(t => t.Abbreviation == abbreviation);
-        var staff = project.KeyStaff.Concat(episode.AdditionalStaff).First(ks => ks.Role.Abbreviation == abbreviation);
+        var staff = project
+            .KeyStaff.Concat(episode.AdditionalStaff)
+            .First(ks => ks.Role.Abbreviation == abbreviation);
 
         task.Done = false;
         task.Updated = DateTimeOffset.UtcNow;
@@ -72,12 +79,14 @@ public partial class Undone(DataContext db, InteractiveService interactive) : In
 
         var taskTitle = staff.Role.Name;
         var title = T("title.progress", gLng, episodeNumber);
-        var status = config?.UpdateDisplay.Equals(UpdatesDisplayType.Extended) ?? false
-            ? episode.GenerateExplainProgress(gLng, abbreviation) // Explanatory
-            : episode.GenerateProgress(abbreviation); // Standard
+        var status =
+            config?.UpdateDisplay.Equals(UpdatesDisplayType.Extended) ?? false
+                ? episode.GenerateExplainProgress(gLng, abbreviation) // Explanatory
+                : episode.GenerateProgress(abbreviation); // Standard
 
         // Skip published embeds for pseudo-tasks
-        if (!staff.IsPseudo) await PublishEmbeds();
+        if (!staff.IsPseudo)
+            await PublishEmbeds();
 
         // Send success embed
         var replyStatus = episode.GenerateProgress(abbreviation, excludePseudo: false);
@@ -86,9 +95,10 @@ public partial class Undone(DataContext db, InteractiveService interactive) : In
             ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
             : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
 
-        var replyBody = config?.ProgressDisplay.Equals(ProgressDisplayType.Verbose) ?? false
-            ? $"{T("progress.undone", lng, episodeNumber, taskTitle)}\n\n{replyStatus}" // Verbose
-            : $"{T("progress.undone", lng, episodeNumber, taskTitle)}"; // Succinct (default)
+        var replyBody =
+            config?.ProgressDisplay.Equals(ProgressDisplayType.Verbose) ?? false
+                ? $"{T("progress.undone", lng, episodeNumber, taskTitle)}\n\n{replyStatus}" // Verbose
+                : $"{T("progress.undone", lng, episodeNumber, taskTitle)}"; // Succinct (default)
 
         var replyEmbed = new EmbedBuilder()
             .WithAuthor(name: replyHeader, url: project.AniListUrl)
@@ -97,21 +107,26 @@ public partial class Undone(DataContext db, InteractiveService interactive) : In
             .WithCurrentTimestamp()
             .Build();
         await interaction.FollowupAsync(embed: replyEmbed);
-            
-        Log.Info($"M[{interaction.User.Id} (@{interaction.User.Username})] marked task {abbreviation} undone for {episode}");
+
+        Log.Info(
+            $"M[{interaction.User.Id} (@{interaction.User.Username})] marked task {abbreviation} undone for {episode}"
+        );
 
         await db.TrySaveChangesAsync(interaction);
         return ExecutionResult.Success;
-            
+
         // -----
-            
+
         // Helper method to publish embeds to the local progress channel and to observers
         async Task PublishEmbeds()
         {
             status = $"❌ **{taskTitle}**\n{status}";
 
             var publishEmbed = new EmbedBuilder()
-                .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString(gLng)})", url: project.AniListUrl)
+                .WithAuthor(
+                    $"{project.Title} ({project.Type.ToFriendlyString(gLng)})",
+                    url: project.AniListUrl
+                )
                 .WithTitle(title)
                 .WithDescription(status)
                 .WithThumbnailUrl(project.PosterUri)
@@ -121,14 +136,21 @@ public partial class Undone(DataContext db, InteractiveService interactive) : In
             // Publish to local progress channel
             try
             {
-                var publishChannel = (SocketTextChannel)Nino.Client.GetChannel(project.UpdateChannelId);
+                var publishChannel = (SocketTextChannel)
+                    Nino.Client.GetChannel(project.UpdateChannelId);
                 await publishChannel.SendMessageAsync(embed: publishEmbed);
             }
             catch (Exception e)
             {
                 Log.Error(e.Message);
                 var guild = Nino.Client.GetGuild(interaction.GuildId ?? 0);
-                await Utils.AlertError(T("error.release.failed", lng, e.Message), guild, project.Nickname, project.OwnerId, "Release");
+                await Utils.AlertError(
+                    T("error.release.failed", lng, e.Message),
+                    guild,
+                    project.Nickname,
+                    project.OwnerId,
+                    "Release"
+                );
             }
 
             // Publish to observers

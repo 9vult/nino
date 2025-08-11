@@ -9,10 +9,7 @@ namespace Nino.Commands
     public partial class Observer
     {
         [SlashCommand("remove", "Stop observing a project on another server")]
-        public async Task<RuntimeResult> Remove(
-            [Summary("serverId", "ID of the server you want to observe")] string serverId,
-            [Summary("project", "Project nickname")] string alias
-        )
+        public async Task<RuntimeResult> Remove(string serverId, string alias)
         {
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
@@ -25,7 +22,8 @@ namespace Nino.Commands
             // Check for guild administrator status
             var guild = Nino.Client.GetGuild(guildId);
             var member = guild.GetUser(interaction.User.Id);
-            if (!Utils.VerifyAdministrator(db, member, guild)) return await Response.Fail(T("error.notPrivileged", lng), interaction);
+            if (!Utils.VerifyAdministrator(db, member, guild))
+                return await Response.Fail(T("error.notPrivileged", lng), interaction);
 
             // Validate observer server
             if (!ulong.TryParse(originGuildIdStr, out var originGuildId))
@@ -35,14 +33,23 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.noSuchServer", lng), interaction);
 
             // Verify project and user access
-            var project = await db.ResolveAlias(alias, interaction, observingGuildId: originGuildId);
+            var project = await db.ResolveAlias(
+                alias,
+                interaction,
+                observingGuildId: originGuildId
+            );
             if (project is null)
-                return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
-            
+                return await Response.Fail(
+                    T("error.alias.resolutionFailed", lng, alias),
+                    interaction
+                );
+
             await db.Entry(project).Collection(p => p.Observers).LoadAsync();
 
             // Validate observer
-            var observer = db.Observers.Where(o => o.GuildId == guildId).SingleOrDefault(o => o.GuildId == guildId && o.ProjectId == project.Id);
+            var observer = db
+                .Observers.Where(o => o.GuildId == guildId)
+                .SingleOrDefault(o => o.GuildId == guildId && o.ProjectId == project.Id);
             if (observer is null)
                 return await Response.Fail(T("error.noSuchObserver", lng), interaction);
 

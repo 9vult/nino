@@ -13,11 +13,12 @@ public class CongaGraph
     /// Special nodes for the current position
     /// </summary>
     public static readonly string[] CurrentSpecials = ["$AIR"];
+
     /// <summary>
     /// Special nodes for the next position
     /// </summary>
     public static readonly string[] NextSpecials = [];
-    
+
     private readonly Dictionary<string, CongaNode> _nodes = [];
 
     /// <summary>
@@ -33,11 +34,16 @@ public class CongaGraph
     /// <param name="next">Next task abbreviation</param>
     /// <param name="currentType">Type of the current node</param>
     /// <param name="nextType">Type of the next node</param>
-    public void Add(string current, string next, CongaNodeType currentType = CongaNodeType.KeyStaff, CongaNodeType nextType = CongaNodeType.KeyStaff)
+    public void Add(
+        string current,
+        string next,
+        CongaNodeType currentType = CongaNodeType.KeyStaff,
+        CongaNodeType nextType = CongaNodeType.KeyStaff
+    )
     {
         var currentNode = GetOrCreateNode(current, currentType);
         var nextNode = GetOrCreateNode(next, nextType);
-        
+
         currentNode.Dependents.Add(nextNode);
         nextNode.Prerequisites.Add(currentNode);
     }
@@ -49,11 +55,15 @@ public class CongaGraph
     /// <param name="next">Next task abbreviation</param>
     public void Remove(string current, string next)
     {
-        if (!_nodes.TryGetValue(current, out var currentNode) || !_nodes.TryGetValue(next, out var nextNode)) return;
-        
+        if (
+            !_nodes.TryGetValue(current, out var currentNode)
+            || !_nodes.TryGetValue(next, out var nextNode)
+        )
+            return;
+
         currentNode.Dependents.Remove(nextNode);
         nextNode.Prerequisites.Remove(currentNode);
-        
+
         if (currentNode.Dependents.Count == 0 && currentNode.Prerequisites.Count == 0)
             _nodes.Remove(current);
         if (nextNode.Dependents.Count == 0 && nextNode.Prerequisites.Count == 0)
@@ -67,8 +77,8 @@ public class CongaGraph
     /// <returns>Prerequisite nodes</returns>
     public IEnumerable<CongaNode> GetPrerequisitesFor(string abbreviation)
     {
-        return _nodes.TryGetValue(abbreviation, out var node) 
-            ? node.Prerequisites 
+        return _nodes.TryGetValue(abbreviation, out var node)
+            ? node.Prerequisites
             : Enumerable.Empty<CongaNode>();
     }
 
@@ -83,7 +93,7 @@ public class CongaGraph
             ? node.Dependents
             : Enumerable.Empty<CongaNode>();
     }
-    
+
     /// <summary>
     /// Get if a task is part of the graph
     /// </summary>
@@ -108,11 +118,16 @@ public class CongaGraph
     /// Gets or creates a node
     /// </summary>
     /// <param name="abbreviation">Task to get or create</param>
+    /// <param name="type">Type of conga node</param>
     /// <returns>The node</returns>
-    private CongaNode GetOrCreateNode(string abbreviation, CongaNodeType type = CongaNodeType.KeyStaff)
+    private CongaNode GetOrCreateNode(
+        string abbreviation,
+        CongaNodeType type = CongaNodeType.KeyStaff
+    )
     {
-        if (_nodes.TryGetValue(abbreviation, out var node)) return node;
-        
+        if (_nodes.TryGetValue(abbreviation, out var node))
+            return node;
+
         node = new CongaNode { Abbreviation = abbreviation, Type = type };
         _nodes[abbreviation] = node;
         return node;
@@ -127,24 +142,31 @@ public class CongaGraph
         var participants = new List<CongaEdge>();
         foreach (var node in Nodes)
         {
-            participants.AddRange(node.Dependents.Select(dep => 
-                new CongaEdge { Current = node.Abbreviation, Next = dep.Abbreviation }));
+            participants.AddRange(
+                node.Dependents.Select(dep => new CongaEdge
+                {
+                    Current = node.Abbreviation,
+                    Next = dep.Abbreviation,
+                })
+            );
         }
         return participants;
     }
-    
+
     /// <summary>
     /// Serialize the graph into a flat list
     /// </summary>
     /// <returns>Flat list</returns>
     public CongaNodeDto[] Serialize()
     {
-        return Nodes.Select(n => new CongaNodeDto
-        {
-            Abbreviation = n.Abbreviation,
-            Type = n.Type,
-            Dependents = n.Dependents.Select(d => d.Abbreviation).ToArray()
-        }).ToArray();
+        return Nodes
+            .Select(n => new CongaNodeDto
+            {
+                Abbreviation = n.Abbreviation,
+                Type = n.Type,
+                Dependents = n.Dependents.Select(d => d.Abbreviation).ToArray(),
+            })
+            .ToArray();
     }
 
     /// <summary>
@@ -155,13 +177,13 @@ public class CongaGraph
     public static CongaGraph Deserialize(CongaNodeDto[] dtos)
     {
         var graph = new CongaGraph();
-        
+
         // First pass: Create nodes
         foreach (var dto in dtos)
         {
             graph.GetOrCreateNode(dto.Abbreviation, dto.Type);
         }
-        
+
         // Second pass: Create edges
         foreach (var dto in dtos)
         {
@@ -170,7 +192,7 @@ public class CongaGraph
                 graph.Add(dto.Abbreviation, dep);
             }
         }
-        
+
         return graph;
     }
 }

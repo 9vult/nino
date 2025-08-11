@@ -35,18 +35,20 @@ public class Project
     public List<Alias> Aliases { get; set; } = [];
     public List<Staff> KeyStaff { get; set; } = [];
     public List<Administrator> Administrators { get; set; } = [];
+
     [JsonIgnore]
     public ICollection<Episode> Episodes = new List<Episode>();
+
     [JsonIgnore]
     public ICollection<Observer> Observers = new List<Observer>();
-        
+
     /// <summary>
     /// AniList URL. <see langword="null"/> if <see cref="AniListId"/> is <see langword="null"/>.
     /// </summary>
     [NotMapped]
     public string? AniListUrl => AniListId is null ? null : $"https://anilist.co/anime/{AniListId}";
 
-    public override string ToString ()
+    public override string ToString()
     {
         return $"P[{Id} ({GuildId}-{Nickname})]";
     }

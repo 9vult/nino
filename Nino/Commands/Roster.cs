@@ -16,18 +16,18 @@ public class Roster(DataContext db) : InteractionModuleBase<SocketInteractionCon
 
     [SlashCommand("roster", "See who's working on an episode")]
     public async Task<RuntimeResult> Handle(
-        [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-        [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
-        [Summary("weights", "Display task weights"), Autocomplete(typeof(EpisodeAutocompleteHandler))] bool withWeights = false
+        [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+        [Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
+        bool withWeights = false
     )
     {
         var interaction = Context.Interaction;
         var lng = interaction.UserLocale;
-            
+
         // Sanitize inputs
         alias = alias.Trim();
         episodeNumber = Episode.CanonicalizeEpisodeNumber(episodeNumber);
-            
+
         // Verify project and user - minimum Key Staff required
         var project = await db.ResolveAlias(alias, interaction);
         if (project is null)
@@ -39,8 +39,10 @@ public class Roster(DataContext db) : InteractionModuleBase<SocketInteractionCon
         // Verify episode
         if (!project.TryGetEpisode(episodeNumber, out var episode))
             return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
-            
-        Log.Trace($"Generating roster for {project} episode {episode} for M[{interaction.User.Id} (@{interaction.User.Username})]");
+
+        Log.Trace(
+            $"Generating roster for {project} episode {episode} for M[{interaction.User.Id} (@{interaction.User.Username})]"
+        );
 
         if (project.KeyStaff.Count == 0)
             return await Response.Fail(T("error.noRoster", lng), interaction);

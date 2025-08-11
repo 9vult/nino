@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿using System.Net.WebSockets;
+using Discord;
+using Discord.WebSocket;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -11,9 +13,9 @@ namespace Nino.Handlers
 
         public static Task Log(LogMessage msg)
         {
-            if (msg.Exception is System.Net.WebSockets.WebSocketException or Discord.WebSocket.GatewayReconnectException)
+            if (msg.Exception is WebSocketException or GatewayReconnectException)
                 return Task.CompletedTask;
-            
+
             switch (msg.Severity)
             {
                 case LogSeverity.Info:
@@ -40,11 +42,14 @@ namespace Nino.Handlers
         public static void SetupLogger()
         {
             var config = new LoggingConfiguration();
-            var consoleTarget = new ColoredConsoleTarget("console") { Layout = "${longdate} [${level}] ${message}" };
+            var consoleTarget = new ColoredConsoleTarget("console")
+            {
+                Layout = "${longdate} [${level}] ${message}",
+            };
             var fileTarget = new FileTarget("logfile")
             {
                 Layout = "${longdate} [${level}] ${message}",
-                FileName = Path.Combine("logs", $"{DateTimeOffset.Now:yyyy-MM-dd}.log")
+                FileName = Path.Combine("logs", $"{DateTimeOffset.Now:yyyy-MM-dd}.log"),
             };
 
             config.AddTarget(consoleTarget);

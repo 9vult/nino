@@ -1,5 +1,5 @@
-﻿using Nino.Records;
-using System.Text.Json;
+﻿using System.Text.Json;
+using Nino.Records;
 
 namespace Nino.Services
 {
@@ -13,14 +13,14 @@ namespace Nino.Services
         /// <returns></returns>
         public static MemoryStream ExportProject(Project project, bool prettyPrint)
         {
-            JsonSerializerOptions options = new() { IncludeFields = true, WriteIndented = prettyPrint };
-
-            var export = new Export
+            JsonSerializerOptions options = new()
             {
-                Project = project,
-                Episodes = [.. project.Episodes]
+                IncludeFields = true,
+                WriteIndented = prettyPrint,
             };
-            
+
+            var export = new Export { Project = project, Episodes = [.. project.Episodes] };
+
             var stream = new MemoryStream();
             JsonSerializer.Serialize(stream, export, options: options);
             stream.Position = 0;

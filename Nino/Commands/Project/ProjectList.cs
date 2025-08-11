@@ -1,8 +1,8 @@
-﻿using Discord;
+﻿using System.Text;
+using Discord;
 using Discord.Interactions;
-using Nino.Utilities;
-using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Nino.Utilities;
 using Tababular;
 using static Localizer.Localizer;
 
@@ -20,26 +20,36 @@ namespace Nino.Commands
             // Check for guild administrator status
             var guild = Nino.Client.GetGuild(guildId);
             var member = guild.GetUser(interaction.User.Id);
-            if (!Utils.VerifyAdministrator(db, member, guild)) return await Response.Fail(T("error.notPrivileged", lng), interaction);
-            
+            if (!Utils.VerifyAdministrator(db, member, guild))
+                return await Response.Fail(T("error.notPrivileged", lng), interaction);
+
             Log.Trace($"Listing projects for {guildId}");
 
             // Get projects
-            var projects = await db.Projects
-                .Include(p => p.Episodes)
-                .Where(p => p.GuildId == guildId).ToListAsync();
+            var projects = await db
+                .Projects.Include(p => p.Episodes)
+                .Where(p => p.GuildId == guildId)
+                .ToListAsync();
 
             if (projects.Count == 0)
                 return await Response.Fail(T("error.noProjects", lng), interaction);
 
-            var tblData = projects.Select(p => new Dictionary<string, string>
-            {
-                [T("project.list.nickname", lng)] = p.Nickname,
-                [T("project.list.owner", lng)] = Nino.Client.GetUser(p.OwnerId)?.Username ?? $"<@{p.OwnerId}>",
-                [T("project.list.isPrivate", lng)] = p.IsPrivate ? T("observer.list.yes", lng) : T("observer.list.no", lng),
-                [T("project.list.isArchived", lng)] = p.IsArchived ? T("observer.list.yes", lng) : T("observer.list.no", lng),
-                [T("project.list.episodeCount", lng)] = p.Episodes.Count.ToString()
-            }).Chunk(10).ToList();
+            var tblData = projects
+                .Select(p => new Dictionary<string, string>
+                {
+                    [T("project.list.nickname", lng)] = p.Nickname,
+                    [T("project.list.owner", lng)] =
+                        Nino.Client.GetUser(p.OwnerId)?.Username ?? $"<@{p.OwnerId}>",
+                    [T("project.list.isPrivate", lng)] = p.IsPrivate
+                        ? T("observer.list.yes", lng)
+                        : T("observer.list.no", lng),
+                    [T("project.list.isArchived", lng)] = p.IsArchived
+                        ? T("observer.list.yes", lng)
+                        : T("observer.list.no", lng),
+                    [T("project.list.episodeCount", lng)] = p.Episodes.Count.ToString(),
+                })
+                .Chunk(10)
+                .ToList();
 
             foreach (var chunk in tblData)
             {
@@ -49,7 +59,10 @@ namespace Nino.Commands
                 sb.AppendLine("```");
 
                 // Send table
-                await interaction.FollowupAsync(text: sb.ToString(), allowedMentions: new AllowedMentions(AllowedMentionTypes.None));
+                await interaction.FollowupAsync(
+                    text: sb.ToString(),
+                    allowedMentions: new AllowedMentions(AllowedMentionTypes.None)
+                );
             }
 
             return ExecutionResult.Success;

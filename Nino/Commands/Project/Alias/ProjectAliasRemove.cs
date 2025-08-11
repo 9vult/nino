@@ -13,21 +13,24 @@ namespace Nino.Commands
         {
             [SlashCommand("remove", "Remove an alias")]
             public async Task<RuntimeResult> Remove(
-                [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-                [Summary("alias", "Alias")] string input
+                [Autocomplete(typeof(ProjectAutocompleteHandler))] string projectAlias,
+                string input
             )
             {
                 var interaction = Context.Interaction;
                 var lng = interaction.UserLocale;
 
                 // Sanitize inputs
-                alias = alias.Trim();
+                projectAlias = projectAlias.Trim();
                 input = input.Trim();
 
                 // Verify project and user - Owner or Admin required
-                var project = await db.ResolveAlias(alias, interaction);
+                var project = await db.ResolveAlias(projectAlias, interaction);
                 if (project is null)
-                    return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+                    return await Response.Fail(
+                        T("error.alias.resolutionFailed", lng, projectAlias),
+                        interaction
+                    );
 
                 if (project.IsArchived)
                     return await Response.Fail(T("error.archived", lng), interaction);
@@ -38,7 +41,10 @@ namespace Nino.Commands
                 // Validate alias exists
                 var aliasToRemove = project.Aliases.FirstOrDefault(a => a.Value == input);
                 if (aliasToRemove is null)
-                    return await Response.Fail(T("error.noSuchAlias", lng, input, project.Nickname), interaction);
+                    return await Response.Fail(
+                        T("error.noSuchAlias", lng, input, project.Nickname),
+                        interaction
+                    );
 
                 // Remove from database
                 project.Aliases.Remove(aliasToRemove);
