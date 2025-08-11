@@ -105,7 +105,7 @@ namespace Nino.Handlers
 
             List<AutocompleteResult> choices = [];
             var alias = (
-                (string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")?.Value
+                (string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "alias")?.Value
             )?.Trim();
             if (alias is null)
                 return AutocompletionResult.FromSuccess([]);
@@ -154,10 +154,10 @@ namespace Nino.Handlers
 
             List<AutocompleteResult> choices = [];
             var alias = (
-                (string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")?.Value
+                (string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "alias")?.Value
             )?.Trim();
             var episodeInput = interaction
-                .Data.Options.FirstOrDefault(o => o.Name == "episode")
+                .Data.Options.FirstOrDefault(o => o.Name == "episode-number")
                 ?.Value;
             if (alias is null)
                 return AutocompletionResult.FromSuccess([]);
@@ -229,7 +229,7 @@ namespace Nino.Handlers
 
             List<AutocompleteResult> choices = [];
             var alias = (
-                (string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")?.Value
+                (string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "alias")?.Value
             )?.Trim();
             if (alias is null)
                 return AutocompletionResult.FromSuccess([]);
@@ -273,10 +273,10 @@ namespace Nino.Handlers
 
             List<AutocompleteResult> choices = [];
             var alias = (
-                (string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")?.Value
+                (string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "alias")?.Value
             )?.Trim();
             var episodeInput = (string?)
-                interaction.Data.Options.FirstOrDefault(o => o.Name == "episode")?.Value;
+                interaction.Data.Options.FirstOrDefault(o => o.Name == "episode-number")?.Value;
             if (alias is null || episodeInput is null)
                 return AutocompletionResult.FromSuccess([]);
 
@@ -325,7 +325,7 @@ namespace Nino.Handlers
 
             List<AutocompleteResult> choices = [];
             var alias = (
-                (string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")?.Value
+                (string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "alias")?.Value
             )?.Trim();
             if (alias is null)
                 return AutocompletionResult.FromSuccess([]);
@@ -369,7 +369,7 @@ namespace Nino.Handlers
 
             List<AutocompleteResult> choices = [];
             var alias = (
-                (string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")?.Value
+                (string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "alias")?.Value
             )?.Trim();
             if (alias is null)
                 return AutocompletionResult.FromSuccess([]);
@@ -418,7 +418,7 @@ namespace Nino.Handlers
 
             List<AutocompleteResult> choices = [];
             var alias = (
-                (string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "project")?.Value
+                (string?)interaction.Data.Options.FirstOrDefault(o => o.Name == "alias")?.Value
             )?.Trim();
             if (alias is null)
                 return AutocompletionResult.FromSuccess([]);
