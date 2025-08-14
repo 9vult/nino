@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using Localizer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Nino.Records.Enums;
 using Nino.Utilities;
 using Nino.Utilities.Extensions;
@@ -18,10 +19,14 @@ namespace Nino.Services
         private const int OneHour = 60 * 60 * 1000;
         private readonly Timer _timer;
 
-        public CongaReminderService(DataContext db)
+        public CongaReminderService(IServiceProvider services)
         {
             _timer = new Timer { Interval = OneHour };
-            _timer.Elapsed += async (_, _) => await RemindTardyTasks(db);
+            _timer.Elapsed += async (_, _) =>
+            {
+                var db = services.GetRequiredService<DataContext>();
+                await RemindTardyTasks(db);
+            };
             _timer.Start();
         }
 

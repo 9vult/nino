@@ -3,6 +3,7 @@ using Discord;
 using Discord.WebSocket;
 using Localizer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities.Extensions;
@@ -21,11 +22,12 @@ namespace Nino.Services
         private const int FiveMinutes = 5 * 60 * 1000;
         private readonly Timer _timer;
 
-        public ReleaseReminderService(DataContext db)
+        public ReleaseReminderService(IServiceProvider services)
         {
             _timer = new Timer { Interval = FiveMinutes };
             _timer.Elapsed += async (_, _) =>
             {
+                var db = services.GetRequiredService<DataContext>();
                 await CheckForReleases(db);
             };
             _timer.Start();
