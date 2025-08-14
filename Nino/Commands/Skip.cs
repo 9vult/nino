@@ -1,114 +1,127 @@
+using System.Text;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Fergun.Interactive;
-using Microsoft.Azure.Cosmos;
+using Localizer;
 using Nino.Handlers;
+using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities;
+using Nino.Utilities.Extensions;
 using NLog;
-using System.Text;
-using Localizer;
-using Nino.Records;
 using static Localizer.Localizer;
 using Task = System.Threading.Tasks.Task;
 
 namespace Nino.Commands;
 
-public partial class Skip(InteractiveService interactive) : InteractionModuleBase<SocketInteractionContext>
+public class Skip(DataContext db, InteractiveService interactive)
+    : InteractionModuleBase<SocketInteractionContext>
 {
     private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
     [SlashCommand("skip", "Skip a position")]
     public async Task<RuntimeResult> Handle(
-        [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-        [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
-        [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(AbbreviationAutocompleteHandler))] string abbreviation
+        [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+        [Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
+        [Autocomplete(typeof(AbbreviationAutocompleteHandler))] string abbreviation
     )
     {
         var interaction = Context.Interaction;
         var lng = interaction.UserLocale;
-        var gLng = Cache.GetConfig(interaction.GuildId ?? 0)?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
+        var config = db.GetConfig(interaction.GuildId ?? 0);
+        var gLng = config?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
 
         // Sanitize inputs
         alias = alias.Trim();
         abbreviation = abbreviation.Trim().ToUpperInvariant();
-        episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
-            
+        episodeNumber = Episode.CanonicalizeEpisodeNumber(episodeNumber);
+
         // Verify project
-        var project = Utils.ResolveAlias(alias, interaction);
-        if (project == null)
+        var project = await db.ResolveAlias(alias, interaction);
+        if (project is null)
             return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
 
         if (project.IsArchived)
             return await Response.Fail(T("error.archived", lng), interaction);
 
         // Check progress channel permissions
-        var goOn = await PermissionChecker.Precheck(interactive, interaction, project, lng, false);
+        var goOn = await PermissionChecker.Precheck(interactive, interaction, project, lng);
         // Cancel
-        if (!goOn) return ExecutionResult.Success;
-            
+        if (!goOn)
+            return ExecutionResult.Success;
+
         // Check Conga permissions
         if (project.CongaParticipants.Nodes.Count != 0)
         {
-            goOn = await PermissionChecker.Precheck(interactive, interaction, project, lng, false, true);
+            goOn = await PermissionChecker.Precheck(
+                interactive,
+                interaction,
+                project,
+                lng,
+                false,
+                true
+            );
             // Cancel
-            if (!goOn) return ExecutionResult.Success;
+            if (!goOn)
+                return ExecutionResult.Success;
         }
 
         // Verify episode and task
-        if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
+        if (!project.TryGetEpisode(episodeNumber, out var episode))
             return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
         if (episode.Tasks.All(t => t.Abbreviation != abbreviation))
             return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
 
         // Verify user
-        if (!Utils.VerifyTaskUser(interaction.User.Id, project, episode, abbreviation))
+        if (!episode.VerifyTaskUser(db, interaction.User.Id, abbreviation))
             return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
         // Verify task is incomplete
         if (episode.Tasks.First(t => t.Abbreviation == abbreviation).Done)
-            return await Response.Fail(T("error.progress.taskAlreadyDone", lng, abbreviation), interaction);
+            return await Response.Fail(
+                T("error.progress.taskAlreadyDone", lng, abbreviation),
+                interaction
+            );
 
         // Check if episode will be done
         var episodeDone = !episode.Tasks.Any(t => t.Abbreviation != abbreviation && !t.Done);
 
         var task = episode.Tasks.Single(t => t.Abbreviation == abbreviation);
-        var staff = project.KeyStaff.Concat(episode.AdditionalStaff)
+        var staff = project
+            .KeyStaff.Concat(episode.AdditionalStaff)
             .First(ks => ks.Role.Abbreviation == abbreviation);
-        
-        // Update database
-        var taskIndex = Array.IndexOf(episode.Tasks, task);
-        await AzureHelper.PatchEpisodeAsync(episode, [
-            PatchOperation.Set($"/tasks/{taskIndex}/done", true),
-            PatchOperation.Set($"/tasks/{taskIndex}/updated", DateTimeOffset.UtcNow),
-            PatchOperation.Set($"/done", episodeDone),
-            PatchOperation.Set($"/updated", DateTimeOffset.UtcNow)
-        ]);
 
-        // Update task for embeds
         task.Done = true;
+        task.Updated = DateTimeOffset.UtcNow;
+        episode.Done = episodeDone;
+        episode.Updated = DateTimeOffset.UtcNow;
 
         var taskTitle = staff.Role.Name;
         var title = T("title.progress", gLng, episodeNumber);
-        var status = Cache.GetConfig(project.GuildId)?.UpdateDisplay.Equals(UpdatesDisplayType.Extended) ?? false
-            ? StaffList.GenerateExplainProgress(project, episode, gLng, abbreviation) // Explanatory
-            : StaffList.GenerateProgress(project, episode, abbreviation); // Standard
+        var status =
+            config?.UpdateDisplay.Equals(UpdatesDisplayType.Extended) ?? false
+                ? episode.GenerateExplainProgress(gLng, abbreviation) // Explanatory
+                : episode.GenerateProgress(abbreviation); // Standard
 
         // Skip published embeds for pseudo-tasks
-        if (!staff.IsPseudo) await PublishEmbeds();
+        if (!staff.IsPseudo)
+            await PublishEmbeds();
 
         // Prepare success embed
-        var episodeDoneText = episodeDone ? $"\n{T("progress.episodeComplete", lng, episodeNumber)}" : string.Empty;
-        var replyStatus = StaffList.GenerateProgress(project, episode, abbreviation, excludePseudo: false);
+        var episodeDoneText = episodeDone
+            ? $"\n{T("progress.episodeComplete", lng, episodeNumber)}"
+            : string.Empty;
+        var replyStatus = episode.GenerateProgress(abbreviation, excludePseudo: false);
 
         var replyHeader = project.IsPrivate
             ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
             : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
 
-        var replyBody = Cache.GetConfig(project.GuildId)?.ProgressDisplay.Equals(ProgressDisplayType.Verbose) ?? false
-            ? $"{T("progress.skipped", lng, taskTitle, episodeNumber)}\n\n{replyStatus}{episodeDoneText}" // Verbose
-            : $"{T("progress.skipped", lng, taskTitle, episodeNumber)}{episodeDoneText}"; // Succinct (default)
+        var replyBody =
+            config?.ProgressDisplay.Equals(ProgressDisplayType.Verbose) ?? false
+                ? $"{T("progress.skipped", lng, taskTitle, episodeNumber)}\n\n{replyStatus}{episodeDoneText}" // Verbose
+                : $"{T("progress.skipped", lng, taskTitle, episodeNumber)}{episodeDoneText}"; // Succinct (default)
 
         // Send the embed
         var replyEmbed = new EmbedBuilder()
@@ -118,35 +131,46 @@ public partial class Skip(InteractiveService interactive) : InteractionModuleBas
             .WithCurrentTimestamp()
             .Build();
         await interaction.FollowupAsync(embed: replyEmbed);
-            
-        Log.Info($"M[{interaction.User.Id} (@{interaction.User.Username})] skipped task {abbreviation} for {episode}");
+
+        Log.Info(
+            $"M[{interaction.User.Id} (@{interaction.User.Username})] skipped task {abbreviation} for {episode}"
+        );
 
         // Everybody do the Conga!
         await DoTheConga();
-            
-        await Cache.RebuildCacheForProject(project.Id);
-        return ExecutionResult.Success; 
-            
+
+        await db.TrySaveChangesAsync(interaction);
+        return ExecutionResult.Success;
+
         // -----
-            
+
         // Helper method for doing the conga
         async Task DoTheConga()
         {
             // Get all conga participants that the current task can call out
-            var congaCandidates = project.CongaParticipants.Get(abbreviation)?.Dependents?
-                .Where(dep => episode.Tasks.Any(t => t.Abbreviation == dep.Abbreviation)).ToList() ?? []; // Limit to tasks in the episode
-            if (congaCandidates.Count == 0) return;
-                
-            var prefixMode = Cache.GetConfig(project.GuildId)?.CongaPrefix ?? CongaPrefixType.None;
+            var congaCandidates =
+                project
+                    .CongaParticipants.Get(abbreviation)
+                    ?.Dependents?.Where(dep =>
+                        episode.Tasks.Any(t => t.Abbreviation == dep.Abbreviation)
+                    )
+                    .ToList() ?? []; // Limit to tasks in the episode
+            if (congaCandidates.Count == 0)
+                return;
+
+            var prefixMode = config?.CongaPrefix ?? CongaPrefixType.None;
             StringBuilder congaContent = new();
 
             var singleCandidates = new List<CongaNode>();
             var multiCandidates = new List<CongaNode>();
-                
+
             foreach (var candidate in congaCandidates)
             {
-                var prereqs = candidate.Prerequisites
-                    .Where(dep => episode.Tasks.Any(t => t.Abbreviation == dep.Abbreviation)).ToList();
+                var prereqs = candidate
+                    .Prerequisites.Where(dep =>
+                        episode.Tasks.Any(t => t.Abbreviation == dep.Abbreviation)
+                    )
+                    .ToList();
                 if (prereqs.Count == 1)
                 {
                     singleCandidates.Add(candidate);
@@ -154,57 +178,84 @@ public partial class Skip(InteractiveService interactive) : InteractionModuleBas
                 }
                 // More than just this task
                 // Determine if the candidate's caller(s) (not this one) are all done
-                if (prereqs
-                    .Select(c => c.Abbreviation)
-                    .Where(c => c != abbreviation)
-                    .Any(c => !episode.Tasks.FirstOrDefault(t => t.Abbreviation == c)?.Done ?? false))
+                if (
+                    prereqs
+                        .Select(c => c.Abbreviation)
+                        .Where(c => c != abbreviation)
+                        .Any(c =>
+                            !episode.Tasks.FirstOrDefault(t => t.Abbreviation == c)?.Done ?? false
+                        )
+                )
                     continue; // Not all callers are done
                 multiCandidates.Add(candidate); // All callers are done
             }
-                
+
             // Because we're skipping, find out if single-prereq tasks should still be pinged
             if (singleCandidates.Count > 0)
             {
-                var (pingOn, finalBody, questionMessage) 
-                    = await Ask.AboutAction(interactive, interaction, project, lng,  Ask.InconsequentialAction.PingCongaAfterSkip);
-                    
+                var (pingOn, finalBody, questionMessage) = await Ask.AboutAction(
+                    interactive,
+                    interaction,
+                    project,
+                    lng,
+                    Ask.InconsequentialAction.PingCongaAfterSkip
+                );
+
                 if (!pingOn)
                     singleCandidates.Clear(); // Do not ping the single-prereq tasks
 
-                if (questionMessage is not null) await questionMessage.DeleteAsync(); // Remove the question embed
+                if (questionMessage is not null)
+                    await questionMessage.DeleteAsync(); // Remove the question embed
             }
-                
+
             // Ping everyone to be pung
             foreach (var candidate in multiCandidates.Concat(singleCandidates))
             {
-                var nextTask = project.KeyStaff.Concat(episode.AdditionalStaff)
+                var nextTask = project
+                    .KeyStaff.Concat(episode.AdditionalStaff)
                     .FirstOrDefault(ks => ks.Role.Abbreviation == candidate.Abbreviation);
-                if (nextTask is null) continue;
-                    
+                if (nextTask is null)
+                    continue;
+
                 // Skip task if already done
-                if (episode.Tasks.FirstOrDefault(t => t.Abbreviation == nextTask.Role.Abbreviation)?.Done ?? false) continue;
-                    
-                var userId = episode.PinchHitters.FirstOrDefault(t => t.Abbreviation == nextTask.Role.Abbreviation)?.UserId ?? nextTask.UserId;
+                if (
+                    episode
+                        .Tasks.FirstOrDefault(t => t.Abbreviation == nextTask.Role.Abbreviation)
+                        ?.Done ?? false
+                )
+                    continue;
+
+                var userId =
+                    episode
+                        .PinchHitters.FirstOrDefault(t =>
+                            t.Abbreviation == nextTask.Role.Abbreviation
+                        )
+                        ?.UserId ?? nextTask.UserId;
                 var staffMention = $"<@{userId}>";
                 var roleTitle = nextTask.Role.Name;
                 if (prefixMode != CongaPrefixType.None)
                 {
                     // Using a switch expression in the middle of string interpolation is insane btw
-                    congaContent.Append($"[{prefixMode switch {
+                    congaContent.Append(
+                        $"[{prefixMode switch {
                         CongaPrefixType.Nickname => project.Nickname,
                         CongaPrefixType.Title => project.Title,
                         _ => string.Empty 
-                    }}] ");
+                    }}] "
+                    );
                 }
-                congaContent.AppendLine(T("progress.done.conga", lng, staffMention, episode.Number, roleTitle));
-                    
+                congaContent.AppendLine(
+                    T("progress.done.conga", lng, staffMention, episode.Number, roleTitle)
+                );
+
                 // Update database with new last-reminded time
-                var congaTaskIndex = Array.IndexOf(episode.Tasks, episode.Tasks.Single(t => t.Abbreviation == nextTask.Role.Abbreviation));
-                await AzureHelper.PatchEpisodeAsync(episode, [
-                    PatchOperation.Set($"/tasks/{congaTaskIndex}/lastReminded", DateTimeOffset.UtcNow)
-                ]);
+                var congaTask = episode.Tasks.FirstOrDefault(t =>
+                    t.Abbreviation == nextTask.Role.Abbreviation
+                );
+                if (congaTask is not null)
+                    congaTask.LastReminded = DateTimeOffset.UtcNow;
             }
-                
+
             if (congaContent.Length > 0)
                 await interaction.Channel.SendMessageAsync(congaContent.ToString());
         }
@@ -212,10 +263,14 @@ public partial class Skip(InteractiveService interactive) : InteractionModuleBas
         // Helper method to publish embeds to the local progress channel and to observers
         async Task PublishEmbeds()
         {
-            status = $":fast_forward: **{taskTitle}** {T("progress.skipped.appendage", lng)}\n{status}";
+            status =
+                $":fast_forward: **{taskTitle}** {T("progress.skipped.appendage", lng)}\n{status}";
 
             var publishEmbed = new EmbedBuilder()
-                .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString(gLng)})", url: project.AniListUrl)
+                .WithAuthor(
+                    $"{project.Title} ({project.Type.ToFriendlyString(gLng)})",
+                    url: project.AniListUrl
+                )
                 .WithTitle(title)
                 .WithDescription(status)
                 .WithThumbnailUrl(project.PosterUri)
@@ -225,18 +280,25 @@ public partial class Skip(InteractiveService interactive) : InteractionModuleBas
             // Publish to local progress channel
             try
             {
-                var publishChannel = (SocketTextChannel)Nino.Client.GetChannel(project.UpdateChannelId);
+                var publishChannel = (SocketTextChannel)
+                    Nino.Client.GetChannel(project.UpdateChannelId);
                 await publishChannel.SendMessageAsync(embed: publishEmbed);
             }
             catch (Exception e)
             {
                 Log.Error(e.Message);
                 var guild = Nino.Client.GetGuild(interaction.GuildId ?? 0);
-                await Utils.AlertError(T("error.release.failed", lng, e.Message), guild, project.Nickname, project.OwnerId, "Release");
+                await Utils.AlertError(
+                    T("error.release.failed", lng, e.Message),
+                    guild,
+                    project.Nickname,
+                    project.OwnerId,
+                    "Release"
+                );
             }
 
             // Publish to observers
-            await ObserverPublisher.PublishProgress(project, publishEmbed);
+            await ObserverPublisher.PublishProgress(project, publishEmbed, db);
         }
     }
 }

@@ -2,54 +2,71 @@
 using Discord;
 using Discord.WebSocket;
 using Localizer;
-using Microsoft.Azure.Cosmos;
+using Microsoft.EntityFrameworkCore;
 using Nino.Records;
 using Nino.Records.Enums;
-using Nino.Utilities;
+using Nino.Utilities.Extensions;
 using NLog;
 using static Localizer.Localizer;
+using Configuration = Nino.Records.Configuration;
 using Task = System.Threading.Tasks.Task;
+using Timer = System.Timers.Timer;
 
 namespace Nino.Services
 {
     internal class ReleaseReminderService
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
-        
-        private const int FiveMinutes = 5 * 60 * 1000;
-        private readonly System.Timers.Timer _timer;
 
-        public ReleaseReminderService()
+        private const int FiveMinutes = 5 * 60 * 1000;
+        private readonly Timer _timer;
+
+        public ReleaseReminderService(DataContext db)
         {
-            _timer = new System.Timers.Timer
-            {
-                Interval = FiveMinutes
-            };
+            _timer = new Timer { Interval = FiveMinutes };
             _timer.Elapsed += async (_, _) =>
             {
-                await CheckForReleases();
+                await CheckForReleases(db);
             };
             _timer.Start();
         }
 
-        private static async Task CheckForReleases()
+        private static async Task CheckForReleases(DataContext db)
         {
             Dictionary<Guid, List<Episode>> marked = [];
-            
-            foreach (var project in Cache.GetProjects().Where(p => p is { AirReminderEnabled: true, AniListId: not null }))
+
+            var targets = await db
+                .Projects.Include(p => p.Episodes)
+                .Where(p => p.AirReminderEnabled && p.AniListId != null)
+                .ToListAsync();
+            foreach (var project in targets)
             {
                 var decimalNumber = 0m;
-                foreach (var episode in Cache.GetEpisodes(project.Id).Where(e => e is { Done: false, ReminderPosted: false } && Utils.EpisodeNumberIsNumber(e.Number, out decimalNumber)))
+                foreach (
+                    var episode in project.Episodes.Where(e =>
+                        e is { Done: false, ReminderPosted: false }
+                        && Episode.EpisodeNumberIsNumber(e.Number, out decimalNumber)
+                    )
+                )
                 {
                     try
                     {
-                        var airTime = await AirDateService.GetAirDate((int)project.AniListId!, decimalNumber + (project.AniListOffset ?? 0));
+                        var airTime = await AirDateService.GetAirDate(
+                            (int)project.AniListId!,
+                            decimalNumber + (project.AniListOffset ?? 0)
+                        );
                         if (airTime is null || DateTimeOffset.UtcNow < airTime)
                             continue;
 
-                        if (await Nino.Client.GetChannelAsync((ulong)project.AirReminderChannelId!) is not SocketTextChannel channel) continue;
-                        var gLng = Cache.GetConfig(channel.Guild.Id)?.Locale?.ToDiscordLocale() ?? channel.Guild.PreferredLocale;
-                        
+                        if (
+                            await Nino.Client.GetChannelAsync((ulong)project.AirReminderChannelId!)
+                            is not SocketTextChannel channel
+                        )
+                            continue;
+                        var config = db.GetConfig(channel.Guild.Id);
+                        var gLng =
+                            config?.Locale?.ToDiscordLocale() ?? channel.Guild.PreferredLocale;
+
                         if (!marked.TryGetValue(project.Id, out var markedList))
                         {
                             markedList = [];
@@ -58,24 +75,35 @@ namespace Nino.Services
                         markedList.Add(episode);
 
                         var role = project.AirReminderRoleId is not null
-                            ? project.AirReminderRoleId == project.GuildId ? "@everyone" : $"<@&{project.AirReminderRoleId}>"
+                            ? project.AirReminderRoleId == project.GuildId
+                                ? "@everyone"
+                                : $"<@&{project.AirReminderRoleId}>"
                             : string.Empty;
                         var member = project.AirReminderUserId is not null
                             ? $"<@{project.AirReminderUserId}>"
                             : string.Empty;
                         var mention = $"{role}{member}";
                         var embed = new EmbedBuilder()
-                            .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString(gLng)})", url: project.AniListUrl)
+                            .WithAuthor(
+                                $"{project.Title} ({project.Type.ToFriendlyString(gLng)})",
+                                url: project.AniListUrl
+                            )
                             .WithTitle(T("title.aired", gLng, episode.Number))
-                            .WithDescription(await AirDateService.GetAirDateString((int)project.AniListId!, decimalNumber + (project.AniListOffset ?? 0), gLng))
+                            .WithDescription(
+                                await AirDateService.GetAirDateString(
+                                    (int)project.AniListId!,
+                                    decimalNumber + (project.AniListOffset ?? 0),
+                                    gLng
+                                )
+                            )
                             .WithThumbnailUrl(project.PosterUri)
                             .WithCurrentTimestamp()
                             .Build();
                         await channel.SendMessageAsync(text: mention, embed: embed);
-                        
+
                         // Conga intervention!
-                        await DoReleaseConga(project, episode, gLng);
-                        
+                        await DoReleaseConga(project, episode, gLng, config);
+
                         Log.Info($"Published release reminder for {project} episode {episode}");
                     }
                     catch (Exception e)
@@ -87,18 +115,11 @@ namespace Nino.Services
             }
 
             // Update database
-            foreach (var kvpair in marked)
+            foreach (var episode in marked.SelectMany(kvp => kvp.Value))
             {
-                TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(kvpair.Key.ToString()));
-                foreach (var episode in kvpair.Value)
-                {
-                    batch.PatchItem(id: episode.Id.ToString(), [
-                        PatchOperation.Set("/reminderPosted", true)
-                    ]);
-                }
-                await batch.ExecuteAsync();
-                await Cache.RebuildCacheForProject(kvpair.Key);
+                episode.ReminderPosted = true;
             }
+            await db.SaveChangesAsync();
         }
 
         /// <summary>
@@ -107,20 +128,30 @@ namespace Nino.Services
         /// <param name="project">The project</param>
         /// <param name="episode">The episode</param>
         /// <param name="gLng">Guild language</param>
-        private static async Task DoReleaseConga(Project project, Episode episode, string gLng)
+        /// <param name="config">Configuration</param>
+        private static async Task DoReleaseConga(
+            Project project,
+            Episode episode,
+            string gLng,
+            Configuration? config
+        )
         {
-            var prefixMode = Cache.GetConfig(project.GuildId)?.CongaPrefix ?? CongaPrefixType.None;
+            var prefixMode = config?.CongaPrefix ?? CongaPrefixType.None;
             var reminderText = new StringBuilder();
             if (project.CongaParticipants.Nodes.Count != 0)
             {
                 var staff = project.KeyStaff.Concat(episode.AdditionalStaff).ToList();
-                var validTargets = new HashSet<string>(staff
-                    .Select(ks => ks.Role.Abbreviation)
-                    .Where(ks => episode.Tasks.FirstOrDefault(t => t.Abbreviation == ks) is { Done: false, LastReminded: null})
+                var validTargets = new HashSet<string>(
+                    staff
+                        .Select(ks => ks.Role.Abbreviation)
+                        .Where(ks =>
+                            episode.Tasks.FirstOrDefault(t => t.Abbreviation == ks)
+                                is { Done: false, LastReminded: null }
+                        )
                 );
 
-                var nodes = project.CongaParticipants
-                    .GetDependentsOf("$AIR")
+                var nodes = project
+                    .CongaParticipants.GetDependentsOf("$AIR")
                     .Where(c => validTargets.Contains(c.Abbreviation))
                     .ToList();
 
@@ -129,38 +160,55 @@ namespace Nino.Services
                     .Where(c => c is not null)
                     .Where(c => c?.UserId != project.AirReminderUserId) // Prevent double pings
                     .ToList();
-                        
-                var patchOperations = nodes
-                    .Select(c => Array.FindIndex(episode.Tasks, t => t.Abbreviation == c.Abbreviation))
-                    .Where(index => index != -1)
-                    .Select(index => PatchOperation.Set($"/tasks/{index}/lastReminded", DateTimeOffset.UtcNow))
-                    .ToList();
 
-                if (patchOperations.Count == 0) return;
-                await AzureHelper.PatchEpisodeAsync(episode, patchOperations);
-                
+                foreach (
+                    var task in nodes
+                        .Select(n =>
+                            episode.Tasks.FirstOrDefault(t => t.Abbreviation == n.Abbreviation)
+                        )
+                        .Where(t => t is not null)
+                )
+                {
+                    task!.LastReminded = DateTimeOffset.UtcNow;
+                }
+
                 // Time to send the conga message
-                if (await Nino.Client.GetChannelAsync((ulong)project.AirReminderChannelId!) is not SocketTextChannel channel) return;
+                if (
+                    await Nino.Client.GetChannelAsync((ulong)project.AirReminderChannelId!)
+                    is not SocketTextChannel channel
+                )
+                    return;
 
                 foreach (var target in pingTargets)
                 {
-                    if (target is null) continue;
+                    if (target is null)
+                        continue;
 
-                    var userId = episode.PinchHitters.FirstOrDefault(t => t.Abbreviation == target.Role.Abbreviation)?.UserId ?? target.UserId;
+                    var userId =
+                        episode
+                            .PinchHitters.FirstOrDefault(t =>
+                                t.Abbreviation == target.Role.Abbreviation
+                            )
+                            ?.UserId ?? target.UserId;
                     var staffMention = $"<@{userId}>";
                     var roleTitle = target.Role.Name;
                     if (prefixMode != CongaPrefixType.None)
                     {
-                        reminderText.Append($"[{prefixMode switch {
+                        reminderText.Append(
+                            $"[{prefixMode switch {
                             CongaPrefixType.Nickname => project.Nickname,
                             CongaPrefixType.Title => project.Title,
                             _ => string.Empty
-                        }}] ");
+                        }}] "
+                        );
                     }
-                    reminderText.AppendLine(T("progress.done.conga", gLng, staffMention, episode.Number, roleTitle));
+                    reminderText.AppendLine(
+                        T("progress.done.conga", gLng, staffMention, episode.Number, roleTitle)
+                    );
                 }
-                
-                if (reminderText.Length <= 0) return;
+
+                if (reminderText.Length <= 0)
+                    return;
                 await channel.SendMessageAsync(reminderText.ToString());
                 Log.Info($"Published release conga reminders for {project} episode {episode}");
             }

@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="ICU4N" Version="60.1.0-alpha.436" />
-    <PackageReference Include="MathEvaluator" Version="1.1.5" />
+    <PackageReference Include="MathEvaluator" Version="2.4.2" />
   </ItemGroup>
 
 </Project>

@@ -1,11 +1,10 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
 using Nino.Records;
 using Nino.Utilities;
-
+using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
@@ -16,8 +15,8 @@ namespace Nino.Commands
         {
             [SlashCommand("add", "Add an administrator to this project")]
             public async Task<RuntimeResult> Add(
-                [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-                [Summary("member", "Staff member")] SocketUser member
+                [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+                SocketUser member
             )
             {
                 var interaction = Context.Interaction;
@@ -29,23 +28,29 @@ namespace Nino.Commands
                 var staffMention = $"<@{memberId}>";
 
                 // Verify project and user - Owner required
-                var project = Utils.ResolveAlias(alias, interaction);
-                if (project == null)
-                    return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+                var project = await db.ResolveAlias(alias, interaction);
+                if (project is null)
+                    return await Response.Fail(
+                        T("error.alias.resolutionFailed", lng, alias),
+                        interaction
+                    );
 
-                if (!Utils.VerifyUser(interaction.User.Id, project, excludeAdmins: true))
+                if (!project.VerifyUser(db, interaction.User.Id, excludeAdmins: true))
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
                 // Validate user isn't already an admin
-                if (project.AdministratorIds.Any(a => a == memberId))
-                    return await Response.Fail(T("error.admin.alreadyAdmin", lng, staffMention), interaction);
+                if (project.Administrators.Any(a => a.UserId == memberId))
+                    return await Response.Fail(
+                        T("error.admin.alreadyAdmin", lng, staffMention),
+                        interaction
+                    );
 
                 // Add to database
-                await AzureHelper.PatchProjectAsync(project, [
-                    PatchOperation.Add("/administratorIds/-", memberId.ToString())
-                ]);
+                project.Administrators.Add(new Administrator { UserId = memberId });
 
-                Log.Info($"Added M[{memberId} (@{member.Username})] as an administrator for {project}");
+                Log.Info(
+                    $"Added M[{memberId} (@{member.Username})] as an administrator for {project}"
+                );
 
                 // Send success embed
                 var embed = new EmbedBuilder()
@@ -54,7 +59,7 @@ namespace Nino.Commands
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 
-                await Cache.RebuildCacheForProject(project.Id);
+                await db.TrySaveChangesAsync(interaction);
                 return ExecutionResult.Success;
             }
         }

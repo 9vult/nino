@@ -1,11 +1,11 @@
-﻿using Discord;
+﻿using System.Text;
+using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
-using Microsoft.Azure.Cosmos;
 using Nino.Records;
 using Nino.Records.Enums;
+using Nino.Services;
 using Nino.Utilities;
-using System.Text;
+using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
@@ -14,16 +14,16 @@ namespace Nino.Commands
     {
         [SlashCommand("create", "Create a new project")]
         public async Task<RuntimeResult> Create(
-            [Summary("nickname", "Short project nickname (no spaces)")] string nickname,
-            [Summary("title", "Full series title")] string title,
-            [Summary("type", "Project type")] ProjectType type,
-            [Summary("length", "Number of episodes"), MinValue(1)] int length,
-            [Summary("poster", "Poster image URL")] string posterUri,
-            [Summary("private", "Is this project private?")] bool isPrivate,
-            [Summary("updateChannel", "Channel to post updates to"), ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel updateChannel,
-            [Summary("releaseChannel", "Channel to post releases to"), ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel releaseChannel,
-            [Summary("anilistId", "AniList ID")] int aniListId,
-            [Summary("firstEpisode", "First episode number")] decimal firstEpisode = 1
+            string nickname,
+            int anilistId,
+            bool isPrivate,
+            [ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel updateChannel,
+            [ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel releaseChannel,
+            string? title = null,
+            ProjectType? type = null,
+            [MinValue(1)] int? length = null,
+            string? posterUri = null,
+            decimal firstEpisode = 1
         )
         {
             var interaction = Context.Interaction;
@@ -32,7 +32,8 @@ namespace Nino.Commands
             var guildId = interaction.GuildId ?? 0;
             var guild = Nino.Client.GetGuild(guildId);
             var member = guild.GetUser(interaction.User.Id);
-            if (!Utils.VerifyAdministrator(member, guild)) return await Response.Fail(T("error.notPrivileged", lng), interaction);
+            if (!Utils.VerifyAdministrator(db, member, guild))
+                return await Response.Fail(T("error.notPrivileged", lng), interaction);
 
             // Get inputs
             var updateChannelId = updateChannel.Id;
@@ -43,22 +44,63 @@ namespace Nino.Commands
             nickname = nickname.Trim().ToLowerInvariant().Replace(" ", string.Empty); // remove spaces
 
             // Verify data
-            if (Cache.GetProjects(guildId).Any(p => p.Nickname == nickname))
-                return await Response.Fail(T("error.project.nameInUse", lng, nickname), interaction);
+            if (db.Projects.Any(p => p.GuildId == guildId && p.Nickname == nickname))
+                return await Response.Fail(
+                    T("error.project.nameInUse", lng, nickname),
+                    interaction
+                );
 
-            if (!Uri.TryCreate(posterUri, UriKind.Absolute, out Uri? _))
-                return await Response.Fail(T("error.project.invalidPosterUrl", lng), interaction);
+            var defaultFieldNames = string.Join(
+                ", ",
+                new[] { nameof(title), nameof(length), nameof(type), nameof(posterUri) }
+                    .Zip(new object?[] { title, length, type, posterUri })
+                    .Where(p => p.Second is null)
+                    .Select(p => p.First)
+            );
+
+            if (defaultFieldNames.Length > 0)
+                Log.Info(
+                    $"AniList will be used in the construction of project '{nickname}' for the following fields: {defaultFieldNames}"
+                );
+
+            var apiResponse = await AniListService.Get(anilistId);
+            if (apiResponse is not null && apiResponse.Error is null)
+            {
+                title ??= apiResponse.Title;
+                length ??= apiResponse.EpisodeCount;
+                type ??= apiResponse.Type;
+
+                if (title is null || length is null || length < 1)
+                {
+                    return await Response.Fail(
+                        T(apiResponse.Error ?? "error.anilist.create", lng),
+                        interaction
+                    );
+                }
+            }
+            else
+            {
+                return await Response.Fail(
+                    T(apiResponse?.Error ?? "error.anilist.create", lng),
+                    interaction
+                );
+            }
+
+            if (posterUri is null || !Uri.TryCreate(posterUri, UriKind.Absolute, out _))
+            {
+                posterUri = apiResponse.CoverImage ?? AniListService.FallbackPosterUri;
+            }
 
             // Populate data
 
             var projectData = new Project
             {
-                Id = AzureHelper.CreateProjectId(),
+                Id = Guid.NewGuid(),
                 GuildId = guildId,
                 Nickname = nickname,
-                Title = title,
+                Title = title!,
                 OwnerId = ownerId,
-                Type = type,
+                Type = type!.Value,
                 PosterUri = posterUri,
                 UpdateChannelId = updateChannelId,
                 ReleaseChannelId = releaseChannelId,
@@ -66,50 +108,44 @@ namespace Nino.Commands
                 IsArchived = false,
                 AirReminderEnabled = false,
                 CongaReminderEnabled = false,
-                AdministratorIds = [],
-                KeyStaff = [],
                 CongaParticipants = new CongaGraph(),
-                Aliases = [],
-                AniListId = aniListId,
-                Created = DateTimeOffset.UtcNow
+                AniListId = anilistId,
+                Created = DateTimeOffset.UtcNow,
             };
 
             var episodes = new List<Episode>();
             for (var i = firstEpisode; i < firstEpisode + length; i++)
             {
-                episodes.Add(new Episode
-                {
-                    Id = AzureHelper.CreateEpisodeId(),
-                    GuildId = guildId,
-                    ProjectId = projectData.Id,
-                    Number = $"{i}",
-                    Done = false,
-                    ReminderPosted = false,
-                    AdditionalStaff = [],
-                    PinchHitters = [],
-                    Tasks = [],
-                });
+                episodes.Add(
+                    new Episode
+                    {
+                        GuildId = guildId,
+                        ProjectId = projectData.Id,
+                        Number = $"{i}",
+                        Done = false,
+                        ReminderPosted = false,
+                        AdditionalStaff = [],
+                        PinchHitters = [],
+                        Tasks = [],
+                    }
+                );
             }
-
-            Log.Info($"Creating project {projectData} for M[{ownerId} (@{member.Username})] with {episodes.Count} episodes, starting with episode {firstEpisode}");
 
             // Add project and episodes to database
-            await AzureHelper.Projects!.UpsertItemAsync(projectData);
-
-            TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(projectData.Id.ToString()));
-            foreach (var episode in episodes)
-            {
-                batch.UpsertItem(episode);
-            }
-            await batch.ExecuteAsync();
+            await db.Projects.AddAsync(projectData);
+            await db.Episodes.AddRangeAsync(episodes);
 
             // Create configuration if the guild doesn't have one yet
-            if (await Getters.GetConfiguration(guildId) == null)
+            if (db.GetConfig(guildId) == null)
             {
                 Log.Info($"Creating default configuration for guild {guildId}");
-                await AzureHelper.Configurations!.UpsertItemAsync(Configuration.CreateDefault(guildId));
+                await db.Configurations.AddAsync(Configuration.CreateDefault(guildId));
             }
-            
+
+            Log.Info(
+                $"Creating project {projectData} for M[{ownerId} (@{member.Username})] with {episodes.Count} episodes, starting with episode {firstEpisode}"
+            );
+
             var builder = new StringBuilder();
             builder.AppendLine(T("project.created", lng, nickname));
 
@@ -128,11 +164,17 @@ namespace Nino.Commands
 
             // Check progress channel permissions
             if (!PermissionChecker.CheckPermissions(updateChannelId))
-                await Response.Info(T("error.missingChannelPerms", lng, $"<#{updateChannelId}>"), interaction);
+                await Response.Info(
+                    T("error.missingChannelPerms", lng, $"<#{updateChannelId}>"),
+                    interaction
+                );
             if (!PermissionChecker.CheckReleasePermissions(releaseChannelId))
-                await Response.Info(T("error.missingChannelPermsRelease", lng, $"<#{releaseChannelId}>"), interaction);
+                await Response.Info(
+                    T("error.missingChannelPermsRelease", lng, $"<#{releaseChannelId}>"),
+                    interaction
+                );
 
-            await Cache.RebuildCacheForGuild(interaction.GuildId ?? 0);
+            await db.TrySaveChangesAsync(interaction);
             return ExecutionResult.Success;
         }
     }

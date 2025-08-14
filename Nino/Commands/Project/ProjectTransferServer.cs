@@ -1,11 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
-using Microsoft.Azure.Cosmos;
-using Nino.Handlers;
-using Nino.Records;
 using Nino.Utilities;
-
+using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
@@ -13,10 +9,7 @@ namespace Nino.Commands
     public partial class ProjectManagement
     {
         [SlashCommand("transfer-server", "Transfer a project from another server to here")]
-        public async Task<RuntimeResult> TransferServer(
-            [Summary("serverId", "ID of the server the project is currently in")] string serverId,
-            [Summary("project", "Project nickname")] string alias
-        )
+        public async Task<RuntimeResult> TransferServer(string serverId, string alias)
         {
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
@@ -29,7 +22,8 @@ namespace Nino.Commands
             // Check for guild administrator status
             var guild = Nino.Client.GetGuild(newGuildId);
             var member = guild.GetUser(interaction.User.Id);
-            if (!Utils.VerifyAdministrator(member, guild)) return await Response.Fail(T("error.notPrivileged", lng), interaction);
+            if (!Utils.VerifyAdministrator(db, member, guild))
+                return await Response.Fail(T("error.notPrivileged", lng), interaction);
 
             // Validate origin server
             if (!ulong.TryParse(originGuildIdStr, out var oldGuildId))
@@ -39,37 +33,26 @@ namespace Nino.Commands
                 return await Response.Fail(T("error.noSuchServer", lng), interaction);
 
             // Verify project and user - Owner required
-            var project = Utils.ResolveAlias(alias, interaction, observingGuildId: oldGuildId);
-            if (project == null)
-                return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+            var project = await db.ResolveAlias(alias, interaction, observingGuildId: oldGuildId);
+            if (project is null)
+                return await Response.Fail(
+                    T("error.alias.resolutionFailed", lng, alias),
+                    interaction
+                );
 
-            if (!Utils.VerifyUser(interaction.User.Id, project, excludeAdmins: true))
+            if (!project.VerifyUser(db, interaction.User.Id, excludeAdmins: true))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
-
-            // Get the episodes
-            var episodes = Cache.GetEpisodes(project.Id);
 
             // Modify the data
             project.GuildId = newGuildId;
-            foreach (var episode in episodes)
+            foreach (var episode in project.Episodes)
             {
                 episode.GuildId = newGuildId;
             }
 
-            // Write new data to database
-            await AzureHelper.Projects!.UpsertItemAsync(project);
-
-            if (episodes.Count > 0)
-            {
-                TransactionalBatch episodeBatch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: new PartitionKey(project.Id.ToString()));
-                foreach (var episode in episodes)
-                {
-                    episodeBatch.UpsertItem(episode);
-                }
-                await episodeBatch.ExecuteAsync();
-            }
-            
-            Log.Info($"Transfered project {project} from server {oldGuildId} to new server {newGuildId}");
+            Log.Info(
+                $"Transfered project {project} from server {oldGuildId} to new server {newGuildId}"
+            );
 
             // Send success embed
             var embed = new EmbedBuilder()
@@ -78,7 +61,7 @@ namespace Nino.Commands
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 
-            await Cache.BuildCache();
+            await db.TrySaveChangesAsync(interaction);
             return ExecutionResult.Success;
         }
     }

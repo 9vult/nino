@@ -5,25 +5,32 @@ namespace Nino.Services
 {
     internal static class AirDateService
     {
-        private static readonly Logger log = LogManager.GetCurrentClassLogger();
-        private const string LANG = "en-US";
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+        private const string Lang = "en-US";
 
-        public static async Task<string> GetAirDateString(int aniListId, decimal episodeNumber, string lng = LANG)
+        public static async Task<string> GetAirDateString(
+            int aniListId,
+            decimal episodeNumber,
+            string lng = Lang
+        )
         {
             try
             {
                 var estimated = false;
                 var date = await GetAirDate(aniListId, episodeNumber);
                 if (date is null)
-                { 
+                {
                     estimated = true;
 
                     // estimate based on "previous" episode
-                    var previousNumber = Math.Floor(episodeNumber) == episodeNumber ? episodeNumber - 1 : Math.Floor(episodeNumber);
+                    var previousNumber =
+                        Math.Floor(episodeNumber) == episodeNumber
+                            ? episodeNumber - 1
+                            : Math.Floor(episodeNumber);
                     date = await GetAirDate(aniListId, previousNumber);
                     if (date is not null)
                     {
-                        date = date?.Add(new TimeSpan(days: 7, 0, 0, 0)); // Add a week
+                        date = date.Value.Add(new TimeSpan(days: 7, 0, 0, 0)); // Add a week
                     }
                     else
                     {
@@ -31,7 +38,9 @@ namespace Nino.Services
                         date = await GetStartDate(aniListId);
                         if (date is null)
                             return T("error.anilist.notSpecified", lng);
-                        date = date?.Add(new TimeSpan(days: (int)(7 * (episodeNumber - 1)), 0, 0, 0));
+                        date = date?.Add(
+                            new TimeSpan(days: (int)(7 * (episodeNumber - 1)), 0, 0, 0)
+                        );
                     }
                 }
 
@@ -48,7 +57,7 @@ namespace Nino.Services
                     result += T("airDate.future", lng, absolute, relative);
                 else
                     result += T("airDate.past", lng, absolute, relative);
-                
+
                 return result;
             }
             catch (Exception e)
@@ -71,12 +80,14 @@ namespace Nino.Services
         public static async Task<bool?> EpisodeAired(int aniListId, decimal episodeNumber)
         {
             var time = await GetAirDate(aniListId, episodeNumber);
-            if (time is not null) return time < DateTimeOffset.UtcNow;
-            
+            if (time is not null)
+                return time < DateTimeOffset.UtcNow;
+
             // Estimation
             var start = await GetStartDate(aniListId);
-            if (start is null) return null; // ???
-            
+            if (start is null)
+                return null; // ???
+
             return start.Value.AddDays(7 * ((double)episodeNumber - 1)) < DateTimeOffset.UtcNow;
         }
 
@@ -109,7 +120,9 @@ namespace Nino.Services
             {
                 if (episode.Episode == episodeNumber)
                 {
-                    return DateTimeOffset.FromUnixTimeSeconds(episode.AiringAt);
+                    return DateTimeOffset
+                        .FromUnixTimeSeconds(episode.AiringAt)
+                        .AddMinutes(response?.Duration ?? 0);
                 }
             }
             return null;

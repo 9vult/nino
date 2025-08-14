@@ -1,24 +1,24 @@
 using Nino.Records.Enums;
 
-namespace Nino.Records;
+namespace Nino.Records.Json;
 
-public record ProjectTemplate
+public class ProjectCreateDto
 {
     public required string Nickname;
-    public required string Title;
-    public required ProjectType Type;
-    public required uint Length;
-    public required string PosterUri;
+    public required int AniListId;
     public required bool IsPrivate;
     public required ulong UpdateChannelId;
     public required ulong ReleaseChannelId;
-    public int AniListId;
-    
+
+    public string? Title;
+    public ProjectType? Type;
+    public int? Length;
+    public string? PosterUri;
     public decimal? FirstEpisode;
     public ulong[]? AdministratorIds;
     public string[]? Aliases;
     public CongaNodeDto[]? CongaParticipants;
-    
-    public required Staff[] KeyStaff;
-    public required Dictionary<string, Staff[]> AdditionalStaff;
+
+    public required StaffCreateDto[] KeyStaff;
+    public required Dictionary<string, StaffCreateDto[]> AdditionalStaff;
 }

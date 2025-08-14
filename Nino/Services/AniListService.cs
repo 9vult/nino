@@ -1,10 +1,11 @@
 ﻿using System.Net;
-using Nino.Utilities;
-using NLog;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Nino.Records.Enums;
+using Nino.Utilities;
+using NLog;
 
 namespace Nino.Services
 {
@@ -14,21 +15,24 @@ namespace Nino.Services
         private const string Cache = ".cache";
         private const string BaseUrl = "https://graphql.anilist.co";
         private static readonly TimeSpan OneDay = TimeSpan.FromDays(1);
-        
-        private static readonly Dictionary<int, ApiResponse> RamCache = new();
-        
-        public static bool AniListEnabled { get; set; } = true;
 
-        private static readonly HttpClient Client = new(new HttpClientHandler
-        {
-            AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate
-        });
+        private static readonly Dictionary<int, ApiResponse> RamCache = new();
+
+        public static bool AniListEnabled { get; set; } = true;
+        public const string FallbackPosterUri = "https://files.catbox.moe/j3qizm.png";
+
+        private static readonly HttpClient Client = new(
+            new HttpClientHandler
+            {
+                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+            }
+        );
 
         /// <summary>
         /// Get the AniList API response for the given ID, either cached or fresh
         /// </summary>
         /// <param name="anilistId">AniList ID</param>
-        /// <returns>API reponse</returns>
+        /// <returns>API response</returns>
         public static async Task<ApiResponse?> Get(int anilistId)
         {
             if (!AniListEnabled)
@@ -39,12 +43,12 @@ namespace Nino.Services
             // Check if it's in the RAM cache
             if (RamCache.TryGetValue(anilistId, out var ramValue))
             {
-                if (DateTime.UtcNow - ramValue.SaveDate.ToUniversalTime() < OneDay)
+                if (DateTimeOffset.UtcNow - ramValue.SaveDate.ToUniversalTime() < OneDay)
                     return ramValue;
             }
-            
+
             // It's either not in the RAM cache or it's too old, continue to the disk cache
-            
+
             var filename = Path.Combine(Cache, $"{anilistId}.json");
             PrepareCacheDirectory();
 
@@ -52,13 +56,14 @@ namespace Nino.Services
             {
                 // Check if the file exists and is younger than a day old
                 var fileInfo = new FileInfo(filename);
-                if (fileInfo.Exists && (DateTime.UtcNow - fileInfo.LastWriteTimeUtc < OneDay))
+                if (fileInfo.Exists && (DateTimeOffset.UtcNow - fileInfo.LastWriteTimeUtc < OneDay))
                 {
                     // Use the cached version
                     await using var stream = File.OpenRead(filename);
                     var response = await JsonSerializer.DeserializeAsync<ApiResponse>(stream);
-                    
-                    if (response is null) return null;
+
+                    if (response is null)
+                        return null;
                     response.SaveDate = fileInfo.LastWriteTimeUtc;
                     RamCache[anilistId] = response;
                     return response;
@@ -82,56 +87,74 @@ namespace Nino.Services
                     if (apiResponse is null)
                         return new ApiResponse { Error = "error.anilist.cache.malformed" };
 
+                    // Round to the nearest multiple of 30 minutes
+                    if (apiResponse.Data?.Media is not null)
+                        apiResponse.Data.Media.Duration =
+                            (int)Math.Ceiling((apiResponse.Data.Media.Duration ?? 0) / 30d) * 30;
+
                     await using var stream = File.OpenWrite(filename);
                     await JsonSerializer.SerializeAsync(stream, apiResponse);
-                    
-                    apiResponse.SaveDate = DateTime.UtcNow;
+
+                    apiResponse.SaveDate = DateTimeOffset.UtcNow;
                     RamCache[anilistId] = apiResponse;
                     return apiResponse;
                 }
-                
+
                 Log.Error($"AniList status code for ID {anilistId} is {response.StatusCode}");
                 return new ApiResponse
                 {
                     Error =
                         response.StatusCode == HttpStatusCode.NotFound
-                            ? $"error.anilist.404"
-                            : $"error.anilist.generic",
+                            ? "error.anilist.404"
+                            : "error.anilist.generic",
                 };
-
             }
-            catch (HttpRequestException e) when (e.StatusCode == System.Net.HttpStatusCode.NotFound)
+            catch (HttpRequestException e) when (e.StatusCode == HttpStatusCode.NotFound)
             {
-                return new ApiResponse
-                {
-                    Error = "error.anilist.404"
-                };
+                return new ApiResponse { Error = "error.anilist.404" };
             }
             catch (HttpRequestException e)
             {
                 Log.Error($"Error getting Start Date for AniListId: {anilistId}");
                 Log.Error(e.Message);
-                return new ApiResponse
-                {
-                    Error = "error.anilist.apiError"
-                };
+                return new ApiResponse { Error = "error.anilist.apiError" };
             }
             catch (Exception e)
             {
                 Log.Error($"Error getting Start Date for AniListId: {anilistId}");
                 Log.Error(e.Message);
-                return new ApiResponse { Error = $"error.anilist.generic" };
+                return new ApiResponse { Error = "error.anilist.generic" };
             }
         }
 
         private static StringContent CreateQuery(int id) =>
-            new(JsonSerializer.Serialize(new
-            {
-                query = "query ($id: Int) { Media (id: $id) { startDate { year month day }, airingSchedule { nodes { episode, airingAt }}}}",
-                variables = new { id },
-            }),
-            Encoding.UTF8,
-            "application/json");
+            new(
+                JsonSerializer.Serialize(
+                    new
+                    {
+                        query = """
+                        query ($id: Int) {
+                            Media (id: $id) {
+                                startDate { year month day },
+                                airingSchedule { nodes { episode, airingAt }},
+                                duration,
+                                episodes,
+                                format,
+                                title {
+                                  romaji
+                                }
+                                coverImage {
+                                  extraLarge
+                                }
+                            }
+                        }
+                        """,
+                        variables = new { id },
+                    }
+                ),
+                Encoding.UTF8,
+                "application/json"
+            );
 
         /// <summary>
         /// Prepare the cache directory
@@ -140,7 +163,8 @@ namespace Nino.Services
         {
             try
             {
-                if (Directory.Exists(Cache)) return;
+                if (Directory.Exists(Cache))
+                    return;
                 Directory.CreateDirectory(Cache);
             }
             catch (IOException e)
@@ -156,12 +180,43 @@ namespace Nino.Services
 
         [JsonIgnore]
         public List<AiringScheduleNode>? Episodes => Data?.Media?.AiringSchedule?.Nodes;
+
         [JsonIgnore]
         public DateTimeOffset? StartDate => Data?.Media?.StartDate;
+
+        [JsonIgnore]
+        public int? Duration => Data?.Media?.Duration;
+
         [JsonIgnore]
         public string? Error { get; set; }
+
         [JsonIgnore]
-        public DateTime SaveDate { get; set; }
+        public DateTimeOffset SaveDate { get; set; }
+
+        [JsonIgnore]
+        public int? EpisodeCount => Data?.Media?.Episodes;
+
+        [JsonIgnore]
+        public string? Title => Data?.Media?.Title?.Romaji;
+
+        [JsonIgnore]
+        public ProjectType Type =>
+            Data?.Media?.Format is not null
+                ? Data?.Media?.Format switch
+                {
+                    "TV" => ProjectType.TV,
+                    "TV_SHORT" => ProjectType.TV,
+                    "MOVIE" => ProjectType.Movie,
+                    "ONA" => ProjectType.ONA,
+                    "OVA" => ProjectType.OVA,
+                    "SPECIAL" => ProjectType.OVA,
+                    "MUSIC" => ProjectType.OVA,
+                    _ => ProjectType.TV,
+                }
+                : ProjectType.TV;
+
+        [JsonIgnore]
+        public string? CoverImage => Data?.Media?.CoverImage?.ExtraLarge;
     }
 
     public class Data
@@ -175,6 +230,11 @@ namespace Nino.Services
 
         [JsonConverter(typeof(StartDateConverter))]
         public DateTimeOffset StartDate { get; set; }
+        public int? Duration { get; set; }
+        public int? Episodes { get; set; }
+        public string? Format { get; set; }
+        public Title? Title { get; set; }
+        public CoverImage? CoverImage { get; set; }
     }
 
     public class AiringSchedule
@@ -186,5 +246,15 @@ namespace Nino.Services
     {
         public int Episode { get; set; }
         public long AiringAt { get; set; }
+    }
+
+    public class CoverImage
+    {
+        public string? ExtraLarge { get; set; }
+    }
+
+    public class Title
+    {
+        public string? Romaji { get; set; }
     }
 }

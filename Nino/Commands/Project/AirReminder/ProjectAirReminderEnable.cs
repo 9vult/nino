@@ -1,11 +1,9 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
-using Nino.Records;
 using Nino.Utilities;
-
+using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
@@ -16,10 +14,10 @@ namespace Nino.Commands
         {
             [SlashCommand("enable", "Enable airing reminders")]
             public async Task<RuntimeResult> Enable(
-                [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-                [Summary("channel", "Channel to post reminders in"), ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel channel,
-                [Summary("role", "Role to ping for reminders")] SocketRole? role = null,
-                [Summary("member", "Member to ping for reminders")] SocketUser? member = null
+                [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+                [ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel channel,
+                SocketRole? role = null,
+                SocketUser? member = null
             )
             {
                 var interaction = Context.Interaction;
@@ -32,20 +30,20 @@ namespace Nino.Commands
                 var memberId = member?.Id;
 
                 // Verify project and user - Owner or Admin required
-                var project = Utils.ResolveAlias(alias, interaction);
-                if (project == null)
-                    return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+                var project = await db.ResolveAlias(alias, interaction);
+                if (project is null)
+                    return await Response.Fail(
+                        T("error.alias.resolutionFailed", lng, alias),
+                        interaction
+                    );
 
-                if (!Utils.VerifyUser(interaction.User.Id, project))
+                if (!project.VerifyUser(db, interaction.User.Id))
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
-                // Set in database
-                await AzureHelper.PatchProjectAsync(project, [
-                    PatchOperation.Set($"/airReminderEnabled", true),
-                    PatchOperation.Set($"/airReminderChannelId", channelId.ToString()),
-                    PatchOperation.Set($"/airReminderRoleId", roleId?.ToString()),
-                    PatchOperation.Set($"/airReminderUserId", memberId?.ToString())
-                ]);
+                project.AirReminderEnabled = true;
+                project.AirReminderChannelId = channelId;
+                project.AirReminderRoleId = roleId;
+                project.AirReminderUserId = memberId;
 
                 Log.Info($"Enabled air reminders for {project}");
 
@@ -58,9 +56,12 @@ namespace Nino.Commands
 
                 // Check reminder channel permissions
                 if (!PermissionChecker.CheckPermissions(channelId))
-                    await Response.Info(T("error.missingChannelPerms", lng, $"<#{channelId}>"), interaction);
+                    await Response.Info(
+                        T("error.missingChannelPerms", lng, $"<#{channelId}>"),
+                        interaction
+                    );
 
-                await Cache.RebuildCacheForProject(project.Id);
+                await db.TrySaveChangesAsync(interaction);
                 return ExecutionResult.Success;
             }
         }

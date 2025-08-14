@@ -1,10 +1,10 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
 using Nino.Records;
 using Nino.Utilities;
+using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
@@ -15,10 +15,10 @@ namespace Nino.Commands
         {
             [SlashCommand("set", "Set a pinch hitter for an episode")]
             public async Task<RuntimeResult> Set(
-                [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-                [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
-                [Summary("abbreviation", "Position shorthand"), Autocomplete(typeof(KeyStaffAutocompleteHandler))] string abbreviation,
-                [Summary("member", "Staff member")] SocketUser member
+                [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+                [Autocomplete(typeof(EpisodeAutocompleteHandler))] string episodeNumber,
+                [Autocomplete(typeof(KeyStaffAutocompleteHandler))] string abbreviation,
+                SocketUser member
             )
             {
                 var interaction = Context.Interaction;
@@ -28,52 +28,60 @@ namespace Nino.Commands
                 var memberId = member.Id;
                 alias = alias.Trim();
                 abbreviation = abbreviation.Trim().ToUpperInvariant();
-                episodeNumber = Utils.CanonicalizeEpisodeNumber(episodeNumber);
+                episodeNumber = Episode.CanonicalizeEpisodeNumber(episodeNumber);
 
                 // Verify project and user - Owner or Admin required
-                var project = Utils.ResolveAlias(alias, interaction);
-                if (project == null)
-                    return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+                var project = await db.ResolveAlias(alias, interaction);
+                if (project is null)
+                    return await Response.Fail(
+                        T("error.alias.resolutionFailed", lng, alias),
+                        interaction
+                    );
 
-                if (!Utils.VerifyUser(interaction.User.Id, project))
+                if (!project.VerifyUser(db, interaction.User.Id))
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
                 // Verify episode
-                if (!Getters.TryGetEpisode(project, episodeNumber, out var episode))
-                    return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
-                
+                if (!project.TryGetEpisode(episodeNumber, out var episode))
+                    return await Response.Fail(
+                        T("error.noSuchEpisode", lng, episodeNumber),
+                        interaction
+                    );
+
                 // Check if position exists
                 if (project.KeyStaff.All(ks => ks.Role.Abbreviation != abbreviation))
-                    return await Response.Fail(T("error.noSuchTask", lng, abbreviation), interaction);
+                    return await Response.Fail(
+                        T("error.noSuchTask", lng, abbreviation),
+                        interaction
+                    );
 
                 // All good!
-                var hitter = new PinchHitter
-                {
-                    UserId = memberId,
-                    Abbreviation = abbreviation
-                };
+                var hitter = new PinchHitter { UserId = memberId, Abbreviation = abbreviation };
 
-                // Add to database
-                TransactionalBatch batch = AzureHelper.Episodes!.CreateTransactionalBatch(partitionKey: AzureHelper.EpisodePartitionKey(episode));
-                
-                var phIndex = Array.IndexOf(episode.PinchHitters, episode.PinchHitters.SingleOrDefault(k => k.Abbreviation == abbreviation));
-                batch.PatchItem(id: episode.Id.ToString(), [
-                    PatchOperation.Set($"/pinchHitters/{(phIndex != -1 ? phIndex : "-")}", hitter)
-                ]);
-                
-                await batch.ExecuteAsync();
+                episode.PinchHitters.RemoveAll(p => p.Abbreviation == abbreviation);
+                episode.PinchHitters.Add(hitter);
 
-                Log.Info($"Set M[{memberId} (@{member.Username})] as pinch hitter for {abbreviation} for {episode}");
+                Log.Info(
+                    $"Set M[{memberId} (@{member.Username})] as pinch hitter for {abbreviation} for {episode}"
+                );
 
                 // Send success embed
                 var staffMention = $"<@{memberId}>";
                 var embed = new EmbedBuilder()
                     .WithTitle(T("title.projectModification", lng))
-                    .WithDescription(T("keyStaff.pinchHitter.set", lng, staffMention, episode.Number, abbreviation))
+                    .WithDescription(
+                        T(
+                            "keyStaff.pinchHitter.set",
+                            lng,
+                            staffMention,
+                            episode.Number,
+                            abbreviation
+                        )
+                    )
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 
-                await Cache.RebuildCacheForProject(episode.ProjectId);
+                await db.TrySaveChangesAsync(interaction);
                 return ExecutionResult.Success;
             }
         }

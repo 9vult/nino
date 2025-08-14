@@ -6,7 +6,7 @@ namespace Nino.Records.Enums
     {
         Auto,
         Conga,
-        Incomplete
+        Incomplete,
     }
 
     public static class AtMeFilterExtensions

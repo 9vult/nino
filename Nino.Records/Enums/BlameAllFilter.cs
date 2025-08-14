@@ -6,7 +6,7 @@ namespace Nino.Records.Enums
     {
         All,
         InProgress,
-        Incomplete
+        Incomplete,
     }
 
     public static class BlameAllFilterExtensions

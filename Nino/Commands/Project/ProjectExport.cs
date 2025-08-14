@@ -2,7 +2,7 @@
 using Nino.Handlers;
 using Nino.Services;
 using Nino.Utilities;
-
+using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
@@ -11,19 +11,22 @@ namespace Nino.Commands
     {
         [SlashCommand("export", "Export a project to JSON")]
         public async Task<RuntimeResult> Export(
-            [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-            [Summary("prettyPrint", "Pretty-print?")] bool prettyPrint = true
+            [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+            bool prettyPrint = true
         )
         {
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
 
             // Verify project and user - Owner required
-            var project = Utils.ResolveAlias(alias, interaction);
-            if (project == null)
-                return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+            var project = await db.ResolveAlias(alias, interaction);
+            if (project is null)
+                return await Response.Fail(
+                    T("error.alias.resolutionFailed", lng, alias),
+                    interaction
+                );
 
-            if (!Utils.VerifyUser(interaction.User.Id, project, excludeAdmins: true))
+            if (!project.VerifyUser(db, interaction.User.Id, excludeAdmins: true))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             Log.Info($"Exporting project {project}");
@@ -32,8 +35,12 @@ namespace Nino.Commands
             var file = ExportService.ExportProject(project, prettyPrint);
 
             // Respond
-            await interaction.FollowupWithFileAsync(file, $"{project.Id}.json", T("project.exported", lng, project.Nickname));
-            
+            await interaction.FollowupWithFileAsync(
+                file,
+                $"{project.Id}.json",
+                T("project.exported", lng, project.Nickname)
+            );
+
             return ExecutionResult.Success;
         }
     }

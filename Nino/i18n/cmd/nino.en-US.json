@@ -9,11 +9,11 @@
     "add": {
       "name": "add",
       "description": "Add additional staff to an episode",
-      "project": {
+      "alias": {
         "name": "project",
         "description": "Project nickname"
       },
-      "episode": {
+      "episode-number": {
         "name": "episode",
         "description": "Episode number"
       },
@@ -37,11 +37,11 @@
     "remove": {
       "name": "remove",
       "description": "Remove additional staff from an episode",
-      "project": {
+      "alias": {
         "name": "project",
         "description": "Project nickname"
       },
-      "episode": {
+      "episode-number": {
         "name": "episode",
         "description": "Episode number"
       },
@@ -57,11 +57,11 @@
     "rename": {
       "name": "rename",
       "description": "Rename an additional staff position",
-      "project": {
+      "alias": {
         "name": "project",
         "description": "Project nickname"
       },
-      "episode": {
+      "episode-number": {
         "name": "episode",
         "description": "Episode number"
       },
@@ -73,7 +73,7 @@
         "name": "new-abbreviation",
         "description": "Position shorthand"
       },
-      "new-name": {
+      "new-task-name": {
         "name": "new-name",
         "description": "Full position name"
       }
@@ -81,11 +81,11 @@
     "set-weight": {
       "name": "set-weight",
       "description": "Set the weight of an Additional Staff position",
-      "project": {
+      "alias": {
         "name": "project",
         "description": "Project nickname"
       },
-      "episode": {
+      "episode-number": {
         "name": "episode",
         "description": "Episode number"
       },
@@ -101,11 +101,11 @@
     "swap": {
       "name": "swap",
       "description": "Swap additional staff into an episode",
-      "project": {
+      "alias": {
         "name": "project",
         "description": "Project nickname"
       },
-      "episode": {
+      "episode-number": {
         "name": "episode",
         "description": "Episode number"
       },
@@ -151,23 +151,27 @@
   "blame": {
     "name": "blame",
     "description": "Check the status of a project",
-    "project": {
+    "alias": {
       "name": "project",
       "description": "Project nickname"
     },
-    "episode": {
+    "episode-number": {
       "name": "episode",
       "description": "Episode number"
     },
     "explain": {
       "name": "explain",
       "description": "Explain what any of this means"
+    },
+    "include-pseudo": {
+      "name": "include-pseudo",
+      "description": "Include pseudo-tasks"
     }
   },
   "blameall": {
     "name": "blameall",
     "description": "Check the overall status of a project",
-    "project": {
+    "alias": {
       "name": "project",
       "description": "Project nickname"
     },
@@ -193,12 +197,16 @@
       "StallCheck": {
         "name": "Stall Check"
       }
+    },
+    "include-pseudo": {
+      "name": "include-pseudo",
+      "description": "Include pseudo-tasks"
     }
   },
   "bulk": {
     "name": "bulk",
     "description": "Do a lot of episodes all at once!",
-    "project": {
+    "alias": {
       "name": "project",
       "description": "Project nickname"
     },
@@ -234,20 +242,16 @@
     "info": {
       "name": "info",
       "description": "Debugging Information",
-      "project": {
+      "alias": {
         "name": "project",
         "description": "Project nickname"
       }
-    },
-    "rebuild-cache": {
-      "name": "rebuild-cache",
-      "description": "Rebuild Nino's cache"
     }
   },
   "done": {
     "name": "done",
     "description": "Mark a position as done",
-    "project": {
+    "alias": {
       "name": "project",
       "description": "Project nickname"
     },
@@ -255,7 +259,7 @@
       "name": "abbreviation",
       "description": "Position shorthand"
     },
-    "episode": {
+    "episode-number": {
       "name": "episode",
       "description": "Episode number"
     }
@@ -266,25 +270,33 @@
     "add": {
       "name": "add",
       "description": "Add an episode",
-      "project": {
+      "alias": {
         "name": "project",
         "description": "Project nickname"
       },
-      "episode": {
+      "episode-number": {
         "name": "episode",
         "description": "Episode number"
+      },
+      "quantity": {
+        "name": "quantity",
+        "description": "Number of episodes to add"
       }
     },
     "remove": {
       "name": "remove",
       "description": "Remove an episode",
-      "project": {
+      "alias": {
         "name": "project",
         "description": "Project nickname"
       },
-      "episode": {
+      "episode-number": {
         "name": "episode",
         "description": "Episode number"
+      },
+      "last-episode": {
+        "name": "last-episode",
+        "description": "Last episode to remove"
       }
     }
   },
@@ -298,7 +310,7 @@
     "add": {
       "name": "add",
       "description": "Add a new Key Staff to the whole project",
-      "project": {
+      "alias": {
         "name": "project",
         "description": "Project nickname"
       },
@@ -322,7 +334,7 @@
     "remove": {
       "name": "remove",
       "description": "Remove a Key Staff from the whole project",
-      "project": {
+      "alias": {
         "name": "project",
         "description": "Project nickname"
       },
@@ -334,7 +346,7 @@
     "rename": {
       "name": "rename",
       "description": "Rename a Key Staff position",
-      "project": {
+      "alias": {
         "name": "project",
         "description": "Project nickname"
       },
@@ -354,7 +366,7 @@
     "set-weight": {
       "name": "set-weight",
       "description": "Set the weight of a Key Staff position",
-      "project": {
+      "alias": {
         "name": "project",
         "description": "Project nickname"
       },
@@ -370,7 +382,7 @@
     "swap": {
       "name": "swap",
       "description": "Swap a Key Staff into the whole project",
-      "project": {
+      "alias": {
         "name": "project",
         "description": "Project nickname"
       },
@@ -389,11 +401,11 @@
       "remove": {
         "name": "remove",
         "description": "Remove a pinch hitter from an episode",
-        "project": {
+        "alias": {
           "name": "project",
           "description": "Project nickname"
         },
-        "episode": {
+        "episode-number": {
           "name": "episode",
           "description": "Episode number"
         },
@@ -405,11 +417,11 @@
       "set": {
         "name": "set",
         "description": "Set a pinch hitter for an episode",
-        "project": {
+        "alias": {
           "name": "project",
           "description": "Project nickname"
         },
-        "episode": {
+        "episode-number": {
           "name": "episode",
           "description": "Episode number"
         },
@@ -434,7 +446,7 @@
         "name": "server-id",
         "description": "ID of the server you want to observe"
       },
-      "project": {
+      "alias": {
         "name": "project",
         "description": "Project nickname"
       },
@@ -466,7 +478,7 @@
         "name": "server-id",
         "description": "ID of the server you want to observe"
       },
-      "project": {
+      "alias": {
         "name": "project",
         "description": "Project nickname"
       }
@@ -478,7 +490,7 @@
     "archive": {
       "name": "archive",
       "description": "Archive a project",
-      "project": {
+      "alias": {
         "name": "project",
         "description": "Project nickname"
       }
@@ -489,6 +501,22 @@
       "nickname": {
         "name": "nickname",
         "description": "Short project nickname (no spaces)"
+      },
+      "anilist-id": {
+        "name": "anilist-id",
+        "description": "AniList ID"
+      },
+      "is-private": {
+        "name": "private",
+        "description": "Hide this project from non-staff"
+      },
+      "update-channel": {
+        "name": "update-channel",
+        "description": "Channel to post updates to"
+      },
+      "release-channel": {
+        "name": "release-channel",
+        "description": "Channel to post releases to"
       },
       "title": {
         "name": "title",
@@ -515,22 +543,6 @@
         "name": "poster",
         "description": "Poster image URL"
       },
-      "private": {
-        "name": "private",
-        "description": "Is this project private?"
-      },
-      "update-channel": {
-        "name": "update-channel",
-        "description": "Channel to post updates to"
-      },
-      "release-channel": {
-        "name": "release-channel",
-        "description": "Channel to post releases to"
-      },
-      "anilist-id": {
-        "name": "anilist-id",
-        "description": "AniList ID"
-      },
       "first-episode": {
         "name": "first-episode",
         "description": "First episode number"
@@ -547,7 +559,7 @@
     "delete": {
       "name": "delete",
       "description": "Delete a project",
-      "project": {
+      "alias": {
         "name": "project",
         "description": "Project nickname"
       }
@@ -555,7 +567,7 @@
     "edit": {
       "name": "edit",
       "description": "Edit a project",
-      "project": {
+      "alias": {
         "name": "project",
         "description": "Project nickname"
       },
@@ -598,7 +610,7 @@
     "export": {
       "name": "export",
       "description": "Export a project to JSON",
-      "project": {
+      "alias": {
         "name": "project",
         "description": "Project nickname"
       },
@@ -607,10 +619,30 @@
         "description": "Pretty-print?"
       }
     },
+    "import": {
+      "name": "import",
+      "description": "Import a project from JSON",
+      "file": {
+        "name": "file",
+        "description": "Project Template"
+      },
+      "update-channel": {
+        "name": "update-channel",
+        "description": "Channel to post updates to"
+      },
+      "release-channel": {
+        "name": "release-channel",
+        "description": "Channel to post releases to"
+      }
+    },
+    "list": {
+      "name": "list",
+      "description": "List the projects in this server"
+    },
     "transfer-ownership": {
       "name": "transfer-ownership",
       "description": "Transfer project ownership to someone else",
-      "project": {
+      "alias": {
         "name": "project",
         "description": "Project nickname"
       },
@@ -626,7 +658,7 @@
         "name": "server-id",
         "description": "ID of the server the project is currently in"
       },
-      "project": {
+      "alias": {
         "name": "project",
         "description": "Project nickname"
       }
@@ -637,7 +669,7 @@
       "add": {
         "name": "add",
         "description": "Add an administrator to this project",
-        "project": {
+        "alias": {
           "name": "project",
           "description": "Project nickname"
         },
@@ -649,7 +681,7 @@
       "remove": {
         "name": "remove",
         "description": "Remove an administrator from this project",
-        "project": {
+        "alias": {
           "name": "project",
           "description": "Project nickname"
         },
@@ -665,7 +697,7 @@
       "disable": {
         "name": "disable",
         "description": "Disable airing reminders",
-        "project": {
+        "alias": {
           "name": "project",
           "description": "Project nickname"
         }
@@ -673,7 +705,7 @@
       "enable": {
         "name": "enable",
         "description": "Enable airing reminders",
-        "project": {
+        "alias": {
           "name": "project",
           "description": "Project nickname"
         },
@@ -697,11 +729,11 @@
       "add": {
         "name": "add",
         "description": "Add a new alias",
-        "project": {
+        "project-alias": {
           "name": "project",
           "description": "Project nickname"
         },
-        "alias": {
+        "input": {
           "name": "alias",
           "description": "Alias"
         }
@@ -709,11 +741,11 @@
       "remove": {
         "name": "remove",
         "description": "Remove an alias",
-        "project": {
+        "project-alias": {
           "name": "project",
           "description": "Project nickname"
         },
-        "alias": {
+        "input": {
           "name": "alias",
           "description": "Alias"
         }
@@ -721,15 +753,15 @@
     },
     "conga": {
       "name": "conga",
-      "description": "A Conga line of Key Staff",
+      "description": "A Conga line of staff!",
       "add": {
         "name": "add",
         "description": "Add a link to the Conga line",
-        "project": {
+        "alias": {
           "name": "project",
           "description": "Project nickname"
         },
-        "abbreviation": {
+        "current": {
           "name": "abbreviation",
           "description": "Position shorthand"
         },
@@ -741,19 +773,23 @@
       "list": {
         "name": "list",
         "description": "List all the Conga line participants",
-        "project": {
+        "alias": {
           "name": "project",
           "description": "Project nickname"
         },
-        "episode": {
+        "episode-number": {
           "name": "episode",
           "description": "Episode number"
+        },
+        "force-additional": {
+          "name": "force-additional",
+          "description": "Force inclusion of additional staff"
         }
       },
       "remove": {
         "name": "remove",
         "description": "Remove a link from the Conga line",
-        "project": {
+        "alias": {
           "name": "project",
           "description": "Project nickname"
         },
@@ -769,7 +805,7 @@
       "disable": {
         "name": "disable",
         "description": "Disable conga reminders",
-        "project": {
+        "alias": {
           "name": "project",
           "description": "Project nickname"
         }
@@ -777,7 +813,7 @@
       "enable": {
         "name": "enable",
         "description": "Enable conga reminders",
-        "project": {
+        "alias": {
           "name": "project",
           "description": "Project nickname"
         },
@@ -792,17 +828,13 @@
       }
     }
   },
-  "list": {
-    "name": "list",
-    "description": "List the projects in this server"
-  },
   "release": {
     "name": "release",
     "description": "Release something to the world!",
     "batch": {
       "name": "batch",
       "description": "Release a batch",
-      "project": {
+      "alias": {
         "name": "project",
         "description": "Project nickname"
       },
@@ -826,11 +858,11 @@
     "episode": {
       "name": "episode",
       "description": "Release a single episode",
-      "project": {
+      "alias": {
         "name": "project",
         "description": "Project nickname"
       },
-      "episode": {
+      "episode-number": {
         "name": "episode",
         "description": "Episode number to release"
       },
@@ -846,7 +878,7 @@
     "volume": {
       "name": "volume",
       "description": "Release a volume",
-      "project": {
+      "alias": {
         "name": "project",
         "description": "Project nickname"
       },
@@ -867,15 +899,15 @@
   "roster": {
     "name": "roster",
     "description": "See who's working on an episode",
-    "project": {
+    "alias": {
       "name": "project",
       "description": "Project nickname"
     },
-    "episode": {
+    "episode-number": {
       "name": "episode",
       "description": "Episode number"
     },
-    "weights": {
+    "with-weights": {
       "name": "weights",
       "description": "Display task weights"
     }
@@ -972,11 +1004,11 @@
   "skip": {
     "name": "skip",
     "description": "Skip a position",
-    "project": {
+    "alias": {
       "name": "project",
       "description": "Project nickname"
     },
-    "episode": {
+    "episode-number": {
       "name": "episode",
       "description": "Episode number"
     },
@@ -992,11 +1024,11 @@
   "undone": {
     "name": "undone",
     "description": "Mark a position as not done",
-    "project": {
+    "alias": {
       "name": "project",
       "description": "Project nickname"
     },
-    "episode": {
+    "episode-number": {
       "name": "episode",
       "description": "Episode number"
     },

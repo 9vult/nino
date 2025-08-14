@@ -1,10 +1,15 @@
-﻿
-namespace Nino.Records
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
+
+namespace Nino.Records;
+
+[Owned]
+public class Role
 {
-    public record Role
-    {
-        public required string Abbreviation;
-        public required string Name;
-        public decimal? Weight;
-    }
+    [MaxLength(16)]
+    public required string Abbreviation { get; set; }
+
+    [MaxLength(32)]
+    public required string Name { get; set; }
+    public decimal? Weight { get; set; }
 }

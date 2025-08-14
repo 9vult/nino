@@ -1,51 +1,36 @@
-﻿using Localizer;
-using Newtonsoft.Json;
+﻿using System.ComponentModel.DataAnnotations;
+using Localizer;
 using Nino.Records.Enums;
 
-namespace Nino.Records
+namespace Nino.Records;
+
+public class Configuration
 {
-    public record Configuration
-    {
-        public required string Id;
-        [JsonIgnore] public required ulong GuildId;
-        public required UpdatesDisplayType UpdateDisplay;
-        public required ProgressDisplayType ProgressDisplay;
-        public required CongaPrefixType CongaPrefix;
-        [JsonIgnore] public required ulong[] AdministratorIds;
-        public string? ReleasePrefix;
-        public Locale? Locale;
+    [Key]
+    public Guid Id { get; set; }
+    public required ulong GuildId { get; set; }
+    public required UpdatesDisplayType UpdateDisplay { get; set; }
+    public required ProgressDisplayType ProgressDisplay { get; set; }
+    public required CongaPrefixType CongaPrefix { get; set; }
 
-        [JsonProperty("GuildId")]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public string SerializationGuildId
+    [MaxLength(128)]
+    public string? ReleasePrefix { get; set; }
+    public Locale? Locale { get; set; }
+
+    public ICollection<Administrator> Administrators = new List<Administrator>();
+
+    /// <summary>
+    /// Create a default configuration for a guild
+    /// </summary>
+    /// <param name="guildId">Guild ID</param>
+    /// <returns>Default configuration options</returns>
+    public static Configuration CreateDefault(ulong guildId) =>
+        new()
         {
-            get => GuildId.ToString();
-            set => GuildId = ulong.Parse(value);
-        }
-
-        [JsonProperty("AdministratorIds")]
-        [System.Text.Json.Serialization.JsonIgnore]
-        public string[] SerializationAdministratorIds
-        {
-            get => AdministratorIds != null && AdministratorIds.Length != 0 ? AdministratorIds.Select(a => a.ToString()).ToArray() : [];
-            set => AdministratorIds = value != null && value.Length != 0 ? value.Select(ulong.Parse).ToArray() : [];
-        }
-
-        /// <summary>
-        /// Create a default configuration for a guild
-        /// </summary>
-        /// <param name="guildId">Guild ID</param>
-        /// <returns>Default configuration options</returns>
-        public static Configuration CreateDefault(ulong guildId) =>
-            new()
-            {
-                Id = $"{guildId}-conf",
-                GuildId = guildId,
-                UpdateDisplay = UpdatesDisplayType.Normal,
-                ProgressDisplay = ProgressDisplayType.Succinct,
-                CongaPrefix = CongaPrefixType.None,
-                AdministratorIds = [],
-                ReleasePrefix = null
-            };
-    }
+            GuildId = guildId,
+            UpdateDisplay = UpdatesDisplayType.Normal,
+            ProgressDisplay = ProgressDisplayType.Succinct,
+            CongaPrefix = CongaPrefixType.None,
+            ReleasePrefix = null,
+        };
 }

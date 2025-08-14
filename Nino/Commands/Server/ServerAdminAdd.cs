@@ -1,10 +1,9 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Microsoft.Azure.Cosmos;
 using Nino.Records;
 using Nino.Utilities;
-
+using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
@@ -14,9 +13,7 @@ namespace Nino.Commands
         public partial class Admin
         {
             [SlashCommand("add", "Add an administrator to this server")]
-            public async Task<RuntimeResult> Add(
-                [Summary("member", "Staff member")] SocketGuildUser member
-            )
+            public async Task<RuntimeResult> Add(SocketGuildUser member)
             {
                 var interaction = Context.Interaction;
                 var lng = interaction.UserLocale;
@@ -29,24 +26,26 @@ namespace Nino.Commands
 
                 // Server administrator permissions required
                 var runner = guild.GetUser(interaction.User.Id);
-                if (!Utils.VerifyAdministrator(runner, guild, excludeServerAdmins: true))
+                if (!Utils.VerifyAdministrator(db, runner, guild, excludeServerAdmins: true))
                     return await Response.Fail(T("error.notPrivileged", lng), interaction);
 
-                var config = await Getters.GetConfiguration(guildId);
-                if (config == null)
+                var config = db.GetConfig(guildId);
+                if (config is null)
                     return await Response.Fail(T("error.noSuchConfig", lng), interaction);
 
                 // Validate user isn't already an admin
-                if (config.AdministratorIds.Any(a => a == memberId))
-                    return await Response.Fail(T("error.admin.alreadyAdmin", lng, staffMention), interaction);
+                if (config.Administrators.Any(a => a.UserId == memberId))
+                    return await Response.Fail(
+                        T("error.admin.alreadyAdmin", lng, staffMention),
+                        interaction
+                    );
 
                 // Add to database
-                await AzureHelper.Configurations!.PatchItemAsync<Configuration>(id: config.Id, partitionKey: AzureHelper.ConfigurationPartitionKey(config),
-                    patchOperations: [
-                        PatchOperation.Add("/administratorIds/-", memberId.ToString())
-                ]);
+                config.Administrators.Add(new Administrator { UserId = memberId });
 
-                log.Info($"Updated configuration for guild {config.GuildId}, added {memberId} as an administrator");
+                Log.Info(
+                    $"Updated configuration for guild {config.GuildId}, added {memberId} as an administrator"
+                );
 
                 // Send success embed
                 var embed = new EmbedBuilder()
@@ -55,7 +54,7 @@ namespace Nino.Commands
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 
-                await Cache.RebuildConfigCache();
+                await db.TrySaveChangesAsync(interaction);
                 return ExecutionResult.Success;
             }
         }

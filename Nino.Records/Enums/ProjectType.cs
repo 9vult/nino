@@ -1,4 +1,5 @@
-﻿using static Localizer.Localizer;
+﻿using Discord.Interactions;
+using static Localizer.Localizer;
 
 namespace Nino.Records.Enums
 {
@@ -7,10 +8,13 @@ namespace Nino.Records.Enums
     {
         TV = 0,
         Movie = 1,
+
+        [Hide]
         BD = 2,
         OVA = 3,
         ONA = 4,
     }
+
     // ReSharper restore InconsistentNaming
 
     public static class ProjectTypeExtensions

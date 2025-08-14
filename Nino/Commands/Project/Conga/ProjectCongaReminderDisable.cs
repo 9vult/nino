@@ -1,10 +1,8 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
-using Nino.Records;
 using Nino.Utilities;
-
+using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
@@ -15,7 +13,7 @@ namespace Nino.Commands
         {
             [SlashCommand("disable", "Disable conga reminders")]
             public async Task<RuntimeResult> Disable(
-                [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias
+                [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias
             )
             {
                 var interaction = Context.Interaction;
@@ -25,19 +23,19 @@ namespace Nino.Commands
                 alias = alias.Trim();
 
                 // Verify project and user - Owner or Admin required
-                var project = Utils.ResolveAlias(alias, interaction);
-                if (project == null)
-                    return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+                var project = await db.ResolveAlias(alias, interaction);
+                if (project is null)
+                    return await Response.Fail(
+                        T("error.alias.resolutionFailed", lng, alias),
+                        interaction
+                    );
 
-                if (!Utils.VerifyUser(interaction.User.Id, project))
+                if (!project.VerifyUser(db, interaction.User.Id))
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
-                // Set in database
-                await AzureHelper.PatchProjectAsync(project, [
-                    PatchOperation.Set($"/congaReminderEnabled", false),
-                    PatchOperation.Set<string?>($"/congaReminderChannelId", null),
-                    PatchOperation.Set<string?>($"/congaReminderPeriod", null)
-                ]);
+                project.CongaReminderEnabled = false;
+                project.CongaReminderChannelId = null;
+                project.CongaReminderPeriod = null;
 
                 Log.Info($"Disabled conga reminders for {project}");
 
@@ -48,7 +46,7 @@ namespace Nino.Commands
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 
-                await Cache.RebuildCacheForProject(project.Id);
+                await db.TrySaveChangesAsync(interaction);
                 return ExecutionResult.Success;
             }
         }

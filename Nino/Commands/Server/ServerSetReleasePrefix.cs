@@ -1,8 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
-using Nino.Records;
 using Nino.Utilities;
+using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
@@ -10,9 +9,7 @@ namespace Nino.Commands
     public partial class ServerManagement
     {
         [SlashCommand("release-prefix", "Specify a prefix for releases")]
-        public async Task<RuntimeResult> SetReleasePrefix(
-            [Summary("newValue", "New Value")] string? newValue
-        )
+        public async Task<RuntimeResult> SetReleasePrefix(string? newValue)
         {
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
@@ -21,30 +18,32 @@ namespace Nino.Commands
 
             // Server administrator permissions required
             var runner = guild.GetUser(interaction.User.Id);
-            if (!Utils.VerifyAdministrator(runner, guild, excludeServerAdmins: true))
+            if (!Utils.VerifyAdministrator(db, runner, guild, excludeServerAdmins: true))
                 return await Response.Fail(T("error.notPrivileged", lng), interaction);
 
-            var config = await Getters.GetConfiguration(guildId);
+            var config = db.GetConfig(guildId);
             if (config == null)
                 return await Response.Fail(T("error.noSuchConfig", lng), interaction);
 
             // Get inputs
             var prefix = newValue == "-" ? null : newValue;
 
-            // Apply change and upsert to database
             config.ReleasePrefix = prefix;
 
-            await AzureHelper.Configurations!.UpsertItemAsync(config);
-            log.Info($"Updated configuration for guild {config.GuildId}, set ReleasePrefix to {prefix ?? "(empty)"}");
+            Log.Info(
+                $"Updated configuration for guild {config.GuildId}, set ReleasePrefix to {prefix ?? "(empty)"}"
+            );
 
             // Send success embed
             var embed = new EmbedBuilder()
                 .WithTitle(T("title.serverConfiguration", lng))
-                .WithDescription($"{T("server.configuration.saved", lng)}\n{T("info.resettable", lng)}")
+                .WithDescription(
+                    $"{T("server.configuration.saved", lng)}\n{T("info.resettable", lng)}"
+                )
                 .Build();
             await interaction.FollowupAsync(embed: embed);
 
-            await Cache.RebuildConfigCache();
+            await db.TrySaveChangesAsync(interaction);
             return ExecutionResult.Success;
         }
     }

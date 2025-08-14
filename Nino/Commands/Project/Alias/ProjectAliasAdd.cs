@@ -1,10 +1,8 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Microsoft.Azure.Cosmos;
 using Nino.Handlers;
-using Nino.Records;
 using Nino.Utilities;
-
+using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
@@ -15,37 +13,40 @@ namespace Nino.Commands
         {
             [SlashCommand("add", "Add a new alias")]
             public async Task<RuntimeResult> Add(
-                [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-                [Summary("alias", "Alias")] string input
+                [Autocomplete(typeof(ProjectAutocompleteHandler))] string projectAlias,
+                string input
             )
             {
                 var interaction = Context.Interaction;
                 var lng = interaction.UserLocale;
 
                 // Sanitize inputs
-                alias = alias.Trim();
+                projectAlias = projectAlias.Trim();
                 input = input.Trim();
 
                 // Verify project and user - Owner or Admin required
-                var project = Utils.ResolveAlias(alias, interaction);
-                if (project == null)
-                    return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+                var project = await db.ResolveAlias(projectAlias, interaction);
+                if (project is null)
+                    return await Response.Fail(
+                        T("error.alias.resolutionFailed", lng, projectAlias),
+                        interaction
+                    );
 
                 if (project.IsArchived)
                     return await Response.Fail(T("error.archived", lng), interaction);
 
-                if (!Utils.VerifyUser(interaction.User.Id, project))
+                if (!project.VerifyUser(db, interaction.User.Id))
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
                 // Validate alias doesn't exist
-                var preexistingProject = Utils.ResolveAlias(input, interaction);
-                if (preexistingProject != null)
-                    return await Response.Fail(T("error.alias.inUse", lng, preexistingProject.Nickname), interaction);
+                var preexistingProject = await db.ResolveAlias(input, interaction);
+                if (preexistingProject is not null)
+                    return await Response.Fail(
+                        T("error.alias.inUse", lng, preexistingProject.Nickname),
+                        interaction
+                    );
 
-                // Add to database
-                await AzureHelper.PatchProjectAsync(project, [
-                    PatchOperation.Add("/aliases/-", input)
-                ]);
+                project.Aliases.Add(new Records.Alias { Value = input });
 
                 Log.Info($"Added {input} as an alias for {project}");
 
@@ -56,7 +57,7 @@ namespace Nino.Commands
                     .Build();
                 await interaction.FollowupAsync(embed: embed);
 
-                await Cache.RebuildCacheForProject(project.Id);
+                await db.TrySaveChangesAsync(interaction);
                 return ExecutionResult.Success;
             }
         }

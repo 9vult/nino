@@ -5,9 +5,7 @@ using NLog;
 namespace Nino.Commands;
 
 [Group("debug", "Commands for debugging")]
-public partial class Debug(InteractionHandler handler, InteractionService commands) : InteractionModuleBase<SocketInteractionContext>
+public partial class Debug : InteractionModuleBase<SocketInteractionContext>
 {
-    public InteractionService Commands { get; private set; } = commands;
-    private readonly InteractionHandler _handler = handler;
     private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 }

@@ -3,7 +3,7 @@ using Discord.Interactions;
 using Nino.Handlers;
 using Nino.Records;
 using Nino.Utilities;
-
+using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
 
 namespace Nino.Commands
@@ -14,9 +14,9 @@ namespace Nino.Commands
         {
             [SlashCommand("list", "List all the Conga line participants")]
             public async Task<RuntimeResult> List(
-                [Summary("project", "Project nickname"), Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
-                [Summary("episode", "Episode number"), Autocomplete(typeof(EpisodeAutocompleteHandler))] string? episodeNumber = null,
-                [Summary("force-additional", "Force inclusion of additional staff")] bool forceAdditional = false
+                [Autocomplete(typeof(ProjectAutocompleteHandler))] string alias,
+                [Autocomplete(typeof(EpisodeAutocompleteHandler))] string? episodeNumber = null,
+                bool forceAdditional = false
             )
             {
                 var interaction = Context.Interaction;
@@ -26,19 +26,30 @@ namespace Nino.Commands
                 alias = alias.Trim();
 
                 // Verify project and user - minimum Key Staff required
-                var project = Utils.ResolveAlias(alias, interaction);
-                if (project == null)
-                    return await Response.Fail(T("error.alias.resolutionFailed", lng, alias), interaction);
+                var project = await db.ResolveAlias(alias, interaction);
+                if (project is null)
+                    return await Response.Fail(
+                        T("error.alias.resolutionFailed", lng, alias),
+                        interaction
+                    );
 
-                if (!Utils.VerifyUser(interaction.User.Id, project, includeKeyStaff: true))
+                if (!project.VerifyUser(db, interaction.User.Id, includeStaff: true))
                     return await Response.Fail(T("error.permissionDenied", lng), interaction);
-                
+
                 // Verify episode
                 Episode? episode = null;
-                if (episodeNumber is not null && !Getters.TryGetEpisode(project, episodeNumber, out episode))
-                    return await Response.Fail(T("error.noSuchEpisode", lng, episodeNumber), interaction);
+                if (
+                    episodeNumber is not null
+                    && project.Episodes.All(e => e.Number != episodeNumber)
+                )
+                    return await Response.Fail(
+                        T("error.noSuchEpisode", lng, episodeNumber),
+                        interaction
+                    );
 
-                Log.Trace($"Listing Conga graph for {project} (episode={episodeNumber ?? "null"},forced={forceAdditional}) for M[{interaction.User.Id} (@{interaction.User.Username})]");
+                Log.Trace(
+                    $"Listing Conga graph for {project} (episode={episodeNumber ?? "null"},forced={forceAdditional}) for M[{interaction.User.Id} (@{interaction.User.Username})]"
+                );
 
                 // Process
 
@@ -53,7 +64,9 @@ namespace Nino.Commands
                     return ExecutionResult.Success;
                 }
 
-                var encodedDot = episode is null ? CongaHelper.GetDot(project, forceAdditional) : CongaHelper.GetDot(project, episode, forceAdditional);
+                var encodedDot = episode is null
+                    ? CongaHelper.GetDot(project, forceAdditional)
+                    : CongaHelper.GetDot(project, episode, forceAdditional);
                 var url = $"https://quickchart.io/graphviz?format=png&graph={encodedDot}";
 
                 // Send embed
