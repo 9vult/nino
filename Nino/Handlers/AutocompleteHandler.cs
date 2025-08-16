@@ -29,7 +29,8 @@ namespace Nino.Handlers
             var guildId = interaction.GuildId ?? 0;
             var userId = interaction.User.Id;
 
-            var db = services.GetRequiredService<DataContext>();
+            using var scope = services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<DataContext>();
 
             var includeObservers = commandName is "blame" or "blameall";
             var includeArchived =
@@ -101,7 +102,8 @@ namespace Nino.Handlers
             var focusedOption = interaction.Data.Current;
             var guildId = interaction.GuildId ?? 0;
 
-            var db = services.GetRequiredService<DataContext>();
+            using var scope = services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<DataContext>();
 
             List<AutocompleteResult> choices = [];
             var alias = (
@@ -150,7 +152,8 @@ namespace Nino.Handlers
             var interaction = (SocketAutocompleteInteraction)context.Interaction;
             var focusedOption = interaction.Data.Current;
 
-            var db = services.GetRequiredService<DataContext>();
+            using var scope = services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<DataContext>();
 
             List<AutocompleteResult> choices = [];
             var alias = (
@@ -225,7 +228,8 @@ namespace Nino.Handlers
             var interaction = (SocketAutocompleteInteraction)context.Interaction;
             var focusedOption = interaction.Data.Current;
 
-            var db = services.GetRequiredService<DataContext>();
+            using var scope = services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<DataContext>();
 
             List<AutocompleteResult> choices = [];
             var alias = (
@@ -269,7 +273,8 @@ namespace Nino.Handlers
             var interaction = (SocketAutocompleteInteraction)context.Interaction;
             var focusedOption = interaction.Data.Current;
 
-            var db = services.GetRequiredService<DataContext>();
+            using var scope = services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<DataContext>();
 
             List<AutocompleteResult> choices = [];
             var alias = (
@@ -321,7 +326,8 @@ namespace Nino.Handlers
             var focusedOption = interaction.Data.Current;
             var userId = interaction.User.Id;
 
-            var db = services.GetRequiredService<DataContext>();
+            using var scope = services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<DataContext>();
 
             List<AutocompleteResult> choices = [];
             var alias = (
@@ -365,7 +371,8 @@ namespace Nino.Handlers
             var focusedOption = interaction.Data.Current;
             var userId = interaction.User.Id;
 
-            var db = services.GetRequiredService<DataContext>();
+            using var scope = services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<DataContext>();
 
             List<AutocompleteResult> choices = [];
             var alias = (
@@ -414,7 +421,8 @@ namespace Nino.Handlers
             var focusedOption = interaction.Data.Current;
             var userId = interaction.User.Id;
 
-            var db = services.GetRequiredService<DataContext>();
+            using var scope = services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<DataContext>();
 
             List<AutocompleteResult> choices = [];
             var alias = (
