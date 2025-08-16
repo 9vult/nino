@@ -3,32 +3,20 @@ using Discord.WebSocket;
 using Localizer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Nino.Records.Enums;
 using Nino.Utilities;
 using Nino.Utilities.Extensions;
 using NLog;
 using static Localizer.Localizer;
-using Timer = System.Timers.Timer;
 
 namespace Nino.Services
 {
-    internal class CongaReminderService
+    internal class CongaReminderService(IServiceProvider services) : BackgroundService
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         private const int OneHour = 60 * 60 * 1000;
-        private readonly Timer _timer;
-
-        public CongaReminderService(IServiceProvider services)
-        {
-            _timer = new Timer { Interval = OneHour };
-            _timer.Elapsed += async (_, _) =>
-            {
-                var db = services.GetRequiredService<DataContext>();
-                await RemindTardyTasks(db);
-            };
-            _timer.Start();
-        }
 
         private static async Task RemindTardyTasks(DataContext db)
         {
@@ -101,6 +89,28 @@ namespace Nino.Services
                 Log.Info($"Published conga reminders for {project}");
 
                 await db.SaveChangesAsync();
+            }
+        }
+
+        /// <inheritdoc />
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            Log.Info("Conga Reminder Service started");
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                await Task.Delay(OneHour, stoppingToken);
+
+                try
+                {
+                    using var scope = services.CreateScope();
+                    var db = scope.ServiceProvider.GetRequiredService<DataContext>();
+
+                    await RemindTardyTasks(db);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex);
+                }
             }
         }
     }

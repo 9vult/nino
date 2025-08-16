@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using Localizer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Nino.Records;
 using Nino.Records.Enums;
 using Nino.Utilities.Extensions;
@@ -15,23 +16,11 @@ using Timer = System.Timers.Timer;
 
 namespace Nino.Services
 {
-    internal class ReleaseReminderService
+    internal class ReleaseReminderService(IServiceProvider services) : BackgroundService
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         private const int FiveMinutes = 5 * 60 * 1000;
-        private readonly Timer _timer;
-
-        public ReleaseReminderService(IServiceProvider services)
-        {
-            _timer = new Timer { Interval = FiveMinutes };
-            _timer.Elapsed += async (_, _) =>
-            {
-                var db = services.GetRequiredService<DataContext>();
-                await CheckForReleases(db);
-            };
-            _timer.Start();
-        }
 
         private static async Task CheckForReleases(DataContext db)
         {
@@ -213,6 +202,28 @@ namespace Nino.Services
                     return;
                 await channel.SendMessageAsync(reminderText.ToString());
                 Log.Info($"Published release conga reminders for {project} episode {episode}");
+            }
+        }
+
+        /// <inheritdoc />
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            Log.Info("Release Reminder Service started");
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                await Task.Delay(FiveMinutes, stoppingToken);
+
+                try
+                {
+                    using var scope = services.CreateScope();
+                    var db = scope.ServiceProvider.GetRequiredService<DataContext>();
+
+                    await CheckForReleases(db);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex);
+                }
             }
         }
     }

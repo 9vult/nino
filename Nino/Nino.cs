@@ -8,6 +8,7 @@ using Fergun.Interactive;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Nino.Handlers;
 using Nino.Services;
 using Nino.Utilities;
@@ -55,8 +56,8 @@ namespace Nino
                 ))
                 .AddSingleton<InteractionHandler>()
                 .AddSingleton<InteractiveService>()
-                .AddSingleton<ReleaseReminderService>()
-                .AddSingleton<CongaReminderService>()
+                .AddHostedService<ReleaseReminderService>()
+                .AddHostedService<CongaReminderService>()
                 .BuildServiceProvider();
         }
 
@@ -102,16 +103,17 @@ namespace Nino
             // Configure DI
             ConfigureServices();
 
-            // Start required background services
-            if (AniListService.AniListEnabled)
-                _ = _services!.GetRequiredService<ReleaseReminderService>();
-            _ = _services!.GetRequiredService<CongaReminderService>();
-
             // Load localization files
             LoadLocalizations(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "i18n/str")));
 
             // Initialize database
             await InitializeDatabase();
+
+            // Start services
+            foreach (var service in _services!.GetServices<IHostedService>())
+            {
+                await service.StartAsync(CancellationToken.None);
+            }
 
             // Initialize Discord client
             await InitializeDiscordClient();
