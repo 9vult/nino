@@ -103,7 +103,7 @@ namespace Nino
             ConfigureServices();
 
             // Start required background services
-            if (!AniListService.AniListEnabled)
+            if (AniListService.AniListEnabled)
                 _ = _services!.GetRequiredService<ReleaseReminderService>();
             _ = _services!.GetRequiredService<CongaReminderService>();
 

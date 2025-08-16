@@ -39,7 +39,7 @@ namespace Nino.Services
 
             var targets = await db
                 .Projects.Include(p => p.Episodes)
-                .Where(p => p.AirReminderEnabled && p.AniListId != null)
+                .Where(p => !p.IsArchived && p.AirReminderEnabled && p.AniListId != null)
                 .ToListAsync();
             foreach (var project in targets)
             {
