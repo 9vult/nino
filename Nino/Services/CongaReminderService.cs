@@ -37,7 +37,7 @@ namespace Nino.Services
                 var gLng = config?.Locale?.ToDiscordLocale() ?? channel.Guild.PreferredLocale;
 
                 var prefixMode = config?.CongaPrefix ?? CongaPrefixType.None;
-                var reminderText = new StringBuilder();
+                var reminderText = new List<string>();
 
                 var sortedEpisodes = project
                     .Episodes.Where(e => !e.Tasks.All(t => t.Done))
@@ -53,6 +53,7 @@ namespace Nino.Services
                         if (staff is null)
                             continue;
 
+                        var current = new StringBuilder();
                         var userId =
                             episode
                                 .PinchHitters.FirstOrDefault(t =>
@@ -64,7 +65,7 @@ namespace Nino.Services
                         if (prefixMode != CongaPrefixType.None)
                         {
                             // Using a switch expression in the middle of string interpolation is insane btw
-                            reminderText.Append(
+                            current.Append(
                                 $"[{prefixMode switch {
                                 CongaPrefixType.Nickname => project.Nickname,
                                 CongaPrefixType.Title => project.Title,
@@ -73,7 +74,7 @@ namespace Nino.Services
                             );
                         }
 
-                        reminderText.AppendLine(
+                        current.Append(
                             T(
                                 "progress.done.conga.reminder",
                                 gLng,
@@ -82,6 +83,7 @@ namespace Nino.Services
                                 roleTitle
                             )
                         );
+                        reminderText.Add(current.ToString());
 
                         // Update database with new last-reminded time
                         var task = episode.Tasks.Single(t => t.Abbreviation == abbreviation);
@@ -89,9 +91,12 @@ namespace Nino.Services
                     }
                 }
 
-                if (reminderText.Length <= 0)
+                if (reminderText.Count <= 0)
                     continue;
-                await channel.SendMessageAsync(reminderText.ToString());
+                foreach (var chunk in reminderText.Chunk(13)) // Because 12 would cause 3 messages on 25
+                {
+                    await channel.SendMessageAsync(string.Join(Environment.NewLine, chunk));
+                }
                 Log.Info($"Published conga reminders for {project}");
 
                 await db.SaveChangesAsync();
