@@ -4,6 +4,7 @@ using Localizer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NaturalSort.Extension;
 using Nino.Records.Enums;
 using Nino.Utilities;
 using Nino.Utilities.Extensions;
@@ -37,7 +38,12 @@ namespace Nino.Services
 
                 var prefixMode = config?.CongaPrefix ?? CongaPrefixType.None;
                 var reminderText = new StringBuilder();
-                foreach (var episode in project.Episodes.Where(e => !e.Tasks.All(t => t.Done)))
+
+                var sortedEpisodes = project
+                    .Episodes.Where(e => !e.Tasks.All(t => t.Done))
+                    .OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort());
+
+                foreach (var episode in sortedEpisodes)
                 {
                     foreach (var abbreviation in CongaHelper.GetTardyTasks(project, episode))
                     {
