@@ -26,6 +26,7 @@ namespace Nino.Commands
             var memberId = member.Id;
             alias = alias.Trim();
             episodeNumber = Episode.CanonicalizeEpisodeNumber(episodeNumber);
+            abbreviation = abbreviation.Trim().ToUpperInvariant();
 
             // Verify project and user - Owner or Admin required
             var project = await db.ResolveAlias(alias, interaction);
