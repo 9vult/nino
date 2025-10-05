@@ -8,47 +8,62 @@ If you have multiple projects to create, or you have a template you use often, y
 {
     // Required fields
     Nickname: string,
-    AniListId: int,
+    AniListId: number,
     IsPrivate: boolean,
-    UpdateChannelId: ulong,
-    ReleaseChannelId: ulong,
+    UpdateChannelId: number,
+    ReleaseChannelId: number,
     KeyStaff: Staff[],
-    AdditionalStaff: Map<string, Staff[]>,
 
     // Optional fields
     Title: string,
     Type: "TV" | "Movie" | "BD" | "OVA" | "ONA",
-    Length: uint,
+    Length: number,
     PosterUri: string,
-    FirstEpisode: decimal,
-    AdministratorIds: ulong[],
+    FirstEpisode: number,
+    AdministratorIds: number[],
     Aliases: string[],
-    CongaParticipants: CongaNodeDto[]
+    CongaParticipants: CongaNode[],
+    AdditionalStaff: Map<string, Staff[]>
 }
 ```
 
-## Example
+## Types
+
+### Staff
+
+```typescript
+{
+  UserId: number,
+  Role: {
+    Abbreviation: string,
+    Name: string,
+    Weight: number // Optional
+  }
+  IsPseudo: boolean
+}
+```
+
+### CongaNode
+
+```typescript
+{
+  Abbreviation: string,
+  Type: "KeyStaff" | "AdditionalStaff" | "Special",
+  Dependents: string[]
+}
+```
+
+## Examples
+
+### Minimal
 
 ```json
-
 {
-  "Nickname": "wolf",
-  "Title": "Ookami to Koushinryou: MERCHANT MEETS THE WISE WOLF",
-  "Type": "TV",
-  "Length": 25,
-  "PosterUri": "https://example.com/spicy-wolf-poster.png",
+  "Nickname": "frieren",
+  "AniListId": 154587,
   "IsPrivate": false,
   "UpdateChannelId": 803139525312249906,
   "ReleaseChannelId": 804434067000393769,
-  "AniListId": 145728,
-  "Aliases": [
-    "spice",
-    "holo"
-  ],
-  "AdministratorIds": [
-    134073223208763392
-  ],
-  "FirstEpisode": 1,
   "KeyStaff": [
     {
       "UserId": 248600185423396866,
@@ -63,6 +78,41 @@ If you have multiple projects to create, or you have a template you use often, y
       "Role": {
         "Abbreviation": "QC",
         "Name": "Quality Checking"
+      },
+      "IsPseudo": false
+    }
+  ]
+}
+```
+
+### Full
+
+```json
+{
+  "Nickname": "wolf",
+  "AniListId": 145728,
+  "IsPrivate": false,
+  "UpdateChannelId": 803139525312249906,
+  "ReleaseChannelId": 804434067000393769,
+  "Aliases": ["spice", "holo"],
+  "AdministratorIds": [134073223208763392],
+  "FirstEpisode": 1,
+  "KeyStaff": [
+    {
+      "UserId": 248600185423396866,
+      "Role": {
+        "Abbreviation": "ED",
+        "Name": "Editing",
+        "Weight": 1
+      },
+      "IsPseudo": false
+    },
+    {
+      "UserId": 134073223208763392,
+      "Role": {
+        "Abbreviation": "QC",
+        "Name": "Quality Checking",
+        "Weight": 2
       },
       "IsPseudo": false
     }
@@ -82,8 +132,18 @@ If you have multiple projects to create, or you have a template you use often, y
   },
   "CongaParticipants": [
     {
+      "Abbreviation": "$AIR",
+      "Type": "Special",
+      "Dependents": ["ED"]
+    },
+    {
       "Abbreviation": "ED",
       "Type": "KeyStaff",
+      "Dependents": ["QC"]
+    },
+    {
+      "Abbreviation": "KFX",
+      "Type": "AdditionalStaff",
       "Dependents": ["QC"]
     },
     {
@@ -95,8 +155,41 @@ If you have multiple projects to create, or you have a template you use often, y
 }
 ```
 
+By default, AniList is used for the following fields, but you can supply them manually if desired. You may need to manually supply some or all of them if the data is missing from AniList.
+
+```json
+{
+  "Title": "Ookami to Koushinryou: MERCHANT MEETS THE WISE WOLF",
+  "Type": "TV",
+  "Length": 25,
+  "PosterUri": "https://example.com/spicy-wolf-poster.png"
+}
+```
+
+## Minimal Copypasta
+
+```json
+{
+  "Nickname": "",
+  "AniListId": 0,
+  "IsPrivate": false,
+  "UpdateChannelId": 0,
+  "ReleaseChannelId": 0,
+  "KeyStaff": [
+    {
+      "UserId": 0,
+      "Role": {
+        "Abbreviation": "",
+        "Name": ""
+      },
+      "IsPseudo": false
+    }
+  ]
+}
+```
+
 ## Note
 
 While this command will set up the majority of the project, other related steps will still need to be done manually - `/project conga-reminder enable` or `/project air-reminder enable`, for example.
 
-I hope this feature proves useful to you. 
+I hope this feature proves useful to you.
