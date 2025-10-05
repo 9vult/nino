@@ -18,7 +18,7 @@ public class ProjectCreateDto
     public ulong[]? AdministratorIds;
     public string[]? Aliases;
     public CongaNodeDto[]? CongaParticipants;
+    public Dictionary<string, StaffCreateDto[]>? AdditionalStaff;
 
     public required StaffCreateDto[] KeyStaff;
-    public required Dictionary<string, StaffCreateDto[]> AdditionalStaff;
 }

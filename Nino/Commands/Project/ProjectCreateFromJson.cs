@@ -142,6 +142,7 @@ public partial class ProjectManagement
             ks.Role.Weight ??= idxWeight++;
         }
         // Go through the additional staff dictionary
+        template.AdditionalStaff ??= [];
         foreach (var ep in template.AdditionalStaff)
         {
             idxWeight = 10000;
