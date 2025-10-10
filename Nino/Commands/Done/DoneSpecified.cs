@@ -5,6 +5,7 @@ using Discord.WebSocket;
 using Localizer;
 using Nino.Records;
 using Nino.Records.Enums;
+using Nino.Services;
 using Nino.Utilities;
 using Nino.Utilities.Extensions;
 using static Localizer.Localizer;
@@ -45,6 +46,46 @@ public partial class Done
                 T("error.progress.taskAlreadyDone", lng, abbreviation),
                 interaction
             );
+
+        // Check if the episode has aired
+        if (
+            project.AniListId is not null
+            && project.AniListId > 0
+            && Episode.EpisodeNumberIsInteger(episodeNumber, out var epNum)
+            && await AirDateService.EpisodeAired(project.AniListId.Value, epNum) == false
+        )
+        {
+            var (goOn, finalBody, questionMessage) = await Ask.AboutAction(
+                interactive,
+                interaction,
+                project,
+                lng,
+                Ask.InconsequentialAction.MarkTaskDoneForUnairedEpisode,
+                arg: episodeNumber
+            );
+
+            // Update the question embed to reflect the choice
+            if (questionMessage is not null)
+            {
+                var header = project.IsPrivate
+                    ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
+                    : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
+                var editedEmbed = new EmbedBuilder()
+                    .WithAuthor(header)
+                    .WithTitle($"❓ {T("progress.done.inTheDust.question", lng)}")
+                    .WithDescription(finalBody)
+                    .WithCurrentTimestamp()
+                    .Build();
+                await questionMessage.ModifyAsync(m =>
+                {
+                    m.Components = null;
+                    m.Embed = editedEmbed;
+                });
+            }
+
+            if (!goOn)
+                return ExecutionResult.Success;
+        }
 
         // Check if episode will be done
         var episodeDone = !episode.Tasks.Any(t => t.Abbreviation != abbreviation && !t.Done);

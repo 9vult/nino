@@ -56,8 +56,10 @@ namespace Nino
                 ))
                 .AddSingleton<InteractionHandler>()
                 .AddSingleton<InteractiveService>()
+#if !DEBUG
                 .AddHostedService<ReleaseReminderService>()
                 .AddHostedService<CongaReminderService>()
+#endif
                 .BuildServiceProvider();
         }
 

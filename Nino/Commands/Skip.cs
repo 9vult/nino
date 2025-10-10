@@ -7,6 +7,7 @@ using Localizer;
 using Nino.Handlers;
 using Nino.Records;
 using Nino.Records.Enums;
+using Nino.Services;
 using Nino.Utilities;
 using Nino.Utilities.Extensions;
 using NLog;
@@ -83,6 +84,46 @@ public class Skip(DataContext db, InteractiveService interactive)
                 T("error.progress.taskAlreadyDone", lng, abbreviation),
                 interaction
             );
+
+        // Check if the episode has aired
+        if (
+            project.AniListId is not null
+            && project.AniListId > 0
+            && Episode.EpisodeNumberIsInteger(episodeNumber, out var epNum)
+            && await AirDateService.EpisodeAired(project.AniListId.Value, epNum) == false
+        )
+        {
+            var (markDone, finalBody, questionMessage) = await Ask.AboutAction(
+                interactive,
+                interaction,
+                project,
+                lng,
+                Ask.InconsequentialAction.MarkTaskDoneForUnairedEpisode,
+                arg: episodeNumber
+            );
+
+            // Update the question embed to reflect the choice
+            if (questionMessage is not null)
+            {
+                var header = project.IsPrivate
+                    ? $"🔒 {project.Title} ({project.Type.ToFriendlyString(lng)})"
+                    : $"{project.Title} ({project.Type.ToFriendlyString(lng)})";
+                var editedEmbed = new EmbedBuilder()
+                    .WithAuthor(header)
+                    .WithTitle($"❓ {T("progress.done.inTheDust.question", lng)}")
+                    .WithDescription(finalBody)
+                    .WithCurrentTimestamp()
+                    .Build();
+                await questionMessage.ModifyAsync(m =>
+                {
+                    m.Components = null;
+                    m.Embed = editedEmbed;
+                });
+            }
+
+            if (!markDone)
+                return ExecutionResult.Success;
+        }
 
         // Check if episode will be done
         var episodeDone = !episode.Tasks.Any(t => t.Abbreviation != abbreviation && !t.Done);
@@ -193,7 +234,7 @@ public class Skip(DataContext db, InteractiveService interactive)
             // Because we're skipping, find out if single-prereq tasks should still be pinged
             if (singleCandidates.Count > 0)
             {
-                var (pingOn, finalBody, questionMessage) = await Ask.AboutAction(
+                var (pingOn, _, questionMessage) = await Ask.AboutAction(
                     interactive,
                     interaction,
                     project,

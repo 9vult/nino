@@ -90,7 +90,8 @@ namespace Nino.Utilities
             SocketInteraction interaction,
             Project project,
             string lng,
-            InconsequentialAction inconsequentialAction
+            InconsequentialAction inconsequentialAction,
+            string? arg = null
         )
         {
             var questionBodyKey = inconsequentialAction switch
@@ -98,6 +99,8 @@ namespace Nino.Utilities
                 InconsequentialAction.PingCongaAfterSkip => "progress.skip.conga.question",
                 InconsequentialAction.MarkTaskDoneIfEpisodeIsDone =>
                     "keyStaff.add.markDone.question",
+                InconsequentialAction.MarkTaskDoneForUnairedEpisode =>
+                    "progress.done.unaired.question",
                 _ => throw new ArgumentOutOfRangeException(
                     nameof(inconsequentialAction),
                     inconsequentialAction,
@@ -109,6 +112,8 @@ namespace Nino.Utilities
                 InconsequentialAction.PingCongaAfterSkip => string.Empty,
                 InconsequentialAction.MarkTaskDoneIfEpisodeIsDone =>
                     "keyStaff.add.markDone.response",
+                InconsequentialAction.MarkTaskDoneForUnairedEpisode =>
+                    "progress.done.unaired.response",
                 _ => throw new ArgumentOutOfRangeException(
                     nameof(inconsequentialAction),
                     inconsequentialAction,
@@ -123,6 +128,10 @@ namespace Nino.Utilities
                 ),
                 InconsequentialAction.MarkTaskDoneIfEpisodeIsDone => (
                     "keyStaff.add.markDone.no.button",
+                    ButtonStyle.Secondary
+                ),
+                InconsequentialAction.MarkTaskDoneForUnairedEpisode => (
+                    "progress.done.unaired.no.button",
                     ButtonStyle.Secondary
                 ),
                 _ => throw new ArgumentOutOfRangeException(
@@ -141,6 +150,10 @@ namespace Nino.Utilities
                     "keyStaff.add.markDone.yes.button",
                     ButtonStyle.Secondary
                 ),
+                InconsequentialAction.MarkTaskDoneForUnairedEpisode => (
+                    "progress.done.unaired.yes.button",
+                    ButtonStyle.Secondary
+                ),
                 _ => throw new ArgumentOutOfRangeException(
                     nameof(inconsequentialAction),
                     inconsequentialAction,
@@ -151,6 +164,7 @@ namespace Nino.Utilities
             {
                 InconsequentialAction.PingCongaAfterSkip => true,
                 InconsequentialAction.MarkTaskDoneIfEpisodeIsDone => true,
+                InconsequentialAction.MarkTaskDoneForUnairedEpisode => true,
                 _ => throw new ArgumentOutOfRangeException(
                     nameof(inconsequentialAction),
                     inconsequentialAction,
@@ -169,7 +183,7 @@ namespace Nino.Utilities
             var questionEmbed = new EmbedBuilder()
                 .WithAuthor(header)
                 .WithTitle($"❓ {T("progress.done.inTheDust.question", lng)}")
-                .WithDescription(T(questionBodyKey, lng, project.Nickname))
+                .WithDescription(T(questionBodyKey, lng, arg ?? string.Empty))
                 .WithCurrentTimestamp()
                 .Build();
 
@@ -190,6 +204,7 @@ namespace Nino.Utilities
             if (!questionResult.IsSuccess)
             {
                 finalBody = T("progress.done.inTheDust.timeout", lng);
+                goOn = successOnTimeout;
             }
             else
             {
@@ -216,6 +231,7 @@ namespace Nino.Utilities
         {
             PingCongaAfterSkip,
             MarkTaskDoneIfEpisodeIsDone,
+            MarkTaskDoneForUnairedEpisode,
         }
     }
 }
