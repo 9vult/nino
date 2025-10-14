@@ -95,8 +95,9 @@ internal static class PermissionChecker
             isRelease ? $"<#{project.ReleaseChannelId}>"
             : !isConga ? $"<#{project.UpdateChannelId}>"
             : $"<#{interaction.Channel.Id}>";
-        var questionBody = !isConga
-            ? T("missingPermsPrecheck.question", lng, channelMention)
+        var questionBody =
+            isRelease ? T("missingPermsPrecheck.question.release", lng, channelMention)
+            : !isConga ? T("missingPermsPrecheck.question", lng, channelMention)
             : T("missingPermsPrecheck.question.conga", lng, channelMention);
 
         var header = project.IsPrivate
