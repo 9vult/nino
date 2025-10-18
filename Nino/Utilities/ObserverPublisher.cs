@@ -111,14 +111,28 @@ namespace Nino.Utilities
                                 : $"<@&{observer.RoleId}> "
                             : "";
 
-                    var observerBody = $"**{publishTitle}**\n{observerRoleStr}{releaseUrl}";
+                    var urls = releaseUrl.Split('|');
+                    var observerBody = new StringBuilder();
+
+                    observerBody.AppendLine($"**{publishTitle}**");
+                    if (!string.IsNullOrEmpty(observerRoleStr))
+                    {
+                        if (urls.Length > 1)
+                            observerBody.AppendLine(observerRoleStr);
+                        else
+                            observerBody.Append(observerRoleStr);
+                    }
+
+                    foreach (var link in urls)
+                        observerBody.AppendLine(link.Trim());
+
                     try
                     {
                         var payload = new
                         {
                             username = "Nino",
                             avatar_url = "https://i.imgur.com/PWtteaY.png",
-                            content = observerBody,
+                            content = observerBody.ToString(),
                         };
                         var data = new StringContent(
                             JsonConvert.SerializeObject(payload),

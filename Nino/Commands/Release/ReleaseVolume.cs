@@ -1,3 +1,4 @@
+using System.Text;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
@@ -54,18 +55,32 @@ public partial class Release
                 : "";
 
         var publishTitle = T("progress.release.volume.publish", gLng, project.Title, volumeNumber);
-        var publishBody = $"**{publishTitle}**\n{roleStr}{url}";
+
+        var urls = url.Split('|');
+        var publishBody = new StringBuilder();
 
         // Add prefix if needed
         if (!string.IsNullOrEmpty(config?.ReleasePrefix))
-            publishBody = $"{config.ReleasePrefix!} {publishBody}";
+            publishBody.Append(config.ReleasePrefix!);
+
+        publishBody.AppendLine($"**{publishTitle}**");
+        if (!string.IsNullOrEmpty(roleStr))
+        {
+            if (urls.Length > 1)
+                publishBody.AppendLine(roleStr);
+            else
+                publishBody.Append(roleStr);
+        }
+
+        foreach (var link in urls)
+            publishBody.AppendLine(link.Trim());
 
         // Publish to local releases channel
         try
         {
             var publishChannel = (SocketTextChannel)
                 Nino.Client.GetChannel(project.ReleaseChannelId);
-            var msg = await publishChannel.SendMessageAsync(text: publishBody);
+            var msg = await publishChannel.SendMessageAsync(text: publishBody.ToString());
             if (msg.Channel.GetChannelType() == ChannelType.News) // Guild announcement channel
                 await msg.CrosspostAsync(); // Publish announcement
         }
