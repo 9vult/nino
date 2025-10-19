@@ -79,18 +79,38 @@ namespace Nino.Services
 
             try
             {
+                var page = 1;
                 var response = await Client.PostAsync(BaseUrl, CreateQuery(anilistId));
 
                 if (response.IsSuccessStatusCode)
                 {
                     var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse>();
-                    if (apiResponse is null)
+                    if (apiResponse?.Data?.Media?.AiringSchedule?.Nodes is null)
                         return new ApiResponse { Error = "error.anilist.cache.malformed" };
 
                     // Round to the nearest multiple of 30 minutes
                     if (apiResponse.Data?.Media is not null)
                         apiResponse.Data.Media.Duration =
                             (int)Math.Ceiling((apiResponse.Data.Media.Duration ?? 0) / 30d) * 30;
+
+                    // If there are multiple pages, we need to fetch the others
+                    while (
+                        page < (apiResponse.Data?.Media?.AiringSchedule?.PageInfo?.LastPage ?? 1)
+                    )
+                    {
+                        page++;
+                        response = await Client.PostAsync(BaseUrl, CreateQuery(anilistId, page));
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var innerData = await response.Content.ReadFromJsonAsync<ApiResponse>();
+                            if (innerData?.Data?.Media?.AiringSchedule?.Nodes is null)
+                                continue;
+
+                            apiResponse.Data!.Media!.AiringSchedule!.Nodes?.AddRange(
+                                innerData.Data.Media.AiringSchedule.Nodes
+                            );
+                        }
+                    }
 
                     await using var stream = File.OpenWrite(filename);
                     await JsonSerializer.SerializeAsync(stream, apiResponse);
@@ -127,16 +147,19 @@ namespace Nino.Services
             }
         }
 
-        private static StringContent CreateQuery(int id) =>
+        private static StringContent CreateQuery(int id, int page = 1) =>
             new(
                 JsonSerializer.Serialize(
                     new
                     {
                         query = """
-                        query ($id: Int) {
+                        query ($id: Int, $page: Int) {
                             Media (id: $id) {
                                 startDate { year month day },
-                                airingSchedule { nodes { episode, airingAt }},
+                                airingSchedule(page: $page) {
+                                    pageInfo { lastPage },
+                                    nodes { episode, airingAt }
+                                },
                                 duration,
                                 episodes,
                                 format,
@@ -149,7 +172,7 @@ namespace Nino.Services
                             }
                         }
                         """,
-                        variables = new { id },
+                        variables = new { id, page },
                     }
                 ),
                 Encoding.UTF8,
@@ -239,7 +262,13 @@ namespace Nino.Services
 
     public class AiringSchedule
     {
+        public PageInfo? PageInfo { get; set; }
         public List<AiringScheduleNode>? Nodes { get; set; }
+    }
+
+    public class PageInfo
+    {
+        public int LastPage { get; set; } = 1;
     }
 
     public class AiringScheduleNode
