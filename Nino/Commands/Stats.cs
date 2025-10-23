@@ -46,15 +46,16 @@ namespace Nino.Commands
 
             if (totalProjects == 0)
             {
-                await interaction.FollowupAsync(embed: new EmbedBuilder()
-                    .WithTitle(T("title.stats", lng))
-                    .WithDescription(T("nino.stats.empty", lng))
-                    .WithUrl("https://github.com/9vult/nino")
-                    .Build());
+                await interaction.FollowupAsync(
+                    embed: new EmbedBuilder()
+                        .WithTitle(T("title.stats", lng))
+                        .WithDescription(T("nino.stats.empty", lng))
+                        .WithUrl("https://github.com/9vult/nino")
+                        .Build()
+                );
                 return ExecutionResult.Success;
             }
-            
-            
+
             var totalGuilds = await db.Projects.GroupBy(p => p.GuildId).CountAsync();
             var ongoingProjects = ongoing.Count;
             var totalEpisodes = await db.Episodes.CountAsync();
