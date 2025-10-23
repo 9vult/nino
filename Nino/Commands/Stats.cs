@@ -42,8 +42,20 @@ namespace Nino.Commands
                 .GroupBy(e => e.ProjectId)
                 .ToDictionary(g => g.Key, g => g.ToList());
 
-            var totalGuilds = await db.Projects.GroupBy(p => p.GuildId).CountAsync();
             var totalProjects = await db.Projects.CountAsync();
+
+            if (totalProjects == 0)
+            {
+                await interaction.FollowupAsync(embed: new EmbedBuilder()
+                    .WithTitle(T("title.stats", lng))
+                    .WithDescription(T("nino.stats.empty", lng))
+                    .WithUrl("https://github.com/9vult/nino")
+                    .Build());
+                return ExecutionResult.Success;
+            }
+            
+            
+            var totalGuilds = await db.Projects.GroupBy(p => p.GuildId).CountAsync();
             var ongoingProjects = ongoing.Count;
             var totalEpisodes = await db.Episodes.CountAsync();
             var totalDoneEpisodes = await db.Episodes.CountAsync(ep => ep.Done);
@@ -51,6 +63,7 @@ namespace Nino.Commands
             var ongoingProjectDoneEpisodes = ongoing.Sum(kv => kv.Value.Count(ep => ep.Done));
             var totalObservers = await db.Observers.CountAsync();
             var uniqueObservers = await db.Observers.GroupBy(o => o.ProjectId).CountAsync();
+            var completedTasks = await db.Episodes.SelectMany(e => e.Tasks).CountAsync(e => e.Done);
 
             var totalDoneEpisodesPercent = Math.Round(
                 totalDoneEpisodes / (decimal)totalEpisodes * 100.0m,
@@ -126,10 +139,12 @@ namespace Nino.Commands
                     PluralDict(uniqueObservers.ToString(nfi))
                 )
             );
+            var tasksPart = T("nino.stats.tasks.done", lng, completedTasks);
 
             var sb = new StringBuilder();
             sb.AppendLine(projectsTotalPart);
             sb.AppendLine(episodesTotalPart);
+            sb.AppendLine(tasksPart);
             sb.AppendLine();
             sb.AppendLine(projectsDetailsPart);
             sb.AppendLine(episodesDetailsPart);
