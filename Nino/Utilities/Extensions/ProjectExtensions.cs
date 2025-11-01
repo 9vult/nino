@@ -1,4 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
+using NaturalSort.Extension;
 using Nino.Records;
 
 namespace Nino.Utilities.Extensions;
@@ -59,5 +61,105 @@ public static class ProjectExtensions
                 e.AdditionalStaff.Any(s => s.UserId == userId)
                 || e.PinchHitters.Any(p => p.UserId == userId)
             );
+    }
+
+    public static string GenerateRoster(this Project project, bool excludePseudo = true)
+    {
+        // Get a list of every task and who performed it
+        List<TaskInfo> tasks = [];
+        foreach (var episode in project.Episodes)
+        {
+            var staff = episode.AdditionalStaff.Concat(project.KeyStaff).ToList();
+            foreach (var task in episode.Tasks)
+            {
+                var position = staff.FirstOrDefault(s => s.Role.Abbreviation == task.Abbreviation);
+                if (position is null || (position.IsPseudo && excludePseudo))
+                    continue;
+
+                var pinch = episode.PinchHitters.FirstOrDefault(ph =>
+                    ph.Abbreviation == task.Abbreviation
+                );
+
+                tasks.Add(
+                    new TaskInfo
+                    {
+                        Name = position.Role.Name,
+                        Episode = episode.Number,
+                        UserId = pinch?.UserId ?? position.UserId,
+                        Weight = position.Role.Weight ?? 0,
+                    }
+                );
+            }
+        }
+
+        // Grouping
+        var groups = tasks
+            .OrderBy(t => t.Weight)
+            .GroupBy(t => t.Name)
+            .Select(taskGroup => new
+            {
+                Name = taskGroup.Key,
+                Assignees = taskGroup
+                    .GroupBy(a => a.UserId)
+                    .Select(assigneeGroup => new
+                    {
+                        AssigneeId = assigneeGroup.Key,
+                        Episodes = string.Join(
+                            ", ",
+                            ToRanges(assigneeGroup.Select(x => x.Episode))
+                        ),
+                    }),
+            });
+
+        var sb = new StringBuilder();
+        foreach (var group in groups)
+        {
+            sb.Append($"**{group.Name}**: ");
+            sb.AppendLine(
+                string.Join(", ", group.Assignees.Select(a => $"<@{a.AssigneeId}> ({a.Episodes})"))
+            );
+        }
+
+        return sb.ToString();
+    }
+
+    private static IEnumerable<string> ToRanges(IEnumerable<string> numbers)
+    {
+        var sorted = numbers
+            .OrderBy(n => n, StringComparison.OrdinalIgnoreCase.WithNaturalSort())
+            .ToList();
+        if (sorted.Count == 0)
+            yield break;
+
+        var start = sorted[0];
+        var end = start;
+        for (var i = 1; i < sorted.Count; i++)
+        {
+            if (
+                Episode.EpisodeNumberIsInteger(sorted[i], out var cur)
+                && Episode.EpisodeNumberIsInteger(end, out var next)
+                && cur == next + 1
+            )
+            {
+                end = sorted[i];
+            }
+            else
+            {
+                yield return FormatRange(start, end);
+                start = end = sorted[i];
+            }
+        }
+        yield return FormatRange(start, end);
+    }
+
+    private static string FormatRange(string start, string end) =>
+        start == end ? start : $"{start}-{end}";
+
+    private class TaskInfo
+    {
+        public required string Name { get; set; }
+        public required ulong UserId { get; set; }
+        public required string Episode { get; set; }
+        public required decimal Weight { get; set; }
     }
 }
