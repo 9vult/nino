@@ -1,5 +1,5 @@
+using System.Text.Json;
 using Discord.Interactions;
-using Newtonsoft.Json;
 using Nino.Handlers;
 using Nino.Utilities;
 using Nino.Utilities.Extensions;
@@ -9,6 +9,8 @@ namespace Nino.Commands
 {
     public partial class Debug
     {
+        private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
+
         public class DebugInfo(DataContext db) : InteractionModuleBase<SocketInteractionContext>
         {
             [SlashCommand("info", "Debugging Information")]
@@ -51,7 +53,7 @@ namespace Nino.Commands
                 };
 
                 await interaction.FollowupAsync(
-                    $"```json\n{JsonConvert.SerializeObject(debugData, Formatting.Indented)}\n```"
+                    $"```json\n{JsonSerializer.Serialize(debugData, JsonOptions)}\n```"
                 );
 
                 return ExecutionResult.Success;

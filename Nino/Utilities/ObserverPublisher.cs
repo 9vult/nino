@@ -1,8 +1,8 @@
 using System.Net;
 using System.Text;
+using System.Text.Json;
 using Discord;
 using Discord.Net;
-using Newtonsoft.Json;
 using Nino.Records;
 using Nino.Utilities.Extensions;
 using NLog;
@@ -42,7 +42,7 @@ namespace Nino.Utilities
                             embeds = new[] { embed.ToJsonObject() },
                         };
                         var data = new StringContent(
-                            JsonConvert.SerializeObject(payload),
+                            JsonSerializer.Serialize(payload),
                             Encoding.UTF8,
                             "application/json"
                         );
@@ -135,7 +135,7 @@ namespace Nino.Utilities
                             content = observerBody.ToString(),
                         };
                         var data = new StringContent(
-                            JsonConvert.SerializeObject(payload),
+                            JsonSerializer.Serialize(payload),
                             Encoding.UTF8,
                             "application/json"
                         );
