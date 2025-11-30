@@ -46,6 +46,7 @@ namespace Nino.Services
                             (int)project.AniListId!,
                             decimalNumber + (project.AniListOffset ?? 0)
                         );
+                        airTime = airTime?.Add(project.AirReminderDelay ?? TimeSpan.Zero);
                         if (airTime is null || DateTimeOffset.UtcNow < airTime)
                             continue;
 

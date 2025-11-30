@@ -13,6 +13,7 @@ namespace Nino.Records.Enums
         ReleaseChannelID = 7,
         Nickname = 8,
         AniListOffset = 9,
+        AirReminderDelay = 10,
     }
 
     public static class ProjectEditOptionExtensions
@@ -37,6 +38,10 @@ namespace Nino.Records.Enums
                 ProjectEditOption.Nickname => T("choice.project.edit.option.nickname", lng),
                 ProjectEditOption.AniListOffset => T(
                     "choice.project.edit.option.anilistoffset",
+                    lng
+                ),
+                ProjectEditOption.AirReminderDelay => T(
+                    "choice.project.edit.option.airreminderdelay",
                     lng
                 ),
                 _ => type.ToString(),

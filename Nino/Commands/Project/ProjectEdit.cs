@@ -151,6 +151,21 @@ namespace Nino.Commands
                     project.Nickname = newValue;
                     break;
 
+                case ProjectEditOption.AirReminderDelay:
+                    // sanitize input
+                    if (!int.TryParse(newValue, out var delay))
+                        return await Response.Fail(
+                            T("error.incorrectIntegerFormat", lng),
+                            interaction
+                        );
+
+                    if (delay is < 1 or > 60 * 24)
+                        return await Response.Fail(T("error.invalidDelay", lng), interaction);
+
+                    project.AirReminderDelay = TimeSpan.FromMinutes(delay);
+                    Log.Info($"Changing AirReminderDelay of {project} to {delay} minutes");
+                    break;
+
                 default:
                     return await Response.Fail(T("error.generic", lng), interaction);
             }

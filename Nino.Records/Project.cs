@@ -27,6 +27,7 @@ public class Project
     public ulong? AirReminderChannelId { get; set; }
     public ulong? AirReminderRoleId { get; set; }
     public ulong? AirReminderUserId { get; set; }
+    public TimeSpan? AirReminderDelay { get; set; }
     public required bool CongaReminderEnabled { get; set; }
     public TimeSpan? CongaReminderPeriod { get; set; }
     public ulong? CongaReminderChannelId { get; set; }
