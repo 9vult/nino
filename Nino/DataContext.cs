@@ -37,7 +37,8 @@ public class DataContext : DbContext
     /// <inheritdoc />
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
-        options.UseSqlite("Data Source=nino-local.db");
+        var dbPath = Path.Combine(AppContext.BaseDirectory, "nino-local.db");
+        options.UseSqlite($"Data Source={dbPath}");
         // options.LogTo(Console.WriteLine);
     }
 
