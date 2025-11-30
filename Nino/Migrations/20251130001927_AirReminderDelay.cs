@@ -15,15 +15,14 @@ namespace Nino.Migrations
                 name: "AirReminderDelay",
                 table: "Projects",
                 type: "TEXT",
-                nullable: true);
+                nullable: true
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "AirReminderDelay",
-                table: "Projects");
+            migrationBuilder.DropColumn(name: "AirReminderDelay", table: "Projects");
         }
     }
 }
