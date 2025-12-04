@@ -161,7 +161,8 @@ public partial class Done
                     ?.Dependents.Where(dep =>
                         episode.Tasks.Any(t => t.Abbreviation == dep.Abbreviation)
                     )
-                    .ToList() ?? []; // Limit to tasks in the episode
+                    .ToList()
+                ?? []; // Limit to tasks in the episode
 
             if (congaCandidates.Count > 0)
             {
@@ -201,7 +202,8 @@ public partial class Done
                     if (
                         episode
                             .Tasks.FirstOrDefault(t => t.Abbreviation == nextTask.Role.Abbreviation)
-                            ?.Done ?? false
+                            ?.Done
+                        ?? false
                     )
                         continue;
 
@@ -210,7 +212,8 @@ public partial class Done
                             .PinchHitters.FirstOrDefault(t =>
                                 t.Abbreviation == nextTask.Role.Abbreviation
                             )
-                            ?.UserId ?? nextTask.UserId;
+                            ?.UserId
+                        ?? nextTask.UserId;
                     var staffMention = $"<@{userId}>";
                     var roleTitle = nextTask.Role.Name;
                     if (prefixMode != CongaPrefixType.None)

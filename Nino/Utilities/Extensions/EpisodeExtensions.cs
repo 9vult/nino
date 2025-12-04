@@ -96,7 +96,8 @@ public static class EpisodeExtensions
             var userId =
                 episode
                     .PinchHitters.FirstOrDefault(k => k.Abbreviation == ks.Role.Abbreviation)
-                    ?.UserId ?? ks.UserId;
+                    ?.UserId
+                ?? ks.UserId;
 
             if (task.Done)
                 sb.AppendLine(

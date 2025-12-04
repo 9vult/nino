@@ -83,7 +83,8 @@ public static class CongaHelper
             var isPseudo =
                 project
                     .KeyStaff.FirstOrDefault(t => t.Role.Abbreviation == node.Abbreviation)
-                    ?.IsPseudo ?? false;
+                    ?.IsPseudo
+                ?? false;
 
             var shape =
                 node.Type == CongaNodeType.Special ? "diamond"
@@ -137,7 +138,8 @@ public static class CongaHelper
                 project
                     .KeyStaff.Concat(episode.AdditionalStaff)
                     .FirstOrDefault(t => t.Role.Abbreviation == node.Abbreviation)
-                    ?.IsPseudo ?? false;
+                    ?.IsPseudo
+                ?? false;
             var color =
                 node.Type == CongaNodeType.Special ? "yellow"
                 : task is null ? "red"

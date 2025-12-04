@@ -59,7 +59,8 @@ namespace Nino.Services
                                 .PinchHitters.FirstOrDefault(t =>
                                     t.Abbreviation == staff.Role.Abbreviation
                                 )
-                                ?.UserId ?? staff.UserId;
+                                ?.UserId
+                            ?? staff.UserId;
                         var staffMention = $"<@{userId}>";
                         var roleTitle = staff.Role.Name;
                         if (prefixMode != CongaPrefixType.None)

@@ -223,7 +223,8 @@ public class Bulk(DataContext db, InteractiveService interactive)
                 ?.Dependents.Where(dep =>
                     episode.Tasks.Any(t => t.Abbreviation == dep.Abbreviation)
                 )
-                .ToList() ?? []; // Limit to tasks in the episode
+                .ToList()
+            ?? []; // Limit to tasks in the episode
 
         if (congaCandidates.Count == 0)
             return string.Empty;
@@ -262,14 +263,16 @@ public class Bulk(DataContext db, InteractiveService interactive)
             if (
                 episode
                     .Tasks.FirstOrDefault(t => t.Abbreviation == nextTask.Role.Abbreviation)
-                    ?.Done ?? false
+                    ?.Done
+                ?? false
             )
                 continue;
 
             var userId =
                 episode
                     .PinchHitters.FirstOrDefault(t => t.Abbreviation == nextTask.Role.Abbreviation)
-                    ?.UserId ?? nextTask.UserId;
+                    ?.UserId
+                ?? nextTask.UserId;
             var staffMention = $"<@{userId}>";
             var roleTitle = nextTask.Role.Name;
             if (prefixMode != CongaPrefixType.None)
