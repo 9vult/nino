@@ -146,7 +146,7 @@ public class Skip(DataContext db, InteractiveService interactive)
                 : episode.GenerateProgress(abbreviation); // Standard
 
         // Skip published embeds for pseudo-tasks
-        if (!staff.IsPseudo)
+        if (!(staff.IsPseudo || (project.IsPrivate && config?.PublishPrivateProgress == false)))
             await PublishEmbeds();
 
         // Prepare success embed

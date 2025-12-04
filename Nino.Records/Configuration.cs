@@ -16,6 +16,7 @@ public class Configuration
     [MaxLength(128)]
     public string? ReleasePrefix { get; set; }
     public Locale? Locale { get; set; }
+    public bool? PublishPrivateProgress { get; set; }
 
     public ICollection<Administrator> Administrators = new List<Administrator>();
 
@@ -32,5 +33,6 @@ public class Configuration
             ProgressDisplay = ProgressDisplayType.Succinct,
             CongaPrefix = CongaPrefixType.None,
             ReleasePrefix = null,
+            PublishPrivateProgress = true,
         };
 }

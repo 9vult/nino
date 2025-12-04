@@ -99,9 +99,10 @@ namespace Nino
                 configBuilder.GetRequiredSection("Configuration").Get<AppConfig?>()
                 ?? throw new Exception("Missing appsettings.json!");
 
+#if !DEBUG
             _cmdLineOptions = Parser.Default.ParseArguments<CmdLineOptions>(args).Value;
             AniListService.AniListEnabled = !_cmdLineOptions.DisableAniList;
-
+#endif
             // Configure DI
             ConfigureServices();
 

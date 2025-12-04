@@ -99,6 +99,9 @@ namespace Nino.Commands
                             interaction
                         );
                     project.IsPrivate = Truthy().IsMatch(input);
+
+                    // Inform about private project behavior
+                    helperText = T("info.publishPrivateProgress", lng);
                     break;
 
                 case ProjectEditOption.UpdateChannelID:

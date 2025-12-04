@@ -31,10 +31,8 @@ public class Bulk(DataContext db, InteractiveService interactive)
     {
         var interaction = Context.Interaction;
         var lng = interaction.UserLocale;
-        var gLng =
-            db.GetConfig(interaction.GuildId ?? 0)?.Locale?.ToDiscordLocale()
-            ?? interaction.GuildLocale
-            ?? "en-US";
+        var config = db.GetConfig(interaction.GuildId ?? 0);
+        var gLng = config?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
 
         // Sanitize inputs
         alias = alias.Trim();
@@ -117,7 +115,7 @@ public class Bulk(DataContext db, InteractiveService interactive)
             await interaction.Channel.SendMessageAsync(congaContent.ToString());
 
         // Skip published embeds for pseudo-tasks
-        if (!staff.IsPseudo)
+        if (!(staff.IsPseudo || (project.IsPrivate && config?.PublishPrivateProgress == false)))
         {
             var status = action switch
             {

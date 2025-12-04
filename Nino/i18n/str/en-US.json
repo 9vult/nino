@@ -114,6 +114,7 @@
     "error.release.failed": "The following error occured while publishing: {errorMessage_1}",
     "error.taskCompleteAllEpisodes": "That task is complete for all episodes!",
     "info.resettable": "To reset this value, set a hyphen: `-`",
+    "info.publishPrivateProgress": "By default, progress updates are published for private projects.\nThis can be configured with `/server display publish-private-progress`.",
     "keyStaff.add.markDone.response": "Consider them done!",
     "keyStaff.add.markDone.no.button": "No",
     "keyStaff.add.markDone.question": "Some episodes are already complete.\nDo you want me to mark the task done for completed episodes?",

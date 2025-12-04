@@ -19,10 +19,8 @@ namespace Nino.Commands
         {
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
-            var gLng =
-                db.GetConfig(interaction.GuildId ?? 0)?.Locale?.ToDiscordLocale()
-                ?? interaction.GuildLocale
-                ?? "en-US";
+            var config = db.GetConfig(interaction.GuildId ?? 0);
+            var gLng = config?.Locale?.ToDiscordLocale() ?? interaction.GuildLocale ?? "en-US";
 
             // Verify project and user - Owner required
             var project = await db.ResolveAlias(alias, interaction);
@@ -56,36 +54,39 @@ namespace Nino.Commands
                 project.IsArchived = true;
 
                 // Announce archival
-                var publishEmbed = new EmbedBuilder()
-                    .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString(gLng)})")
-                    .WithTitle(T("title.archived", gLng))
-                    .WithDescription(T("project.archive.publish", gLng))
-                    .WithThumbnailUrl(project.PosterUri)
-                    .WithCurrentTimestamp()
-                    .Build();
-
-                // Publish to local progress channel
-                try
+                if (!(project.IsPrivate && config?.PublishPrivateProgress == false))
                 {
-                    var publishChannel = (SocketTextChannel)
-                        Nino.Client.GetChannel(project.UpdateChannelId);
-                    await publishChannel.SendMessageAsync(embed: publishEmbed);
-                }
-                catch (Exception e)
-                {
-                    Log.Error(e.Message);
-                    var guild = Nino.Client.GetGuild(interaction.GuildId ?? 0);
-                    await Utils.AlertError(
-                        T("error.release.failed", lng, e.Message),
-                        guild,
-                        project.Nickname,
-                        project.OwnerId,
-                        "Release"
-                    );
-                }
+                    var publishEmbed = new EmbedBuilder()
+                        .WithAuthor($"{project.Title} ({project.Type.ToFriendlyString(gLng)})")
+                        .WithTitle(T("title.archived", gLng))
+                        .WithDescription(T("project.archive.publish", gLng))
+                        .WithThumbnailUrl(project.PosterUri)
+                        .WithCurrentTimestamp()
+                        .Build();
 
-                // Publish to observers
-                await ObserverPublisher.PublishProgress(project, publishEmbed, db);
+                    // Publish to local progress channel
+                    try
+                    {
+                        var publishChannel = (SocketTextChannel)
+                            Nino.Client.GetChannel(project.UpdateChannelId);
+                        await publishChannel.SendMessageAsync(embed: publishEmbed);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error(e.Message);
+                        var guild = Nino.Client.GetGuild(interaction.GuildId ?? 0);
+                        await Utils.AlertError(
+                            T("error.release.failed", lng, e.Message),
+                            guild,
+                            project.Nickname,
+                            project.OwnerId,
+                            "Release"
+                        );
+                    }
+
+                    // Publish to observers
+                    await ObserverPublisher.PublishProgress(project, publishEmbed, db);
+                }
             }
 
             // Send embed

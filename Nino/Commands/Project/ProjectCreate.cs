@@ -174,6 +174,10 @@ namespace Nino.Commands
                     interaction
                 );
 
+            // Inform about private project behavior
+            if (projectData.IsPrivate)
+                await Response.Info(T("info.publishPrivateProgress", lng), interaction);
+
             await db.TrySaveChangesAsync(interaction);
             return ExecutionResult.Success;
         }
