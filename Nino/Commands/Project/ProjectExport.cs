@@ -18,7 +18,7 @@ namespace Nino.Commands
             var interaction = Context.Interaction;
             var lng = interaction.UserLocale;
 
-            // Verify project and user - Owner required
+            // Verify project and user - Owner or Admin required
             var project = await db.ResolveAlias(alias, interaction);
             if (project is null)
                 return await Response.Fail(
@@ -26,7 +26,7 @@ namespace Nino.Commands
                     interaction
                 );
 
-            if (!project.VerifyUser(db, interaction.User.Id, excludeAdmins: true))
+            if (!project.VerifyUser(db, interaction.User.Id))
                 return await Response.Fail(T("error.permissionDenied", lng), interaction);
 
             Log.Info($"Exporting project {project}");
