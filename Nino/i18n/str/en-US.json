@@ -72,6 +72,7 @@
     "error.archived": "This project is archived.",
     "error.blameFailureGeneric": "The project is complete, or the specified episode could not be found.",
     "error.conga.alreadyExists": "{current_1} → {next_2} is already in the Conga line!",
+    "error.conga.invalidFile": "Invalid Conga file! File must be of format `A -> B`, one per line.",
     "error.databaseError": "A database error occured.",
     "error.doneFailureGeneric": "Your task is complete for all episodes, or the specified episode could not be found.",
     "error.episode.alreadyExists": "Episode {episode_1} already exists!",
@@ -307,6 +308,10 @@
     "progress.bulk.episodeComplete": {
       "one": "Also, {count_1} episode is now complete: `{list_2}`",
       "other": "Also, {count_1} episodes are now complete: `{list_2}`"
+    },
+    "project.conga.imported": {
+      "one": "I added {number_1} entry to `{project_2}`'s Conga line for you.",
+      "other": "I added {number_1} entries to `{project_2}`'s Conga line for you."
     },
     "nino.stats.projects.total.projectCount": {
       "one": "**{number_1}** project",
