@@ -123,9 +123,14 @@ public class Blame(DataContext db) : InteractionModuleBase<SocketInteractionCont
             );
         }
 
+        var embedTitle =
+            project.Type is ProjectType.Movie && project.Episodes.Count == 1
+                ? null
+                : T("title.progress", lng, episode.Number);
+
         var resultEmbed = new EmbedBuilder()
             .WithAuthor(title, url: project.AniListUrl)
-            .WithTitle(T("title.progress", lng, episode.Number))
+            .WithTitle(embedTitle)
             .WithThumbnailUrl(project.PosterUri)
             .WithDescription(progress.ToString())
             .WithCurrentTimestamp()

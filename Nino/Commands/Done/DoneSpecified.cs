@@ -102,7 +102,10 @@ public partial class Done
         episode.Updated = DateTimeOffset.UtcNow;
 
         var taskTitle = staff.Role.Name;
-        var title = T("title.progress", gLng, episodeNumber);
+        var embedTitle =
+            project.Type is ProjectType.Movie && project.Episodes.Count == 1
+                ? null
+                : T("title.progress", lng, episode.Number);
         var status =
             config?.UpdateDisplay.Equals(UpdatesDisplayType.Extended) ?? false
                 ? episode.GenerateExplainProgress(gLng, abbreviation) // Explanatory
@@ -254,7 +257,7 @@ public partial class Done
                     name: $"{project.Title} ({project.Type.ToFriendlyString(gLng)})",
                     url: project.AniListUrl
                 )
-                .WithTitle(title)
+                .WithTitle(embedTitle)
                 .WithDescription(status)
                 .WithThumbnailUrl(project.PosterUri)
                 .WithCurrentTimestamp()
