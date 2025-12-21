@@ -38,10 +38,7 @@ namespace Nino.Commands
 
                 // Verify episode
                 Episode? episode = null;
-                if (
-                    episodeNumber is not null
-                    && project.Episodes.All(e => e.Number != episodeNumber)
-                )
+                if (episodeNumber is not null && !project.TryGetEpisode(episodeNumber, out episode))
                     return await Response.Fail(
                         T("error.noSuchEpisode", lng, episodeNumber),
                         interaction
