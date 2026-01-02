@@ -96,6 +96,7 @@ namespace Nino.Commands
             "nino.help.roster.title",
             "nino.help.admin.title",
             "nino.help.customize.title",
+            "nino.help.archive.title",
             "nino.help.help.title",
             "nino.help.language.title",
             "nino.help.localize.title",
