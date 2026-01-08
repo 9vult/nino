@@ -17,6 +17,13 @@ namespace Nino.Commands;
 
 public partial class ProjectManagement
 {
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        IncludeFields = true,
+        PropertyNameCaseInsensitive = true,
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
+    };
+
     [SlashCommand("create-from-json", "Create a project using a json file")]
     public async Task<RuntimeResult> CreateFromJson(IAttachment file)
     {
@@ -39,20 +46,59 @@ public partial class ProjectManagement
         {
             Log.Trace("Attempting to get and parse JSON...");
             using var client = new HttpClient();
-            template = await client.GetFromJsonAsync<ProjectCreateDto>(
-                file.Url,
-                new JsonSerializerOptions
-                {
-                    IncludeFields = true,
-                    PropertyNameCaseInsensitive = true,
-                    Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
-                }
-            );
+            var content = await client.GetStringAsync(file.Url);
+            using var json = JsonDocument.Parse(content);
 
-            if (template is null)
+            if (!json.RootElement.TryGetProperty("Episodes", out _))
             {
-                Log.Trace("Project creation from json file failed (null)");
-                return await Response.Fail(T("error.generic", lng), interaction);
+                Log.Trace("Input appears to be a Create-From-Json file, proceeding normally...");
+                template = JsonSerializer.Deserialize<ProjectCreateDto>(content, JsonOptions);
+                if (template is null)
+                {
+                    Log.Trace("Project creation from json file failed (null)");
+                    return await Response.Fail(T("error.generic", lng), interaction);
+                }
+            }
+            else
+            {
+                Log.Trace("Input appears to be an Export file, attempting to migrate...");
+                var import = JsonSerializer.Deserialize<Export>(content, JsonOptions);
+                if (import is null)
+                {
+                    Log.Trace("Project creation from json file failed (null)");
+                    return await Response.Fail(T("error.generic", lng), interaction);
+                }
+
+                template = new ProjectCreateDto
+                {
+                    Nickname = import.Project.Nickname,
+                    AniListId = import.Project.AniListId ?? 0,
+                    IsPrivate = import.Project.IsPrivate,
+                    UpdateChannelId = import.Project.UpdateChannelId,
+                    ReleaseChannelId = import.Project.ReleaseChannelId,
+                    Title = import.Project.Title,
+                    Type = import.Project.Type,
+                    Length = import.Episodes.Length,
+                    PosterUri = import.Project.PosterUri,
+                    FirstEpisode = 1,
+                    AdministratorIds = import
+                        .Project.Administrators.Select(a => a.UserId)
+                        .ToArray(),
+                    Aliases = import.Project.Aliases.Select(a => a.Value).ToArray(),
+                    CongaParticipants = import.Project.CongaParticipants.Serialize(),
+                    AdditionalStaff = [],
+                    KeyStaff = import
+                        .Project.KeyStaff.Select(s => new StaffCreateDto
+                        {
+                            UserId = s.UserId,
+                            Role = s.Role,
+                            IsPseudo = s.IsPseudo,
+                        })
+                        .ToArray(),
+                };
+                Log.Trace(
+                    $"Migration successful! Assumption: {template.Length} episodes, starting at 1."
+                );
             }
 
             template.FirstEpisode ??= 1;
@@ -104,35 +150,45 @@ public partial class ProjectManagement
                 $"AniList will be used in the construction of project '{template.Nickname}' for the following fields: {defaultFieldNames}"
             );
 
-        var apiResponse = await AniListService.Get(template.AniListId);
-        if (apiResponse is not null && apiResponse.Error is null)
+        if (defaultFieldNames.Length > 0 && template.AniListId > 0)
         {
-            template.Title ??= apiResponse.Title;
-            template.Length ??= apiResponse.EpisodeCount;
-            template.Type ??= apiResponse.Type;
+            var apiResponse = await AniListService.Get(template.AniListId);
+            if (apiResponse is not null && apiResponse.Error is null)
+            {
+                template.Title ??= apiResponse.Title;
+                template.Length ??= apiResponse.EpisodeCount;
+                template.Type ??= apiResponse.Type;
 
-            if (template.Title is null || template.Length is null || template.Length < 1)
+                if (template.Title is null || template.Length is null || template.Length < 1)
+                {
+                    return await Response.Fail(
+                        T(apiResponse.Error ?? "error.anilist.create", lng),
+                        interaction
+                    );
+                }
+
+                if (
+                    template.PosterUri is null
+                    || !Uri.TryCreate(template.PosterUri, UriKind.Absolute, out _)
+                )
+                {
+                    template.PosterUri = apiResponse.CoverImage ?? AniListService.FallbackPosterUri;
+                }
+            }
+            else
             {
                 return await Response.Fail(
-                    T(apiResponse.Error ?? "error.anilist.create", lng),
+                    T(apiResponse?.Error ?? "error.anilist.create", lng),
                     interaction
                 );
             }
         }
         else
         {
-            return await Response.Fail(
-                T(apiResponse?.Error ?? "error.anilist.create", lng),
-                interaction
-            );
-        }
-
-        if (
-            template.PosterUri is null
-            || !Uri.TryCreate(template.PosterUri, UriKind.Absolute, out _)
-        )
-        {
-            template.PosterUri = apiResponse.CoverImage ?? AniListService.FallbackPosterUri;
+            if (defaultFieldNames.Length > 0)
+                Log.Warn(
+                    $"AniList ID not specified! Skipping autofill for fields: {defaultFieldNames}..."
+                );
         }
 
         // Configure weights
