@@ -86,7 +86,17 @@ public partial class ProjectManagement
                         .ToArray(),
                     Aliases = import.Project.Aliases.Select(a => a.Value).ToArray(),
                     CongaParticipants = import.Project.CongaParticipants.Serialize(),
-                    AdditionalStaff = [],
+                    AdditionalStaff = import.Episodes.ToDictionary(
+                        e => e.Number,
+                        e =>
+                            e.AdditionalStaff.Select(s => new StaffCreateDto
+                                {
+                                    UserId = s.UserId,
+                                    Role = s.Role,
+                                    IsPseudo = s.IsPseudo,
+                                })
+                                .ToArray()
+                    ),
                     KeyStaff = import
                         .Project.KeyStaff.Select(s => new StaffCreateDto
                         {
