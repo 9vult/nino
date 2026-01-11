@@ -1,4 +1,6 @@
-﻿using Discord;
+﻿using System.Text;
+using System.Text.Json;
+using Discord;
 using Discord.Interactions;
 using Nino.Handlers;
 using Nino.Records;
@@ -61,17 +63,42 @@ namespace Nino.Commands
                     return ExecutionResult.Success;
                 }
 
-                var encodedDot = episode is null
+                var dot = episode is null
                     ? CongaHelper.GetDot(project, forceAdditional)
                     : CongaHelper.GetDot(project, episode, forceAdditional);
-                var url = $"https://quickchart.io/graphviz?format=png&graph={encodedDot}";
+
+                var data = new StringContent(
+                    JsonSerializer.Serialize(
+                        new
+                        {
+                            graph = dot,
+                            layout = "dot",
+                            format = "png",
+                        }
+                    ),
+                    Encoding.UTF8,
+                    "application/json"
+                );
+
+                var httpClient = new HttpClient();
+                var response = await httpClient.PostAsync("https://quickchart.io/graphviz", data);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    await interaction.FollowupAsync(
+                        $"{response.StatusCode}: {response.ReasonPhrase}"
+                    );
+                    return ExecutionResult.Success;
+                }
+
+                using var stream = new MemoryStream(await response.Content.ReadAsByteArrayAsync());
 
                 // Send embed
                 var embed = new EmbedBuilder()
                     .WithTitle(T("title.congaList", lng))
-                    .WithImageUrl(url)
+                    .WithImageUrl("attachment://congo.png")
                     .Build();
-                await interaction.FollowupAsync(embed: embed);
+                await interaction.FollowupWithFileAsync(stream, "congo.png", embed: embed);
 
                 return ExecutionResult.Success;
             }
