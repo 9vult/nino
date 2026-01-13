@@ -120,7 +120,7 @@ public static class CongaHelper
     public static string GetDot(Project project, Episode episode, bool forceAdditional = false)
     {
         var sb = new StringBuilder();
-        sb.AppendLine("digraph {");
+        sb.Append("digraph {");
 
         // Filter nodes
 
@@ -151,8 +151,8 @@ public static class CongaHelper
                 : "circle";
             var style = node.Type == CongaNodeType.AdditionalStaff ? "filled,dashed" : "filled";
 
-            sb.AppendLine(
-                $"    \"{node.Abbreviation}\" [style=\"{style}\" fillcolor={color}, shape={shape}, width=0.75];"
+            sb.Append(
+                $"\"{node.Abbreviation}\" [style=\"{style}\" fillcolor={color}, shape={shape}, width=0.75];"
             );
 
             var dependents = forceAdditional
@@ -164,11 +164,11 @@ public static class CongaHelper
 
             foreach (var dependent in dependents)
             {
-                sb.AppendLine($"    \"{node.Abbreviation}\" -> \"{dependent.Abbreviation}\";");
+                sb.Append($"\"{node.Abbreviation}\" -> \"{dependent.Abbreviation}\";");
             }
         }
 
-        sb.AppendLine("}");
-        return Uri.EscapeDataString(sb.ToString());
+        sb.Append('}');
+        return sb.ToString();
     }
 }
