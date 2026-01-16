@@ -90,7 +90,10 @@ public class Skip(DataContext db, InteractiveService interactive)
             project.AniListId is not null
             && project.AniListId > 0
             && Episode.EpisodeNumberIsInteger(episodeNumber, out var epNum)
-            && await AirDateService.EpisodeAired(project.AniListId.Value, epNum) == false
+            && await AirDateService.EpisodeAired(
+                project.AniListId.Value,
+                epNum + (project.AniListOffset ?? 0)
+            ) == false
         )
         {
             var (markDone, finalBody, questionMessage) = await Ask.AboutAction(
