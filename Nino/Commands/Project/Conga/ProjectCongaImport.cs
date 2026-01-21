@@ -81,6 +81,8 @@ public partial class ProjectManagement
 
                 if (current.StartsWith('$'))
                     currentType = CongaNodeType.Special;
+                else if (current.StartsWith('@'))
+                    currentType = CongaNodeType.Group;
                 else
                 {
                     if (project.KeyStaff.Any(ks => ks.Role.Abbreviation == current))
@@ -99,9 +101,9 @@ public partial class ProjectManagement
                 }
 
                 if (next.StartsWith('$'))
-                {
                     nextType = CongaNodeType.Special;
-                }
+                else if (next.StartsWith('@'))
+                    nextType = CongaNodeType.Group;
                 else
                 {
                     if (project.KeyStaff.Any(ks => ks.Role.Abbreviation == next))

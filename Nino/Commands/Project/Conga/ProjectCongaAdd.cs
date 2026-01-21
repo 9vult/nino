@@ -53,11 +53,13 @@ namespace Nino.Commands
 
                 // Validate tasks
 
-                var currentType = CongaNodeType.Unknown;
-                var nextType = CongaNodeType.Unknown;
+                CongaNodeType currentType;
+                CongaNodeType nextType;
 
                 if (current.StartsWith('$'))
                     currentType = CongaNodeType.Special;
+                else if (current.StartsWith('@'))
+                    currentType = CongaNodeType.Group;
                 else
                 {
                     if (project.KeyStaff.Any(ks => ks.Role.Abbreviation == current))
@@ -74,8 +76,11 @@ namespace Nino.Commands
                             interaction
                         );
                 }
+
                 if (next.StartsWith('$'))
                     nextType = CongaNodeType.Special;
+                else if (next.StartsWith('@'))
+                    nextType = CongaNodeType.Group;
                 else
                 {
                     if (project.KeyStaff.Any(ks => ks.Role.Abbreviation == next))

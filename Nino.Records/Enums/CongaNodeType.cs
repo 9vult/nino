@@ -5,5 +5,6 @@ public enum CongaNodeType
     KeyStaff = 0,
     AdditionalStaff = 1,
     Special = 2,
-    Unknown = 3,
+    Group = 3,
+    Unknown = 4,
 }

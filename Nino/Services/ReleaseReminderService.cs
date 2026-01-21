@@ -133,19 +133,12 @@ namespace Nino.Services
             if (project.CongaParticipants.Nodes.Count != 0)
             {
                 var staff = project.KeyStaff.Concat(episode.AdditionalStaff).ToList();
-                var validTargets = new HashSet<string>(
-                    staff
-                        .Select(ks => ks.Role.Abbreviation)
-                        .Where(ks =>
-                            episode.Tasks.FirstOrDefault(t => t.Abbreviation == ks)
-                                is { Done: false, LastReminded: null }
-                        )
-                );
 
-                var nodes = project
-                    .CongaParticipants.GetDependentsOf("$AIR")
-                    .Where(c => validTargets.Contains(c.Abbreviation))
-                    .ToList();
+                var airNode = project.CongaParticipants.Get("$AIR");
+                if (airNode is null)
+                    return;
+
+                var nodes = airNode.GetActivatedNodes(episode);
 
                 var pingTargets = nodes
                     .Select(c => staff.FirstOrDefault(ks => ks.Role.Abbreviation == c.Abbreviation))

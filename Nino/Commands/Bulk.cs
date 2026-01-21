@@ -212,87 +212,51 @@ public class Bulk(DataContext db, InteractiveService interactive)
         CongaPrefixType prefixMode
     )
     {
-        StringBuilder congaContent = new();
-
-        // Get all conga participants that the current task can call out
-        var congaCandidates =
-            project
-                .CongaParticipants.Get(abbreviation)
-                ?.Dependents.Where(dep =>
-                    episode.Tasks.Any(t => t.Abbreviation == dep.Abbreviation)
-                )
-                .ToList()
-            ?? []; // Limit to tasks in the episode
-
-        if (congaCandidates.Count == 0)
+        var completedNode = project.CongaParticipants.Get(abbreviation);
+        if (completedNode is null)
+            return string.Empty;
+        var activatedNodes = completedNode.GetActivatedNodes(episode);
+        if (activatedNodes.Count == 0)
             return string.Empty;
 
-        foreach (var candidate in congaCandidates)
-        {
-            var prereqs = candidate
-                .Prerequisites.Where(dep =>
-                    episode.Tasks.Any(t => t.Abbreviation == dep.Abbreviation)
-                )
-                .ToList();
-            var ping = true;
-            if (prereqs.Count > 1) // More than just this task
-            {
-                // Determine if the candidate's caller(s) (not this one) are all done
-                if (
-                    prereqs
-                        .Select(c => c.Abbreviation)
-                        .Where(c => c != abbreviation)
-                        .Any(c =>
-                            !episode.Tasks.FirstOrDefault(t => t.Abbreviation == c)?.Done ?? false
-                        )
-                )
-                    ping = false; // Not all caller(s) are done
-            }
-            if (!ping)
-                continue;
+        StringBuilder congaContent = new();
 
+        foreach (var node in activatedNodes)
+        {
             var nextTask = project
                 .KeyStaff.Concat(episode.AdditionalStaff)
-                .FirstOrDefault(ks => ks.Role.Abbreviation == candidate.Abbreviation);
-            if (nextTask == null)
+                .FirstOrDefault(ks => ks.Role.Abbreviation == node.Abbreviation);
+            if (nextTask is null)
                 continue;
 
-            // Skip task if task is done
-            if (
-                episode
-                    .Tasks.FirstOrDefault(t => t.Abbreviation == nextTask.Role.Abbreviation)
-                    ?.Done
-                ?? false
-            )
-                continue;
-
+            // Get the ID of the user to ping
             var userId =
                 episode
                     .PinchHitters.FirstOrDefault(t => t.Abbreviation == nextTask.Role.Abbreviation)
                     ?.UserId
                 ?? nextTask.UserId;
             var staffMention = $"<@{userId}>";
-            var roleTitle = nextTask.Role.Name;
+
+            // Optional prefix
             if (prefixMode != CongaPrefixType.None)
             {
-                // Using a switch expression in the middle of string interpolation is insane btw
-                congaContent.Append(
-                    $"[{prefixMode switch {
+                var prefix = prefixMode switch
+                {
                     CongaPrefixType.Nickname => project.Nickname,
                     CongaPrefixType.Title => project.Title,
-                    _ => string.Empty 
-                }}] "
-                );
+                    _ => string.Empty,
+                };
+                congaContent.Append($"[{prefix}] ");
             }
+
             congaContent.AppendLine(
-                T("progress.done.conga", lng, staffMention, episode.Number, roleTitle)
+                T("progress.done.conga", lng, staffMention, episode.Number, nextTask.Role.Name)
             );
 
-            var task = episode.Tasks.FirstOrDefault(t =>
-                t.Abbreviation == nextTask.Role.Abbreviation
-            );
-            if (task is not null)
-                task.LastReminded = DateTimeOffset.UtcNow;
+            // Update the last reminded timestamp
+            episode
+                .Tasks.FirstOrDefault(t => t.Abbreviation == node.Abbreviation)
+                ?.LastReminded = DateTimeOffset.UtcNow;
         }
 
         return congaContent.ToString();
