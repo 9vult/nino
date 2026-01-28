@@ -84,6 +84,11 @@ public class BlameAll(DataContext db, InteractiveService interactive)
         var pageLength = Math.Floor(episodes.Count / pageCount);
         var roundUp = episodes.Count % pageCount;
 
+        var firstUndoneIdx = episodes.TakeWhile(e => e.Done).Count();
+        if (firstUndoneIdx >= episodes.Count)
+            firstUndoneIdx = 0;
+        var startPage = Math.Max(Math.Ceiling(firstUndoneIdx / pageLength) - 1, 0); // 0-indexed
+
         // Build the paginator
         var paginator = new LazyPaginatorBuilder()
             .AddUser(Context.User)
@@ -115,6 +120,7 @@ public class BlameAll(DataContext db, InteractiveService interactive)
                     .WithDescription(progress)
                     .WithCurrentTimestamp();
             })
+            .WithStartPageIndex((int)startPage)
             .WithMaxPageIndex((int)pageCount - 1)
             .AddOption(new Emoji("◀"), PaginatorAction.Backward, ButtonStyle.Secondary)
             .AddOption(new Emoji("▶"), PaginatorAction.Forward, ButtonStyle.Secondary)
