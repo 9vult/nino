@@ -14,7 +14,7 @@ Despite there being a single `/project create` command, it actually takes a few 
 
 Some additional setup options:
 
-- If you want subsequent Key Staff members to be notified when the preceeding task is completed, use `/project conga add`.
+- If you want subsequent Key Staff members to be notified when the preceding task is completed, use `/project conga add`.
 - If you would like air times to be displayed in /blame embeds, use `/project edit` to set the `AniDB ID` and `Air Time 24h` properties.
     - If you would like to be notified when an episode airs, use `/project airreminder enable`.
 - You might want to use `/project alias add` to add aliases. These aliases can be used as alternatives to the project's nickname for most commands.
@@ -59,7 +59,7 @@ Set the weight of an Additional Staff position. The weight determines the order 
 
 Check on the status of a project. May include observed projects if the `blame` flag was set during observer creation. Defaults to the current "working episode", but any episode can be requested using the `episode` option.
 
-Additionally, an explanitory version of the embed can be requested using the `explain` option.
+Additionally, an explanatory version of the embed can be requested using the `explain` option.
 
 ### blameall
 
@@ -158,11 +158,14 @@ List all the links in the project's Conga line.
 
 #### project conga remove
 
-Remvove a link from the Conga line.
+Remove a link from the Conga line.
 
 #### project create
 
 Scaffold a new project. See [Getting Started](#getting-started) for tips.
+
+For the differences between a public project and a private project, see
+[Privacy Settings](#privacy-settings).
 
 Note that only users with discord server administrator permissions can create projects. You can [transfer](#project-transferownership) the project to someone if this poses an issue.
 
@@ -172,7 +175,7 @@ Delete a project. Will also remove all observers observing the project.
 
 #### project edit
 
-Edit the project. This is also where you can change privacy settings and add the series' AniDB ID and air time.
+Edit the project. This is also where you can change [privacy settings](#privacy-settings) and add the series' AniDB ID and air time.
 
 The MOTD option can be reset by setting it to a hyphen (`-`).
 
@@ -212,7 +215,7 @@ Control how Nino's replies to [/done](#done), etc look. For example, add a blame
 
 #### server display updates
 
-Control how updates in the Progress channel look. For example, set it to use the [explanitory blame](#blame) format instead of the short format.
+Control how updates in the Progress channel look. For example, set it to use the [explanatory blame](#blame) format instead of the short format.
 
 #### server conga-prefix
 
@@ -229,3 +232,19 @@ Skip a task. Considers the task complete.
 ### Undone
 
 Mark a task as not done.
+
+## Privacy Settings
+
+A project can be either public or private. A private project is designed to be
+less visible to users who are not working on it.
+
+1. Private projects will not appear in autocomplete suggestions (e.g., when
+  typing [`/blame`](#blame) or [`/done`](#done)) for users who are not involved
+  with the project.
+2. Users cannot [observe](#observer-add) the project unless they are a member of
+  the project staff or an administrator. Note that if the project used to be
+  public, any existing observers will continue to function unless the updates
+  are disabled via `/server display publish-private-progress`.
+3. By default, Nino will still post progress updates for private projects to the
+  configured update channel. However, there is the option to disable these
+  updates globally for the server with `/server display publish-private-progress`.
