@@ -107,7 +107,7 @@ public class CongaNode
                     // Otherwise, only ping non-members
                     result.AddRange(
                         dependent.Dependents.Where(d =>
-                            !members.Contains(d) && !d.IsComplete(episode)
+                            !members.Contains(d) && !d.IsComplete(episode) && d.CanActivate(episode)
                         )
                     );
                     break;
