@@ -5,4 +5,11 @@
     <Nullable>enable</Nullable>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Discord.Net.Core" />
+    <PackageReference Include="Discord.Net.Interactions" />
+    <PackageReference Include="Discord.Net.WebSocket" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
+  </ItemGroup>
 </Project>

@@ -6,11 +6,18 @@
   <ItemGroup>
     <PackageVersion Include="Ben.Demystifier" Version="0.4.1" />
     <PackageVersion Include="CSharpier.MsBuild" Version="1.2.1" />
+    <PackageVersion Include="Discord.Net.Core" Version="3.18.0" />
+    <PackageVersion Include="Discord.Net.Interactions" Version="3.18.0" />
+    <PackageVersion Include="Discord.Net.WebSocket" Version="3.18.0" />
     <PackageVersion Include="GitInfo" Version="3.3.5" />
     <PackageVersion Include="ICU4N" Version="60.1.0-alpha.439" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.3" />
-    <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.0" />
-    <PackageVersion Include="NLog" Version="6.0.6" />
-    <PackageVersion Include="NLog.Extensions.Logging" Version="6.1.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Abstractions" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.3" />
+    <PackageVersion Include="NLog" Version="6.1.0" />
+    <PackageVersion Include="NLog.Extensions.Hosting" Version="6.1.1" />
+    <PackageVersion Include="NLog.Extensions.Logging" Version="6.1.1" />
   </ItemGroup>
 </Project>
