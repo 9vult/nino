@@ -1,0 +1,15 @@
+// SPDX-License-Identifier: MPL-2.0
+
+namespace Nino.Core.Entities;
+
+/// <summary>
+/// A position
+/// </summary>
+public class Staff
+{
+    [Key]
+    public Guid Id { get; set; }
+    public required ulong UserId { get; set; }
+    public required Role Role { get; set; }
+    public required bool IsPseudo { get; set; } = false;
+}

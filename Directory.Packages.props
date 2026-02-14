@@ -8,6 +8,7 @@
     <PackageVersion Include="CSharpier.MsBuild" Version="1.2.1" />
     <PackageVersion Include="GitInfo" Version="3.3.5" />
     <PackageVersion Include="ICU4N" Version="60.1.0-alpha.439" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.3" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.0" />
     <PackageVersion Include="NLog" Version="6.0.6" />
     <PackageVersion Include="NLog.Extensions.Logging" Version="6.1.0" />
