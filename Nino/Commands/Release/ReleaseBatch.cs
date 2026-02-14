@@ -107,6 +107,10 @@ public partial class Release
             .Build();
         await interaction.FollowupAsync(embed: replyEmbed);
 
+        Log.Info(
+            $"M[{interaction.User.Id} (@{interaction.User.Username})] released {project} batch {first}-{last}"
+        );
+
         return ExecutionResult.Success;
     }
 }
