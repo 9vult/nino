@@ -5,4 +5,8 @@
     <Nullable>enable</Nullable>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="ICU4N" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
+  </ItemGroup>
 </Project>
