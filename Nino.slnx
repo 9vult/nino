@@ -1,5 +1,4 @@
 <Solution>
-  <Project Path="Localizer/Localizer.csproj" />
-  <Project Path="Nino.Records/Nino.Records.csproj" />
-  <Project Path="Nino/Nino.csproj" />
+  <Project Path="Nino.Host/Nino.Host.csproj" />
+  <Project Path="Nino.Localization/Nino.Localization.csproj" />
 </Solution>
