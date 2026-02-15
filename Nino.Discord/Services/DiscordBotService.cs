@@ -4,32 +4,28 @@ using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Nino.Discord.Handlers;
 
 namespace Nino.Discord.Services;
 
-public class DiscordBotService(ILogger<DiscordBotService> logger, IOptions<DiscordSettings> options)
-    : IHostedService
+public class DiscordBotService(
+    DiscordSocketClient client,
+    InteractionHandler interactionHandler,
+    ILogger<DiscordBotService> logger,
+    IOptions<DiscordSettings> options
+) : IHostedService
 {
-    private static readonly DiscordSocketConfig SocketConfig = new()
-    {
-        LogLevel = LogSeverity.Info,
-        GatewayIntents =
-            GatewayIntents.AllUnprivileged
-            ^ GatewayIntents.GuildScheduledEvents
-            ^ GatewayIntents.GuildInvites,
-    };
-    private readonly DiscordSocketClient _client = new(SocketConfig);
-    private readonly DiscordSettings _settings = options.Value;
-
     /// <inheritdoc />
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         logger.LogInformation("Starting Nino Discord Bot...");
-        _client.Ready += OnReady;
-        _client.Log += OnLog;
+        client.Ready += OnReady;
+        client.Log += OnLog;
 
-        await _client.LoginAsync(TokenType.Bot, _settings.Token);
-        await _client.StartAsync();
+        await interactionHandler.InitializeAsync();
+
+        await client.LoginAsync(TokenType.Bot, options.Value.Token);
+        await client.StartAsync();
     }
 
     /// <inheritdoc />
@@ -37,8 +33,8 @@ public class DiscordBotService(ILogger<DiscordBotService> logger, IOptions<Disco
     {
         logger.LogInformation("Stopping Nino Discord Bot...");
 
-        await _client.LogoutAsync();
-        await _client.StopAsync();
+        await client.LogoutAsync();
+        await client.StopAsync();
     }
 
     private Task OnLog(LogMessage msg)
@@ -65,7 +61,7 @@ public class DiscordBotService(ILogger<DiscordBotService> logger, IOptions<Disco
     {
         logger.LogInformation(
             "Successfully logged in to Discord as {Username}",
-            _client.CurrentUser.Username
+            client.CurrentUser.Username
         );
         return Task.CompletedTask;
     }

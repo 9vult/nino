@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Nino.Data;
-using Nino.Discord;
 using Nino.Discord.Services;
 using Nino.Host;
 using NLog.Extensions.Hosting;
@@ -33,12 +32,10 @@ var builder = Host.CreateDefaultBuilder(args)
     .ConfigureServices(
         (context, services) =>
         {
-            services.Configure<DiscordSettings>(context.Configuration.GetSection("Discord"));
             services.AddDbContext<DataContext>(options =>
                 options.UseSqlite(context.Configuration.GetConnectionString("DefaultConnection"))
             );
-
-            services.AddHostedService<DiscordBotService>();
+            services.AddDiscordBotService(context.Configuration);
         }
     );
 
