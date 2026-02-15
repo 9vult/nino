@@ -4,7 +4,7 @@ using Nino.Core.Entities;
 
 namespace Nino.Core.Dtos;
 
-public class StaffCreateDto
+public sealed class StaffCreateDto
 {
     public required ulong UserId { get; set; }
     public required Role Role { get; set; }

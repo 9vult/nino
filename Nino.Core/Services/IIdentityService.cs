@@ -22,4 +22,12 @@ public interface IIdentityService
     /// <returns>Group ID</returns>
     /// <remarks>Creates a new <see cref="Group"/> if not found</remarks>
     Task<Guid> GetOrCreateGroupByDiscordIdAsync(ulong discordId);
+
+    /// <summary>
+    /// Get the <see cref="Channel"/> ID for a given Discord ID
+    /// </summary>
+    /// <param name="discordId">Discord channel ID</param>
+    /// <returns>Channel ID</returns>
+    /// <remarks>Creates a new <see cref="Channel"/> if not found</remarks>
+    Task<Guid> GetOrCreateChannelByDiscordIdAsync(ulong discordId);
 }

@@ -40,6 +40,10 @@ internal sealed class LogProvider
             FileName = Path.Combine("logs", $"{DateTime.Now:yyyy-MM-dd}.jsonl"),
         };
 
+        config.LoggingRules.Add(
+            new LoggingRule("Microsoft.*", LogLevel.Info, LogLevel.Debug, new NullTarget())
+        );
+
         config.AddTarget("console", consoleTarget);
         config.AddTarget("file", fileTarget);
 

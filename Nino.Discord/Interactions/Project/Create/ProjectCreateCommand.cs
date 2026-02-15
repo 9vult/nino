@@ -2,19 +2,21 @@
 
 using Discord;
 using Discord.Interactions;
+using Nino.Core.Actions.Project.Create;
+using Nino.Core.Dtos;
 using Nino.Core.Enums;
 
 namespace Nino.Discord.Interactions.Project;
 
 public partial class ProjectModule
 {
-    [SlashCommand("delete", "Delete a project")]
+    [SlashCommand("create", "Create a project")]
     public async Task<RuntimeResult> CreateAsync(
         string nickname,
-        string anilistId,
+        int anilistId,
         bool isPrivate,
         [ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel updateChannel,
-        [ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel releasesChannel,
+        [ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel releaseChannel,
         string? title = null,
         ProjectType? type = null,
         [MinValue(1)] int? length = null,
@@ -24,6 +26,58 @@ public partial class ProjectModule
     {
         var interaction = Context.Interaction;
         var lng = interaction.UserLocale;
+
+        var guild = client.GetGuild(interaction.GuildId!.Value);
+        var member = guild.GetUser(interaction.User.Id);
+
+        // Verify user - Administrator required
+        var (userId, groupId) = await interactionIdService.GetUserAndGroupAsync(interaction);
+        if (
+            !member.GuildPermissions.Administrator // Discord admin
+            && !await verificationService.VerifyGroupPermissionsAsync(
+                groupId,
+                userId,
+                PermissionsLevel.Administrator
+            )
+        )
+            return await interaction.FailAsync("");
+
+        var updateChannelId = await identityService.GetOrCreateChannelByDiscordIdAsync(
+            updateChannel.Id
+        );
+        var releaseChannelId = await identityService.GetOrCreateChannelByDiscordIdAsync(
+            releaseChannel.Id
+        );
+
+        var dto = new ProjectCreateDto
+        {
+            Nickname = nickname,
+            AniListId = anilistId,
+            IsPrivate = isPrivate,
+            UpdateChannelId = updateChannelId,
+            ReleaseChannelId = releaseChannelId,
+            Title = title,
+            Type = type,
+            Length = length,
+            PosterUri = posterUri,
+            FirstEpisode = firstEpisode,
+        };
+
+        var response = await createHandler.HandleAsync(
+            new ProjectCreateAction(dto, groupId, userId)
+        );
+
+        switch (response.Status)
+        {
+            case ActionStatus.Success:
+                await interaction.FollowupAsync("Created project");
+                break;
+            case ActionStatus.Conflict:
+                await interaction.FollowupAsync("Conflicting project");
+                break;
+            case ActionStatus.Error:
+                break;
+        }
 
         return ExecutionResult.Success;
     }

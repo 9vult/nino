@@ -4,7 +4,7 @@ using Nino.Core.Entities;
 
 namespace Nino.Core.Dtos;
 
-public class ExportDto
+public sealed class ExportDto
 {
     public required Project Project { get; init; }
     public required Episode[] Episodes { get; init; }

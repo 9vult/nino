@@ -8,6 +8,7 @@ public class Channel
     public Guid Id { get; set; }
     public Guid GroupId { get; set; }
     public required ulong DiscordId { get; set; }
+    public required DateTimeOffset CreatedAt { get; set; }
 
     /// <inheritdoc />
     public override string ToString()

@@ -9,7 +9,7 @@ public class UserVerificationService(DataContext db, ILogger<UserVerificationSer
     : IUserVerificationService
 {
     /// <inheritdoc />
-    public async Task<bool> VerifyPermissionsAsync(
+    public async Task<bool> VerifyProjectPermissionsAsync(
         Guid projectId,
         Guid userId,
         PermissionsLevel minimumPermissions
@@ -22,12 +22,30 @@ public class UserVerificationService(DataContext db, ILogger<UserVerificationSer
             return false;
         }
 
-        var effectivePermissions = await GetPermissionsLevelAsync(project, userId);
+        var effectivePermissions = await GetProjectPermissionsAsync(project, userId);
         return effectivePermissions >= minimumPermissions;
     }
 
     /// <inheritdoc />
-    public async Task<PermissionsLevel> GetPermissionsLevelAsync(Project project, Guid userId)
+    public async Task<bool> VerifyGroupPermissionsAsync(
+        Guid groupId,
+        Guid userId,
+        PermissionsLevel minimumPermissions
+    )
+    {
+        var group = await db.Groups.SingleOrDefaultAsync(g => g.Id == groupId);
+        if (group is null)
+        {
+            logger.LogWarning("Group {GroupId} was not found", groupId);
+            return false;
+        }
+
+        var effectivePermissions = GetGroupPermissions(group, userId);
+        return effectivePermissions >= minimumPermissions;
+    }
+
+    /// <inheritdoc />
+    public async Task<PermissionsLevel> GetProjectPermissionsAsync(Project project, Guid userId)
     {
         if (project.OwnerId == userId)
             return PermissionsLevel.Owner;
@@ -56,5 +74,13 @@ public class UserVerificationService(DataContext db, ILogger<UserVerificationSer
             return PermissionsLevel.Staff;
 
         return project.IsPrivate ? PermissionsLevel.None : PermissionsLevel.User;
+    }
+
+    /// <inheritdoc />
+    public PermissionsLevel GetGroupPermissions(Group group, Guid userId)
+    {
+        return group.Configuration.Administrators.Any(a => a.UserId == userId)
+            ? PermissionsLevel.Administrator
+            : PermissionsLevel.User;
     }
 }

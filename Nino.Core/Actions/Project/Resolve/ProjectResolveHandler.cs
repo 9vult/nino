@@ -32,7 +32,7 @@ public class ProjectResolveHandler(
 
         if (
             !project.IsPrivate
-            || await verificationService.VerifyPermissionsAsync(
+            || await verificationService.VerifyProjectPermissionsAsync(
                 project.Id,
                 action.RequestedBy,
                 PermissionsLevel.Staff

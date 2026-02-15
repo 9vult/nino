@@ -14,8 +14,21 @@ public interface IUserVerificationService
     /// <param name="userId">User ID</param>
     /// <param name="minimumPermissions">Level of permissions required</param>
     /// <returns><see langword="true"/> if the user has the required <paramref name="minimumPermissions"/></returns>
-    Task<bool> VerifyPermissionsAsync(
+    Task<bool> VerifyProjectPermissionsAsync(
         Guid projectId,
+        Guid userId,
+        PermissionsLevel minimumPermissions
+    );
+
+    /// <summary>
+    /// Check if the user meets the minimum permissions for an action
+    /// </summary>
+    /// <param name="groupId">Group ID</param>
+    /// <param name="userId">User ID</param>
+    /// <param name="minimumPermissions">Level of permissions required</param>
+    /// <returns><see langword="true"/> if the user has the required <paramref name="minimumPermissions"/></returns>
+    Task<bool> VerifyGroupPermissionsAsync(
+        Guid groupId,
         Guid userId,
         PermissionsLevel minimumPermissions
     );
@@ -26,5 +39,13 @@ public interface IUserVerificationService
     /// <param name="project">Project</param>
     /// <param name="userId">User ID</param>
     /// <returns>Effective permissions level</returns>
-    Task<PermissionsLevel> GetPermissionsLevelAsync(Project project, Guid userId);
+    Task<PermissionsLevel> GetProjectPermissionsAsync(Project project, Guid userId);
+
+    /// <summary>
+    /// Get the effective permissions level for a user
+    /// </summary>
+    /// <param name="group">Group</param>
+    /// <param name="userId">User ID</param>
+    /// <returns>Effective permissions level</returns>
+    PermissionsLevel GetGroupPermissions(Group group, Guid userId);
 }

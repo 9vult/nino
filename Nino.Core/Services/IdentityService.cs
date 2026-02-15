@@ -22,10 +22,9 @@ public class IdentityService(DataContext db, ILogger<IdentityService> logger) : 
             Id = Guid.NewGuid(),
             Name = discordName,
             DiscordId = discordId,
-            CreatedAt = DateTimeOffset.Now,
+            CreatedAt = DateTimeOffset.UtcNow,
         };
-
-        db.Users.Add(user);
+        await db.Users.AddAsync(user);
 
         try
         {
@@ -57,8 +56,10 @@ public class IdentityService(DataContext db, ILogger<IdentityService> logger) : 
         {
             Id = Guid.NewGuid(),
             DiscordId = discordId,
-            CreatedAt = DateTimeOffset.Now,
+            CreatedAt = DateTimeOffset.UtcNow,
+            Configuration = Configuration.CreateDefault(),
         };
+        await db.Groups.AddAsync(group);
 
         try
         {
@@ -70,7 +71,53 @@ public class IdentityService(DataContext db, ILogger<IdentityService> logger) : 
         {
             // Race condition handler
             var existing = await db.Groups.SingleAsync(g => g.DiscordId == discordId);
-            logger.LogTrace("Resolved Discord ID {DiscordId} to group {User}", discordId, group);
+            logger.LogTrace("Resolved Discord ID {DiscordId} to group {Group}", discordId, group);
+            return existing.Id;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<Guid> GetOrCreateChannelByDiscordIdAsync(ulong discordId)
+    {
+        var channel = await db.Channels.SingleOrDefaultAsync(c => c.DiscordId == discordId);
+
+        if (channel is not null)
+        {
+            logger.LogTrace(
+                "Resolved Discord ID {DiscordId} to channel {Channel}",
+                discordId,
+                channel
+            );
+            return channel.Id;
+        }
+
+        channel = new Channel
+        {
+            Id = Guid.NewGuid(),
+            DiscordId = discordId,
+            CreatedAt = DateTimeOffset.UtcNow,
+        };
+        await db.Channels.AddAsync(channel);
+
+        try
+        {
+            await db.SaveChangesAsync();
+            logger.LogTrace(
+                "Created channel {Channel} for Discord ID {DiscordId}",
+                channel,
+                discordId
+            );
+            return channel.Id;
+        }
+        catch (DbUpdateException)
+        {
+            // Race condition handler
+            var existing = await db.Channels.SingleAsync(c => c.DiscordId == discordId);
+            logger.LogTrace(
+                "Resolved Discord ID {DiscordId} to channel {Channel}",
+                discordId,
+                channel
+            );
             return existing.Id;
         }
     }

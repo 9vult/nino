@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Nino.Core;
+using Nino.Core.Actions.Project.Create;
 using Nino.Core.Actions.Project.Delete;
 using Nino.Core.Actions.Project.Resolve;
 using Nino.Core.Events;
@@ -14,6 +15,7 @@ using Nino.Discord;
 using Nino.Discord.Services;
 using Nino.Host;
 using NLog.Extensions.Hosting;
+using NLog.Extensions.Logging;
 
 LogProvider.Setup();
 var builder = Host.CreateDefaultBuilder(args)
@@ -31,9 +33,19 @@ var builder = Host.CreateDefaultBuilder(args)
     .ConfigureLogging(logging =>
     {
         logging.ClearProviders();
-        logging.SetMinimumLevel(LogLevel.Trace);
+        logging.SetMinimumLevel(LogLevel.Debug);
+        logging.AddFilter<NLogLoggerProvider>("Microsoft.EntityFrameworkCore", LogLevel.Warning);
+        logging.AddFilter<NLogLoggerProvider>(
+            "Microsoft.EntityFrameworkCore.Database",
+            LogLevel.Warning
+        );
+        logging.AddFilter<NLogLoggerProvider>("System.Net.Http.HttpClient", LogLevel.Warning);
+        logging.AddFilter<NLogLoggerProvider>(
+            "Microsoft.Extensions.Http.DefaultHttpClientFactory",
+            LogLevel.Warning
+        );
+        logging.AddNLog();
     })
-    .UseNLog()
     .ConfigureServices(
         (context, services) =>
         {
@@ -49,9 +61,17 @@ var builder = Host.CreateDefaultBuilder(args)
 
             // Action handlers
             services.AddScoped<ProjectResolveHandler>();
+            services.AddScoped<ProjectCreateHandler>();
             services.AddScoped<ProjectDeleteHandler>();
         }
     );
 
 var host = builder.Build();
+
+using (var scope = host.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<DataContext>();
+    await db.Database.MigrateAsync();
+}
+
 await host.RunAsync();

@@ -8,7 +8,7 @@ using Nino.Core.Entities;
 
 namespace Nino.Core;
 
-public class DataContext : DbContext
+public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
 {
     private static readonly JsonSerializerOptions JsonSerializerOptions = new();
 
@@ -65,6 +65,19 @@ public class DataContext : DbContext
                 c =>
                 {
                     c.WithOwner().HasForeignKey("GroupId");
+                    c.OwnsMany(
+                        e => e.Administrators,
+                        s =>
+                        {
+                            s.WithOwner().HasForeignKey("GroupId");
+                            s.HasOne(a => a.User)
+                                .WithMany()
+                                .HasForeignKey(a => a.UserId)
+                                .IsRequired();
+                            s.Navigation(a => a.User).AutoInclude();
+                        }
+                    );
+                    c.Navigation(p => p.Administrators).AutoInclude();
                 }
             );
             group.Navigation(g => g.Configuration).AutoInclude();

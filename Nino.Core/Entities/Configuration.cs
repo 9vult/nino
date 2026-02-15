@@ -10,8 +10,6 @@ namespace Nino.Core.Entities;
 /// </summary>
 public class Configuration
 {
-    [Key]
-    public Guid Id { get; set; }
     public required ProgressResponseType ProgressResponseType { get; set; }
     public required ProgressPublishType ProgressPublishType { get; set; }
     public required CongaPrefixType CongaPrefix { get; set; }
@@ -21,7 +19,6 @@ public class Configuration
     public Locale Locale { get; set; }
     public bool PublishPrivateProgress { get; set; }
 
-    public Group Group { get; set; } = null!;
     public ICollection<Administrator> Administrators { get; set; } = [];
 
     public static Configuration CreateDefault()

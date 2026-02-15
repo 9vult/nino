@@ -16,7 +16,7 @@ public partial class ProjectModule
         var lng = interaction.UserLocale;
 
         // Verify project and user - Owner required
-        var (userId, groupId) = await identityService.GetUserAndGroupAsync(interaction);
+        var (userId, groupId) = await interactionIdService.GetUserAndGroupAsync(interaction);
         var projectResolution = await projectResolver.HandleAsync(
             new ProjectResolveAction(alias, groupId, userId)
         );
@@ -26,7 +26,7 @@ public partial class ProjectModule
 
         var projectId = projectResolution.ProjectId!.Value;
 
-        var isVerified = await verificationService.VerifyPermissionsAsync(
+        var isVerified = await verificationService.VerifyProjectPermissionsAsync(
             projectId,
             userId,
             PermissionsLevel.Owner
