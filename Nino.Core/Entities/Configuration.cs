@@ -12,7 +12,6 @@ public class Configuration
 {
     [Key]
     public Guid Id { get; set; }
-    public required ulong GuildId { get; set; }
     public required ProgressResponseType ProgressResponseType { get; set; }
     public required ProgressPublishType ProgressPublishType { get; set; }
     public required CongaPrefixType CongaPrefix { get; set; }
@@ -22,13 +21,13 @@ public class Configuration
     public Locale Locale { get; set; }
     public bool PublishPrivateProgress { get; set; }
 
-    public ICollection<Administrator> Administrators { get; set; } = new List<Administrator>();
+    public Group Group { get; set; } = null!;
+    public ICollection<Administrator> Administrators { get; set; } = [];
 
-    public static Configuration CreateDefault(ulong guildId)
+    public static Configuration CreateDefault()
     {
         return new Configuration
         {
-            GuildId = guildId,
             ProgressResponseType = ProgressResponseType.Succinct,
             ProgressPublishType = ProgressPublishType.Normal,
             CongaPrefix = CongaPrefixType.None,

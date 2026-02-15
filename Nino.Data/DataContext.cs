@@ -13,34 +13,18 @@ public class DataContext : DbContext
 {
     private static readonly JsonSerializerOptions JsonSerializerOptions = new();
 
-    /// <summary>
-    /// Projects table
-    /// </summary>
+    public DbSet<User> Users { get; set; }
+    public DbSet<Group> Groups { get; set; }
+    public DbSet<Channel> Channels { get; set; }
+
     public DbSet<Project> Projects { get; set; }
-
-    /// <summary>
-    /// Episodes table
-    /// </summary>
     public DbSet<Episode> Episodes { get; set; }
-
-    /// <summary>
-    /// Observers table
-    /// </summary>
     public DbSet<Observer> Observers { get; set; }
-
-    /// <summary>
-    /// Server configuration table
-    /// </summary>
     public DbSet<Configuration> Configurations { get; set; }
 
     private static readonly ValueConverter<ulong, string> UlongStringConverter = new(
         v => v.ToString(CultureInfo.InvariantCulture),
         v => ulong.Parse(v, CultureInfo.InvariantCulture)
-    );
-
-    private static readonly ValueConverter<ulong?, string?> NullableUlongStringConverter = new(
-        v => v.HasValue ? v.Value.ToString(CultureInfo.InvariantCulture) : null,
-        v => v != null ? ulong.Parse(v, CultureInfo.InvariantCulture) : null
     );
 
     private static readonly ValueConverter<CongaGraph, string> CongaGraphConverter = new(
@@ -57,119 +41,173 @@ public class DataContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        // User
+
+        modelBuilder.Entity<User>(user =>
+        {
+            user.Property(p => p.DiscordId).HasConversion(UlongStringConverter);
+        });
+
+        // Channel
+
+        modelBuilder.Entity<Channel>(channel =>
+        {
+            channel.Property(p => p.DiscordId).HasConversion(UlongStringConverter);
+        });
+
+        // Group
+
+        modelBuilder.Entity<Group>(group =>
+        {
+            group.Property(p => p.DiscordId).HasConversion(UlongStringConverter);
+
+            group.OwnsOne<Configuration>(
+                g => g.Configuration,
+                c =>
+                {
+                    c.WithOwner().HasForeignKey("GroupId");
+                }
+            );
+            group.Navigation(g => g.Configuration).AutoInclude();
+        });
+
         // Project
 
-        modelBuilder.Entity<Project>(entity =>
+        modelBuilder.Entity<Project>(project =>
         {
-            entity.Property(p => p.GuildId).HasConversion(UlongStringConverter);
-            entity.Property(p => p.OwnerId).HasConversion(UlongStringConverter);
-            entity.Property(p => p.UpdateChannelId).HasConversion(UlongStringConverter);
-            entity.Property(p => p.ReleaseChannelId).HasConversion(UlongStringConverter);
+            project.Property(p => p.Nickname).UseCollation("NOCASE");
+            project.OwnsMany(p => p.Aliases, b => b.Property(a => a.Value).UseCollation("NOCASE"));
 
-            entity
-                .Property(p => p.AirReminderChannelId)
-                .HasConversion(NullableUlongStringConverter);
-            entity.Property(p => p.AirReminderRoleId).HasConversion(NullableUlongStringConverter);
-            entity.Property(p => p.AirReminderUserId).HasConversion(NullableUlongStringConverter);
-            entity
-                .Property(p => p.CongaReminderChannelId)
-                .HasConversion(NullableUlongStringConverter);
-
-            entity
+            project
                 .Property(p => p.CongaParticipants)
                 .HasConversion(CongaGraphConverter)
                 .HasColumnType("TEXT");
 
-            entity.Property(p => p.Nickname).UseCollation("NOCASE");
-
-            entity.OwnsMany(p => p.Administrators);
-            entity.OwnsMany(
-                p => p.Aliases,
-                b =>
+            project.OwnsMany(
+                e => e.KeyStaff,
+                s =>
                 {
-                    b.Property(a => a.Value).UseCollation("NOCASE");
-                }
-            );
-            entity.OwnsMany(
-                p => p.KeyStaff,
-                b =>
-                {
-                    b.Property(s => s.UserId).HasConversion(UlongStringConverter);
+                    s.WithOwner().HasForeignKey("ProjectId");
+                    s.HasOne(a => a.User).WithMany().HasForeignKey(a => a.UserId).IsRequired();
+                    s.Navigation(a => a.User).AutoInclude();
                 }
             );
 
-            entity
-                .HasMany(p => p.Episodes)
-                .WithOne(e => e.Project)
-                .OnDelete(DeleteBehavior.Cascade);
-            entity
-                .HasMany(p => p.Observers)
-                .WithOne(o => o.Project)
+            project.OwnsMany(
+                e => e.Administrators,
+                s =>
+                {
+                    s.WithOwner().HasForeignKey("ProjectId");
+                    s.HasOne(a => a.User).WithMany().HasForeignKey(a => a.UserId).IsRequired();
+                    s.Navigation(a => a.User).AutoInclude();
+                }
+            );
+
+            project
+                .HasOne(p => p.Owner)
+                .WithMany()
+                .HasForeignKey(p => p.OwnerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            project
+                .HasOne(p => p.Group)
+                .WithMany(g => g.Projects)
+                .HasForeignKey(p => p.GroupId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            entity.Navigation(o => o.KeyStaff).AutoInclude();
-            entity.Navigation(o => o.Administrators).AutoInclude();
-            entity.Navigation(o => o.Aliases).AutoInclude();
+            project
+                .HasOne(p => p.UpdateChannel)
+                .WithMany()
+                .HasForeignKey(p => p.UpdateChannelId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            project
+                .HasOne(p => p.ReleaseChannel)
+                .WithMany()
+                .HasForeignKey(p => p.ReleaseChannelId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            project
+                .HasOne(p => p.CongaReminderChannel)
+                .WithMany()
+                .HasForeignKey(p => p.CongaReminderChannelId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            project
+                .HasOne(p => p.AirReminderChannel)
+                .WithMany()
+                .HasForeignKey(p => p.AirReminderChannelId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         // Episode
-
-        modelBuilder.Entity<Episode>(entity =>
+        modelBuilder.Entity<Episode>(episode =>
         {
-            entity.Property(e => e.GuildId).HasConversion(UlongStringConverter);
+            episode
+                .HasOne(e => e.Project)
+                .WithMany(p => p.Episodes)
+                .HasForeignKey(e => e.ProjectId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            entity.Property(e => e.Updated).HasColumnType("TEXT");
+            episode
+                .HasOne(e => e.Group)
+                .WithMany()
+                .HasForeignKey(e => e.GroupId)
+                .OnDelete(DeleteBehavior.NoAction);
 
-            entity.OwnsMany(e => e.PinchHitters);
-            entity.OwnsMany(
+            episode.OwnsMany(
                 e => e.Tasks,
-                b =>
+                t =>
                 {
-                    b.Property(t => t.Updated).HasColumnType("TEXT");
-                    b.Property(t => t.LastReminded).HasColumnType("TEXT");
+                    t.WithOwner().HasForeignKey("EpisodeId");
                 }
             );
 
-            entity.OwnsMany(
+            episode.OwnsMany(
                 e => e.AdditionalStaff,
-                b =>
+                s =>
                 {
-                    b.Property(s => s.UserId).HasConversion(UlongStringConverter);
+                    s.WithOwner().HasForeignKey("EpisodeId");
+                    s.HasOne(a => a.User).WithMany().HasForeignKey(a => a.UserId).IsRequired();
+                    s.Navigation(a => a.User).AutoInclude();
                 }
             );
 
-            entity.Navigation(e => e.AdditionalStaff).AutoInclude();
-            entity.Navigation(e => e.Tasks).AutoInclude();
-            entity.Navigation(e => e.PinchHitters).AutoInclude();
+            episode.OwnsMany(
+                e => e.PinchHitters,
+                s =>
+                {
+                    s.WithOwner().HasForeignKey("EpisodeId");
+                    s.HasOne(a => a.User).WithMany().HasForeignKey(a => a.UserId).IsRequired();
+                    s.Navigation(a => a.User).AutoInclude();
+                }
+            );
         });
 
         // Observer
 
-        modelBuilder.Entity<Observer>(entity =>
+        modelBuilder.Entity<Observer>(observer =>
         {
-            entity.Property(o => o.GuildId).HasConversion(UlongStringConverter);
-            entity.Property(o => o.OriginGuildId).HasConversion(UlongStringConverter);
-            entity.Property(o => o.OwnerId).HasConversion(UlongStringConverter);
-            entity.Property(o => o.RoleId).HasConversion(NullableUlongStringConverter);
-
-            entity.Navigation(o => o.Project).AutoInclude();
-        });
-
-        // Configuration
-
-        modelBuilder.Entity<Configuration>(entity =>
-        {
-            entity.Property(o => o.GuildId).HasConversion(UlongStringConverter);
-
-            entity.OwnsMany(
-                c => c.Administrators,
-                b =>
-                {
-                    b.Property(s => s.UserId).HasConversion(UlongStringConverter);
-                }
-            );
-
-            entity.Navigation(o => o.Administrators).AutoInclude();
+            observer
+                .HasOne(e => e.Project)
+                .WithMany(p => p.Observers)
+                .HasForeignKey(e => e.ProjectId)
+                .OnDelete(DeleteBehavior.Cascade);
+            observer
+                .HasOne(e => e.Group)
+                .WithMany()
+                .HasForeignKey(e => e.GroupId)
+                .OnDelete(DeleteBehavior.Cascade);
+            observer
+                .HasOne(e => e.OriginGroup)
+                .WithMany()
+                .HasForeignKey(e => e.OriginGroupId)
+                .OnDelete(DeleteBehavior.Cascade);
+            observer
+                .HasOne(e => e.Owner)
+                .WithMany()
+                .HasForeignKey(e => e.OwnerId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

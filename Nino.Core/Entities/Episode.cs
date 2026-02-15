@@ -13,7 +13,7 @@ public class Episode
     [Key]
     public Guid Id { get; set; }
     public required Guid ProjectId { get; set; }
-    public required ulong GuildId { get; set; }
+    public required Guid GroupId { get; set; }
 
     [MaxLength(32)]
     public required string Number { get; set; }
@@ -21,12 +21,12 @@ public class Episode
     public required bool ReminderPosted { get; set; }
     public DateTimeOffset? Updated { get; set; }
 
-    public List<Task> Tasks { get; set; } = [];
-    public List<Staff> AdditionalStaff { get; set; } = [];
-    public List<PinchHitter> PinchHitters { get; set; } = [];
+    public ICollection<Task> Tasks { get; set; } = [];
+    public ICollection<Staff> AdditionalStaff { get; set; } = [];
+    public ICollection<PinchHitter> PinchHitters { get; set; } = [];
 
-    [JsonIgnore]
     public Project Project { get; set; } = null!;
+    public Group Group { get; set; } = null!;
 
     /// <summary>
     /// Canonicalize an episode number

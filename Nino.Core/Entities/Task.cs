@@ -6,6 +6,8 @@ public class Task
 {
     [Key]
     public Guid Id { get; set; }
+
+    [MaxLength(16)]
     public required string Abbreviation { get; set; }
     public required bool Done { get; set; }
     public DateTimeOffset? Updated { get; set; }

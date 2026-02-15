@@ -9,7 +9,9 @@ public class Staff
 {
     [Key]
     public Guid Id { get; set; }
-    public required ulong UserId { get; set; }
+    public required Guid UserId { get; set; }
     public required Role Role { get; set; }
     public required bool IsPseudo { get; set; } = false;
+
+    public User User { get; set; } = null!;
 }

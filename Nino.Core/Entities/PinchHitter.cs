@@ -9,6 +9,10 @@ public class PinchHitter
 {
     [Key]
     public Guid Id { get; set; }
-    public required ulong UserId { get; set; }
+    public required Guid UserId { get; set; }
+
+    [MaxLength(16)]
     public required string Abbreviation { get; set; }
+
+    public User User { get; set; } = null!;
 }

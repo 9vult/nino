@@ -9,5 +9,7 @@ public class Alias
 {
     [Key]
     public Guid Id { get; set; }
+
+    [MaxLength(32)]
     public required string Value { get; set; }
 }
