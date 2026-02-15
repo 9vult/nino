@@ -31,6 +31,12 @@ public class InteractionHandler(
     {
         try
         {
+            if (interaction.GuildId is null)
+            {
+                await interaction.RespondAsync("Nino commands must be run in a server!");
+                return;
+            }
+
             await interaction.DeferAsync();
 
             var context = new SocketInteractionContext(client, interaction);
@@ -46,6 +52,12 @@ public class InteractionHandler(
     {
         try
         {
+            if (interaction.GuildId is null)
+            {
+                await interaction.RespondAsync("Nino commands must be run in a server!");
+                return;
+            }
+
             await interaction.DeferAsync();
 
             var context = new SocketInteractionContext(client, interaction);

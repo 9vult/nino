@@ -7,8 +7,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Nino.Core;
 using Nino.Core.Actions.Project.Delete;
+using Nino.Core.Actions.Project.Resolve;
 using Nino.Core.Events;
 using Nino.Core.Services;
+using Nino.Discord;
 using Nino.Discord.Services;
 using Nino.Host;
 using NLog.Extensions.Hosting;
@@ -42,9 +44,11 @@ var builder = Host.CreateDefaultBuilder(args)
 
             // Services
             services.AddSingleton<IEventBus, InMemoryEventBus>();
-            services.AddSingleton<IUserIdentityService, UserIdentityService>();
+            services.AddScoped<IIdentityService, IdentityService>();
+            services.AddScoped<IUserVerificationService, UserVerificationService>();
 
             // Action handlers
+            services.AddScoped<ProjectResolveHandler>();
             services.AddScoped<ProjectDeleteHandler>();
         }
     );

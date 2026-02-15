@@ -4,14 +4,15 @@ using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Nino.Discord.Entities;
 using Nino.Discord.Handlers;
 
-namespace Nino.Discord.Services;
+namespace Nino.Discord;
 
-public class DiscordBotService(
+public class DiscordBotHostedService(
     DiscordSocketClient client,
     InteractionHandler interactionHandler,
-    ILogger<DiscordBotService> logger,
+    ILogger<DiscordBotHostedService> logger,
     IOptions<DiscordSettings> options
 ) : IHostedService
 {

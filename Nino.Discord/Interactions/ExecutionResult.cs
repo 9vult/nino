@@ -11,4 +11,5 @@ public sealed class ExecutionResult : RuntimeResult
         : base(error, reason) { }
 
     public static ExecutionResult Success => new ExecutionResult(null, "Success");
+    public static ExecutionResult Failure => new ExecutionResult(null, "Failure");
 }

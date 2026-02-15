@@ -19,7 +19,6 @@ public class DataContext : DbContext
     public DbSet<Project> Projects { get; set; }
     public DbSet<Episode> Episodes { get; set; }
     public DbSet<Observer> Observers { get; set; }
-    public DbSet<Configuration> Configurations { get; set; }
 
     private static readonly ValueConverter<ulong, string> UlongStringConverter = new(
         v => v.ToString(CultureInfo.InvariantCulture),
@@ -92,6 +91,7 @@ public class DataContext : DbContext
                     s.Navigation(a => a.User).AutoInclude();
                 }
             );
+            project.Navigation(p => p.KeyStaff).AutoInclude();
 
             project.OwnsMany(
                 e => e.Administrators,
@@ -102,6 +102,7 @@ public class DataContext : DbContext
                     s.Navigation(a => a.User).AutoInclude();
                 }
             );
+            project.Navigation(p => p.Administrators).AutoInclude();
 
             project
                 .HasOne(p => p.Owner)

@@ -7,9 +7,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nino.Core.Events;
 using Nino.Core.Events.Episode;
+using Nino.Discord.Entities;
 using Nino.Discord.Handlers;
+using Nino.Discord.Services;
 
-namespace Nino.Discord.Services;
+namespace Nino.Discord;
 
 public static class DiscordBotServiceCollectionExtensions
 {
@@ -35,11 +37,14 @@ public static class DiscordBotServiceCollectionExtensions
         ));
         services.AddSingleton<DiscordSocketClient>();
 
+        // Services
+        services.AddScoped<IInteractionIdentityService, InteractionIdentityService>();
+
         // Handlers!
         services.AddSingleton<InteractionHandler>();
         services.AddScoped<IEventHandler<TaskSkippedEvent>, TaskSkippedEventHandler>();
 
-        services.AddHostedService<DiscordBotService>();
+        services.AddHostedService<DiscordBotHostedService>();
         return services;
     }
 }

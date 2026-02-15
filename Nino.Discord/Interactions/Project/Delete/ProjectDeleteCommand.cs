@@ -2,6 +2,8 @@
 
 using Discord;
 using Discord.Interactions;
+using Nino.Core.Actions.Project.Resolve;
+using Nino.Core.Enums;
 
 namespace Nino.Discord.Interactions.Project;
 
@@ -14,8 +16,23 @@ public partial class ProjectModule
         var lng = interaction.UserLocale;
 
         // Verify project and user - Owner required
-        var projectId = Guid.NewGuid();
-        var userId = await identityService.GetOrCreateUserByDiscordIdAsync(interaction.User.Id);
+        var (userId, groupId) = await identityService.GetUserAndGroupAsync(interaction);
+        var projectResolution = await projectResolver.HandleAsync(
+            new ProjectResolveAction(alias, groupId, userId)
+        );
+
+        if (projectResolution.Status is not ActionStatus.Success)
+            return await interaction.FailAsync("");
+
+        var projectId = projectResolution.ProjectId!.Value;
+
+        var isVerified = await verificationService.VerifyPermissionsAsync(
+            projectId,
+            userId,
+            PermissionsLevel.Owner
+        );
+        if (!isVerified)
+            return await interaction.FailAsync("");
 
         // Ask if the user is sure
         var embed = new EmbedBuilder()

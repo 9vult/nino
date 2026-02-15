@@ -66,6 +66,7 @@ public class Episode
         return int.TryParse(input, out episodeNumber);
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return $"E[{Id} ({Number})]";

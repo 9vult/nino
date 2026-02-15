@@ -65,8 +65,9 @@ public class Project
     [NotMapped]
     public string AniListUrl => $"https://anilist.co/anime/{AniListId}";
 
+    /// <inheritdoc />
     public override string ToString()
     {
-        return $"P[{Id} ({GroupId}-{Nickname})]";
+        return $"P[{Id} ({Nickname})]";
     }
 }

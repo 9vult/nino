@@ -11,4 +11,10 @@ public class User
     public string? Name { get; set; }
     public required ulong DiscordId { get; set; }
     public required DateTimeOffset CreatedAt { get; set; }
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return $"U[{Id} ({Name},{DiscordId})]";
+    }
 }

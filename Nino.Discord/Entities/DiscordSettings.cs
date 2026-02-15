@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
-namespace Nino.Discord;
+namespace Nino.Discord.Entities;
 
 public class DiscordSettings
 {
