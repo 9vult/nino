@@ -15,7 +15,7 @@ public partial class ProjectModule
 
         // Verify project and user - Owner required
         var projectId = Guid.NewGuid();
-        var userId = interaction.User.Id;
+        var userId = await identityService.GetOrCreateUserByDiscordIdAsync(interaction.User.Id);
 
         // Ask if the user is sure
         var embed = new EmbedBuilder()

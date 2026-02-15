@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Nino.Core;
 using Nino.Core.Actions.Project.Delete;
 using Nino.Core.Events;
+using Nino.Core.Services;
 using Nino.Discord.Services;
 using Nino.Host;
 using NLog.Extensions.Hosting;
@@ -39,8 +40,9 @@ var builder = Host.CreateDefaultBuilder(args)
             );
             services.AddDiscordBotService(context.Configuration);
 
-            // Event bus
+            // Services
             services.AddSingleton<IEventBus, InMemoryEventBus>();
+            services.AddSingleton<IUserIdentityService, UserIdentityService>();
 
             // Action handlers
             services.AddScoped<ProjectDeleteHandler>();

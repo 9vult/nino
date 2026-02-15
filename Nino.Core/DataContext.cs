@@ -45,6 +45,7 @@ public class DataContext : DbContext
         modelBuilder.Entity<User>(user =>
         {
             user.Property(p => p.DiscordId).HasConversion(UlongStringConverter);
+            user.HasIndex(u => u.DiscordId).IsUnique();
         });
 
         // Channel

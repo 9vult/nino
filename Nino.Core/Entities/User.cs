@@ -8,6 +8,7 @@ public class User
     public Guid Id { get; set; }
 
     [MaxLength(64)]
-    public required string Name { get; set; }
+    public string? Name { get; set; }
     public required ulong DiscordId { get; set; }
+    public required DateTimeOffset CreatedAt { get; set; }
 }

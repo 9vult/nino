@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
+using Nino.Core.Enums;
 using Nino.Core.Events;
 
 namespace Nino.Core.Actions.Project.Delete;
@@ -10,19 +11,19 @@ public sealed class ProjectDeleteHandler(
     ILogger<ProjectDeleteHandler> logger
 )
 {
-    public async Task<bool> Handle(ProjectDeleteAction action)
+    public async Task<ActionResult> Handle(ProjectDeleteAction action)
     {
         // check here
         var project = await db.Projects.FirstOrDefaultAsync(p => p.Id == action.ProjectId);
 
         if (project is null)
-            return false;
+            return new ActionResult(ActionStatus.NotFound);
 
         db.Projects.Remove(project);
         await db.SaveChangesAsync();
 
         // publish event
 
-        return true;
+        return ActionResult.Success;
     }
 }
