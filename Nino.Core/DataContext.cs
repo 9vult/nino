@@ -2,12 +2,11 @@
 
 using System.Globalization;
 using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Nino.Core.Dtos;
 using Nino.Core.Entities;
 
-namespace Nino.Data;
+namespace Nino.Core;
 
 public class DataContext : DbContext
 {

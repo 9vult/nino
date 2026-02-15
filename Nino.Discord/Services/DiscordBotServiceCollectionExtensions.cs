@@ -5,6 +5,8 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Nino.Core.Events;
+using Nino.Core.Events.Episode;
 using Nino.Discord.Handlers;
 
 namespace Nino.Discord.Services;
@@ -33,7 +35,9 @@ public static class DiscordBotServiceCollectionExtensions
         ));
         services.AddSingleton<DiscordSocketClient>();
 
+        // Handlers!
         services.AddSingleton<InteractionHandler>();
+        services.AddScoped<IEventHandler<TaskSkippedEvent>, TaskSkippedEventHandler>();
 
         services.AddHostedService<DiscordBotService>();
         return services;

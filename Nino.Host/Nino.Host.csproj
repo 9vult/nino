@@ -15,7 +15,6 @@
     <PackageReference Include="NLog.Extensions.Logging" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Nino.Data\Nino.Data.csproj" />
     <ProjectReference Include="..\Nino.Discord\Nino.Discord.csproj" />
     <ProjectReference Include="..\Nino.Web\Nino.Web.csproj" />
   </ItemGroup>

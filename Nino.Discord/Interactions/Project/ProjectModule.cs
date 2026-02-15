@@ -6,4 +6,5 @@ using Discord.Interactions;
 namespace Nino.Discord.Interactions.Project;
 
 [Group("project", "Project management")]
-public partial class ProjectModule : InteractionModuleBase<IInteractionContext> { }
+public partial class ProjectModule(ILogger<ProjectModule> logger)
+    : InteractionModuleBase<IInteractionContext> { }

@@ -1,6 +1,5 @@
 <Solution>
   <Project Path="Nino.Core/Nino.Core.csproj" />
-  <Project Path="Nino.Data/Nino.Data.csproj" />
   <Project Path="Nino.Discord/Nino.Discord.csproj" />
   <Project Path="Nino.Host/Nino.Host.csproj" />
   <Project Path="Nino.Localization/Nino.Localization.csproj" />

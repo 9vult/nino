@@ -5,7 +5,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Nino.Data;
+using Nino.Core;
+using Nino.Core.Actions.Project.Delete;
+using Nino.Core.Events;
 using Nino.Discord.Services;
 using Nino.Host;
 using NLog.Extensions.Hosting;
@@ -36,6 +38,12 @@ var builder = Host.CreateDefaultBuilder(args)
                 options.UseSqlite(context.Configuration.GetConnectionString("DefaultConnection"))
             );
             services.AddDiscordBotService(context.Configuration);
+
+            // Event bus
+            services.AddSingleton<IEventBus, InMemoryEventBus>();
+
+            // Action handlers
+            services.AddScoped<ProjectDeleteHandler>();
         }
     );
 
