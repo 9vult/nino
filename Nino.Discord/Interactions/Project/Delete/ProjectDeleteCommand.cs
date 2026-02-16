@@ -25,7 +25,7 @@ public partial class ProjectModule
         if (projectResolution.Status is not ResultStatus.Success)
             return await interaction.FailAsync("");
 
-        var projectId = projectResolution.Data;
+        var projectId = projectResolution.Value;
 
         var isVerified = await verificationService.VerifyProjectPermissionsAsync(
             projectId,
