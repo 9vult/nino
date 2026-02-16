@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 using Nino.Core.Entities;
+using Task = System.Threading.Tasks.Task;
 
 namespace Nino.Core.Services;
 
@@ -30,4 +31,12 @@ public interface IIdentityService
     /// <returns>Channel ID</returns>
     /// <remarks>Creates a new <see cref="Channel"/> if not found</remarks>
     Task<Guid> GetOrCreateChannelByDiscordIdAsync(ulong discordId);
+
+    /// <summary>
+    /// Get the <see cref="MentionRole"/> ID for a given Discord ID
+    /// </summary>
+    /// <param name="discordId">Discord role ID</param>
+    /// <returns>Role ID</returns>
+    /// <remarks>Creates a new <see cref="MentionRole"/> if not found</remarks>
+    Task<Guid> GetOrCreateMentionRoleByDiscordIdAsync(ulong discordId);
 }

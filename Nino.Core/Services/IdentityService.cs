@@ -121,4 +121,38 @@ public class IdentityService(DataContext db, ILogger<IdentityService> logger) : 
             return existing.Id;
         }
     }
+
+    /// <inheritdoc />
+    public async Task<Guid> GetOrCreateMentionRoleByDiscordIdAsync(ulong discordId)
+    {
+        var role = await db.MentionRoles.SingleOrDefaultAsync(r => r.DiscordId == discordId);
+
+        if (role is not null)
+        {
+            logger.LogTrace("Resolved Discord ID {DiscordId} to role {Role}", discordId, role);
+            return role.Id;
+        }
+
+        role = new MentionRole
+        {
+            Id = Guid.NewGuid(),
+            DiscordId = discordId,
+            CreatedAt = DateTimeOffset.UtcNow,
+        };
+        await db.MentionRoles.AddAsync(role);
+
+        try
+        {
+            await db.SaveChangesAsync();
+            logger.LogTrace("Created role {Role} for Discord ID {DiscordId}", role, discordId);
+            return role.Id;
+        }
+        catch (DbUpdateException)
+        {
+            // Race condition handler
+            var existing = await db.MentionRoles.SingleAsync(c => c.DiscordId == discordId);
+            logger.LogTrace("Resolved Discord ID {DiscordId} to role {Channel}", discordId, role);
+            return existing.Id;
+        }
+    }
 }

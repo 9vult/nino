@@ -15,6 +15,7 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     public DbSet<User> Users { get; set; }
     public DbSet<Group> Groups { get; set; }
     public DbSet<Channel> Channels { get; set; }
+    public DbSet<MentionRole> MentionRoles { get; set; }
 
     public DbSet<Project> Projects { get; set; }
     public DbSet<Episode> Episodes { get; set; }
@@ -151,6 +152,18 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
                 .HasOne(p => p.CongaReminderChannel)
                 .WithMany()
                 .HasForeignKey(p => p.CongaReminderChannelId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            project
+                .HasOne(p => p.AirReminderChannel)
+                .WithMany()
+                .HasForeignKey(p => p.AirReminderChannelId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            project
+                .HasOne(p => p.AirReminderRole)
+                .WithMany()
+                .HasForeignKey(p => p.AirReminderRoleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             project

@@ -40,7 +40,7 @@ public class Project
 
     public Guid? AirReminderChannelId { get; set; }
     public Guid? AirReminderUserId { get; set; }
-    public ulong? AirReminderRoleId { get; set; }
+    public Guid? AirReminderRoleId { get; set; }
     public TimeSpan AirReminderDelay { get; set; } = TimeSpan.Zero;
     public TimeSpan CongaReminderPeriod { get; set; } = TimeSpan.Zero;
     public Guid? CongaReminderChannelId { get; set; }
@@ -54,6 +54,8 @@ public class Project
     public Channel ReleaseChannel { get; set; } = null!;
     public Channel? AirReminderChannel { get; set; }
     public Channel? CongaReminderChannel { get; set; }
+    public User? AirReminderUser { get; set; }
+    public MentionRole? AirReminderRole { get; set; }
 
     public ICollection<Alias> Aliases { get; set; } = [];
     public ICollection<Staff> KeyStaff { get; set; } = [];
