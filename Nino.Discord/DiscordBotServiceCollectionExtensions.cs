@@ -6,7 +6,6 @@ using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nino.Core.Events;
-using Nino.Core.Events.Episode;
 using Nino.Discord.Entities;
 using Nino.Discord.Handlers;
 using Nino.Discord.Services;

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 using Nino.Core.Events;
-using Nino.Core.Events.Episode;
 
 namespace Nino.Discord.Handlers;
 

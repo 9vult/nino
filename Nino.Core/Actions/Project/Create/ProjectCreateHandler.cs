@@ -63,7 +63,7 @@ public class ProjectCreateHandler(DataContext db, ILogger<ProjectCreateHandler> 
                     ProjectId = project.Id,
                     Number = Convert.ToString(i, CultureInfo.InvariantCulture),
                     Done = false,
-                    ReminderPosted = false,
+                    AirReminderPosted = false,
                     AdditionalStaff = [],
                     PinchHitters = [],
                     Tasks = [],

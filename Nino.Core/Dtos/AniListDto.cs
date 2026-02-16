@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 using System.Text.Json.Serialization;
 
 namespace Nino.Core.Dtos;
@@ -31,6 +32,7 @@ public class Media
     public int Episodes { get; set; }
 
     [JsonPropertyName("format")]
+    [MaxLength(64)]
     public string? Format { get; set; }
 
     [JsonPropertyName("title")]
@@ -82,11 +84,13 @@ public class AiringNode
 public class Title
 {
     [JsonPropertyName("romaji")]
+    [MaxLength(128)]
     public string? Romaji { get; set; }
 }
 
 public class CoverImage
 {
     [JsonPropertyName("extraLarge")]
+    [MaxLength(256)]
     public string? ExtraLarge { get; set; }
 }

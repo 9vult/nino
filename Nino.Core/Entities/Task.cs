@@ -12,4 +12,10 @@ public class Task
     public required bool Done { get; set; }
     public DateTimeOffset? Updated { get; set; }
     public DateTimeOffset? LastReminded { get; set; }
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return $"T[{Id}] ({Abbreviation})]";
+    }
 }

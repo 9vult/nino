@@ -53,6 +53,9 @@ var builder = Host.CreateDefaultBuilder(args)
             services.AddHttpClient();
             services.AddDiscordBotService(context.Configuration);
 
+            // Background Services
+            services.AddHostedService<AirNotificationService>();
+
             // Services
             services.AddSingleton<IEventBus, InMemoryEventBus>();
             services.AddScoped<IAniListService, AniListService>();

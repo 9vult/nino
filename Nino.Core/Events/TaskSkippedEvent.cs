@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
-namespace Nino.Core.Events.Episode;
+namespace Nino.Core.Events;
 
 public record TaskSkippedEvent(
     Guid ProjectId,

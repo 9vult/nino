@@ -41,8 +41,8 @@ public class Project
     public Guid? AirReminderChannelId { get; set; }
     public Guid? AirReminderUserId { get; set; }
     public ulong? AirReminderRoleId { get; set; }
-    public TimeSpan? AirReminderDelay { get; set; }
-    public TimeSpan? CongaReminderPeriod { get; set; }
+    public TimeSpan AirReminderDelay { get; set; } = TimeSpan.Zero;
+    public TimeSpan CongaReminderPeriod { get; set; } = TimeSpan.Zero;
     public Guid? CongaReminderChannelId { get; set; }
 
     public ICollection<Episode> Episodes { get; set; } = [];
@@ -64,6 +64,16 @@ public class Project
     /// </summary>
     [NotMapped]
     public string AniListUrl => $"https://anilist.co/anime/{AniListId}";
+
+    /// <summary>
+    /// Helper for getting all staff for an episode
+    /// </summary>
+    /// <param name="episode">Episode to fetch additional staff from</param>
+    /// <returns>Combined Key and Additional staff</returns>
+    public IEnumerable<Staff> GetCombinedStaff(Episode episode)
+    {
+        return KeyStaff.Concat(episode.AdditionalStaff);
+    }
 
     /// <inheritdoc />
     public override string ToString()
