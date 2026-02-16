@@ -2,7 +2,6 @@
 
 using Discord;
 using Discord.Interactions;
-using Nino.Core.Actions;
 using Nino.Core.Actions.Project.Create;
 using Nino.Core.Dtos;
 using Nino.Core.Enums;
@@ -16,6 +15,7 @@ public partial class ProjectModule
         string nickname,
         int anilistId,
         bool isPrivate,
+        [ChannelTypes(ChannelType.Text)] IMessageChannel projectChannel,
         [ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel updateChannel,
         [ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel releaseChannel,
         string? title = null,
@@ -41,8 +41,11 @@ public partial class ProjectModule
                 PermissionsLevel.Administrator
             )
         )
-            return await interaction.FailAsync("");
+            return await interaction.FailAsync(T("error.permissions", lng));
 
+        var projectChannelId = await identityService.GetOrCreateChannelByDiscordIdAsync(
+            projectChannel.Id
+        );
         var updateChannelId = await identityService.GetOrCreateChannelByDiscordIdAsync(
             updateChannel.Id
         );
@@ -55,6 +58,7 @@ public partial class ProjectModule
             Nickname = nickname,
             AniListId = anilistId,
             IsPrivate = isPrivate,
+            ProjectChannelId = projectChannelId,
             UpdateChannelId = updateChannelId,
             ReleaseChannelId = releaseChannelId,
             Title = title,
@@ -71,12 +75,16 @@ public partial class ProjectModule
         switch (response.Status)
         {
             case ResultStatus.Success:
-                await interaction.FollowupAsync("Created project");
+                await interaction.FollowupAsync(T("project.creation.success", lng, nickname));
                 break;
             case ResultStatus.Conflict:
-                await interaction.FollowupAsync("Conflicting project");
+                await interaction.FollowupAsync(T("project.creation.conflict", lng, nickname));
+                break;
+            case ResultStatus.BadRequest:
+                await interaction.FollowupAsync(T("project.creation.failed", lng));
                 break;
             case ResultStatus.Error:
+                await interaction.FollowupAsync(T("project.creation.failed.generic", lng));
                 break;
         }
 

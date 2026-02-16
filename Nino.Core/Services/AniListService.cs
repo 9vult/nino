@@ -14,13 +14,22 @@ public class AniListService(DataContext db, HttpClient client, ILogger<AniListSe
     : IAniListService
 {
     private const string BaseUrl = "https://graphql.anilist.co";
-    private const string FallbackPosterUrl = "https://files.catbox.moe/j3qizm.png";
 
     private static readonly TimeSpan OneDay = TimeSpan.FromDays(1);
 
     /// <inheritdoc />
     public async Task<AniListResponse> GetAnimeAsync(int aniListId)
     {
+        if (aniListId <= 0)
+        {
+            return new AniListResponse
+            {
+                Status = ResultStatus.BadRequest,
+                AniListId = aniListId,
+                Data = null,
+            };
+        }
+
         var cachedResponse = await db.AniListCache.SingleOrDefaultAsync(r =>
             r.AniListId == aniListId
         );
@@ -52,10 +61,7 @@ public class AniListService(DataContext db, HttpClient client, ILogger<AniListSe
                     await System.Threading.Tasks.Task.Delay(1000);
 
                     page++;
-                    response = await client.PostAsync(
-                        FallbackPosterUrl,
-                        CreateQuery(aniListId, page)
-                    );
+                    response = await client.PostAsync(BaseUrl, CreateQuery(aniListId, page));
                     if (response.IsSuccessStatusCode)
                     {
                         var innerData = await response.Content.ReadFromJsonAsync<AniListRoot>();

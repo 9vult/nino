@@ -9,6 +9,7 @@ public sealed class ProjectCreateDto
     public required string Nickname;
     public required int AniListId;
     public required bool IsPrivate;
+    public required Guid ProjectChannelId;
     public required Guid UpdateChannelId;
     public required Guid ReleaseChannelId;
 

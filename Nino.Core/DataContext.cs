@@ -137,6 +137,12 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
                 .OnDelete(DeleteBehavior.Cascade);
 
             project
+                .HasOne(p => p.ProjectChannel)
+                .WithMany()
+                .HasForeignKey(p => p.ProjectChannelId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            project
                 .HasOne(p => p.UpdateChannel)
                 .WithMany()
                 .HasForeignKey(p => p.UpdateChannelId)
@@ -146,12 +152,6 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
                 .HasOne(p => p.ReleaseChannel)
                 .WithMany()
                 .HasForeignKey(p => p.ReleaseChannelId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            project
-                .HasOne(p => p.CongaReminderChannel)
-                .WithMany()
-                .HasForeignKey(p => p.CongaReminderChannelId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             project

@@ -1,13 +1,21 @@
 // SPDX-License-Identifier: MPL-2.0
 
 using System.Globalization;
+using Nino.Core.Dtos;
 using Nino.Core.Entities;
 using Nino.Core.Enums;
+using Nino.Core.Services;
 
 namespace Nino.Core.Actions.Project.Create;
 
-public class ProjectCreateHandler(DataContext db, ILogger<ProjectCreateHandler> logger)
+public class ProjectCreateHandler(
+    DataContext db,
+    IAniListService aniListService,
+    ILogger<ProjectCreateHandler> logger
+)
 {
+    private const string FallbackPosterUrl = "https://files.catbox.moe/j3qizm.png";
+
     public async Task<Result<ProjectCreateResult>> HandleAsync(ProjectCreateAction action)
     {
         var dto = action.Dto;
@@ -22,12 +30,27 @@ public class ProjectCreateHandler(DataContext db, ILogger<ProjectCreateHandler> 
         )
             return new Result<ProjectCreateResult>(ResultStatus.Conflict, null);
 
-        // TODO: Temp
-        dto.Title ??= "Kono Subarashii Sekai ni Shukufuku wo!";
-        dto.Type ??= ProjectType.TV;
-        dto.Length ??= 10;
-        dto.PosterUri ??=
-            "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21202-qQoJeKz76vRT.png";
+        var autoFields = GetAutoFields(dto);
+        if (!string.IsNullOrEmpty(autoFields))
+            logger.LogInformation(
+                "AniList will be used in the construction of project {Nickname} for the following fields: {Fields}",
+                dto.Nickname,
+                autoFields
+            );
+
+        var anime = await aniListService.GetAnimeAsync(dto.AniListId);
+        if (anime.Status is ResultStatus.Success)
+        {
+            dto.Title ??= anime.Title;
+            dto.Length ??= anime.EpisodeCount;
+            dto.Type ??= anime.Type;
+            dto.PosterUri ??= anime.PosterUrl ?? FallbackPosterUrl;
+        }
+        else if (anime.Status is not ResultStatus.BadRequest) // Any other error (bad request is AniListId <= 0)
+            return new Result<ProjectCreateResult>(ResultStatus.Error);
+
+        if (dto.Title is null || dto.Length is null || dto.Type is null || dto.PosterUri is null)
+            return new Result<ProjectCreateResult>(ResultStatus.BadRequest);
 
         var project = new Entities.Project
         {
@@ -38,6 +61,7 @@ public class ProjectCreateHandler(DataContext db, ILogger<ProjectCreateHandler> 
             OwnerId = action.OwnerId,
             Type = dto.Type.Value,
             PosterUri = dto.PosterUri,
+            ProjectChannelId = dto.ProjectChannelId,
             UpdateChannelId = dto.UpdateChannelId,
             ReleaseChannelId = dto.ReleaseChannelId,
             IsPrivate = dto.IsPrivate,
@@ -83,6 +107,17 @@ public class ProjectCreateHandler(DataContext db, ILogger<ProjectCreateHandler> 
         return new Result<ProjectCreateResult>(
             ResultStatus.Success,
             new ProjectCreateResult(project.Id, project.Nickname)
+        );
+    }
+
+    private static string GetAutoFields(ProjectCreateDto dto)
+    {
+        return string.Join(
+            ", ",
+            new[] { nameof(dto.Title), nameof(dto.Length), nameof(dto.Type), nameof(dto.PosterUri) }
+                .Zip(new object?[] { dto.Title, dto.Length, dto.Type, dto.PosterUri })
+                .Where(p => p.Second is null)
+                .Select(p => p.First)
         );
     }
 }

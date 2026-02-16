@@ -16,4 +16,26 @@ public class AniListResponse
 
     [NotMapped]
     public ResultStatus Status { get; set; }
+
+    [NotMapped]
+    public string? Title => Data?.Data?.Media?.Title?.Romaji;
+
+    [NotMapped]
+    public int? EpisodeCount => Data?.Data?.Media?.Episodes;
+
+    [NotMapped]
+    public string? PosterUrl => Data?.Data?.Media?.CoverImage?.ExtraLarge;
+
+    [NotMapped]
+    public ProjectType Type =>
+        Data?.Data?.Media?.Format is not null
+            ? Data?.Data?.Media?.Format switch
+            {
+                "TV" or "TV_SHORT" => ProjectType.TV,
+                "MOVIE" => ProjectType.Movie,
+                "ONA" => ProjectType.ONA,
+                "OVA" or "SPECIAL" or "MUSIC" => ProjectType.OVA,
+                _ => ProjectType.TV,
+            }
+            : ProjectType.TV;
 }

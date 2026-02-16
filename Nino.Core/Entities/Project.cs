@@ -24,6 +24,7 @@ public class Project
 
     [MaxLength(256)]
     public required string PosterUri { get; set; }
+    public required Guid ProjectChannelId { get; set; }
     public required Guid UpdateChannelId { get; set; }
     public required Guid ReleaseChannelId { get; set; }
     public required bool IsPrivate { get; set; }
@@ -43,17 +44,16 @@ public class Project
     public Guid? AirReminderRoleId { get; set; }
     public TimeSpan AirReminderDelay { get; set; } = TimeSpan.Zero;
     public TimeSpan CongaReminderPeriod { get; set; } = TimeSpan.Zero;
-    public Guid? CongaReminderChannelId { get; set; }
 
     public ICollection<Episode> Episodes { get; set; } = [];
     public ICollection<Observer> Observers { get; set; } = [];
 
     public Group Group { get; set; } = null!;
     public User Owner { get; set; } = null!;
+    public Channel ProjectChannel { get; set; } = null!;
     public Channel UpdateChannel { get; set; } = null!;
     public Channel ReleaseChannel { get; set; } = null!;
     public Channel? AirReminderChannel { get; set; }
-    public Channel? CongaReminderChannel { get; set; }
     public User? AirReminderUser { get; set; }
     public MentionRole? AirReminderRole { get; set; }
 

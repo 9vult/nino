@@ -16,4 +16,7 @@
     <ProjectReference Include="..\Nino.Core\Nino.Core.csproj" />
     <ProjectReference Include="..\Nino.Localization\Nino.Localization.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="I18N\**\*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>
