@@ -19,6 +19,7 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     public DbSet<Project> Projects { get; set; }
     public DbSet<Episode> Episodes { get; set; }
     public DbSet<Observer> Observers { get; set; }
+    public DbSet<AniListResponse> AniListCache { get; set; }
 
     private static readonly ValueConverter<ulong, string> UlongStringConverter = new(
         v => v.ToString(CultureInfo.InvariantCulture),
@@ -32,6 +33,11 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
                 JsonSerializer.Deserialize<CongaNodeDto[]>(json, JsonSerializerOptions)
                     ?? Array.Empty<CongaNodeDto>()
             )
+    );
+
+    private static readonly ValueConverter<AniListRoot?, string> AniListResponseConverter = new(
+        r => JsonSerializer.Serialize(r, JsonSerializerOptions),
+        json => JsonSerializer.Deserialize<AniListRoot>(json, JsonSerializerOptions) ?? null
     );
 
     /// <inheritdoc />
@@ -222,6 +228,16 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
                 .WithMany()
                 .HasForeignKey(e => e.OwnerId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // AniList Cache
+
+        modelBuilder.Entity<AniListResponse>(cached =>
+        {
+            cached
+                .Property(c => c.Data)
+                .HasConversion(AniListResponseConverter)
+                .HasColumnType("TEXT");
         });
     }
 }

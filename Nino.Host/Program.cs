@@ -12,9 +12,7 @@ using Nino.Core.Actions.Project.Resolve;
 using Nino.Core.Events;
 using Nino.Core.Services;
 using Nino.Discord;
-using Nino.Discord.Services;
 using Nino.Host;
-using NLog.Extensions.Hosting;
 using NLog.Extensions.Logging;
 
 LogProvider.Setup();
@@ -52,10 +50,12 @@ var builder = Host.CreateDefaultBuilder(args)
             services.AddDbContext<DataContext>(options =>
                 options.UseSqlite(context.Configuration.GetConnectionString("DefaultConnection"))
             );
+            services.AddHttpClient();
             services.AddDiscordBotService(context.Configuration);
 
             // Services
             services.AddSingleton<IEventBus, InMemoryEventBus>();
+            services.AddScoped<IAniListService, AniListService>();
             services.AddScoped<IIdentityService, IdentityService>();
             services.AddScoped<IUserVerificationService, UserVerificationService>();
 
