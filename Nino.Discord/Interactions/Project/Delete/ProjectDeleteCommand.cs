@@ -2,6 +2,7 @@
 
 using Discord;
 using Discord.Interactions;
+using Nino.Core.Actions;
 using Nino.Core.Actions.Project.Resolve;
 using Nino.Core.Enums;
 
@@ -21,10 +22,10 @@ public partial class ProjectModule
             new ProjectResolveAction(alias, groupId, userId)
         );
 
-        if (projectResolution.Status is not ActionStatus.Success)
+        if (projectResolution.Status is not ResultStatus.Success)
             return await interaction.FailAsync("");
 
-        var projectId = projectResolution.ProjectId!.Value;
+        var projectId = projectResolution.Data;
 
         var isVerified = await verificationService.VerifyProjectPermissionsAsync(
             projectId,

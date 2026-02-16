@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using Nino.Core.Actions;
 using Nino.Core.Dtos;
 using Nino.Core.Entities;
 using Nino.Core.Enums;
@@ -40,7 +41,7 @@ public class AniListService(DataContext db, HttpClient client, ILogger<AniListSe
                 if (data?.Data?.Media?.AiringSchedule?.Nodes is null)
                     return new AniListResponse
                     {
-                        Status = ActionStatus.Error,
+                        Status = ResultStatus.Error,
                         AniListId = aniListId,
                         Data = null,
                     };
@@ -72,7 +73,7 @@ public class AniListService(DataContext db, HttpClient client, ILogger<AniListSe
                 {
                     cachedResponse.Data = data;
                     cachedResponse.FetchedAt = DateTimeOffset.UtcNow;
-                    cachedResponse.Status = ActionStatus.Success;
+                    cachedResponse.Status = ResultStatus.Success;
                 }
                 else
                 {
@@ -81,7 +82,7 @@ public class AniListService(DataContext db, HttpClient client, ILogger<AniListSe
                         AniListId = aniListId,
                         Data = data,
                         FetchedAt = DateTimeOffset.UtcNow,
-                        Status = ActionStatus.Success,
+                        Status = ResultStatus.Success,
                     };
                     await db.AniListCache.AddAsync(cachedResponse);
                 }
@@ -91,7 +92,7 @@ public class AniListService(DataContext db, HttpClient client, ILogger<AniListSe
             }
             return new AniListResponse
             {
-                Status = ActionStatus.NotFound,
+                Status = ResultStatus.NotFound,
                 AniListId = aniListId,
                 Data = null,
             };
@@ -100,7 +101,7 @@ public class AniListService(DataContext db, HttpClient client, ILogger<AniListSe
         {
             return new AniListResponse
             {
-                Status = ActionStatus.NotFound,
+                Status = ResultStatus.NotFound,
                 AniListId = aniListId,
                 Data = null,
             };
@@ -115,7 +116,7 @@ public class AniListService(DataContext db, HttpClient client, ILogger<AniListSe
             );
             return new AniListResponse
             {
-                Status = ActionStatus.Error,
+                Status = ResultStatus.Error,
                 AniListId = aniListId,
                 Data = null,
             };
@@ -125,7 +126,7 @@ public class AniListService(DataContext db, HttpClient client, ILogger<AniListSe
             logger.LogError(e, "Error when getting AniList ID {AniListID}", aniListId);
             return new AniListResponse
             {
-                Status = ActionStatus.Error,
+                Status = ResultStatus.Error,
                 AniListId = aniListId,
                 Data = null,
             };

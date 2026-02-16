@@ -2,7 +2,7 @@
 
 namespace Nino.Core.Enums;
 
-public enum ActionStatus
+public enum ResultStatus
 {
     Success = 200,
     BadRequest = 400,

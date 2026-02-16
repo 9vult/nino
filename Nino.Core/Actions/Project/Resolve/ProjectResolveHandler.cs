@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
+using Nino.Core.Entities;
 using Nino.Core.Enums;
 using Nino.Core.Services;
 
@@ -11,7 +12,7 @@ public class ProjectResolveHandler(
     ILogger<ProjectResolveHandler> logger
 )
 {
-    public async Task<ProjectResolveResult> HandleAsync(ProjectResolveAction action)
+    public async Task<Result<Guid>> HandleAsync(ProjectResolveAction action)
     {
         var project = await db
             .Projects.Where(p =>
@@ -27,7 +28,7 @@ public class ProjectResolveHandler(
         if (project is null)
         {
             logger.LogTrace("Unable to resolve alias {Alias} to a project", action.Alias);
-            return new ProjectResolveResult(ActionStatus.NotFound, null);
+            return new Result<Guid>(ResultStatus.NotFound, Guid.Empty);
         }
 
         if (
@@ -44,10 +45,10 @@ public class ProjectResolveHandler(
                 action.Alias,
                 project
             );
-            return new ProjectResolveResult(ActionStatus.Success, project.Id);
+            return new Result<Guid>(ResultStatus.Success, project.Id);
         }
 
         // Unauthorized, pretend we do not see it
-        return new ProjectResolveResult(ActionStatus.NotFound, null);
+        return new Result<Guid>(ResultStatus.NotFound, Guid.Empty);
     }
 }

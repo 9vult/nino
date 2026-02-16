@@ -8,7 +8,7 @@ namespace Nino.Core.Actions.Project.Create;
 
 public class ProjectCreateHandler(DataContext db, ILogger<ProjectCreateHandler> logger)
 {
-    public async Task<ProjectCreateResult> HandleAsync(ProjectCreateAction action)
+    public async Task<Result<ProjectCreateResult>> HandleAsync(ProjectCreateAction action)
     {
         var dto = action.Dto;
 
@@ -20,7 +20,7 @@ public class ProjectCreateHandler(DataContext db, ILogger<ProjectCreateHandler> 
                 p.GroupId == action.GroupId && p.Nickname == dto.Nickname
             )
         )
-            return new ProjectCreateResult(ActionStatus.Conflict, null, dto.Nickname);
+            return new Result<ProjectCreateResult>(ResultStatus.Conflict, null);
 
         // TODO: Temp
         dto.Title ??= "Kono Subarashii Sekai ni Shukufuku wo!";
@@ -80,6 +80,9 @@ public class ProjectCreateHandler(DataContext db, ILogger<ProjectCreateHandler> 
 
         await db.SaveChangesAsync();
 
-        return new ProjectCreateResult(ActionStatus.Success, project.Id, project.Nickname);
+        return new Result<ProjectCreateResult>(
+            ResultStatus.Success,
+            new ProjectCreateResult(project.Id, project.Nickname)
+        );
     }
 }

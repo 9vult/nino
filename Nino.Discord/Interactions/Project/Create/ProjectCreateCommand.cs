@@ -2,6 +2,7 @@
 
 using Discord;
 using Discord.Interactions;
+using Nino.Core.Actions;
 using Nino.Core.Actions.Project.Create;
 using Nino.Core.Dtos;
 using Nino.Core.Enums;
@@ -69,13 +70,13 @@ public partial class ProjectModule
 
         switch (response.Status)
         {
-            case ActionStatus.Success:
+            case ResultStatus.Success:
                 await interaction.FollowupAsync("Created project");
                 break;
-            case ActionStatus.Conflict:
+            case ResultStatus.Conflict:
                 await interaction.FollowupAsync("Conflicting project");
                 break;
-            case ActionStatus.Error:
+            case ResultStatus.Error:
                 break;
         }
 
