@@ -4,11 +4,11 @@ using Nino.Core.Dtos;
 
 namespace Nino.Core.Services;
 
-public class NotificationDataService(DataContext db, ILogger<NotificationDataService> logger)
-    : INotificationDataService
+public class DataService(DataContext db, ILogger<DataService> logger)
+    : IDataService
 {
     /// <inheritdoc />
-    public async Task<AirNotificationDto?> GetAirNotificationDataAsync(
+    public async Task<AirNotificationDto> GetAirNotificationDataAsync(
         Guid projectId,
         Guid episodeId
     )
@@ -17,23 +17,11 @@ public class NotificationDataService(DataContext db, ILogger<NotificationDataSer
             .Projects.Include(p => p.AirReminderChannel)
             .Include(p => p.AirReminderUser)
             .Include(p => p.AirReminderRole)
-            .SingleOrDefaultAsync(p => p.Id == projectId);
-        var episode = await db.Episodes.SingleOrDefaultAsync(e => e.Id == episodeId);
+            .SingleAsync(p => p.Id == projectId);
+        var episode = await db.Episodes.SingleAsync(e => e.Id == episodeId);
 
-        if (project is null)
-        {
-            logger.LogWarning("Failed to find a project with id {ProjectId}", projectId);
-            return null;
-        }
-
-        if (episode is null)
-        {
-            logger.LogWarning("Failed to find a episode with id {EpisodeId}", episodeId);
-            return null;
-        }
-
-        var locale = (await db.Groups.SingleOrDefaultAsync(g => g.Id == project.GroupId))
-            ?.Configuration
+        var locale = (await db.Groups.SingleAsync(g => g.Id == project.GroupId))
+            .Configuration
             .Locale;
 
         return new AirNotificationDto(
@@ -46,6 +34,19 @@ public class NotificationDataService(DataContext db, ILogger<NotificationDataSer
             NotificationUser: project.AirReminderUser,
             NotificationRole: project.AirReminderRole,
             NotificationLocale: locale
+        );
+    }
+
+    /// <inheritdoc />
+    public async Task<ProjectBasicInfoDto> GetProjectBasicInfoAsync(Guid projectId)
+    {
+        var project = await db.Projects.SingleAsync(p => p.Id == projectId);
+
+        return new ProjectBasicInfoDto(
+            Nickname: project.Nickname,
+            Title: project.Title,
+            Type: project.Type,
+            IsPrivate: project.IsPrivate
         );
     }
 }

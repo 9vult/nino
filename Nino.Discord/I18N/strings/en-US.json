@@ -1,12 +1,24 @@
 {
   "singular": {
+    "action.question": "❓ What do you want me to do?",
+    "action.canceled": "Okay, I won't do anything then.",
+    "button.cancel": "Cancel",
+    "button.delete": "Delete",
+    "button.no": "No",
+    "button.yes": "Yes",
     "episode.aired.body": "Aired on {absolute_1} ({relative_2})",
     "episode.aired.title": "Episode {number_1} has aired!",
+    "error.db": "A database error occured.",
     "error.permissions": "You do not have permission to perform this action.",
-    "project.creation.conflict": "A project with the name {nickname_1} already exists!",
+    "project.creation.conflict": "A project with the name `{nickname_1}` already exists!",
     "project.creation.failed.generic": "An error occured while creating the project.",
     "project.creation.failed.badRequest": "An error occured while creating the project.\nPlease make sure the AniList ID is correct or that all fields are present.",
-    "project.creation.success": "I created project {nickname_1} for you. You may want to consider the following:\n1. `/keystaff add` to add positions\n2. `/keystaff set-weight` to re-order positions\n3. `/project edit`: `AniList` to set airing date/times, and `/air-reminder enable` to get airing notifications."
+    "project.creation.success": "I created project `{nickname_1}` for you. You may want to consider the following:\n1. `/keystaff add` to add positions\n2. `/keystaff set-weight` to re-order positions\n3. `/project edit`: `AniList` to set airing date/times, and `/air-reminder enable` to get airing notifications.",
+    "project.delete.complete": "Cleaned out the **{title_1}** project for you. 残念。",
+    "project.delete.question": "Are you sure you want to delete **{title_1}**?\nThis action is irreversible.",
+    "project.delete.title": "Project Deletion",
+    "project.export": "Here's everything I know about `{nickname_1}`!",
+    "project.resolution.failed": "Could not resolve alias `{alias_1}` to a project."
   },
   "plural": {
     

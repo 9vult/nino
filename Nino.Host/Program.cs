@@ -61,7 +61,7 @@ var builder = Host.CreateDefaultBuilder(args)
             services.AddScoped<IAniListService, AniListService>();
             services.AddScoped<IIdentityService, IdentityService>();
             services.AddScoped<IUserVerificationService, UserVerificationService>();
-            services.AddScoped<INotificationDataService, NotificationDataService>();
+            services.AddScoped<IDataService, DataService>();
 
             // Action handlers
             services.AddScoped<ProjectResolveHandler>();

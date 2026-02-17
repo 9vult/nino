@@ -11,7 +11,7 @@ namespace Nino.Discord.Handlers;
 
 public class EpisodeAiredEventHandler(
     DiscordSocketClient client,
-    INotificationDataService dataService,
+    IDataService dataService,
     ILogger<EpisodeAiredEventHandler> logger
 ) : IEventHandler<EpisodeAiredEvent>
 {

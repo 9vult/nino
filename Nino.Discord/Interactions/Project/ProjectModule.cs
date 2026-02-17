@@ -15,6 +15,7 @@ namespace Nino.Discord.Interactions.Project;
 public partial class ProjectModule(
     DiscordSocketClient client,
     IIdentityService identityService,
+    IDataService dataService,
     IInteractionIdentityService interactionIdService,
     IUserVerificationService verificationService,
     ProjectResolveHandler projectResolver,

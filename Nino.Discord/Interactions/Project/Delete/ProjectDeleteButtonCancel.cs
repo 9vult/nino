@@ -2,21 +2,26 @@
 
 using Discord;
 using Discord.Interactions;
+using Nino.Core.Enums;
 
 namespace Nino.Discord.Interactions.Project;
 
 public partial class ProjectModule
 {
     [ComponentInteraction("nino:project:delete:cancel:*:*", ignoreGroupNames: true)]
-    public async Task<RuntimeResult> CancelDeleteAsync(string projectId, string userId)
+    public async Task<RuntimeResult> CancelDeleteAsync(Guid projectId, Guid userId)
     {
         var interaction = Context.Interaction;
-        var lng = interaction.UserLocale;
+        var locale = interaction.UserLocale;
+
+        var data = await dataService.GetProjectBasicInfoAsync(projectId);
+        var header = $"{data.Title} ({data.Type.ToFriendlyString(locale)})";
 
         var embed = new EmbedBuilder()
-            .WithAuthor("Project Name")
-            .WithTitle("Are you sure you want to delete this project?")
-            .WithDescription($"Canceled deletion of {projectId} {userId}")
+            .WithAuthor(header)
+            .WithTitle(T("project.delete.title", locale))
+            .WithDescription(T("action.canceled", locale))
+            .WithCurrentTimestamp()
             .Build();
 
         await interaction.ModifyOriginalResponseAsync(m =>
