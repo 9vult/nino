@@ -2,16 +2,12 @@
 
 namespace Nino.Core.Entities;
 
-public class Group
+public class Group : MappedId
 {
-    [Key]
-    public Guid Id { get; set; }
     public Guid? OwnerId { get; set; }
 
     [MaxLength(64)]
     public string Name { get; set; } = string.Empty;
-    public required ulong DiscordId { get; set; }
-    public required DateTimeOffset CreatedAt { get; set; }
 
     public User? Owner { get; set; } = null!;
     public Configuration Configuration { get; set; } = null!;

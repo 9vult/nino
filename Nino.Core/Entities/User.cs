@@ -2,15 +2,10 @@
 
 namespace Nino.Core.Entities;
 
-public class User
+public class User : MappedId
 {
-    [Key]
-    public Guid Id { get; set; }
-
     [MaxLength(64)]
     public string? Name { get; set; }
-    public required ulong DiscordId { get; set; }
-    public required DateTimeOffset CreatedAt { get; set; }
 
     /// <inheritdoc />
     public override string ToString()

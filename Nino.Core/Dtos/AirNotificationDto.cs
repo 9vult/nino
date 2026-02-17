@@ -12,7 +12,7 @@ public sealed record AirNotificationDto(
     string AniListUrl,
     string PosterUrl,
     string EpisodeNumber,
-    Channel? NotificationChannel,
+    MappedIdDto? NotificationChannel,
     User? NotificationUser,
     MentionRole? NotificationRole,
     Locale? NotificationLocale

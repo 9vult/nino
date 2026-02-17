@@ -21,11 +21,11 @@ public class EpisodeAiredEventHandler(
         var (projectId, episodeId, airTime) = @event;
         var data = await dataService.GetAirNotificationDataAsync(projectId, episodeId);
 
-        if (data?.NotificationChannel is null)
+        if (data.NotificationChannel?.DiscordId is null)
             return;
 
         if (
-            await client.GetChannelAsync(data.NotificationChannel.DiscordId)
+            await client.GetChannelAsync(data.NotificationChannel.DiscordId.Value)
             is not SocketTextChannel channel
         )
         {

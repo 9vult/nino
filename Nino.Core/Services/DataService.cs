@@ -4,8 +4,7 @@ using Nino.Core.Dtos;
 
 namespace Nino.Core.Services;
 
-public class DataService(DataContext db, ILogger<DataService> logger)
-    : IDataService
+public class DataService(DataContext db, ILogger<DataService> logger) : IDataService
 {
     /// <inheritdoc />
     public async Task<AirNotificationDto> GetAirNotificationDataAsync(
@@ -30,7 +29,7 @@ public class DataService(DataContext db, ILogger<DataService> logger)
             AniListUrl: project.AniListUrl,
             PosterUrl: project.PosterUri,
             EpisodeNumber: episode.Number,
-            NotificationChannel: project.AirReminderChannel,
+            NotificationChannel: project.AirReminderChannel?.AsMappedId(),
             NotificationUser: project.AirReminderUser,
             NotificationRole: project.AirReminderRole,
             NotificationLocale: locale
