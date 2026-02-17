@@ -35,14 +35,13 @@ public class Project
     public required string Motd { get; set; }
     public required int AniListId { get; set; }
     public required int AniListOffset { get; set; }
-    public required bool AirReminderEnabled { get; set; }
-    public required bool CongaReminderEnabled { get; set; }
+    public required bool AirNotificationsEnabled { get; set; }
+    public required bool CongaRemindersEnabled { get; set; }
     public required DateTimeOffset Created { get; set; }
 
-    public Guid? AirReminderChannelId { get; set; }
     public Guid? AirReminderUserId { get; set; }
     public Guid? AirReminderRoleId { get; set; }
-    public TimeSpan AirReminderDelay { get; set; } = TimeSpan.Zero;
+    public TimeSpan AirNotificationDelay { get; set; } = TimeSpan.Zero;
     public TimeSpan CongaReminderPeriod { get; set; } = TimeSpan.Zero;
 
     public ICollection<Episode> Episodes { get; set; } = [];

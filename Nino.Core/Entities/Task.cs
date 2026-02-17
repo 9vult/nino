@@ -9,9 +9,9 @@ public class Task
 
     [MaxLength(16)]
     public required string Abbreviation { get; set; }
-    public required bool Done { get; set; }
-    public DateTimeOffset? Updated { get; set; }
-    public DateTimeOffset? LastReminded { get; set; }
+    public required bool IsDone { get; set; }
+    public DateTimeOffset? UpdatedAt { get; set; }
+    public DateTimeOffset? LastRemindedAt { get; set; }
 
     /// <inheritdoc />
     public override string ToString()

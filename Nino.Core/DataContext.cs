@@ -155,21 +155,15 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
                 .OnDelete(DeleteBehavior.Restrict);
 
             project
-                .HasOne(p => p.AirReminderChannel)
-                .WithMany()
-                .HasForeignKey(p => p.AirReminderChannelId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            project
                 .HasOne(p => p.AirReminderRole)
                 .WithMany()
                 .HasForeignKey(p => p.AirReminderRoleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             project
-                .HasOne(p => p.AirReminderChannel)
+                .HasOne(p => p.AirReminderUser)
                 .WithMany()
-                .HasForeignKey(p => p.AirReminderChannelId)
+                .HasForeignKey(p => p.AirReminderUserId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
 
@@ -181,12 +175,6 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
                 .WithMany(p => p.Episodes)
                 .HasForeignKey(e => e.ProjectId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            episode
-                .HasOne(e => e.Group)
-                .WithMany()
-                .HasForeignKey(e => e.GroupId)
-                .OnDelete(DeleteBehavior.NoAction);
 
             episode.OwnsMany(
                 e => e.Tasks,

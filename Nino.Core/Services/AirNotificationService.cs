@@ -38,7 +38,7 @@ public class AirNotificationService(
 
             var targets = await db
                 .Projects.Include(p => p.Episodes)
-                .Where(p => !p.IsArchived && p.AirReminderEnabled && p.AniListId > 0)
+                .Where(p => !p.IsArchived && p.AirNotificationsEnabled && p.AniListId > 0)
                 .ToListAsync();
 
             foreach (var project in targets)
@@ -46,7 +46,7 @@ public class AirNotificationService(
                 var episodeNumber = 0m;
                 foreach (
                     var episode in project.Episodes.Where(e =>
-                        e is { Done: false, AirReminderPosted: false }
+                        e is { IsDone: false, AirNotificationPosted: false }
                         && Episode.EpisodeNumberIsNumber(e.Number, out episodeNumber)
                     )
                 )
@@ -57,7 +57,7 @@ public class AirNotificationService(
                     );
                     if (status != ResultStatus.Success)
                         continue;
-                    airTime = airTime.Add(project.AirReminderDelay);
+                    airTime = airTime.Add(project.AirNotificationDelay);
                     if (airTime > DateTimeOffset.UtcNow)
                         continue;
 
@@ -65,7 +65,7 @@ public class AirNotificationService(
 
                     var airEvent = new EpisodeAiredEvent(project.Id, episode.Id, airTime);
                     await eventBus.PublishAsync(airEvent);
-                    episode.AirReminderPosted = true;
+                    episode.AirNotificationPosted = true;
 
                     // Conga time!
 
@@ -92,7 +92,7 @@ public class AirNotificationService(
                         var congaEvent = new CongaEvent(project.Id, episode.Id, task.Id);
                         await eventBus.PublishAsync(congaEvent);
 
-                        task.LastReminded = DateTimeOffset.UtcNow;
+                        task.LastRemindedAt = DateTimeOffset.UtcNow;
                     }
                 }
             }

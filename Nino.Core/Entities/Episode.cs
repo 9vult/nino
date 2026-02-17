@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 using System.Globalization;
-using System.Text.Json.Serialization;
 
 namespace Nino.Core.Entities;
 
@@ -13,20 +12,18 @@ public class Episode
     [Key]
     public Guid Id { get; set; }
     public required Guid ProjectId { get; set; }
-    public required Guid GroupId { get; set; }
 
     [MaxLength(32)]
     public required string Number { get; set; }
-    public required bool Done { get; set; }
-    public required bool AirReminderPosted { get; set; }
-    public DateTimeOffset? Updated { get; set; }
+    public required bool IsDone { get; set; }
+    public required bool AirNotificationPosted { get; set; }
+    public DateTimeOffset? UpdatedAt { get; set; }
 
     public ICollection<Task> Tasks { get; set; } = [];
     public ICollection<Staff> AdditionalStaff { get; set; } = [];
     public ICollection<PinchHitter> PinchHitters { get; set; } = [];
 
     public Project Project { get; set; } = null!;
-    public Group Group { get; set; } = null!;
 
     /// <summary>
     /// Canonicalize an episode number

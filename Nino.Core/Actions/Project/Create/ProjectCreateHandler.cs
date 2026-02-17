@@ -70,8 +70,8 @@ public class ProjectCreateHandler(
             Motd = string.Empty,
             AniListId = dto.AniListId,
             AniListOffset = 0,
-            AirReminderEnabled = false,
-            CongaReminderEnabled = false,
+            AirNotificationsEnabled = false,
+            CongaRemindersEnabled = false,
             Created = DateTimeOffset.UtcNow,
         };
         logger.LogInformation("Creating project {Project}", project);
@@ -83,11 +83,10 @@ public class ProjectCreateHandler(
             episodes.Add(
                 new Episode
                 {
-                    GroupId = action.GroupId,
                     ProjectId = project.Id,
                     Number = Convert.ToString(i, CultureInfo.InvariantCulture),
-                    Done = false,
-                    AirReminderPosted = false,
+                    IsDone = false,
+                    AirNotificationPosted = false,
                     AdditionalStaff = [],
                     PinchHitters = [],
                     Tasks = [],

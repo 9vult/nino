@@ -41,7 +41,7 @@ public class CongaNode
         {
             case CongaNodeType.KeyStaff:
             case CongaNodeType.AdditionalStaff:
-                return episode.Tasks.FirstOrDefault(t => t.Abbreviation == Abbreviation)?.Done
+                return episode.Tasks.FirstOrDefault(t => t.Abbreviation == Abbreviation)?.IsDone
                     ?? true;
             case CongaNodeType.Group:
                 var members = Dependents.Where(d => d.Dependents.Contains(this));
