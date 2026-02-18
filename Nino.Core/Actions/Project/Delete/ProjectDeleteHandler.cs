@@ -13,7 +13,7 @@ public sealed class ProjectDeleteHandler(DataContext db, ILogger<ProjectDeleteHa
         var project = await db.Projects.FirstOrDefaultAsync(p => p.Id == action.ProjectId);
 
         if (project is null)
-            return new Result<string>(ResultStatus.NotFound, null);
+            return new Result<string>(ResultStatus.NotFound);
 
         db.Projects.Remove(project);
         await db.SaveChangesAsync();

@@ -75,7 +75,7 @@ public class AirNotificationService(
 
                     var combinedStaff = project
                         .GetCombinedStaff(episode)
-                        .Where(s => s.UserId != project.AirReminderUserId) // Prevent double pings
+                        .Where(s => s.UserId != project.AirNotificationUserId) // Prevent double pings
                         .ToList();
                     var activatedNodes = airNode.GetActivatedNodes(episode);
                     foreach (var node in activatedNodes)

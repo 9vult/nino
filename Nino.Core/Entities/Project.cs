@@ -39,8 +39,8 @@ public class Project
     public required bool CongaRemindersEnabled { get; set; }
     public required DateTimeOffset Created { get; set; }
 
-    public Guid? AirReminderUserId { get; set; }
-    public Guid? AirReminderRoleId { get; set; }
+    public Guid? AirNotificationUserId { get; set; }
+    public Guid? AirNotificationRoleId { get; set; }
     public TimeSpan AirNotificationDelay { get; set; } = TimeSpan.Zero;
     public TimeSpan CongaReminderPeriod { get; set; } = TimeSpan.Zero;
 
@@ -52,9 +52,9 @@ public class Project
     public Channel ProjectChannel { get; set; } = null!;
     public Channel UpdateChannel { get; set; } = null!;
     public Channel ReleaseChannel { get; set; } = null!;
-    public Channel? AirReminderChannel { get; set; }
-    public User? AirReminderUser { get; set; }
-    public MentionRole? AirReminderRole { get; set; }
+    public Channel? AirNotificationChannel { get; set; }
+    public User? AirNotificationUser { get; set; }
+    public MentionRole? AirNotificationRole { get; set; }
 
     public ICollection<Alias> Aliases { get; set; } = [];
     public ICollection<Staff> KeyStaff { get; set; } = [];

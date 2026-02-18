@@ -155,15 +155,15 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
                 .OnDelete(DeleteBehavior.Restrict);
 
             project
-                .HasOne(p => p.AirReminderRole)
+                .HasOne(p => p.AirNotificationRole)
                 .WithMany()
-                .HasForeignKey(p => p.AirReminderRoleId)
+                .HasForeignKey(p => p.AirNotificationRoleId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             project
-                .HasOne(p => p.AirReminderUser)
+                .HasOne(p => p.AirNotificationUser)
                 .WithMany()
-                .HasForeignKey(p => p.AirReminderUserId)
+                .HasForeignKey(p => p.AirNotificationUserId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
 

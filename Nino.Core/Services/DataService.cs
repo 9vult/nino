@@ -13,9 +13,9 @@ public class DataService(DataContext db, ILogger<DataService> logger) : IDataSer
     )
     {
         var project = await db
-            .Projects.Include(p => p.AirReminderChannel)
-            .Include(p => p.AirReminderUser)
-            .Include(p => p.AirReminderRole)
+            .Projects.Include(p => p.AirNotificationChannel)
+            .Include(p => p.AirNotificationUser)
+            .Include(p => p.AirNotificationRole)
             .SingleAsync(p => p.Id == projectId);
         var episode = await db.Episodes.SingleAsync(e => e.Id == episodeId);
 
@@ -29,9 +29,9 @@ public class DataService(DataContext db, ILogger<DataService> logger) : IDataSer
             AniListUrl: project.AniListUrl,
             PosterUrl: project.PosterUri,
             EpisodeNumber: episode.Number,
-            NotificationChannel: project.AirReminderChannel?.AsMappedId(),
-            NotificationUser: project.AirReminderUser,
-            NotificationRole: project.AirReminderRole,
+            NotificationChannel: project.AirNotificationChannel?.AsMappedId(),
+            NotificationUser: project.AirNotificationUser,
+            NotificationRole: project.AirNotificationRole,
             NotificationLocale: locale
         );
     }
