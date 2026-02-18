@@ -14,6 +14,17 @@ public partial class ProjectModule
         var interaction = Context.Interaction;
         var locale = interaction.UserLocale;
 
+        // Verify button was clicked by initiator
+        if (
+            await identityService.GetOrCreateUserByDiscordIdAsync(
+                interaction.User.Id,
+                interaction.User.Username
+            ) != userId
+        )
+            return await interaction.FailAsync(T("error.hijack", locale), ephemeral: true);
+
+        logger.LogTrace("Project deletion canceled by {UserId}", userId);
+
         var data = await dataService.GetProjectBasicInfoAsync(projectId);
         var header = $"{data.Title} ({data.Type.ToFriendlyString(locale)})";
 

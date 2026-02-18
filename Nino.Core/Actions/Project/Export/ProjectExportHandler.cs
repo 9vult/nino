@@ -21,7 +21,7 @@ public class ProjectExportHandler(
             !await verificationService.VerifyProjectPermissionsAsync(
                 projectId,
                 userId,
-                PermissionsLevel.Owner
+                PermissionsLevel.Administrator
             )
         )
             return new Result<string>(ResultStatus.Unauthorized);

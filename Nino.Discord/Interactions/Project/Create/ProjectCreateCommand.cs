@@ -68,6 +68,8 @@ public partial class ProjectModule
             FirstEpisode = firstEpisode,
         };
 
+        logger.LogTrace("Project creation requested by {UserId}", userId);
+
         var response = await createHandler.HandleAsync(
             new ProjectCreateAction(dto, groupId, userId)
         );

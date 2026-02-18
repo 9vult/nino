@@ -9,7 +9,8 @@ public static class InteractionExtensions
 {
     public static async Task<RuntimeResult> FailAsync(
         this IDiscordInteraction interaction,
-        string message
+        string message,
+        bool ephemeral = false
     )
     {
         var embed = new EmbedBuilder()
@@ -17,7 +18,7 @@ public static class InteractionExtensions
             .WithDescription(message)
             .WithColor(0xd797ff)
             .Build();
-        await interaction.FollowupAsync(embed: embed);
+        await interaction.FollowupAsync(embed: embed, ephemeral: ephemeral);
         return ExecutionResult.Failure;
     }
 }

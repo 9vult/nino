@@ -35,6 +35,8 @@ public partial class ProjectModule
         var data = await dataService.GetProjectBasicInfoAsync(projectId);
         var header = $"{data.Title} ({data.Type.ToFriendlyString(locale)})";
 
+        logger.LogTrace("Displaying project deletion confirmation to {UserId}", userId);
+
         // Ask if the user is sure
         var embed = new EmbedBuilder()
             .WithAuthor(header)

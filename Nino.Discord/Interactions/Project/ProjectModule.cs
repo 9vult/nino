@@ -5,6 +5,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Nino.Core.Actions.Project.Create;
 using Nino.Core.Actions.Project.Delete;
+using Nino.Core.Actions.Project.Export;
 using Nino.Core.Actions.Project.Resolve;
 using Nino.Core.Services;
 using Nino.Discord.Services;
@@ -20,6 +21,7 @@ public partial class ProjectModule(
     IUserVerificationService verificationService,
     ProjectResolveHandler projectResolver,
     ProjectCreateHandler createHandler,
+    ProjectExportHandler exportHandler,
     ProjectDeleteHandler deleteHandler,
     ILogger<ProjectModule> logger
 ) : InteractionModuleBase<IInteractionContext> { }
