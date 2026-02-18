@@ -6,12 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Nino.Core;
-using Nino.Core.Actions.Project.Create;
-using Nino.Core.Actions.Project.Delete;
-using Nino.Core.Actions.Project.Export;
-using Nino.Core.Actions.Project.Resolve;
-using Nino.Core.Events;
-using Nino.Core.Services;
 using Nino.Discord;
 using Nino.Host;
 using NLog.Extensions.Logging;
@@ -52,23 +46,8 @@ var builder = Host.CreateDefaultBuilder(args)
                 options.UseSqlite(context.Configuration.GetConnectionString("DefaultConnection"))
             );
             services.AddHttpClient();
+            services.AddNinoCore(context.Configuration);
             services.AddDiscordBotService(context.Configuration);
-
-            // Background Services
-            services.AddHostedService<AirNotificationService>();
-
-            // Services
-            services.AddSingleton<IEventBus, InMemoryEventBus>();
-            services.AddScoped<IAniListService, AniListService>();
-            services.AddScoped<IIdentityService, IdentityService>();
-            services.AddScoped<IUserVerificationService, UserVerificationService>();
-            services.AddScoped<IDataService, DataService>();
-
-            // Action handlers
-            services.AddScoped<ProjectResolveHandler>();
-            services.AddScoped<ProjectCreateHandler>();
-            services.AddScoped<ProjectExportHandler>();
-            services.AddScoped<ProjectDeleteHandler>();
         }
     );
 
