@@ -6,15 +6,15 @@ using Nino.Core.Entities;
 using Nino.Core.Enums;
 using Nino.Core.Services;
 
-namespace Nino.Core.Actions.Project.Delete;
+namespace Nino.Core.Actions.Project.Export;
 
-public sealed class ProjectDeleteHandler(
+public class ProjectExportHandler(
     DataContext db,
     IUserVerificationService verificationService,
-    ILogger<ProjectDeleteHandler> logger
+    ILogger<ProjectExportHandler> logger
 )
 {
-    public async Task<Result<string>> HandleAsync(ProjectDeleteAction action)
+    public async Task<Result<string>> HandleAsync(ProjectExportAction action)
     {
         var (projectId, userId) = action;
         if (
@@ -29,18 +29,13 @@ public sealed class ProjectDeleteHandler(
         var project = await db
             .Projects.Include(p => p.Episodes)
             .SingleOrDefaultAsync(p => p.Id == action.ProjectId);
+
         if (project is null)
             return new Result<string>(ResultStatus.NotFound);
 
         logger.LogInformation("Generating JSON export of project {Project}", project);
 
         var export = ExportDto.Create(project);
-
-        logger.LogInformation("Deleting project {Project}", project);
-
-        db.Projects.Remove(project);
-        await db.SaveChangesAsync();
-
         return new Result<string>(ResultStatus.Success, JsonSerializer.Serialize(export));
     }
 }

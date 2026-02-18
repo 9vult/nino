@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Nino.Core;
 using Nino.Core.Actions.Project.Create;
 using Nino.Core.Actions.Project.Delete;
+using Nino.Core.Actions.Project.Export;
 using Nino.Core.Actions.Project.Resolve;
 using Nino.Core.Events;
 using Nino.Core.Services;
@@ -66,6 +67,7 @@ var builder = Host.CreateDefaultBuilder(args)
             // Action handlers
             services.AddScoped<ProjectResolveHandler>();
             services.AddScoped<ProjectCreateHandler>();
+            services.AddScoped<ProjectExportHandler>();
             services.AddScoped<ProjectDeleteHandler>();
         }
     );

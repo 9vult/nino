@@ -13,7 +13,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Actions\Project\Export\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
   <ItemGroup>
