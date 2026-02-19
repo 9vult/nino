@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
-namespace Nino.Core.Actions.KeyStaff.Add;
+namespace Nino.Core.Features.KeyStaff.Add;
 
-public sealed record KeyStaffAddAction(
+public sealed record AddKeyStaffCommand(
     Guid ProjectId,
     Guid UserId,
     string Abbreviation,

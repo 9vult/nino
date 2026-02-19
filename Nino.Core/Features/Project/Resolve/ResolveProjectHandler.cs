@@ -4,30 +4,28 @@ using Nino.Core.Entities;
 using Nino.Core.Enums;
 using Nino.Core.Services;
 
-namespace Nino.Core.Actions.Project.Resolve;
+namespace Nino.Core.Features.Project.Resolve;
 
-public class ProjectResolveHandler(
+public class ResolveProjectHandler(
     DataContext db,
     IUserVerificationService verificationService,
-    ILogger<ProjectResolveHandler> logger
+    ILogger<ResolveProjectHandler> logger
 )
 {
-    public async Task<Result<Guid>> HandleAsync(ProjectResolveAction action)
+    public async Task<Result<Guid>> HandleAsync(ResolveProjectQuery query)
     {
         var project = await db
             .Projects.Where(p =>
                 (
-                    p.GroupId == action.GroupId
-                    || (
-                        action.IncludeObservers && p.Observers.Any(o => o.GroupId == action.GroupId)
-                    )
-                ) && (p.Nickname == action.Alias || p.Aliases.Any(a => a.Value == action.Alias))
+                    p.GroupId == query.GroupId
+                    || (query.IncludeObservers && p.Observers.Any(o => o.GroupId == query.GroupId))
+                ) && (p.Nickname == query.Alias || p.Aliases.Any(a => a.Value == query.Alias))
             )
             .FirstOrDefaultAsync();
 
         if (project is null)
         {
-            logger.LogTrace("Unable to resolve alias {Alias} to a project", action.Alias);
+            logger.LogTrace("Unable to resolve alias {Alias} to a project", query.Alias);
             return new Result<Guid>(ResultStatus.NotFound, Guid.Empty);
         }
 
@@ -35,14 +33,14 @@ public class ProjectResolveHandler(
             !project.IsPrivate
             || await verificationService.VerifyProjectPermissionsAsync(
                 project.Id,
-                action.RequestedBy,
+                query.RequestedBy,
                 PermissionsLevel.Staff
             )
         )
         {
             logger.LogTrace(
                 "Resolved alias \"{Alias}\" to project {Project}",
-                action.Alias,
+                query.Alias,
                 project
             );
             return new Result<Guid>(ResultStatus.Success, project.Id);

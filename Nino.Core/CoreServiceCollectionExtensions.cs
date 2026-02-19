@@ -2,11 +2,11 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Nino.Core.Actions.Project.Create;
-using Nino.Core.Actions.Project.Delete;
-using Nino.Core.Actions.Project.Export;
-using Nino.Core.Actions.Project.Resolve;
 using Nino.Core.Events;
+using Nino.Core.Features.Project.Create;
+using Nino.Core.Features.Project.Delete;
+using Nino.Core.Features.Project.Export;
+using Nino.Core.Features.Project.Resolve;
 using Nino.Core.Services;
 
 namespace Nino.Core;
@@ -18,12 +18,14 @@ public static class CoreServiceCollectionExtensions
         IConfiguration configuration
     )
     {
-        services.AddDbContext<DataContext>(db => db.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
+        services.AddDbContext<DataContext>(db =>
+            db.UseSqlite(configuration.GetConnectionString("DefaultConnection"))
+        );
         services.AddSingleton<IEventBus, InMemoryEventBus>();
-        
+
         // Background Services
         services.AddHostedService<AirNotificationService>();
-        
+
         // Services
         services.AddScoped<IAniListService, AniListService>();
         services.AddScoped<IIdentityService, IdentityService>();
@@ -31,11 +33,11 @@ public static class CoreServiceCollectionExtensions
         services.AddScoped<IDataService, DataService>();
 
         // Action handlers
-        services.AddScoped<ProjectResolveHandler>();
-        services.AddScoped<ProjectCreateHandler>();
-        services.AddScoped<ProjectExportHandler>();
-        services.AddScoped<ProjectDeleteHandler>();
-        
+        services.AddScoped<ResolveProjectHandler>();
+        services.AddScoped<CreateProjectHandler>();
+        services.AddScoped<ExportProjectHandler>();
+        services.AddScoped<DeleteProjectHandler>();
+
         return services;
     }
 }

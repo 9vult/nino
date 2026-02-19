@@ -2,9 +2,9 @@
 
 using Discord;
 using Discord.Interactions;
-using Nino.Core.Actions.Project.Create;
 using Nino.Core.Dtos;
 using Nino.Core.Enums;
+using Nino.Core.Features.Project.Create;
 
 namespace Nino.Discord.Interactions.Project;
 
@@ -62,8 +62,8 @@ public partial class ProjectModule
 
         logger.LogTrace("Project creation requested by {UserId}", userId);
 
-        var response = await createHandler.HandleAsync(
-            new ProjectCreateAction(dto, groupId, userId, isDiscordAdmin)
+        var response = await handler.HandleAsync(
+            new CreateProjectCommand(dto, groupId, userId, isDiscordAdmin)
         );
 
         switch (response.Status)

@@ -2,9 +2,9 @@
 
 using Nino.Core.Dtos;
 
-namespace Nino.Core.Actions.Project.Create;
+namespace Nino.Core.Features.Project.Create;
 
-public sealed record ProjectCreateAction(
+public sealed record CreateProjectCommand(
     ProjectCreateDto Dto,
     Guid GroupId,
     Guid OwnerId,

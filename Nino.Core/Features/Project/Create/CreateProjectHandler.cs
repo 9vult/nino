@@ -6,20 +6,20 @@ using Nino.Core.Entities;
 using Nino.Core.Enums;
 using Nino.Core.Services;
 
-namespace Nino.Core.Actions.Project.Create;
+namespace Nino.Core.Features.Project.Create;
 
-public sealed class ProjectCreateHandler(
+public sealed class CreateProjectHandler(
     DataContext db,
     IAniListService aniListService,
     IUserVerificationService verificationService,
-    ILogger<ProjectCreateHandler> logger
+    ILogger<CreateProjectHandler> logger
 )
 {
     private const string FallbackPosterUrl = "https://files.catbox.moe/j3qizm.png";
 
-    public async Task<Result<ProjectCreateResult>> HandleAsync(ProjectCreateAction action)
+    public async Task<Result<CreateProjectResponse>> HandleAsync(CreateProjectCommand input)
     {
-        var (dto, groupId, ownerId, overrideVerification) = action;
+        var (dto, groupId, ownerId, overrideVerification) = input;
         if (
             !overrideVerification
             && !await verificationService.VerifyGroupPermissionsAsync(
@@ -28,17 +28,17 @@ public sealed class ProjectCreateHandler(
                 PermissionsLevel.Administrator
             )
         )
-            return new Result<ProjectCreateResult>(ResultStatus.Unauthorized);
+            return new Result<CreateProjectResponse>(ResultStatus.Unauthorized);
 
         // Sanitize nickname
         dto.Nickname = dto.Nickname.Trim().ToLowerInvariant().Replace(" ", string.Empty);
 
         if (
             await db.Projects.AnyAsync(p =>
-                p.GroupId == action.GroupId && p.Nickname == dto.Nickname
+                p.GroupId == input.GroupId && p.Nickname == dto.Nickname
             )
         )
-            return new Result<ProjectCreateResult>(ResultStatus.Conflict, null);
+            return new Result<CreateProjectResponse>(ResultStatus.Conflict, null);
 
         var autoFields = GetAutoFields(dto);
         if (!string.IsNullOrEmpty(autoFields))
@@ -57,18 +57,18 @@ public sealed class ProjectCreateHandler(
             dto.PosterUri ??= anime.PosterUrl ?? FallbackPosterUrl;
         }
         else if (anime.Status is not ResultStatus.BadRequest) // Any other error (bad request is AniListId <= 0)
-            return new Result<ProjectCreateResult>(ResultStatus.Error);
+            return new Result<CreateProjectResponse>(ResultStatus.Error);
 
         if (dto.Title is null || dto.Length is null || dto.Type is null || dto.PosterUri is null)
-            return new Result<ProjectCreateResult>(ResultStatus.BadRequest);
+            return new Result<CreateProjectResponse>(ResultStatus.BadRequest);
 
         var project = new Entities.Project
         {
             Id = Guid.NewGuid(),
-            GroupId = action.GroupId,
+            GroupId = input.GroupId,
             Nickname = dto.Nickname,
             Title = dto.Title,
-            OwnerId = action.OwnerId,
+            OwnerId = input.OwnerId,
             Type = dto.Type.Value,
             PosterUrl = dto.PosterUri,
             ProjectChannelId = dto.ProjectChannelId,
@@ -113,9 +113,9 @@ public sealed class ProjectCreateHandler(
 
         await db.SaveChangesAsync();
 
-        return new Result<ProjectCreateResult>(
+        return new Result<CreateProjectResponse>(
             ResultStatus.Success,
-            new ProjectCreateResult(project.Id, project.Nickname)
+            new CreateProjectResponse(project.Id, project.Nickname)
         );
     }
 

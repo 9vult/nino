@@ -3,7 +3,7 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Nino.Core.Actions.Project.Resolve;
+using Nino.Core.Features.Project.Resolve;
 using Nino.Core.Services;
 using Nino.Discord.Services;
 
@@ -16,6 +16,6 @@ public partial class KeyStaffModule(
     IDataService dataService,
     IInteractionIdentityService interactionIdService,
     IUserVerificationService verificationService,
-    ProjectResolveHandler projectResolver,
+    ResolveProjectHandler projectResolver,
     ILogger<KeyStaffModule> logger
 ) : InteractionModuleBase<IInteractionContext> { }

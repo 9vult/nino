@@ -3,8 +3,8 @@
 using System.Text;
 using Discord;
 using Discord.Interactions;
-using Nino.Core.Actions.Project.Delete;
 using Nino.Core.Enums;
+using Nino.Core.Features.Project.Delete;
 
 namespace Nino.Discord.Interactions.Project;
 
@@ -31,7 +31,7 @@ public partial class ProjectModule
         logger.LogTrace("Project deletion confirmed by {UserId}", userId);
 
         var (status, json) = await deleteHandler.HandleAsync(
-            new ProjectDeleteAction(projectId, userId)
+            new DeleteProjectCommand(projectId, userId)
         );
 
         if (status is not ResultStatus.Success)

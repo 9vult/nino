@@ -6,36 +6,41 @@ using Nino.Core.Entities;
 using Nino.Core.Enums;
 using Nino.Core.Services;
 
-namespace Nino.Core.Actions.Project.Export;
+namespace Nino.Core.Features.Project.Delete;
 
-public class ProjectExportHandler(
+public sealed class DeleteProjectHandler(
     DataContext db,
     IUserVerificationService verificationService,
-    ILogger<ProjectExportHandler> logger
+    ILogger<DeleteProjectHandler> logger
 )
 {
-    public async Task<Result<string>> HandleAsync(ProjectExportAction action)
+    public async Task<Result<string>> HandleAsync(DeleteProjectCommand input)
     {
-        var (projectId, userId) = action;
+        var (projectId, userId) = input;
         if (
             !await verificationService.VerifyProjectPermissionsAsync(
                 projectId,
                 userId,
-                PermissionsLevel.Administrator
+                PermissionsLevel.Owner
             )
         )
             return new Result<string>(ResultStatus.Unauthorized);
 
         var project = await db
             .Projects.Include(p => p.Episodes)
-            .SingleOrDefaultAsync(p => p.Id == action.ProjectId);
-
+            .SingleOrDefaultAsync(p => p.Id == input.ProjectId);
         if (project is null)
             return new Result<string>(ResultStatus.NotFound);
 
         logger.LogInformation("Generating JSON export of project {Project}", project);
 
         var export = ExportDto.Create(project);
+
+        logger.LogInformation("Deleting project {Project}", project);
+
+        db.Projects.Remove(project);
+        await db.SaveChangesAsync();
+
         return new Result<string>(ResultStatus.Success, JsonSerializer.Serialize(export));
     }
 }

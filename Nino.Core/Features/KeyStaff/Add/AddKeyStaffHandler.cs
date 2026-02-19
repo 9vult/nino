@@ -4,15 +4,15 @@ using Nino.Core.Entities;
 using Nino.Core.Enums;
 using Nino.Core.Services;
 
-namespace Nino.Core.Actions.KeyStaff.Add;
+namespace Nino.Core.Features.KeyStaff.Add;
 
-public sealed class KeyStaffAddHandler(
+public sealed class AddKeyStaffHandler(
     DataContext db,
     IUserVerificationService verificationService,
-    ILogger<KeyStaffAddHandler> logger
+    ILogger<AddKeyStaffHandler> logger
 )
 {
-    public async Task<Result> HandleAsync(KeyStaffAddAction action)
+    public async Task<Result> HandleAsync(AddKeyStaffCommand action)
     {
         var (projectId, userId, abbreviation, fullName, isPseudo, requestedBy) = action;
 

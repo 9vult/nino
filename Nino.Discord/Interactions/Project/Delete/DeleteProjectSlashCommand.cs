@@ -2,8 +2,8 @@
 
 using Discord;
 using Discord.Interactions;
-using Nino.Core.Actions.Project.Resolve;
 using Nino.Core.Enums;
+using Nino.Core.Features.Project.Resolve;
 
 namespace Nino.Discord.Interactions.Project;
 
@@ -18,7 +18,7 @@ public partial class ProjectModule
         // Verify project and user - Owner required
         var (userId, groupId) = await interactionIdService.GetUserAndGroupAsync(interaction);
         var (status, projectId) = await projectResolver.HandleAsync(
-            new ProjectResolveAction(alias, groupId, userId)
+            new ResolveProjectQuery(alias, groupId, userId)
         );
 
         if (status is not ResultStatus.Success)

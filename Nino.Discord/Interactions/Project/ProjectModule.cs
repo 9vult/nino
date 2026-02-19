@@ -3,10 +3,10 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Nino.Core.Actions.Project.Create;
-using Nino.Core.Actions.Project.Delete;
-using Nino.Core.Actions.Project.Export;
-using Nino.Core.Actions.Project.Resolve;
+using Nino.Core.Features.Project.Create;
+using Nino.Core.Features.Project.Delete;
+using Nino.Core.Features.Project.Export;
+using Nino.Core.Features.Project.Resolve;
 using Nino.Core.Services;
 using Nino.Discord.Services;
 
@@ -19,9 +19,9 @@ public partial class ProjectModule(
     IDataService dataService,
     IInteractionIdentityService interactionIdService,
     IUserVerificationService verificationService,
-    ProjectResolveHandler projectResolver,
-    ProjectCreateHandler createHandler,
-    ProjectExportHandler exportHandler,
-    ProjectDeleteHandler deleteHandler,
+    ResolveProjectHandler projectResolver,
+    CreateProjectHandler handler,
+    ExportProjectHandler exportHandler,
+    DeleteProjectHandler deleteHandler,
     ILogger<ProjectModule> logger
 ) : InteractionModuleBase<IInteractionContext> { }

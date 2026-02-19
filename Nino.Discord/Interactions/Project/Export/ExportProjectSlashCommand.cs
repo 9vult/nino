@@ -2,9 +2,9 @@
 
 using System.Text;
 using Discord.Interactions;
-using Nino.Core.Actions.Project.Export;
-using Nino.Core.Actions.Project.Resolve;
 using Nino.Core.Enums;
+using Nino.Core.Features.Project.Export;
+using Nino.Core.Features.Project.Resolve;
 
 namespace Nino.Discord.Interactions.Project;
 
@@ -19,7 +19,7 @@ public partial class ProjectModule
         // Verify project and user - Admin required
         var (userId, groupId) = await interactionIdService.GetUserAndGroupAsync(interaction);
         var (resolveStatus, projectId) = await projectResolver.HandleAsync(
-            new ProjectResolveAction(alias, groupId, userId)
+            new ResolveProjectQuery(alias, groupId, userId)
         );
 
         if (resolveStatus is not ResultStatus.Success)
@@ -35,7 +35,7 @@ public partial class ProjectModule
 
         var data = await dataService.GetProjectBasicInfoAsync(projectId);
         var (exportStatus, json) = await exportHandler.HandleAsync(
-            new ProjectExportAction(projectId, userId)
+            new ExportProjectCommand(projectId, userId)
         );
 
         if (exportStatus is not ResultStatus.Success)
