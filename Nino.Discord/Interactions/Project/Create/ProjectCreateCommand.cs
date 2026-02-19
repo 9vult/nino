@@ -33,15 +33,7 @@ public partial class ProjectModule
 
         // Verify user - Administrator required
         var (userId, groupId) = await interactionIdService.GetUserAndGroupAsync(interaction);
-        if (
-            !member.GuildPermissions.Administrator // Discord admin
-            && !await verificationService.VerifyGroupPermissionsAsync(
-                groupId,
-                userId,
-                PermissionsLevel.Administrator
-            )
-        )
-            return await interaction.FailAsync(T("error.permissions", lng));
+        var isDiscordAdmin = member.GuildPermissions.Administrator;
 
         var projectChannelId = await identityService.GetOrCreateChannelByDiscordIdAsync(
             projectChannel.Id
@@ -71,7 +63,7 @@ public partial class ProjectModule
         logger.LogTrace("Project creation requested by {UserId}", userId);
 
         var response = await createHandler.HandleAsync(
-            new ProjectCreateAction(dto, groupId, userId)
+            new ProjectCreateAction(dto, groupId, userId, isDiscordAdmin)
         );
 
         switch (response.Status)
@@ -79,15 +71,14 @@ public partial class ProjectModule
             case ResultStatus.Success:
                 await interaction.FollowupAsync(T("project.creation.success", lng, nickname));
                 break;
+            case ResultStatus.Unauthorized:
+                return await interaction.FailAsync(T("error.permissions", lng));
             case ResultStatus.Conflict:
-                await interaction.FollowupAsync(T("project.creation.conflict", lng, nickname));
-                break;
+                return await interaction.FailAsync(T("project.creation.conflict", lng, nickname));
             case ResultStatus.BadRequest:
-                await interaction.FollowupAsync(T("project.creation.failed", lng));
-                break;
+                return await interaction.FailAsync(T("project.creation.failed", lng));
             case ResultStatus.Error:
-                await interaction.FollowupAsync(T("project.creation.failed.generic", lng));
-                break;
+                return await interaction.FailAsync(T("project.creation.failed.generic", lng));
         }
 
         return ExecutionResult.Success;

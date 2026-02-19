@@ -4,4 +4,9 @@ using Nino.Core.Dtos;
 
 namespace Nino.Core.Actions.Project.Create;
 
-public sealed record ProjectCreateAction(ProjectCreateDto Dto, Guid GroupId, Guid OwnerId);
+public sealed record ProjectCreateAction(
+    ProjectCreateDto Dto,
+    Guid GroupId,
+    Guid OwnerId,
+    bool OverrideVerification
+);

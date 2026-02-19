@@ -8,9 +8,10 @@ using Nino.Core.Services;
 
 namespace Nino.Core.Actions.Project.Create;
 
-public class ProjectCreateHandler(
+public sealed class ProjectCreateHandler(
     DataContext db,
     IAniListService aniListService,
+    IUserVerificationService verificationService,
     ILogger<ProjectCreateHandler> logger
 )
 {
@@ -18,7 +19,16 @@ public class ProjectCreateHandler(
 
     public async Task<Result<ProjectCreateResult>> HandleAsync(ProjectCreateAction action)
     {
-        var dto = action.Dto;
+        var (dto, groupId, ownerId, overrideVerification) = action;
+        if (
+            !overrideVerification
+            && !await verificationService.VerifyGroupPermissionsAsync(
+                groupId,
+                ownerId,
+                PermissionsLevel.Administrator
+            )
+        )
+            return new Result<ProjectCreateResult>(ResultStatus.Unauthorized);
 
         // Sanitize nickname
         dto.Nickname = dto.Nickname.Trim().ToLowerInvariant().Replace(" ", string.Empty);
