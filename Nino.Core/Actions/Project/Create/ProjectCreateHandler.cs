@@ -70,7 +70,7 @@ public sealed class ProjectCreateHandler(
             Title = dto.Title,
             OwnerId = action.OwnerId,
             Type = dto.Type.Value,
-            PosterUri = dto.PosterUri,
+            PosterUrl = dto.PosterUri,
             ProjectChannelId = dto.ProjectChannelId,
             UpdateChannelId = dto.UpdateChannelId,
             ReleaseChannelId = dto.ReleaseChannelId,

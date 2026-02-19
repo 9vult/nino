@@ -12,7 +12,7 @@ public sealed class ProjectImportDto
     public required string Nickname { get; init; }
     public required string Title { get; init; }
     public required ProjectType Type { get; init; }
-    public required string PosterUri { get; init; }
+    public required string PosterUrl { get; init; }
     public required bool IsPrivate { get; init; }
     public required bool IsArchived { get; init; }
 

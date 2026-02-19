@@ -13,7 +13,7 @@ public sealed class ProjectExportDto
     public required string Nickname { get; init; }
     public required string Title { get; init; }
     public required ProjectType Type { get; init; }
-    public required string PosterUri { get; init; }
+    public required string PosterUrl { get; init; }
     public required bool IsPrivate { get; init; }
     public required bool IsArchived { get; init; }
 
@@ -47,7 +47,7 @@ public sealed class ProjectExportDto
             Nickname = project.Nickname,
             Title = project.Title,
             Type = project.Type,
-            PosterUri = project.PosterUri,
+            PosterUrl = project.PosterUrl,
             IsPrivate = project.IsPrivate,
             IsArchived = project.IsArchived,
             ProjectChannelId = MappedIdDto.FromMappedId(project.ProjectChannel),

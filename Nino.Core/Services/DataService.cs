@@ -16,18 +16,35 @@ public class DataService(DataContext db, ILogger<DataService> logger) : IDataSer
             .Projects.Include(p => p.AirNotificationChannel)
             .Include(p => p.AirNotificationUser)
             .Include(p => p.AirNotificationRole)
-            .SingleAsync(p => p.Id == projectId);
-        var episode = await db.Episodes.SingleAsync(e => e.Id == episodeId);
+            .Where(p => p.Id == projectId)
+            .Select(p => new
+            {
+                p.GroupId,
+                p.Title,
+                p.Type,
+                p.AniListUrl,
+                p.PosterUrl,
+                p.AirNotificationChannel,
+                p.AirNotificationUser,
+                p.AirNotificationRole,
+            })
+            .SingleAsync();
 
-        var locale = (await db.Groups.SingleAsync(g => g.Id == project.GroupId))
-            .Configuration
-            .Locale;
+        var episode = await db
+            .Episodes.Where(e => e.Id == episodeId)
+            .Select(e => new { e.Number })
+            .SingleAsync();
+
+        var locale = await db
+            .Groups.Where(g => g.Id == project.GroupId)
+            .Select(g => g.Configuration.Locale)
+            .SingleAsync();
 
         return new AirNotificationDto(
             ProjectTitle: project.Title,
             ProjectType: project.Type,
             AniListUrl: project.AniListUrl,
-            PosterUrl: project.PosterUri,
+            PosterUrl: project.PosterUrl,
             EpisodeNumber: episode.Number,
             NotificationChannel: project.AirNotificationChannel?.AsMappedId(),
             NotificationUser: project.AirNotificationUser,
@@ -39,13 +56,14 @@ public class DataService(DataContext db, ILogger<DataService> logger) : IDataSer
     /// <inheritdoc />
     public async Task<ProjectBasicInfoDto> GetProjectBasicInfoAsync(Guid projectId)
     {
-        var project = await db.Projects.SingleAsync(p => p.Id == projectId);
-
-        return new ProjectBasicInfoDto(
-            Nickname: project.Nickname,
-            Title: project.Title,
-            Type: project.Type,
-            IsPrivate: project.IsPrivate
-        );
+        return await db
+            .Projects.Where(p => p.Id == projectId)
+            .Select(p => new ProjectBasicInfoDto(
+                Nickname: p.Nickname,
+                Title: p.Title,
+                Type: p.Type,
+                IsPrivate: p.IsPrivate
+            ))
+            .SingleAsync();
     }
 }

@@ -23,7 +23,7 @@ public class Project
     public required ProjectType Type { get; set; }
 
     [MaxLength(256)]
-    public required string PosterUri { get; set; }
+    public required string PosterUrl { get; set; }
     public required Guid ProjectChannelId { get; set; }
     public required Guid UpdateChannelId { get; set; }
     public required Guid ReleaseChannelId { get; set; }
