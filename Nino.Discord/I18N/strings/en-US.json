@@ -21,7 +21,8 @@
     "project.delete.question": "Are you sure you want to delete **{title_1}**?\nThis action is irreversible.",
     "project.delete.title": "Project Deletion",
     "project.export": "Here's everything I know about `{nickname_1}`!",
-    "project.resolution.failed": "Could not resolve alias `{alias_1}` to a project."
+    "project.resolution.failed": "Could not resolve alias `{alias_1}` to a project.",
+    "task.creation.conflict": "A task with the abbreviation `{abbreviation_1}` already exists!"
   },
   "plural": {
     
