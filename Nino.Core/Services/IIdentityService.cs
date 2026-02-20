@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
 using Nino.Core.Entities;
-using Task = System.Threading.Tasks.Task;
 
 namespace Nino.Core.Services;
 
@@ -39,4 +38,32 @@ public interface IIdentityService
     /// <returns>Role ID</returns>
     /// <remarks>Creates a new <see cref="MentionRole"/> if not found</remarks>
     Task<Guid> GetOrCreateMentionRoleByDiscordIdAsync(ulong discordId);
+
+    /// <summary>
+    /// Get a <see cref="User"/>'s Discord ID
+    /// </summary>
+    /// <param name="userId">User ID</param>
+    /// <returns>User's Discord ID, or <see langword="null"/> if it does not exist</returns>
+    Task<ulong?> GetDiscordUserIdAsync(Guid userId);
+
+    /// <summary>
+    /// Get a <see cref="Group"/>'s Discord ID
+    /// </summary>
+    /// <param name="groupId">Group ID</param>
+    /// <returns>Group's Discord ID, or <see langword="null"/> if it does not exist</returns>
+    Task<ulong?> GetDiscordGroupIdAsync(Guid groupId);
+
+    /// <summary>
+    /// Get a <see cref="Channel"/>'s Discord ID
+    /// </summary>
+    /// <param name="channelId">Channel ID</param>
+    /// <returns>Channel's Discord ID, or <see langword="null"/> if it does not exist</returns>
+    Task<ulong?> GetDiscordChannelIdAsync(Guid channelId);
+
+    /// <summary>
+    /// Get a <see cref="MentionRole"/>'s Discord ID
+    /// </summary>
+    /// <param name="roleId">Role ID</param>
+    /// <returns>Role's Discord ID, or <see langword="null"/> if it does not exist</returns>
+    Task<ulong?> GetDiscordMentionRoleIdAsync(Guid roleId);
 }

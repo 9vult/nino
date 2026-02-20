@@ -155,4 +155,40 @@ public class IdentityService(DataContext db, ILogger<IdentityService> logger) : 
             return existing.Id;
         }
     }
+
+    /// <inheritdoc />
+    public async Task<ulong?> GetDiscordUserIdAsync(Guid userId)
+    {
+        return await db
+            .Users.Where(u => u.Id == userId)
+            .Select(u => u.DiscordId)
+            .SingleOrDefaultAsync();
+    }
+
+    /// <inheritdoc />
+    public async Task<ulong?> GetDiscordGroupIdAsync(Guid groupId)
+    {
+        return await db
+            .Groups.Where(u => u.Id == groupId)
+            .Select(g => g.DiscordId)
+            .SingleOrDefaultAsync();
+    }
+
+    /// <inheritdoc />
+    public async Task<ulong?> GetDiscordChannelIdAsync(Guid channelId)
+    {
+        return await db
+            .Channels.Where(u => u.Id == channelId)
+            .Select(c => c.DiscordId)
+            .SingleOrDefaultAsync();
+    }
+
+    /// <inheritdoc />
+    public async Task<ulong?> GetDiscordMentionRoleIdAsync(Guid roleId)
+    {
+        return await db
+            .MentionRoles.Where(u => u.Id == roleId)
+            .Select(r => r.DiscordId)
+            .SingleOrDefaultAsync();
+    }
 }
