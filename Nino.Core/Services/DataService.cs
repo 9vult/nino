@@ -66,4 +66,10 @@ public class DataService(DataContext db, ILogger<DataService> logger) : IDataSer
             ))
             .SingleAsync();
     }
+
+    /// <inheritdoc />
+    public async Task<bool> GetProjectCompletionStatusAsync(Guid projectId)
+    {
+        return await db.Episodes.Where(p => p.Id == projectId).AllAsync(e => e.IsDone);
+    }
 }

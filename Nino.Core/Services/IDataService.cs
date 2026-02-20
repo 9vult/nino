@@ -20,4 +20,11 @@ public interface IDataService
     /// <param name="projectId">Project ID</param>
     /// <returns>Basic information about the project</returns>
     Task<ProjectBasicInfoDto> GetProjectBasicInfoAsync(Guid projectId);
+
+    /// <summary>
+    /// Get whether the project is currently complete
+    /// </summary>
+    /// <param name="projectId">Project ID</param>
+    /// <returns><see langword="true"/> if all episodes are complete</returns>
+    Task<bool> GetProjectCompletionStatusAsync(Guid projectId);
 }
