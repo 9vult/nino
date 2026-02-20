@@ -21,6 +21,7 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     public DbSet<Episode> Episodes { get; set; }
     public DbSet<Observer> Observers { get; set; }
     public DbSet<AniListResponse> AniListCache { get; set; }
+    public DbSet<State> StateCache { get; set; }
 
     private static readonly ValueConverter<ulong, string> UlongStringConverter = new(
         v => v.ToString(CultureInfo.InvariantCulture),

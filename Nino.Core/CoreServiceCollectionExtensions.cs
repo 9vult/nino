@@ -33,6 +33,7 @@ public static class CoreServiceCollectionExtensions
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IUserVerificationService, UserVerificationService>();
         services.AddScoped<IDataService, DataService>();
+        services.AddScoped<IStateService, StateService>();
 
         // Project handlers
         services.AddScoped<ResolveProjectHandler>();
