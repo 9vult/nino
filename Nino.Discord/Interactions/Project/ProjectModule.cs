@@ -17,6 +17,7 @@ public partial class ProjectModule(
     DiscordSocketClient client,
     IIdentityService identityService,
     IDataService dataService,
+    IStateService stateService,
     IInteractionIdentityService interactionIdService,
     IUserVerificationService verificationService,
     ResolveProjectHandler projectResolver,

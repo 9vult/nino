@@ -3,6 +3,7 @@
 using Discord;
 using Discord.Interactions;
 using Nino.Core.Enums;
+using Nino.Core.Features.Project.Delete;
 using Nino.Core.Features.Project.Resolve;
 
 namespace Nino.Discord.Interactions.Project;
@@ -45,8 +46,12 @@ public partial class ProjectModule
             .WithCurrentTimestamp()
             .Build();
 
-        var cancelId = $"nino:project:delete:cancel:{projectId}:{userId}";
-        var confirmId = $"nino:project:delete:confirm:{projectId}:{userId}";
+        // Save the command state
+        var commandDto = new DeleteProjectCommand(projectId, userId);
+        var stateId = await stateService.SaveStateAsync(commandDto);
+
+        var cancelId = $"nino:project:delete:cancel:{stateId}";
+        var confirmId = $"nino:project:delete:confirm:{stateId}";
 
         var component = new ComponentBuilder()
             .WithButton(T("button.cancel", locale), cancelId, ButtonStyle.Danger)
