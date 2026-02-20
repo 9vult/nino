@@ -8,5 +8,6 @@ public sealed record AddKeyStaffCommand(
     string Abbreviation,
     string FullName,
     bool IsPseudo,
+    bool MarkDoneForDoneEpisodes,
     Guid RequestedBy
 );

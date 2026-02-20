@@ -38,9 +38,7 @@ public sealed class DeleteProjectHandler(
 
         logger.LogInformation("Deleting project {Project}", project);
 
-        db.Projects.Remove(project);
-        await db.SaveChangesAsync();
-
+        await db.Projects.Where(p => p.Id == project.Id).ExecuteDeleteAsync();
         return new Result<string>(ResultStatus.Success, JsonSerializer.Serialize(export));
     }
 }

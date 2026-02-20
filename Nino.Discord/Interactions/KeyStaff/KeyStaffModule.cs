@@ -16,6 +16,7 @@ public partial class KeyStaffModule(
     DiscordSocketClient client,
     IIdentityService identityService,
     IDataService dataService,
+    IStateService stateService,
     IInteractionIdentityService interactionIdService,
     IUserVerificationService verificationService,
     ResolveProjectHandler projectResolver,

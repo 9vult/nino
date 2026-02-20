@@ -42,6 +42,9 @@ public partial class KeyStaffModule
             );
         }
 
+        var data = await dataService.GetProjectBasicInfoAsync(projectId);
+        var header = $"{data.Title} ({data.Type.ToFriendlyString(locale)})";
+
         var body = new StringBuilder();
         body.AppendLine(T("keyStaff.delete.success", locale, abbreviation));
 
@@ -55,6 +58,7 @@ public partial class KeyStaffModule
         }
 
         var embed = new EmbedBuilder()
+            .WithAuthor(header)
             .WithTitle(T("project.modification.title", locale))
             .WithDescription(body.ToString())
             .Build();

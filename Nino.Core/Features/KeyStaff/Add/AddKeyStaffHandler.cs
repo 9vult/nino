@@ -3,6 +3,7 @@
 using Nino.Core.Entities;
 using Nino.Core.Enums;
 using Nino.Core.Services;
+using Task = Nino.Core.Entities.Task;
 
 namespace Nino.Core.Features.KeyStaff.Add;
 
@@ -14,7 +15,7 @@ public sealed class AddKeyStaffHandler(
 {
     public async Task<Result> HandleAsync(AddKeyStaffCommand action)
     {
-        var (projectId, userId, abbreviation, fullName, isPseudo, requestedBy) = action;
+        var (projectId, userId, abbreviation, fullName, isPseudo, markDone, requestedBy) = action;
 
         if (
             !await verificationService.VerifyProjectPermissionsAsync(
@@ -54,7 +55,22 @@ public sealed class AddKeyStaffHandler(
             IsPseudo = isPseudo,
         };
 
-        logger.LogInformation("Adding new Key Staff {Staff} to {Project}", newStaff, project);
+        foreach (var episode in project.Episodes)
+        {
+            episode.Tasks.Add(
+                new Task
+                {
+                    Abbreviation = abbreviation,
+                    IsDone = episode.IsDone && markDone,
+                    UpdatedAt = null,
+                    LastRemindedAt = null,
+                }
+            );
+            if (!markDone)
+                episode.IsDone = false;
+        }
+
+        logger.LogInformation("Added new Key Staff {Staff} to {Project}", newStaff, project);
 
         project.KeyStaff.Add(newStaff);
         await db.SaveChangesAsync();
