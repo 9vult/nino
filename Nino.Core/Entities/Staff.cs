@@ -14,4 +14,10 @@ public class Staff
     public required bool IsPseudo { get; set; } = false;
 
     public User User { get; set; } = null!;
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return $"S[{Id} ({Role.Abbreviation})]";
+    }
 }

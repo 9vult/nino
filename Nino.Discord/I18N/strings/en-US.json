@@ -13,6 +13,10 @@
     "error.hijack": "And what made you think you could click that button?",
     "error.projectNotFound": "Project not found",
     "error.permissions": "You do not have permission to perform this action.",
+    "keyStaff.creation.conflict": "A task with the abbreviation {abbreviation_1} already exists!",
+    "keyStaff.creation.success": "Added {staff_1} for position {abbreviation_2}.",
+    "keyStaff.delete.success": "Removed position {abbreviation} from the project.",
+    "keyStaff.notFound": "A Key Staff position with the abbreviation {abbreviation_1} was not found!",
     "project.creation.conflict": "A project with the name `{nickname_1}` already exists!",
     "project.creation.failed.generic": "An error occured while creating the project.",
     "project.creation.failed.badRequest": "An error occured while creating the project.\nPlease make sure the AniList ID is correct or that all fields are present.",
@@ -20,11 +24,14 @@
     "project.delete.complete": "Cleaned out the **{title_1}** project for you. 残念。",
     "project.delete.question": "Are you sure you want to delete **{title_1}**?\nThis action is irreversible.",
     "project.delete.title": "Project Deletion",
+    "project.modification.title": "Project Modification",
     "project.export": "Here's everything I know about `{nickname_1}`!",
     "project.resolution.failed": "Could not resolve alias `{alias_1}` to a project.",
-    "task.creation.conflict": "A task with the abbreviation `{abbreviation_1}` already exists!"
   },
   "plural": {
-    
+    "keyStaff.deleted.completedEpisodes": {
+      "one": "Also, {number_1} episode is now complete!",
+      "other": "Also, {number_1} episodes are now complete!"
+    }
   }
 }
