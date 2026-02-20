@@ -68,8 +68,21 @@ public class DataService(DataContext db, ILogger<DataService> logger) : IDataSer
     }
 
     /// <inheritdoc />
-    public async Task<bool> GetProjectCompletionStatusAsync(Guid projectId)
+    public async Task<ProjectCompletionStatusDto> GetProjectCompletionStatusAsync(Guid projectId)
     {
-        return await db.Episodes.Where(p => p.Id == projectId).AllAsync(e => e.IsDone);
+        var counts = await db
+            .Episodes.Where(e => e.ProjectId == projectId)
+            .GroupBy(_ => true)
+            .Select(g => new
+            {
+                Completed = g.Count(e => e.IsDone),
+                Incomplete = g.Count(e => !e.IsDone),
+            })
+            .FirstOrDefaultAsync();
+
+        return new ProjectCompletionStatusDto(
+            CompletedEpisodeCount: counts?.Completed ?? 0,
+            IncompleteEpisodeCount: counts?.Incomplete ?? 0
+        );
     }
 }

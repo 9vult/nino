@@ -25,6 +25,6 @@ public interface IDataService
     /// Get whether the project is currently complete
     /// </summary>
     /// <param name="projectId">Project ID</param>
-    /// <returns><see langword="true"/> if all episodes are complete</returns>
-    Task<bool> GetProjectCompletionStatusAsync(Guid projectId);
+    /// <returns>Episode completion status for the project</returns>
+    Task<ProjectCompletionStatusDto> GetProjectCompletionStatusAsync(Guid projectId);
 }
