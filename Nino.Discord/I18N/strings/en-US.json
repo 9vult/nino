@@ -5,6 +5,7 @@
     "additionalStaff.creation.conflict": "A task with the abbreviation {abbreviation_1} already exists!",
     "additionalStaff.creation.success": "Added {staff_1} for position {abbreviation_2} for episode {episode_3}.",
     "additionalStaff.delete.success": "Removed position {abbreviation_1} from episode {episode_2}.",
+    "additionalStaff.notFound": "An Additional Staff position with the abbreviation {abbreviation_1} was not found in episode {episode_2}!",
     "additionalStaff.rename.success": "Renamed position {abbreviation_1} to {newAbbreviation_2} ({fullName_3}).",
     "additionalStaff.setWeight.success": "Set weight of position {abbreviation_1} to {weight_2}.",
     "additionalStaff.swap.success": "Swapped {staff_1} in for position {abbreviation_2}.",
