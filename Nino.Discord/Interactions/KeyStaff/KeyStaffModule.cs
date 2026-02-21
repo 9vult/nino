@@ -5,6 +5,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Nino.Core.Features.KeyStaff.Add;
 using Nino.Core.Features.KeyStaff.Remove;
+using Nino.Core.Features.KeyStaff.Swap;
 using Nino.Core.Features.Project.Resolve;
 using Nino.Core.Services;
 using Nino.Discord.Services;
@@ -21,6 +22,7 @@ public partial class KeyStaffModule(
     IUserVerificationService verificationService,
     ResolveProjectHandler projectResolver,
     AddKeyStaffHandler addHandler,
+    SwapKeyStaffHandler swapHandler,
     RemoveKeyStaffHandler removeHandler,
     ILogger<KeyStaffModule> logger
 ) : InteractionModuleBase<IInteractionContext> { }
