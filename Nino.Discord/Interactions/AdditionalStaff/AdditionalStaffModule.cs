@@ -7,6 +7,7 @@ using Nino.Core.Features.AdditionalStaff.Add;
 using Nino.Core.Features.AdditionalStaff.Remove;
 using Nino.Core.Features.AdditionalStaff.Rename;
 using Nino.Core.Features.AdditionalStaff.SetWeight;
+using Nino.Core.Features.AdditionalStaff.Swap;
 using Nino.Core.Features.Project.Resolve;
 using Nino.Core.Services;
 using Nino.Discord.Services;
@@ -21,6 +22,7 @@ public partial class AdditionalStaffModule(
     IInteractionIdentityService interactionIdService,
     ResolveProjectHandler projectResolver,
     AddAdditionalStaffHandler addHandler,
+    SwapAdditionalStaffHandler swapHandler,
     RenameAdditionalStaffHandler renameHandler,
     SetAdditionalStaffWeightHandler setWeightHandler,
     RemoveAdditionalStaffHandler removeHandler,

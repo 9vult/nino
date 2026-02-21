@@ -7,6 +7,7 @@ using Nino.Core.Features.AdditionalStaff.Add;
 using Nino.Core.Features.AdditionalStaff.Remove;
 using Nino.Core.Features.AdditionalStaff.Rename;
 using Nino.Core.Features.AdditionalStaff.SetWeight;
+using Nino.Core.Features.AdditionalStaff.Swap;
 using Nino.Core.Features.KeyStaff.Add;
 using Nino.Core.Features.KeyStaff.PinchHitter.Remove;
 using Nino.Core.Features.KeyStaff.PinchHitter.Set;
@@ -61,7 +62,7 @@ public static class CoreServiceCollectionExtensions
 
         // Additional Staff handlers
         services.AddScoped<AddAdditionalStaffHandler>();
-
+        services.AddScoped<SwapAdditionalStaffHandler>();
         services.AddScoped<RenameAdditionalStaffHandler>();
         services.AddScoped<SetAdditionalStaffWeightHandler>();
         services.AddScoped<RemoveAdditionalStaffHandler>();
