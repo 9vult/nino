@@ -2,7 +2,6 @@
 
 using Nino.Core.Entities;
 using Nino.Core.Enums;
-using Nino.Core.Features.KeyStaff.Add;
 using Nino.Core.Services;
 
 namespace Nino.Core.Features.KeyStaff.Rename;
@@ -10,7 +9,7 @@ namespace Nino.Core.Features.KeyStaff.Rename;
 public sealed class RenameKeyStaffHandler(
     DataContext db,
     IUserVerificationService verificationService,
-    ILogger<AddKeyStaffHandler> logger
+    ILogger<RenameKeyStaffHandler> logger
 )
 {
     public async Task<Result> HandleAsync(RenameKeyStaffCommand action)

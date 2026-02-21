@@ -4,17 +4,17 @@ using Nino.Core.Entities;
 using Nino.Core.Enums;
 using Nino.Core.Services;
 
-namespace Nino.Core.Features.KeyStaff.Swap;
+namespace Nino.Core.Features.KeyStaff.SetWeight;
 
-public sealed class SwapKeyStaffHandler(
+public sealed class SetKeyStaffWeightHandler(
     DataContext db,
     IUserVerificationService verificationService,
-    ILogger<SwapKeyStaffHandler> logger
+    ILogger<SetKeyStaffWeightCommand> logger
 )
 {
-    public async Task<Result> HandleAsync(SwapKeyStaffCommand action)
+    public async Task<Result> HandleAsync(SetKeyStaffWeightCommand action)
     {
-        var (projectId, userId, abbreviation, requestedBy) = action;
+        var (projectId, abbreviation, weight, requestedBy) = action;
 
         if (
             !await verificationService.VerifyProjectPermissionsAsync(
@@ -34,13 +34,13 @@ public sealed class SwapKeyStaffHandler(
             return new Result(ResultStatus.NotFound);
 
         logger.LogInformation(
-            "Swapping {UserId} in to {Project} for {Abbreviation}",
-            userId,
+            "Setting weight of {Abbreviation} for {Project} to {Weight}",
+            abbreviation,
             project,
-            abbreviation
+            weight
         );
 
-        staff.UserId = userId;
+        staff.Role.Weight = weight;
         await db.SaveChangesAsync();
         return new Result(ResultStatus.Success);
     }

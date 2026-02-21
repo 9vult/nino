@@ -6,6 +6,7 @@ using Nino.Core.Events;
 using Nino.Core.Features.KeyStaff.Add;
 using Nino.Core.Features.KeyStaff.Remove;
 using Nino.Core.Features.KeyStaff.Rename;
+using Nino.Core.Features.KeyStaff.SetWeight;
 using Nino.Core.Features.KeyStaff.Swap;
 using Nino.Core.Features.Project.Create;
 using Nino.Core.Features.Project.Delete;
@@ -47,6 +48,7 @@ public static class CoreServiceCollectionExtensions
         services.AddScoped<AddKeyStaffHandler>();
         services.AddScoped<SwapKeyStaffHandler>();
         services.AddScoped<RenameKeyStaffHandler>();
+        services.AddScoped<SetKeyStaffWeightHandler>();
         services.AddScoped<RemoveKeyStaffHandler>();
 
         return services;
