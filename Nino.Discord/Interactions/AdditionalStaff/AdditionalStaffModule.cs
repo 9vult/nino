@@ -6,6 +6,7 @@ using Discord.WebSocket;
 using Nino.Core.Features.AdditionalStaff.Add;
 using Nino.Core.Features.AdditionalStaff.Remove;
 using Nino.Core.Features.AdditionalStaff.Rename;
+using Nino.Core.Features.AdditionalStaff.SetWeight;
 using Nino.Core.Features.Project.Resolve;
 using Nino.Core.Services;
 using Nino.Discord.Services;
@@ -21,6 +22,7 @@ public partial class AdditionalStaffModule(
     ResolveProjectHandler projectResolver,
     AddAdditionalStaffHandler addHandler,
     RenameAdditionalStaffHandler renameHandler,
+    SetAdditionalStaffWeightHandler setWeightHandler,
     RemoveAdditionalStaffHandler removeHandler,
     ILogger<AdditionalStaffModule> logger
 ) : InteractionModuleBase<IInteractionContext> { }
