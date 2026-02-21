@@ -24,6 +24,12 @@ public partial class AdditionalStaffModule
         var interaction = Context.Interaction;
         var locale = interaction.UserLocale;
 
+        // Cleanup
+        alias = alias.Trim();
+        episodeNumber = episodeNumber.Trim();
+        abbreviation = abbreviation.Trim();
+        fullName = fullName.Trim();
+
         // Resolve user, group, and project
         var (requestedBy, groupId) = await interactionIdService.GetUserAndGroupAsync(interaction);
         var (resolveStatus, projectId) = await projectResolver.HandleAsync(

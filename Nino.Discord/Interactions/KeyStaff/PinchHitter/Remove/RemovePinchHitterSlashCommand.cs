@@ -22,6 +22,11 @@ public partial class KeyStaffModule
             var interaction = Context.Interaction;
             var locale = interaction.UserLocale;
 
+            // Cleanup
+            alias = alias.Trim();
+            episodeNumber = episodeNumber.Trim();
+            abbreviation = abbreviation.Trim();
+
             // Resolve user, group, and project
             var (requestedBy, groupId) = await interactionIdService.GetUserAndGroupAsync(
                 interaction

@@ -16,6 +16,9 @@ public partial class ProjectModule
         var interaction = Context.Interaction;
         var locale = interaction.UserLocale;
 
+        // Cleanup
+        alias = alias.Trim();
+
         // Verify project and user - Owner required
         var (userId, groupId) = await interactionIdService.GetUserAndGroupAsync(interaction);
         var (status, projectId) = await projectResolver.HandleAsync(

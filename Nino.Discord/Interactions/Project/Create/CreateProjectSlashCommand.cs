@@ -28,6 +28,11 @@ public partial class ProjectModule
         var interaction = Context.Interaction;
         var lng = interaction.UserLocale;
 
+        // Cleanup
+        nickname = nickname.Trim();
+        title = title?.Trim();
+        posterUri = posterUri?.Trim();
+
         var guild = client.GetGuild(interaction.GuildId!.Value);
         var member = guild.GetUser(interaction.User.Id);
 
