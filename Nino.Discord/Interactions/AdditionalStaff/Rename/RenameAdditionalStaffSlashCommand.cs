@@ -3,16 +3,17 @@
 using Discord;
 using Discord.Interactions;
 using Nino.Core.Enums;
-using Nino.Core.Features.KeyStaff.Rename;
+using Nino.Core.Features.AdditionalStaff.Rename;
 using Nino.Core.Features.Project.Resolve;
 
-namespace Nino.Discord.Interactions.KeyStaff;
+namespace Nino.Discord.Interactions.AdditionalStaff;
 
-public partial class KeyStaffModule
+public partial class AdditionalStaffModule
 {
-    [SlashCommand("rename", "Rename a Key Staff")]
+    [SlashCommand("rename", "Rename an Additional Staff")]
     public async Task<RuntimeResult> RenameAsync(
         string alias,
+        string episodeNumber,
         [MaxLength(16)] string abbreviation,
         [MaxLength(16)] string newAbbreviation,
         [MaxLength(32)] string fullName
@@ -23,6 +24,7 @@ public partial class KeyStaffModule
 
         // Cleanup
         alias = alias.Trim();
+        episodeNumber = episodeNumber.Trim();
         abbreviation = abbreviation.Trim();
         fullName = fullName.Trim();
 
@@ -36,8 +38,9 @@ public partial class KeyStaffModule
             return await interaction.FailAsync(T("project.resolution.failed", locale, alias));
 
         var result = await renameHandler.HandleAsync(
-            new RenameKeyStaffCommand(
+            new RenameAdditionalStaffCommand(
                 projectId,
+                episodeNumber,
                 abbreviation,
                 newAbbreviation,
                 fullName,
@@ -51,8 +54,17 @@ public partial class KeyStaffModule
                 result.Status switch
                 {
                     ResultStatus.Unauthorized => T("error.permissions", locale),
-                    ResultStatus.NotFound => T("keyStaff.notFound", locale),
-                    ResultStatus.Conflict => T("keyStaff.creation.conflict", locale, abbreviation),
+                    ResultStatus.NotFound => T(
+                        "additionalStaff.notFound",
+                        locale,
+                        abbreviation,
+                        episodeNumber
+                    ),
+                    ResultStatus.Conflict => T(
+                        "additionalStaff.creation.conflict",
+                        locale,
+                        abbreviation
+                    ),
                     _ => T("error.generic", locale),
                 }
             );
@@ -65,7 +77,7 @@ public partial class KeyStaffModule
             .WithAuthor(header)
             .WithTitle(T("project.modification.title", locale))
             .WithDescription(
-                T("keyStaff.rename.success", locale, abbreviation, newAbbreviation, fullName)
+                T("additionalStaff.rename.success", locale, abbreviation, newAbbreviation, fullName)
             )
             .Build();
 

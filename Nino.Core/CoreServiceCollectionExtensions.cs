@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Nino.Core.Events;
 using Nino.Core.Features.AdditionalStaff.Add;
 using Nino.Core.Features.AdditionalStaff.Remove;
+using Nino.Core.Features.AdditionalStaff.Rename;
 using Nino.Core.Features.KeyStaff.Add;
 using Nino.Core.Features.KeyStaff.PinchHitter.Remove;
 using Nino.Core.Features.KeyStaff.PinchHitter.Set;
@@ -59,6 +60,8 @@ public static class CoreServiceCollectionExtensions
 
         // Additional Staff handlers
         services.AddScoped<AddAdditionalStaffHandler>();
+
+        services.AddScoped<RenameAdditionalStaffHandler>();
         services.AddScoped<RemoveAdditionalStaffHandler>();
 
         return services;
