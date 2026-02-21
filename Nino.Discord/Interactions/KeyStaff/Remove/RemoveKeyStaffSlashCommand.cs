@@ -12,7 +12,10 @@ namespace Nino.Discord.Interactions.KeyStaff;
 public partial class KeyStaffModule
 {
     [SlashCommand("remove", "Remove a Key Staff from the whole project")]
-    public async Task<RuntimeResult> RemoveAsync(string alias, [MaxLength(16)] string abbreviation)
+    public async Task<RuntimeResult> RemoveAsync(
+        [MaxLength(32)] string alias,
+        [MaxLength(16)] string abbreviation
+    )
     {
         var interaction = Context.Interaction;
         var locale = interaction.UserLocale;

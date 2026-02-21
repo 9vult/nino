@@ -13,7 +13,7 @@ public partial class KeyStaffModule
 {
     [SlashCommand("swap", "Swap a Key Staff into the whole project")]
     public async Task<RuntimeResult> SwapAsync(
-        string alias,
+        [MaxLength(32)] string alias,
         [MaxLength(16)] string abbreviation,
         SocketUser member
     )

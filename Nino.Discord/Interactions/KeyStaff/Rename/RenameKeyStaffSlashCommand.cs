@@ -12,7 +12,7 @@ public partial class KeyStaffModule
 {
     [SlashCommand("rename", "Rename a Key Staff")]
     public async Task<RuntimeResult> RenameAsync(
-        string alias,
+        [MaxLength(32)] string alias,
         [MaxLength(16)] string abbreviation,
         [MaxLength(16)] string newAbbreviation,
         [MaxLength(32)] string fullName

@@ -14,8 +14,8 @@ public partial class KeyStaffModule
     {
         [SlashCommand("remove", "Remove a pinch hitter from an episode")]
         public async Task<RuntimeResult> RemovePinchHitterAsync(
-            string alias,
-            string episodeNumber,
+            [MaxLength(32)] string alias,
+            [MaxLength(32)] string episodeNumber,
             [MaxLength(16)] string abbreviation
         )
         {

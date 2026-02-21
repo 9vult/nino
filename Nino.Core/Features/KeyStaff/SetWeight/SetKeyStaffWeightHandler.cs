@@ -9,7 +9,7 @@ namespace Nino.Core.Features.KeyStaff.SetWeight;
 public sealed class SetKeyStaffWeightHandler(
     DataContext db,
     IUserVerificationService verificationService,
-    ILogger<SetKeyStaffWeightCommand> logger
+    ILogger<SetKeyStaffWeightHandler> logger
 )
 {
     public async Task<Result> HandleAsync(SetKeyStaffWeightCommand action)

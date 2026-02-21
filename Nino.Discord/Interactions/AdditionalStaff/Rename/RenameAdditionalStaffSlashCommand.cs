@@ -12,8 +12,8 @@ public partial class AdditionalStaffModule
 {
     [SlashCommand("rename", "Rename an Additional Staff")]
     public async Task<RuntimeResult> RenameAsync(
-        string alias,
-        string episodeNumber,
+        [MaxLength(32)] string alias,
+        [MaxLength(32)] string episodeNumber,
         [MaxLength(16)] string abbreviation,
         [MaxLength(16)] string newAbbreviation,
         [MaxLength(32)] string fullName

@@ -13,7 +13,7 @@ public partial class KeyStaffModule
 {
     [SlashCommand("add", "Add a new Key Staff to the whole project")]
     public async Task<RuntimeResult> AddAsync(
-        string alias,
+        [MaxLength(32)] string alias,
         SocketUser member,
         [MaxLength(16)] string abbreviation,
         [MaxLength(32)] string fullName,

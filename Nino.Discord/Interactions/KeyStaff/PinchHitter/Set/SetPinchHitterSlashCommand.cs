@@ -15,8 +15,8 @@ public partial class KeyStaffModule
     {
         [SlashCommand("set", "Set a pinch hitter for an episode")]
         public async Task<RuntimeResult> SetPinchHitterAsync(
-            string alias,
-            string episodeNumber,
+            [MaxLength(32)] string alias,
+            [MaxLength(32)] string episodeNumber,
             [MaxLength(16)] string abbreviation,
             SocketUser member
         )

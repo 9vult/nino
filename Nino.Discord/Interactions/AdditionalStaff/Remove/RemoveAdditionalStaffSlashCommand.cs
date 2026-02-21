@@ -12,8 +12,8 @@ public partial class AdditionalStaffModule
 {
     [SlashCommand("add", "Remove an Additional Staff from an episode")]
     public async Task<RuntimeResult> RemoveAsync(
-        string alias,
-        string episodeNumber,
+        [MaxLength(32)] string alias,
+        [MaxLength(32)] string episodeNumber,
         [MaxLength(16)] string abbreviation
     )
     {

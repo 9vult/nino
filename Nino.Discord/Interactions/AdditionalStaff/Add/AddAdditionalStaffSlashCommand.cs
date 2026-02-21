@@ -13,8 +13,8 @@ public partial class AdditionalStaffModule
 {
     [SlashCommand("add", "Add an Additional Staff to an episode")]
     public async Task<RuntimeResult> AddAsync(
-        string alias,
-        string episodeNumber,
+        [MaxLength(32)] string alias,
+        [MaxLength(32)] string episodeNumber,
         SocketUser member,
         [MaxLength(16)] string abbreviation,
         [MaxLength(32)] string fullName,

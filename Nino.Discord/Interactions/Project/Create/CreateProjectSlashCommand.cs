@@ -12,16 +12,16 @@ public partial class ProjectModule
 {
     [SlashCommand("create", "Create a project")]
     public async Task<RuntimeResult> CreateAsync(
-        string nickname,
+        [MaxLength(32)] string nickname,
         int anilistId,
         bool isPrivate,
         [ChannelTypes(ChannelType.Text)] IMessageChannel projectChannel,
         [ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel updateChannel,
         [ChannelTypes(ChannelType.Text, ChannelType.News)] IMessageChannel releaseChannel,
-        string? title = null,
+        [MaxLength(128)] string? title = null,
         ProjectType? type = null,
         [MinValue(1)] int? length = null,
-        string? posterUri = null,
+        [MaxLength(256)] string? posterUri = null,
         decimal firstEpisode = 1
     )
     {
