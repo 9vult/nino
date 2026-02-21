@@ -19,7 +19,4 @@
   <ItemGroup>
     <None Include="I18N\**\*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Interactions\KeyStaff\Rename\" />
-  </ItemGroup>
 </Project>

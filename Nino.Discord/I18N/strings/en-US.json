@@ -20,6 +20,7 @@
     "keyStaff.creation.success": "Added {staff_1} for position {abbreviation_2}.",
     "keyStaff.delete.success": "Removed position {abbreviation} from the project.",
     "keyStaff.notFound": "A Key Staff position with the abbreviation {abbreviation_1} was not found!",
+    "keyStaff.rename.success": "Renamed position {abbreviation_1} to {newAbbreviation_2} ({fullName_3}).",
     "keyStaff.swap.success": "Swapped {staff_1} in for position {abbreviation_2}.",
     "project.creation.conflict": "A project with the name `{nickname_1}` already exists!",
     "project.creation.failed.generic": "An error occured while creating the project.",
