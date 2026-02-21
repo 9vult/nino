@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nino.Core.Events;
 using Nino.Core.Features.KeyStaff.Add;
+using Nino.Core.Features.KeyStaff.PinchHitter.Remove;
+using Nino.Core.Features.KeyStaff.PinchHitter.Set;
 using Nino.Core.Features.KeyStaff.Remove;
 using Nino.Core.Features.KeyStaff.Rename;
 using Nino.Core.Features.KeyStaff.SetWeight;
@@ -50,6 +52,8 @@ public static class CoreServiceCollectionExtensions
         services.AddScoped<RenameKeyStaffHandler>();
         services.AddScoped<SetKeyStaffWeightHandler>();
         services.AddScoped<RemoveKeyStaffHandler>();
+        services.AddScoped<SetPinchHitterHandler>();
+        services.AddScoped<RemovePinchHitterHandler>();
 
         return services;
     }

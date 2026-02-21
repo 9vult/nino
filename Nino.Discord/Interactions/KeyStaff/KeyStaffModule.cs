@@ -4,6 +4,8 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Nino.Core.Features.KeyStaff.Add;
+using Nino.Core.Features.KeyStaff.PinchHitter.Remove;
+using Nino.Core.Features.KeyStaff.PinchHitter.Set;
 using Nino.Core.Features.KeyStaff.Remove;
 using Nino.Core.Features.KeyStaff.Rename;
 using Nino.Core.Features.KeyStaff.SetWeight;
@@ -29,4 +31,17 @@ public partial class KeyStaffModule(
     SetKeyStaffWeightHandler setWeightHandler,
     RemoveKeyStaffHandler removeHandler,
     ILogger<KeyStaffModule> logger
-) : InteractionModuleBase<IInteractionContext> { }
+) : InteractionModuleBase<IInteractionContext>
+{
+    [Group("pinch-hitter", "Key Staff pinch hitters")]
+    public partial class PinchHitterModule(
+        DiscordSocketClient client,
+        IIdentityService identityService,
+        IDataService dataService,
+        IInteractionIdentityService interactionIdService,
+        ResolveProjectHandler projectResolver,
+        SetPinchHitterHandler setPinchHitterHandler,
+        RemovePinchHitterHandler removePinchHitterHandler,
+        ILogger<PinchHitterModule> logger
+    ) : InteractionModuleBase<IInteractionContext> { }
+}

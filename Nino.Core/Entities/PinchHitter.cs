@@ -15,4 +15,10 @@ public class PinchHitter
     public required string Abbreviation { get; set; }
 
     public User User { get; set; } = null!;
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        return $"PH[{Id} ({Abbreviation})]";
+    }
 }
