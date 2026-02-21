@@ -58,13 +58,7 @@ public sealed class AddKeyStaffHandler(
         foreach (var episode in project.Episodes)
         {
             episode.Tasks.Add(
-                new Task
-                {
-                    Abbreviation = abbreviation,
-                    IsDone = episode.IsDone && markDone,
-                    UpdatedAt = null,
-                    LastRemindedAt = null,
-                }
+                new Task { Abbreviation = abbreviation, IsDone = episode.IsDone && markDone }
             );
             if (!markDone)
                 episode.IsDone = false;

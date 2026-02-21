@@ -3,6 +3,7 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Nino.Core.Features.AdditionalStaff.Add;
 using Nino.Core.Features.Project.Resolve;
 using Nino.Core.Services;
 using Nino.Discord.Services;
@@ -15,7 +16,7 @@ public partial class AdditionalStaffModule(
     IIdentityService identityService,
     IDataService dataService,
     IInteractionIdentityService interactionIdService,
-    IUserVerificationService verificationService,
     ResolveProjectHandler projectResolver,
+    AddAdditionalStaffHandler addHandler,
     ILogger<AdditionalStaffModule> logger
 ) : InteractionModuleBase<IInteractionContext> { }
