@@ -15,6 +15,7 @@
     "button.yes": "Yes",
     "episode.aired.body": "Aired on {absolute_1} ({relative_2})",
     "episode.aired.title": "Episode {number_1} has aired!",
+    "episode.creation.badRequest": "To add multiple episodes, the starting episode must be either a decimal number (ex: 3.5) or use the template syntax $(n), where n is a decimal number (ex: \"OVA $(3.5)\".",
     "error.db": "A database error occured.",
     "error.episodeNotFound": "Episode not found",
     "error.generic": "An error occured",
@@ -43,12 +44,16 @@
     "project.delete.title": "Project Deletion",
     "project.modification.title": "Project Modification",
     "project.export": "Here's everything I know about `{nickname_1}`!",
-    "project.resolution.failed": "Could not resolve alias `{alias_1}` to a project.",
+    "project.resolution.failed": "Could not resolve alias `{alias_1}` to a project."
   },
   "plural": {
     "keyStaff.deleted.completedEpisodes": {
       "one": "Also, {number_1} episode is now complete!",
       "other": "Also, {number_1} episodes are now complete!"
+    },
+    "episode.creation.success": {
+      "one": "I added {number_1} episode to `{project_2}` for you.",
+      "other": "I added {number_1} episodes to `{project_2}` for you."
     }
   }
 }
