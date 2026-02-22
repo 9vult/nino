@@ -5,6 +5,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Nino.Core.Features.Episodes.Add;
 using Nino.Core.Features.Episodes.Remove;
+using Nino.Core.Features.Episodes.Roster;
 using Nino.Core.Features.Project.Resolve;
 using Nino.Core.Services;
 using Nino.Discord.Services;
@@ -20,5 +21,6 @@ public partial class EpisodesModule(
     ResolveProjectHandler projectResolver,
     AddEpisodeHandler addHandler,
     RemoveEpisodeHandler removeHandler,
+    EpisodeRosterHandler rosterHandler,
     ILogger<EpisodesModule> logger
 ) : InteractionModuleBase<IInteractionContext> { }

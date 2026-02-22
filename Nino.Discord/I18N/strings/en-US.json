@@ -16,6 +16,8 @@
     "episode.aired.body": "Aired on {absolute_1} ({relative_2})",
     "episode.aired.title": "Episode {number_1} has aired!",
     "episode.creation.badRequest": "To add multiple episodes, the starting episode must be either a decimal number (ex: 3.5) or use the template syntax $(n), where n is a decimal number (ex: \"OVA $(3.5)\".",
+    "episode.roster.empty": "There aren't any tasks!",
+    "episode.roster.title": "Episode {episode_1} Roster",
     "error.db": "A database error occured.",
     "error.episodeNotFound": "Episode not found",
     "error.generic": "An error occured",
