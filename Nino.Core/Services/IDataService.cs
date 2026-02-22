@@ -27,4 +27,23 @@ public interface IDataService
     /// <param name="projectId">Project ID</param>
     /// <returns>Episode completion status for the project</returns>
     Task<ProjectCompletionStatusDto> GetProjectCompletionStatusAsync(Guid projectId);
+
+    /// <summary>
+    /// Get the status of an episode
+    /// </summary>
+    /// <param name="projectId">Project ID</param>
+    /// <param name="episodeNumber">Episode number</param>
+    /// <returns>Episode status</returns>
+    Task<EpisodeStatusDto> GetEpisodeStatusAsync(Guid projectId, string episodeNumber);
+
+    /// <summary>
+    /// Get the status of episodes
+    /// </summary>
+    /// <param name="projectId">Project ID</param>
+    /// <param name="episodeNumbers">Episode numbers</param>
+    /// <returns>Episode statuses</returns>
+    Task<List<EpisodeStatusDto>> GetEpisodeStatusAsync(
+        Guid projectId,
+        IList<string> episodeNumbers
+    );
 }

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 using Nino.Core.Dtos;
+using Nino.Core.Entities;
 
 namespace Nino.Core.Services;
 
@@ -84,5 +85,57 @@ public class DataService(DataContext db, ILogger<DataService> logger) : IDataSer
             CompletedEpisodeCount: counts?.Completed ?? 0,
             IncompleteEpisodeCount: counts?.Incomplete ?? 0
         );
+    }
+
+    /// <inheritdoc />
+    public async Task<EpisodeStatusDto> GetEpisodeStatusAsync(Guid projectId, string episodeNumber)
+    {
+        var project = await db.Projects.SingleAsync(p => p.Id == projectId);
+        var episode = await db.Episodes.SingleAsync(e =>
+            e.ProjectId == projectId && e.Number == episodeNumber
+        );
+        return MapEpisodeStatus(project, episode);
+    }
+
+    /// <inheritdoc />
+    public async Task<List<EpisodeStatusDto>> GetEpisodeStatusAsync(
+        Guid projectId,
+        IList<string> episodeNumbers
+    )
+    {
+        var project = await db.Projects.SingleAsync(p => p.Id == projectId);
+        var episodes = await db
+            .Episodes.Where(e => e.ProjectId == projectId && episodeNumbers.Contains(e.Number))
+            .ToListAsync();
+
+        return episodes.Select(e => MapEpisodeStatus(project, e)).ToList();
+    }
+
+    private static EpisodeStatusDto MapEpisodeStatus(Project project, Episode episode)
+    {
+        var staff = project
+            .KeyStaff.Concat(episode.AdditionalStaff)
+            .ToDictionary(s => s.Role.Abbreviation);
+
+        return new EpisodeStatusDto
+        {
+            Number = episode.Number,
+            IsDone = episode.IsDone,
+            UpdatedAt = episode.UpdatedAt,
+            Tasks = episode
+                .Tasks.Select(t =>
+                {
+                    var s = staff[t.Abbreviation];
+                    return new TaskStatusDto
+                    {
+                        Abbreviation = t.Abbreviation,
+                        Weight = s.Role.Weight,
+                        User = MappedIdDto.FromMappedId(s.User),
+                        IsPseudo = false,
+                        IsDone = t.IsDone,
+                    };
+                })
+                .ToArray(),
+        };
     }
 }
