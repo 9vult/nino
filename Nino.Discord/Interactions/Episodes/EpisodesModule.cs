@@ -4,6 +4,7 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Nino.Core.Features.Episodes.Add;
+using Nino.Core.Features.Episodes.Remove;
 using Nino.Core.Features.Project.Resolve;
 using Nino.Core.Services;
 using Nino.Discord.Services;
@@ -15,10 +16,9 @@ public partial class EpisodesModule(
     DiscordSocketClient client,
     IIdentityService identityService,
     IDataService dataService,
-    IStateService stateService,
     IInteractionIdentityService interactionIdService,
-    IUserVerificationService verificationService,
     ResolveProjectHandler projectResolver,
     AddEpisodeHandler addHandler,
+    RemoveEpisodeHandler removeHandler,
     ILogger<EpisodesModule> logger
 ) : InteractionModuleBase<IInteractionContext> { }

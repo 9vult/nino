@@ -54,6 +54,10 @@
     "episode.creation.success": {
       "one": "I added {number_1} episode to `{project_2}` for you.",
       "other": "I added {number_1} episodes to `{project_2}` for you."
+    },
+    "episode.delete.success": {
+      "one": "I removed {number_1} episode from `{project_2}` for you.",
+      "other": "I removed {number_1} episodes from `{project_2}` for you."
     }
   }
 }
