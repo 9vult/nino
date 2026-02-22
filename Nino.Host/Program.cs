@@ -53,10 +53,20 @@ var builder = Host.CreateDefaultBuilder(args)
 
 var host = builder.Build();
 
-using (var scope = host.Services.CreateScope())
+using (var migrationScope = host.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<DataContext>();
+    var db = migrationScope.ServiceProvider.GetRequiredService<DataContext>();
     await db.Database.MigrateAsync();
 }
+
+using var globalScope = host
+    .Services.GetRequiredService<ILogger>()
+    .BeginScope(
+        new Dictionary<string, object>
+        {
+            ["CorrelationId"] = "global",
+            ["InteractionType"] = "System",
+        }
+    );
 
 await host.RunAsync();

@@ -10,7 +10,7 @@ namespace Nino.Host;
 internal sealed class LogProvider
 {
     private const string PrintLayout =
-        "${longdate} | ${level:uppercase=true:padding=-5} | ${logger}.${callsite:className=false:methodName=true} → ${message}";
+        "${longdate} | ${mdlc:CorrelationId} | ${level:uppercase=true:padding=-5} | ${logger}.${callsite:className=false:methodName=true} → ${message}";
 
     private static readonly JsonLayout FileLayout = new()
     {
@@ -25,6 +25,11 @@ internal sealed class LogProvider
             new JsonAttribute(
                 "properties",
                 new JsonLayout { IncludeEventProperties = true },
+                encode: false
+            ),
+            new JsonAttribute(
+                "scope",
+                new JsonLayout { IncludeScopeProperties = true },
                 encode: false
             ),
         },

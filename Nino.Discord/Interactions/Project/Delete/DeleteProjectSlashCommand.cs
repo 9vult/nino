@@ -53,8 +53,8 @@ public partial class ProjectModule
         var commandDto = new DeleteProjectCommand(projectId, userId);
         var stateId = await stateService.SaveStateAsync(commandDto);
 
-        var cancelId = $"nino:project:delete:cancel:{stateId}";
-        var confirmId = $"nino:project:delete:confirm:{stateId}";
+        var cancelId = $"nino.project.delete.cancel:{stateId}";
+        var confirmId = $"nino.project.delete.confirm:{stateId}";
 
         var component = new ComponentBuilder()
             .WithButton(T("button.cancel", locale), cancelId, ButtonStyle.Danger)

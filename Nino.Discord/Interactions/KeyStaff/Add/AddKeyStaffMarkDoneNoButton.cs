@@ -9,7 +9,7 @@ namespace Nino.Discord.Interactions.KeyStaff;
 
 public partial class KeyStaffModule
 {
-    [ComponentInteraction("nino:keyStaff:create:markDone:no:*", ignoreGroupNames: true)]
+    [ComponentInteraction("nino.keyStaff.create.markDone.no:*", ignoreGroupNames: true)]
     public async Task<RuntimeResult> CreateAndDoNotMarkDoneAsync(Guid stateId)
     {
         var interaction = Context.Interaction;

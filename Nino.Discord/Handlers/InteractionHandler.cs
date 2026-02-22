@@ -37,6 +37,15 @@ public class InteractionHandler(
                 return;
             }
 
+            using var scope = logger.BeginScope(
+                new Dictionary<string, object>
+                {
+                    ["CorrelationId"] = Guid.NewGuid(),
+                    ["InteractionType"] = "SlashCommand",
+                    ["CommandName"] = interaction.CommandName,
+                }
+            );
+
             await interaction.DeferAsync();
 
             var context = new SocketInteractionContext(client, interaction);
@@ -57,6 +66,18 @@ public class InteractionHandler(
                 await interaction.RespondAsync("Nino commands must be run in a server!");
                 return;
             }
+
+            var buttonName = interaction.Data.CustomId[
+                ..interaction.Data.CustomId.IndexOf(':', StringComparison.Ordinal)
+            ];
+            using var scope = logger.BeginScope(
+                new Dictionary<string, object>
+                {
+                    ["CorrelationId"] = Guid.NewGuid(),
+                    ["InteractionType"] = "SlashCommand",
+                    ["CommandName"] = buttonName,
+                }
+            );
 
             await interaction.DeferAsync();
 

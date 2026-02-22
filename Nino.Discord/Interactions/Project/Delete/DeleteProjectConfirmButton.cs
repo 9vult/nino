@@ -10,7 +10,7 @@ namespace Nino.Discord.Interactions.Project;
 
 public partial class ProjectModule
 {
-    [ComponentInteraction("nino:project:delete:confirm:*", ignoreGroupNames: true)]
+    [ComponentInteraction("nino.project.delete.confirm:*", ignoreGroupNames: true)]
     public async Task<RuntimeResult> ConfirmDeleteAsync(Guid stateId)
     {
         var interaction = Context.Interaction;

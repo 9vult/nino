@@ -9,7 +9,7 @@ namespace Nino.Discord.Interactions.Project;
 
 public partial class ProjectModule
 {
-    [ComponentInteraction("nino:project:delete:cancel:*", ignoreGroupNames: true)]
+    [ComponentInteraction("nino.project.delete.cancel:*", ignoreGroupNames: true)]
     public async Task<RuntimeResult> CancelDeleteAsync(Guid stateId)
     {
         var interaction = Context.Interaction;

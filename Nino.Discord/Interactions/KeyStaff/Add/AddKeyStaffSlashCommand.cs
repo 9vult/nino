@@ -87,8 +87,8 @@ public partial class KeyStaffModule
                 .WithCurrentTimestamp()
                 .Build();
 
-            var noId = $"nino:keyStaff:create:markDone:no:{stateId}";
-            var yesId = $"nino:keyStaff:create:markDone:yes:{stateId}";
+            var noId = $"nino.keyStaff.create.markDone.no:{stateId}";
+            var yesId = $"nino.keyStaff.create.markDone.yes:{stateId}";
 
             var component = new ComponentBuilder()
                 .WithButton(T("button.no", locale), noId, ButtonStyle.Secondary)
