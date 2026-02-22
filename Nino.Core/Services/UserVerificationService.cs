@@ -9,6 +9,49 @@ public class UserVerificationService(DataContext db, ILogger<UserVerificationSer
     : IUserVerificationService
 {
     /// <inheritdoc />
+    public async Task<bool> VerifyTaskPermissionsAsync(
+        Guid projectId,
+        Guid episodeId,
+        Guid userId,
+        string abbreviation
+    )
+    {
+        var project = await db.Projects.SingleOrDefaultAsync(p => p.Id == projectId);
+        if (project is null)
+        {
+            logger.LogWarning("Project {ProjectId} was not found", projectId);
+            return false;
+        }
+        var episode = await db.Episodes.SingleOrDefaultAsync(e => e.Id == episodeId);
+        if (episode is null)
+        {
+            logger.LogWarning("Episode {EpisodeId} was not found", episodeId);
+            return false;
+        }
+        var task = episode.Tasks.SingleOrDefault(t => t.Abbreviation == abbreviation);
+        if (task is null)
+        {
+            logger.LogWarning("Task {Abbreviation} was not found", abbreviation);
+            return false;
+        }
+
+        var projectPermissions = await GetProjectPermissionsAsync(project, userId);
+        if (projectPermissions >= PermissionsLevel.Administrator)
+            return true;
+
+        var staff = project
+            .KeyStaff.Concat(episode.AdditionalStaff)
+            .SingleOrDefault(s => s.Role.Abbreviation == abbreviation);
+        if (staff?.UserId == userId)
+            return true;
+
+        var pinchHitter = episode.PinchHitters.SingleOrDefault(h => h.Abbreviation == abbreviation);
+        if (pinchHitter?.UserId == userId)
+            return true;
+        return false;
+    }
+
+    /// <inheritdoc />
     public async Task<bool> VerifyProjectPermissionsAsync(
         Guid projectId,
         Guid userId,

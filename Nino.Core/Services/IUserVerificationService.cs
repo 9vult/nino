@@ -8,6 +8,21 @@ namespace Nino.Core.Services;
 public interface IUserVerificationService
 {
     /// <summary>
+    /// Check if the user is able to modify a task's status
+    /// </summary>
+    /// <param name="projectId">Project ID</param>
+    /// <param name="episodeId">Episode ID</param>
+    /// <param name="userId">User ID</param>
+    /// <param name="abbreviation">Task abbreviation</param>
+    /// <returns><see langword="true"/> if the user has permissions to modify the given task's status</returns>
+    Task<bool> VerifyTaskPermissionsAsync(
+        Guid projectId,
+        Guid episodeId,
+        Guid userId,
+        string abbreviation
+    );
+
+    /// <summary>
     /// Check if the user meets the minimum permissions for an action
     /// </summary>
     /// <param name="projectId">Project ID</param>
