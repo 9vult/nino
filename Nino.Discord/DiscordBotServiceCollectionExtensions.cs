@@ -41,7 +41,7 @@ public static class DiscordBotServiceCollectionExtensions
 
         // Handlers!
         services.AddSingleton<InteractionHandler>();
-        services.AddScoped<IEventHandler<TaskSkippedEvent>, TaskSkippedEventHandler>();
+        services.AddScoped<IEventHandler<TaskCompletedEvent>, TaskCompletedEventHandler>();
         services.AddScoped<IEventHandler<EpisodeAiredEvent>, EpisodeAiredEventHandler>();
 
         services.AddHostedService<DiscordBotHostedService>();

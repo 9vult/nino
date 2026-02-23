@@ -4,10 +4,10 @@ using Nino.Core.Events;
 
 namespace Nino.Discord.Handlers;
 
-public class TaskSkippedEventHandler : IEventHandler<TaskSkippedEvent>
+public class TaskCompletedEventHandler : IEventHandler<TaskCompletedEvent>
 {
     /// <inheritdoc />
-    public async Task HandleAsync(TaskSkippedEvent @event)
+    public async Task HandleAsync(TaskCompletedEvent @event)
     {
         throw new NotImplementedException();
     }

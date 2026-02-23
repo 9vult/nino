@@ -89,7 +89,12 @@ public class AirNotificationService(
                         var task = episode.Tasks.Single(t => t.Abbreviation == node.Abbreviation);
                         logger.LogTrace("Publishing Conga event for {Task}", task);
 
-                        var congaEvent = new CongaEvent(project.Id, episode.Id, task.Id);
+                        var congaEvent = new CongaNotificationEvent(
+                            project.Id,
+                            episode.Id,
+                            task.Abbreviation,
+                            IsReminder: false
+                        );
                         await eventBus.PublishAsync(congaEvent);
 
                         task.LastRemindedAt = DateTimeOffset.UtcNow;

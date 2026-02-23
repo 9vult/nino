@@ -2,9 +2,9 @@
 
 namespace Nino.Core.Events;
 
-public record TaskSkippedEvent(
+public record CongaNotificationEvent(
     Guid ProjectId,
     Guid EpisodeId,
     string Abbreviation,
-    DateTimeOffset Timestamp
+    bool IsReminder
 ) : IEvent;

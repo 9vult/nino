@@ -46,4 +46,24 @@ public interface IDataService
         Guid projectId,
         IList<string> episodeNumbers
     );
+
+    /// <summary>
+    /// Get the current working episode for a project
+    /// </summary>
+    /// <param name="projectId">Project ID</param>
+    /// <returns>Episode number, or <see langword="null"/> if all episodes are complete</returns>
+    Task<string?> GetWorkingEpisodeAsync(Guid projectId);
+
+    /// <summary>
+    /// Gets how far apart two episodes are
+    /// </summary>
+    /// <param name="projectId">Project ID</param>
+    /// <param name="firstEpisodeNumber">First episode</param>
+    /// <param name="secondEpisodeNumber">Second episode</param>
+    /// <returns>How many episodes ahead <paramref name="secondEpisodeNumber"/> is from <paramref name="firstEpisodeNumber"/></returns>
+    Task<int> GetEpisodeDifferenceAsync(
+        Guid projectId,
+        string firstEpisodeNumber,
+        string secondEpisodeNumber
+    );
 }

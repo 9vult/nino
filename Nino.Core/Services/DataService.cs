@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
+using NaturalSort.Extension;
 using Nino.Core.Dtos;
 using Nino.Core.Entities;
 
@@ -109,6 +110,38 @@ public class DataService(DataContext db, ILogger<DataService> logger) : IDataSer
             .ToListAsync();
 
         return episodes.Select(e => MapEpisodeStatus(project, e)).ToList();
+    }
+
+    /// <inheritdoc />
+    public async Task<string?> GetWorkingEpisodeAsync(Guid projectId)
+    {
+        var candidates = await db
+            .Episodes.Where(e => e.ProjectId == projectId && !e.IsDone)
+            .Select(e => e.Number)
+            .ToListAsync();
+
+        if (candidates.Count == 0)
+            return null;
+
+        return candidates
+            .OrderBy(n => n, StringComparer.OrdinalIgnoreCase.WithNaturalSort())
+            .First();
+    }
+
+    /// <inheritdoc />
+    public async Task<int> GetEpisodeDifferenceAsync(
+        Guid projectId,
+        string firstEpisodeNumber,
+        string secondEpisodeNumber
+    )
+    {
+        var episodes = (await db.Episodes.Where(p => p.Id == projectId).ToListAsync())
+            .OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort())
+            .ToList();
+
+        var firstIdx = episodes.FindIndex(e => e.Number == firstEpisodeNumber);
+        var lastIdx = episodes.FindIndex(e => e.Number == secondEpisodeNumber);
+        return lastIdx - firstIdx;
     }
 
     private static EpisodeStatusDto MapEpisodeStatus(Project project, Episode episode)

@@ -8,6 +8,7 @@ using Nino.Core.Features.AdditionalStaff.Remove;
 using Nino.Core.Features.AdditionalStaff.Rename;
 using Nino.Core.Features.AdditionalStaff.SetWeight;
 using Nino.Core.Features.AdditionalStaff.Swap;
+using Nino.Core.Features.Done;
 using Nino.Core.Features.Episodes.Add;
 using Nino.Core.Features.Episodes.Remove;
 using Nino.Core.Features.Episodes.Roster;
@@ -22,6 +23,7 @@ using Nino.Core.Features.Project.Create;
 using Nino.Core.Features.Project.Delete;
 using Nino.Core.Features.Project.Export;
 using Nino.Core.Features.Project.Resolve;
+using Nino.Core.Handlers;
 using Nino.Core.Services;
 
 namespace Nino.Core;
@@ -47,6 +49,9 @@ public static class CoreServiceCollectionExtensions
         services.AddScoped<IUserVerificationService, UserVerificationService>();
         services.AddScoped<IDataService, DataService>();
         services.AddScoped<IStateService, StateService>();
+
+        // Event handlers
+        services.AddScoped<IEventHandler<TaskCompletedEvent>, CongaTaskCompletedEventHandler>();
 
         // Project handlers
         services.AddScoped<ResolveProjectHandler>();
@@ -74,6 +79,9 @@ public static class CoreServiceCollectionExtensions
         services.AddScoped<AddEpisodeHandler>();
         services.AddScoped<RemoveEpisodeHandler>();
         services.AddScoped<EpisodeRosterHandler>();
+
+        // Task handlers
+        services.AddScoped<DoneHandler>();
 
         return services;
     }
