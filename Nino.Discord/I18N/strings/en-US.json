@@ -11,10 +11,12 @@
     "additionalStaff.swap.success": "Swapped {staff_1} in for position {abbreviation_2}.",
     "button.cancel": "Cancel",
     "button.delete": "Delete",
+    "button.doIt": "Do it!",
     "button.no": "No",
     "button.yes": "Yes",
     "episode.aired.body": "Aired on {absolute_1} ({relative_2})",
     "episode.aired.title": "Episode {number_1} has aired!",
+    "episode.allComplete": "All episodes are complete!",
     "episode.creation.badRequest": "To add multiple episodes, the starting episode must be either a decimal number (ex: 3.5) or use the template syntax $(n), where n is a decimal number (ex: \"OVA $(3.5)\".",
     "episode.roster.empty": "There aren't any tasks!",
     "episode.roster.title": "Episode {episode_1} Roster",
@@ -24,6 +26,7 @@
     "error.hijack": "And what made you think you could click that button?",
     "error.projectNotFound": "Project not found",
     "error.permissions": "You do not have permission to perform this action.",
+    "error.taskNotFound": "Task {abbreviation_1} does not exist!",
     "keyStaff.creation.conflict": "A task with the abbreviation {abbreviation_1} already exists!",
     "keyStaff.creation.markDone.question": "Some episodes are already complete.\nDo you want me to mark the task done for completed episodes?",
     "keyStaff.creation.markDone.response.no": "Okay, I'll mark those episodes incomplete then.",
@@ -46,7 +49,14 @@
     "project.delete.title": "Project Deletion",
     "project.modification.title": "Project Modification",
     "project.export": "Here's everything I know about `{nickname_1}`!",
-    "project.resolution.failed": "Could not resolve alias `{alias_1}` to a project."
+    "project.resolution.failed": "Could not resolve alias `{alias_1}` to a project.",
+    "task.complete.ahead.question": "Your team is still working on episode **{currentEpisode_1}**, but your task there is already done.\nThe next episode awaiting **{taskName_2}** is episode **{nextEpisode_3}**; did you want me to mark that one done instead?",
+    "task.complete.alreadyDone": "Task {abbreviation_1} is already done!",
+    "task.complete.episodeDone": "Also, episode {episode_1} is now complete!",
+    "task.complete.success": "Nice job getting the **{taskName_1}** for episode {episode_2} done.",
+    "task.complete.title": "Task Complete",
+    "task.complete.unaired.question": "It doesn't look like episode {episode_1} has aired yet. Continue?",
+    "task.complete.unaired.response": "Alrighty then! Full steam ahead!"
   },
   "plural": {
     "keyStaff.deleted.completedEpisodes": {
@@ -60,6 +70,10 @@
     "episode.delete.success": {
       "one": "I removed {number_1} episode from `{project_2}` for you.",
       "other": "I removed {number_1} episodes from `{project_2}` for you."
+    },
+    "task.complete.ahead.response": {
+      "one": "Alrighty, **{taskName_1}** is now {number_2} episode ahead.",
+      "other": "Alrighty, **{taskName_1}** is now {number_2} episodes ahead."
     }
   }
 }

@@ -3,19 +3,19 @@
 using Discord;
 using Discord.Interactions;
 using Nino.Core.Enums;
-using Nino.Core.Features.Project.Delete;
+using Nino.Core.Features.Done;
 
-namespace Nino.Discord.Interactions.Project;
+namespace Nino.Discord.Interactions.Done;
 
-public partial class ProjectModule
+public partial class DoneModule
 {
-    [ComponentInteraction("nino.project.delete.cancel:*", ignoreGroupNames: true)]
-    public async Task<RuntimeResult> CancelDeleteAsync(Guid stateId)
+    [ComponentInteraction("nino.done.ahead.cancel:*", ignoreGroupNames: true)]
+    public async Task<RuntimeResult> CancelAheadAsync(Guid stateId)
     {
         var interaction = Context.Interaction;
         var locale = interaction.UserLocale;
 
-        var commandDto = await stateService.LoadStateAsync<DeleteProjectCommand>(stateId);
+        var commandDto = await stateService.LoadStateAsync<DoneCommand>(stateId);
         if (commandDto is null)
             return await interaction.FailAsync(T("error.db", locale));
 
@@ -31,7 +31,10 @@ public partial class ProjectModule
         // Delete state, won't be needed regardless of the final status
         await stateService.DeleteStateAsync(stateId);
 
-        logger.LogTrace("Project deletion canceled by {UserId}", commandDto.RequestedBy);
+        logger.LogTrace(
+            "/done canceled by user {UserId} due to ahead status",
+            commandDto.RequestedBy
+        );
 
         var data = await dataService.GetProjectBasicInfoAsync(commandDto.ProjectId);
         var header = $"{data.Title} ({data.Type.ToFriendlyString(locale)})";

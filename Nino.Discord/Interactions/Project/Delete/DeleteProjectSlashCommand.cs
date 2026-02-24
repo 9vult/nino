@@ -44,7 +44,7 @@ public partial class ProjectModule
         // Ask if the user is sure
         var embed = new EmbedBuilder()
             .WithAuthor(header)
-            .WithTitle(T("project.delete.title", locale))
+            .WithTitle(T("action.question", locale))
             .WithDescription(T("project.delete.question", locale, data.Title))
             .WithCurrentTimestamp()
             .Build();

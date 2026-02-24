@@ -82,7 +82,7 @@ public partial class KeyStaffModule
 
             var questionEmbed = new EmbedBuilder()
                 .WithAuthor(header)
-                .WithTitle(T("project.modification.title", locale))
+                .WithTitle(T("action.question", locale))
                 .WithDescription(T("keyStaff.creation.markDone.question", locale))
                 .WithCurrentTimestamp()
                 .Build();

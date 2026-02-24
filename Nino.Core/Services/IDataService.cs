@@ -15,6 +15,19 @@ public interface IDataService
     Task<AirNotificationDto> GetAirNotificationDataAsync(Guid projectId, Guid episodeId);
 
     /// <summary>
+    /// Get the data required to publish a progress update
+    /// </summary>
+    /// <param name="projectId">Project ID</param>
+    /// <param name="episodeNumber">Episode number</param>
+    /// <param name="abbreviation">Task abbreviation</param>
+    /// <returns>Required data for publishing a progress update</returns>
+    Task<TaskProgressDto> GetTaskProgressDataAsync(
+        Guid projectId,
+        string episodeNumber,
+        string abbreviation
+    );
+
+    /// <summary>
     /// Get basic information about a project
     /// </summary>
     /// <param name="projectId">Project ID</param>
@@ -55,6 +68,14 @@ public interface IDataService
     Task<string?> GetWorkingEpisodeAsync(Guid projectId);
 
     /// <summary>
+    /// Get the current working episode for a task
+    /// </summary>
+    /// <param name="projectId">Project ID</param>
+    /// <param name="abbreviation">Task abbreviation</param>
+    /// <returns>Episode number, or <see langword="null"/> if task is complete for all episodes</returns>
+    Task<string?> GetWorkingTaskEpisodeAsync(Guid projectId, string abbreviation);
+
+    /// <summary>
     /// Gets how far apart two episodes are
     /// </summary>
     /// <param name="projectId">Project ID</param>
@@ -66,4 +87,29 @@ public interface IDataService
         string firstEpisodeNumber,
         string secondEpisodeNumber
     );
+
+    /// <summary>
+    /// Get if an episode has aired
+    /// </summary>
+    /// <param name="projectId">Project ID</param>
+    /// <param name="episodeNumber">Episode number</param>
+    /// <returns><see langword="true"/> if the episode aired or cannot be checked</returns>
+    Task<bool> GetHasEpisodeAiredAsync(Guid projectId, string episodeNumber);
+
+    /// <summary>
+    /// Get the full name of a task
+    /// </summary>
+    /// <param name="projectId">Project ID</param>
+    /// <param name="episodeNumber">Episode number</param>
+    /// <param name="abbreviation">Task abbreviation</param>
+    /// <returns>Name of the task</returns>
+    Task<string> GetTaskNameAsync(Guid projectId, string episodeNumber, string abbreviation);
+
+    /// <summary>
+    /// Determine if a task exists
+    /// </summary>
+    /// <param name="projectId">Project ID</param>
+    /// <param name="abbreviation">Task abbreviation</param>
+    /// <returns><see langword="true"/> if the task exists</returns>
+    Task<bool> GetDoesTaskExistAsync(Guid projectId, string abbreviation);
 }
