@@ -21,6 +21,7 @@ public class ResolveProjectHandler(
                     || (query.IncludeObservers && p.Observers.Any(o => o.GroupId == query.GroupId))
                 ) && (p.Nickname == query.Alias || p.Aliases.Any(a => a.Value == query.Alias))
             )
+            .AsSingleQuery()
             .FirstOrDefaultAsync();
 
         if (project is null)
