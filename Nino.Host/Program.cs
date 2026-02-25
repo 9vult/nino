@@ -60,7 +60,7 @@ using (var migrationScope = host.Services.CreateScope())
 }
 
 using var globalScope = host
-    .Services.GetRequiredService<ILogger>()
+    .Services.GetRequiredService<ILogger<Program>>()
     .BeginScope(
         new Dictionary<string, object>
         {
