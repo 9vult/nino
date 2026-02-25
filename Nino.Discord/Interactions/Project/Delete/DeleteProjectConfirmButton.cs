@@ -11,8 +11,9 @@ namespace Nino.Discord.Interactions.Project;
 public partial class ProjectModule
 {
     [ComponentInteraction("nino.project.delete.confirm:*", ignoreGroupNames: true)]
-    public async Task<RuntimeResult> ConfirmDeleteAsync(Guid stateId)
+    public async Task<RuntimeResult> ConfirmDeleteAsync(string id)
     {
+        var stateId = Guid.Parse(id);
         var interaction = Context.Interaction;
         var locale = interaction.UserLocale;
 

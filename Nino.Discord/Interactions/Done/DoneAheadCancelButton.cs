@@ -10,8 +10,9 @@ namespace Nino.Discord.Interactions.Done;
 public partial class DoneModule
 {
     [ComponentInteraction("nino.done.ahead.cancel:*", ignoreGroupNames: true)]
-    public async Task<RuntimeResult> CancelAheadAsync(Guid stateId)
+    public async Task<RuntimeResult> CancelAheadAsync(string id)
     {
+        var stateId = Guid.Parse(id);
         var interaction = Context.Interaction;
         var locale = interaction.UserLocale;
 

@@ -21,7 +21,7 @@ public partial class DoneModule
 
         // Cleanup
         alias = alias.Trim();
-        abbreviation = abbreviation.Trim();
+        abbreviation = abbreviation.Trim().ToUpperInvariant();
         episodeNumber = episodeNumber?.Trim();
 
         // Resolve user, group, and project

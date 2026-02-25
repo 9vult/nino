@@ -10,8 +10,9 @@ namespace Nino.Discord.Interactions.Done;
 public partial class DoneModule
 {
     [ComponentInteraction("nino.done.ahead.confirm:*", ignoreGroupNames: true)]
-    public async Task<RuntimeResult> ConfirmAheadAsync(Guid stateId)
+    public async Task<RuntimeResult> ConfirmAheadAsync(string id)
     {
+        var stateId = Guid.Parse(id);
         var interaction = Context.Interaction;
         var locale = interaction.UserLocale;
 

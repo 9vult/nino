@@ -10,8 +10,9 @@ namespace Nino.Discord.Interactions.KeyStaff;
 public partial class KeyStaffModule
 {
     [ComponentInteraction("nino.keyStaff.create.markDone.no:*", ignoreGroupNames: true)]
-    public async Task<RuntimeResult> CreateAndDoNotMarkDoneAsync(Guid stateId)
+    public async Task<RuntimeResult> CreateAndDoNotMarkDoneAsync(string id)
     {
+        var stateId = Guid.Parse(id);
         var interaction = Context.Interaction;
         var locale = interaction.UserLocale;
 

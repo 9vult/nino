@@ -10,7 +10,7 @@ namespace Nino.Discord.Interactions.AdditionalStaff;
 
 public partial class AdditionalStaffModule
 {
-    [SlashCommand("add", "Remove an Additional Staff from an episode")]
+    [SlashCommand("remove", "Remove an Additional Staff from an episode")]
     public async Task<RuntimeResult> RemoveAsync(
         [MaxLength(32)] string alias,
         [MaxLength(32)] string episodeNumber,
@@ -23,7 +23,7 @@ public partial class AdditionalStaffModule
         // Cleanup
         alias = alias.Trim();
         episodeNumber = episodeNumber.Trim();
-        abbreviation = abbreviation.Trim();
+        abbreviation = abbreviation.Trim().ToUpperInvariant();
 
         // Resolve user, group, and project
         var (requestedBy, groupId) = await interactionIdService.GetUserAndGroupAsync(interaction);

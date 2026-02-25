@@ -10,8 +10,9 @@ namespace Nino.Discord.Interactions.Project;
 public partial class ProjectModule
 {
     [ComponentInteraction("nino.project.delete.cancel:*", ignoreGroupNames: true)]
-    public async Task<RuntimeResult> CancelDeleteAsync(Guid stateId)
+    public async Task<RuntimeResult> CancelDeleteAsync(string id)
     {
+        var stateId = Guid.Parse(id);
         var interaction = Context.Interaction;
         var locale = interaction.UserLocale;
 

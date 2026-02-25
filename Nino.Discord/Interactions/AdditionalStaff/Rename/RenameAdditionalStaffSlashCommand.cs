@@ -25,7 +25,7 @@ public partial class AdditionalStaffModule
         // Cleanup
         alias = alias.Trim();
         episodeNumber = episodeNumber.Trim();
-        abbreviation = abbreviation.Trim();
+        abbreviation = abbreviation.Trim().ToUpperInvariant();
         fullName = fullName.Trim();
 
         // Resolve user, group, and project

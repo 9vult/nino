@@ -23,7 +23,7 @@ public partial class KeyStaffModule
 
         // Cleanup
         alias = alias.Trim();
-        abbreviation = abbreviation.Trim();
+        abbreviation = abbreviation.Trim().ToUpperInvariant();
         fullName = fullName.Trim();
 
         // Resolve user, group, and project

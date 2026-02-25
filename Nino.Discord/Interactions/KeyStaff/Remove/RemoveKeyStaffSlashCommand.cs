@@ -22,7 +22,7 @@ public partial class KeyStaffModule
 
         // Cleanup
         alias = alias.Trim();
-        abbreviation = abbreviation.Trim();
+        abbreviation = abbreviation.Trim().ToUpperInvariant();
 
         // Resolve user, group, and project
         var (requestedBy, groupId) = await interactionIdService.GetUserAndGroupAsync(interaction);

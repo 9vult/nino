@@ -11,8 +11,9 @@ namespace Nino.Discord.Interactions.Done;
 public partial class DoneModule
 {
     [ComponentInteraction("nino.done.unaired.confirm:*", ignoreGroupNames: true)]
-    public async Task<RuntimeResult> ConfirmUnairedAsync(Guid stateId)
+    public async Task<RuntimeResult> ConfirmUnairedAsync(string id)
     {
+        var stateId = Guid.Parse(id);
         var interaction = Context.Interaction;
         var locale = interaction.UserLocale;
 

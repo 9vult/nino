@@ -10,8 +10,9 @@ namespace Nino.Discord.Interactions.Done;
 public partial class DoneModule
 {
     [ComponentInteraction("nino.done.unaired.cancel:*", ignoreGroupNames: true)]
-    public async Task<RuntimeResult> CancelUnairedAsync(Guid stateId)
+    public async Task<RuntimeResult> CancelUnairedAsync(string id)
     {
+        var stateId = Guid.Parse(id);
         var interaction = Context.Interaction;
         var locale = interaction.UserLocale;
 
