@@ -171,6 +171,8 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
         // Episode
         modelBuilder.Entity<Episode>(episode =>
         {
+            episode.Property(e => e.Number).UseCollation("NOCASE");
+
             episode
                 .HasOne(e => e.Project)
                 .WithMany(p => p.Episodes)

@@ -11,7 +11,7 @@ using Nino.Core;
 namespace Nino.Core.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20260225005613_Initial")]
+    [Migration("20260225011224_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -73,7 +73,8 @@ namespace Nino.Core.Migrations
                     b.Property<string>("Number")
                         .IsRequired()
                         .HasMaxLength(32)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .UseCollation("NOCASE");
 
                     b.Property<Guid>("ProjectId")
                         .HasColumnType("TEXT");

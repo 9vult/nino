@@ -83,7 +83,7 @@ namespace Nino.Core.Migrations
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     ProjectId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Number = table.Column<string>(type: "TEXT", maxLength: 32, nullable: false),
+                    Number = table.Column<string>(type: "TEXT", maxLength: 32, nullable: false, collation: "NOCASE"),
                     IsDone = table.Column<bool>(type: "INTEGER", nullable: false),
                     AirNotificationPosted = table.Column<bool>(type: "INTEGER", nullable: false),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: true)
