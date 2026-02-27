@@ -8,7 +8,7 @@ namespace Nino.Core.Entities;
 public class Alias
 {
     [Key]
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
 
     [MaxLength(32)]
     public required string Value { get; set; }

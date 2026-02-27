@@ -8,7 +8,7 @@ namespace Nino.Core.Entities;
 public class PinchHitter
 {
     [Key]
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
     public required Guid UserId { get; set; }
 
     [MaxLength(16)]

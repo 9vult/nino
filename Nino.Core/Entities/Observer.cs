@@ -8,7 +8,7 @@ namespace Nino.Core.Entities;
 public class Observer
 {
     [Key]
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
     public required Guid GroupId { get; set; }
     public required Guid OriginGroupId { get; set; }
     public required Guid OwnerId { get; set; }

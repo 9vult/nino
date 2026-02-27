@@ -10,7 +10,7 @@ namespace Nino.Core.Entities;
 public class Episode
 {
     [Key]
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
     public required Guid ProjectId { get; set; }
 
     [MaxLength(32)]

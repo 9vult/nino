@@ -7,7 +7,7 @@ namespace Nino.Core.Entities;
 public abstract class MappedId
 {
     [Key]
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
     public ulong DiscordId { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
 

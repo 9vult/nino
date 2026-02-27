@@ -5,7 +5,7 @@ namespace Nino.Core.Entities;
 public class Task
 {
     [Key]
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
 
     [MaxLength(16)]
     public required string Abbreviation { get; set; }

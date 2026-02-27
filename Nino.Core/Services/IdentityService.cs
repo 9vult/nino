@@ -19,7 +19,6 @@ public class IdentityService(DataContext db, ILogger<IdentityService> logger) : 
 
         user = new User
         {
-            Id = Guid.NewGuid(),
             Name = discordName,
             DiscordId = discordId,
             CreatedAt = DateTimeOffset.UtcNow,
@@ -54,7 +53,6 @@ public class IdentityService(DataContext db, ILogger<IdentityService> logger) : 
 
         group = new Group
         {
-            Id = Guid.NewGuid(),
             DiscordId = discordId,
             CreatedAt = DateTimeOffset.UtcNow,
             Configuration = Configuration.CreateDefault(),
@@ -91,12 +89,7 @@ public class IdentityService(DataContext db, ILogger<IdentityService> logger) : 
             return channel.Id;
         }
 
-        channel = new Channel
-        {
-            Id = Guid.NewGuid(),
-            DiscordId = discordId,
-            CreatedAt = DateTimeOffset.UtcNow,
-        };
+        channel = new Channel { DiscordId = discordId, CreatedAt = DateTimeOffset.UtcNow };
         await db.Channels.AddAsync(channel);
 
         try
@@ -133,12 +126,7 @@ public class IdentityService(DataContext db, ILogger<IdentityService> logger) : 
             return role.Id;
         }
 
-        role = new MentionRole
-        {
-            Id = Guid.NewGuid(),
-            DiscordId = discordId,
-            CreatedAt = DateTimeOffset.UtcNow,
-        };
+        role = new MentionRole { DiscordId = discordId, CreatedAt = DateTimeOffset.UtcNow };
         await db.MentionRoles.AddAsync(role);
 
         try

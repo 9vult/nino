@@ -12,10 +12,10 @@ public sealed class StateService(DataContext db, ILogger<StateService> logger) :
     public async Task<Guid> SaveStateAsync<T>(T dto)
     {
         logger.LogTrace("Saving {Type} object to the state cache", typeof(T).FullName);
-        var id = Guid.NewGuid();
-        await db.StateCache.AddAsync(new State { Id = id, Json = JsonSerializer.Serialize(dto) });
+        var state = new State { Json = JsonSerializer.Serialize(dto) };
+        await db.StateCache.AddAsync(state);
         await db.SaveChangesAsync();
-        return id;
+        return state.Id;
     }
 
     /// <inheritdoc />

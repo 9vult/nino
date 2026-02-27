@@ -8,7 +8,7 @@ namespace Nino.Core.Entities;
 public class Staff
 {
     [Key]
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
     public required Guid UserId { get; set; }
     public required Role Role { get; set; }
     public required bool IsPseudo { get; set; } = false;

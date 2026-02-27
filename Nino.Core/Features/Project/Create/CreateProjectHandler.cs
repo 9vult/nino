@@ -64,7 +64,6 @@ public sealed class CreateProjectHandler(
 
         var project = new Entities.Project
         {
-            Id = Guid.NewGuid(),
             GroupId = input.GroupId,
             Nickname = dto.Nickname,
             Title = dto.Title,

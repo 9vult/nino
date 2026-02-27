@@ -11,7 +11,7 @@ namespace Nino.Core.Entities;
 public class Project
 {
     [Key]
-    public required Guid Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
     public required Guid GroupId { get; set; }
 
     [MaxLength(32)]
