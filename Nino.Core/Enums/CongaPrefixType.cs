@@ -29,9 +29,9 @@ public static class CongaPrefixTypeExtensions
     {
         return type switch
         {
-            CongaPrefixType.None => T("choice.server.congaPrefixType.none", lng),
-            CongaPrefixType.Nickname => T("choice.server.congaPrefixType.nickname", lng),
-            CongaPrefixType.Title => T("choice.server.congaPrefixType.title", lng),
+            CongaPrefixType.None => T("choice.congaPrefixType.none", lng),
+            CongaPrefixType.Nickname => T("choice.congaPrefixType.nickname", lng),
+            CongaPrefixType.Title => T("choice.congaPrefixType.title", lng),
             _ => type.ToString(),
         };
     }

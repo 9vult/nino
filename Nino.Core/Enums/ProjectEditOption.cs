@@ -16,7 +16,7 @@ public enum ProjectEditOption
     ReleaseChannelId = 7,
     Nickname = 8,
     AniListOffset = 9,
-    AirReminderDelay = 10,
+    AirNotificationDelay = 10,
 }
 
 public static class ProjectEditOptionExtensions
@@ -37,8 +37,8 @@ public static class ProjectEditOptionExtensions
             ),
             ProjectEditOption.Nickname => T("choice.project.edit.option.nickname", lng),
             ProjectEditOption.AniListOffset => T("choice.project.edit.option.aniListOffset", lng),
-            ProjectEditOption.AirReminderDelay => T(
-                "choice.project.edit.option.airReminderDelay",
+            ProjectEditOption.AirNotificationDelay => T(
+                "choice.project.edit.option.airNotificationDelay",
                 lng
             ),
             _ => type.ToString(),

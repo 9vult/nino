@@ -24,8 +24,8 @@ public static class ProgressPublishTypeExtensions
     {
         return type switch
         {
-            ProgressPublishType.Normal => T("choice.server.display.type.normal", lng),
-            ProgressPublishType.Extended => T("choice.server.display.type.extended", lng),
+            ProgressPublishType.Normal => T("choice.progressPublish.type.normal", lng),
+            ProgressPublishType.Extended => T("choice.progressPublish.type.extended", lng),
             _ => type.ToString(),
         };
     }

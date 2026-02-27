@@ -24,8 +24,8 @@ public static class ProgressResponseTypeExtensions
     {
         return type switch
         {
-            ProgressResponseType.Succinct => T("choice.server.display.type.succinct", lng),
-            ProgressResponseType.Verbose => T("choice.server.display.type.verbose", lng),
+            ProgressResponseType.Succinct => T("choice.progressResponse.type.succinct", lng),
+            ProgressResponseType.Verbose => T("choice.progressResponse.type.verbose", lng),
             _ => type.ToString(),
         };
     }
