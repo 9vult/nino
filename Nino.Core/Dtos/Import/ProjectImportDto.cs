@@ -6,8 +6,8 @@ namespace Nino.Core.Dtos.Import;
 
 public sealed class ProjectImportDto
 {
-    public required MappedIdDto GroupId { get; init; }
-    public required MappedIdDto OwnerId { get; init; }
+    public required MappedIdDto Group { get; init; }
+    public required MappedIdDto Owner { get; init; }
 
     public required string Nickname { get; init; }
     public required string Title { get; init; }
@@ -16,9 +16,9 @@ public sealed class ProjectImportDto
     public required bool IsPrivate { get; init; }
     public required bool IsArchived { get; init; }
 
-    public required MappedIdDto ProjectChannelId { get; init; }
-    public required MappedIdDto UpdateChannelId { get; init; }
-    public required MappedIdDto ReleaseChannelId { get; init; }
+    public required MappedIdDto ProjectChannel { get; init; }
+    public required MappedIdDto UpdateChannel { get; init; }
+    public required MappedIdDto ReleaseChannel { get; init; }
 
     public required int AniListId { get; init; }
 

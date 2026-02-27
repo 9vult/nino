@@ -17,9 +17,9 @@ public sealed class ProjectExportDto
     public required bool IsPrivate { get; init; }
     public required bool IsArchived { get; init; }
 
-    public required MappedIdDto ProjectChannelId { get; init; }
-    public required MappedIdDto UpdateChannelId { get; init; }
-    public required MappedIdDto ReleaseChannelId { get; init; }
+    public required MappedIdDto ProjectChannel { get; init; }
+    public required MappedIdDto UpdateChannel { get; init; }
+    public required MappedIdDto ReleaseChannel { get; init; }
 
     public required string Motd { get; init; }
     public required string[] Aliases { get; init; }
@@ -50,9 +50,9 @@ public sealed class ProjectExportDto
             PosterUrl = project.PosterUrl,
             IsPrivate = project.IsPrivate,
             IsArchived = project.IsArchived,
-            ProjectChannelId = MappedIdDto.FromMappedId(project.ProjectChannel),
-            UpdateChannelId = MappedIdDto.FromMappedId(project.UpdateChannel),
-            ReleaseChannelId = MappedIdDto.FromMappedId(project.ReleaseChannel),
+            ProjectChannel = MappedIdDto.FromMappedId(project.ProjectChannel),
+            UpdateChannel = MappedIdDto.FromMappedId(project.UpdateChannel),
+            ReleaseChannel = MappedIdDto.FromMappedId(project.ReleaseChannel),
             Motd = project.Motd,
             Aliases = project.Aliases.Select(a => a.Value).ToArray(),
             AniListId = project.AniListId,
