@@ -7,15 +7,26 @@ using Nino.Core.Enums;
 
 namespace Nino.Core.Services;
 
-public class DataService(NinoDbContext db, IAniListService aniListService) : IDataService
+public class DataService : IDataService
 {
+    private readonly NinoDbContext _db;
+    private readonly IAniListService _aniListService;
+
+    public DataService(NinoDbContext db, IAniListService aniListService)
+    {
+        // Make read-only
+        db.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+        _db = db;
+        _aniListService = aniListService;
+    }
+
     /// <inheritdoc />
     public async Task<AirNotificationDto> GetAirNotificationDataAsync(
         Guid projectId,
         Guid episodeId
     )
     {
-        var project = await db
+        var project = await _db
             .Projects.Include(p => p.AirNotificationChannel)
             .Include(p => p.AirNotificationUser)
             .Include(p => p.AirNotificationRole)
@@ -33,12 +44,12 @@ public class DataService(NinoDbContext db, IAniListService aniListService) : IDa
             })
             .SingleAsync();
 
-        var episode = await db
+        var episode = await _db
             .Episodes.Where(e => e.Id == episodeId)
             .Select(e => new { e.Number })
             .SingleAsync();
 
-        var locale = await db
+        var locale = await _db
             .Groups.Where(g => g.Id == project.GroupId)
             .Select(g => g.Configuration.Locale)
             .SingleAsync();
@@ -63,7 +74,7 @@ public class DataService(NinoDbContext db, IAniListService aniListService) : IDa
         string abbreviation
     )
     {
-        var episodeId = await db
+        var episodeId = await _db
             .Episodes.Where(e => e.ProjectId == projectId && e.Number == episodeNumber)
             .Select(e => e.Id)
             .SingleAsync();
@@ -77,11 +88,11 @@ public class DataService(NinoDbContext db, IAniListService aniListService) : IDa
         string abbreviation
     )
     {
-        var project = await db
+        var project = await _db
             .Projects.Include(project => project.UpdateChannel)
             .SingleAsync(p => p.Id == projectId);
-        var episode = await db.Episodes.SingleAsync(e => e.Id == episodeId);
-        var config = await db
+        var episode = await _db.Episodes.SingleAsync(e => e.Id == episodeId);
+        var config = await _db
             .Groups.Where(g => g.Id == project.GroupId)
             .Select(g => g.Configuration)
             .SingleAsync();
@@ -104,7 +115,7 @@ public class DataService(NinoDbContext db, IAniListService aniListService) : IDa
     /// <inheritdoc />
     public async Task<ProjectBasicInfoDto> GetProjectBasicInfoAsync(Guid projectId)
     {
-        return await db
+        return await _db
             .Projects.Where(p => p.Id == projectId)
             .Select(p => new ProjectBasicInfoDto(
                 Nickname: p.Nickname,
@@ -121,7 +132,7 @@ public class DataService(NinoDbContext db, IAniListService aniListService) : IDa
     /// <inheritdoc />
     public async Task<ProjectCompletionStatusDto> GetProjectCompletionStatusAsync(Guid projectId)
     {
-        var counts = await db
+        var counts = await _db
             .Episodes.Where(e => e.ProjectId == projectId)
             .GroupBy(_ => true)
             .Select(g => new
@@ -140,8 +151,8 @@ public class DataService(NinoDbContext db, IAniListService aniListService) : IDa
     /// <inheritdoc />
     public async Task<EpisodeStatusDto> GetEpisodeStatusAsync(Guid projectId, string episodeNumber)
     {
-        var project = await db.Projects.SingleAsync(p => p.Id == projectId);
-        var episode = await db.Episodes.SingleAsync(e =>
+        var project = await _db.Projects.SingleAsync(p => p.Id == projectId);
+        var episode = await _db.Episodes.SingleAsync(e =>
             e.ProjectId == projectId && e.Number == episodeNumber
         );
         return MapEpisodeStatus(project, episode);
@@ -153,8 +164,8 @@ public class DataService(NinoDbContext db, IAniListService aniListService) : IDa
         IList<string> episodeNumbers
     )
     {
-        var project = await db.Projects.SingleAsync(p => p.Id == projectId);
-        var episodes = await db
+        var project = await _db.Projects.SingleAsync(p => p.Id == projectId);
+        var episodes = await _db
             .Episodes.Where(e => e.ProjectId == projectId && episodeNumbers.Contains(e.Number))
             .ToListAsync();
 
@@ -164,7 +175,7 @@ public class DataService(NinoDbContext db, IAniListService aniListService) : IDa
     /// <inheritdoc />
     public async Task<string?> GetWorkingEpisodeAsync(Guid projectId)
     {
-        var candidates = await db
+        var candidates = await _db
             .Episodes.Where(e => e.ProjectId == projectId && !e.IsDone)
             .Select(e => e.Number)
             .ToListAsync();
@@ -180,10 +191,9 @@ public class DataService(NinoDbContext db, IAniListService aniListService) : IDa
     /// <inheritdoc />
     public async Task<string?> GetWorkingTaskEpisodeAsync(Guid projectId, string abbreviation)
     {
-        var candidates = await db
+        var candidates = await _db
             .Episodes.Where(e => e.ProjectId == projectId && !e.IsDone)
             .Select(e => new { e.Number, e.Tasks })
-            .AsNoTracking()
             .ToListAsync();
 
         if (candidates.Count == 0)
@@ -204,7 +214,7 @@ public class DataService(NinoDbContext db, IAniListService aniListService) : IDa
         string secondEpisodeNumber
     )
     {
-        var episodes = (await db.Episodes.Where(p => p.Id == projectId).ToListAsync())
+        var episodes = (await _db.Episodes.Where(p => p.Id == projectId).ToListAsync())
             .OrderBy(e => e.Number, StringComparison.OrdinalIgnoreCase.WithNaturalSort())
             .ToList();
 
@@ -216,7 +226,7 @@ public class DataService(NinoDbContext db, IAniListService aniListService) : IDa
     /// <inheritdoc />
     public async Task<bool> GetHasEpisodeAiredAsync(Guid projectId, string episodeNumber)
     {
-        var aniListId = await db
+        var aniListId = await _db
             .Projects.Where(p => p.Id == projectId)
             .Select(p => p.AniListId)
             .SingleAsync();
@@ -226,7 +236,7 @@ public class DataService(NinoDbContext db, IAniListService aniListService) : IDa
 
         if (decimal.TryParse(episodeNumber, out var dec))
         {
-            var result = await aniListService.EpisodeHasAiredAsync(aniListId, dec);
+            var result = await _aniListService.EpisodeHasAiredAsync(aniListId, dec);
             if (result.Status == ResultStatus.Success)
                 return result.Value;
         }
@@ -240,7 +250,7 @@ public class DataService(NinoDbContext db, IAniListService aniListService) : IDa
         string abbreviation
     )
     {
-        var keyStaff = await db
+        var keyStaff = await _db
             .Projects.Where(p => p.Id == projectId)
             .Select(p => p.KeyStaff)
             .SingleAsync();
@@ -248,7 +258,7 @@ public class DataService(NinoDbContext db, IAniListService aniListService) : IDa
         if (name is not null)
             return name;
 
-        var additionalStaff = await db
+        var additionalStaff = await _db
             .Episodes.Where(e => e.ProjectId == projectId && e.Number == episodeNumber)
             .Select(e => e.AdditionalStaff)
             .SingleAsync();
@@ -259,7 +269,7 @@ public class DataService(NinoDbContext db, IAniListService aniListService) : IDa
     /// <inheritdoc />
     public async Task<bool> GetDoesTaskExistAsync(Guid projectId, string abbreviation)
     {
-        return await db
+        return await _db
             .Episodes.Where(e => e.ProjectId == projectId)
             .AnyAsync(e => e.Tasks.Any(t => t.Abbreviation == abbreviation));
     }
