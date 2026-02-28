@@ -7,7 +7,7 @@ using Nino.Core.Services;
 namespace Nino.Core.Features.Project.Resolve;
 
 public class ResolveProjectHandler(
-    DataContext db,
+    NinoDbContext db,
     IUserVerificationService verificationService,
     ILogger<ResolveProjectHandler> logger
 )

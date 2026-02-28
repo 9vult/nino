@@ -8,7 +8,7 @@ using Nino.Core.Utilities;
 namespace Nino.Core.Features.KeyStaff.Remove;
 
 public sealed class RemoveKeyStaffHandler(
-    DataContext db,
+    NinoDbContext db,
     IUserVerificationService verificationService,
     ILogger<RemoveKeyStaffHandler> logger
 )

@@ -6,7 +6,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Nino.Core.Services;
 
-public sealed class StateService(DataContext db, ILogger<StateService> logger) : IStateService
+public sealed class StateService(NinoDbContext db, ILogger<StateService> logger) : IStateService
 {
     /// <inheritdoc />
     public async Task<Guid> SaveStateAsync<T>(T dto)

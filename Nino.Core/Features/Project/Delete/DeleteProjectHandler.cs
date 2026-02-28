@@ -9,7 +9,7 @@ using Nino.Core.Services;
 namespace Nino.Core.Features.Project.Delete;
 
 public sealed class DeleteProjectHandler(
-    DataContext db,
+    NinoDbContext db,
     IUserVerificationService verificationService,
     ILogger<DeleteProjectHandler> logger
 )

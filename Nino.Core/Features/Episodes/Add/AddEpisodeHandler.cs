@@ -10,7 +10,7 @@ using Task = Nino.Core.Entities.Task;
 namespace Nino.Core.Features.Episodes.Add;
 
 public partial class AddEpisodeHandler(
-    DataContext db,
+    NinoDbContext db,
     IUserVerificationService verificationService,
     ILogger<AddEpisodeHandler> logger
 )

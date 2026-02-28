@@ -42,7 +42,7 @@ var builder = Host.CreateDefaultBuilder(args)
     .ConfigureServices(
         (context, services) =>
         {
-            services.AddDbContext<DataContext>(options =>
+            services.AddDbContext<NinoDbContext>(options =>
                 options.UseSqlite(context.Configuration.GetConnectionString("DefaultConnection"))
             );
             services.AddHttpClient();
@@ -55,7 +55,7 @@ var host = builder.Build();
 
 using (var migrationScope = host.Services.CreateScope())
 {
-    var db = migrationScope.ServiceProvider.GetRequiredService<DataContext>();
+    var db = migrationScope.ServiceProvider.GetRequiredService<NinoDbContext>();
     await db.Database.MigrateAsync();
 }
 

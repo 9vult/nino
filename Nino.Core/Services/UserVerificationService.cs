@@ -5,7 +5,7 @@ using Nino.Core.Enums;
 
 namespace Nino.Core.Services;
 
-public class UserVerificationService(DataContext db, ILogger<UserVerificationService> logger)
+public class UserVerificationService(NinoDbContext db, ILogger<UserVerificationService> logger)
     : IUserVerificationService
 {
     /// <inheritdoc />

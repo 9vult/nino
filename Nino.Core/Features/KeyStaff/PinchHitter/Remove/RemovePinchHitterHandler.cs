@@ -7,7 +7,7 @@ using Nino.Core.Services;
 namespace Nino.Core.Features.KeyStaff.PinchHitter.Remove;
 
 public sealed class RemovePinchHitterHandler(
-    DataContext db,
+    NinoDbContext db,
     IUserVerificationService verificationService,
     ILogger<RemovePinchHitterHandler> logger
 )

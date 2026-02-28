@@ -7,7 +7,7 @@ using Nino.Core.Services;
 namespace Nino.Core.Features.AdditionalStaff.SetWeight;
 
 public sealed class SetAdditionalStaffWeightHandler(
-    DataContext db,
+    NinoDbContext db,
     IUserVerificationService verificationService,
     ILogger<SetAdditionalStaffWeightHandler> logger
 )

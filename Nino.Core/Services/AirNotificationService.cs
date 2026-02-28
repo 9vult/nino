@@ -33,7 +33,7 @@ public class AirNotificationService(
         try
         {
             await using var scope = scopeFactory.CreateAsyncScope();
-            var db = scope.ServiceProvider.GetRequiredService<DataContext>();
+            var db = scope.ServiceProvider.GetRequiredService<NinoDbContext>();
             var aniListService = scope.ServiceProvider.GetRequiredService<AniListService>();
 
             var targets = await db

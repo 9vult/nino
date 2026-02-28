@@ -8,5 +8,8 @@ public sealed record ProjectBasicInfoDto(
     string Nickname,
     string Title,
     ProjectType Type,
+    string AniListUrl,
+    string PosterUrl,
+    MappedIdDto Owner,
     bool IsPrivate
 );

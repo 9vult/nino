@@ -5,7 +5,7 @@ using Nino.Core.Events;
 namespace Nino.Core.Handlers;
 
 public sealed class CongaTaskCompletedEventHandler(
-    DataContext db,
+    NinoDbContext db,
     IEventBus eventBus,
     ILogger<CongaTaskCompletedEventHandler> logger
 ) : IEventHandler<TaskCompletedEvent>

@@ -8,7 +8,7 @@ using Task = Nino.Core.Entities.Task;
 namespace Nino.Core.Features.AdditionalStaff.Add;
 
 public sealed class AddAdditionalStaffHandler(
-    DataContext db,
+    NinoDbContext db,
     IUserVerificationService verificationService,
     ILogger<AddAdditionalStaffHandler> logger
 )

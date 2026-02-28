@@ -7,7 +7,7 @@ using Nino.Core.Services;
 namespace Nino.Core.Features.KeyStaff.PinchHitter.Set;
 
 public sealed class SetPinchHitterHandler(
-    DataContext db,
+    NinoDbContext db,
     IUserVerificationService verificationService,
     ILogger<SetPinchHitterHandler> logger
 )

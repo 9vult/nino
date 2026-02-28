@@ -7,7 +7,7 @@ using Nino.Core.Services;
 namespace Nino.Core.Features.AdditionalStaff.Rename;
 
 public sealed class RenameAdditionalStaffHandler(
-    DataContext db,
+    NinoDbContext db,
     IUserVerificationService verificationService,
     ILogger<RenameAdditionalStaffHandler> logger
 )

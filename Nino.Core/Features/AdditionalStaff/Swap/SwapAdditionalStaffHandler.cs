@@ -7,7 +7,7 @@ using Nino.Core.Services;
 namespace Nino.Core.Features.AdditionalStaff.Swap;
 
 public sealed class SwapAdditionalStaffHandler(
-    DataContext db,
+    NinoDbContext db,
     IUserVerificationService verificationService,
     ILogger<SwapAdditionalStaffHandler> logger
 )

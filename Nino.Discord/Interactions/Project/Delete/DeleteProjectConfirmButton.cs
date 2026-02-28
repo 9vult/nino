@@ -33,7 +33,7 @@ public partial class ProjectModule
         // Delete state, won't be needed regardless of the final status
         await stateService.DeleteStateAsync(stateId);
 
-        var (nickname, title, type, _) = await dataService.GetProjectBasicInfoAsync(
+        var (nickname, title, type, _, _, _, _) = await dataService.GetProjectBasicInfoAsync(
             commandDto.ProjectId
         );
         var header = $"{title} ({type.ToFriendlyString(locale)})";

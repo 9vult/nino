@@ -4,7 +4,7 @@ using Nino.Core.Entities;
 
 namespace Nino.Core.Services;
 
-public class IdentityService(DataContext db, ILogger<IdentityService> logger) : IIdentityService
+public class IdentityService(NinoDbContext db, ILogger<IdentityService> logger) : IIdentityService
 {
     /// <inheritdoc />
     public async Task<Guid> GetOrCreateUserByDiscordIdAsync(ulong discordId, string discordName)

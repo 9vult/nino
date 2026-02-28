@@ -8,7 +8,7 @@ using Nino.Core.Services;
 namespace Nino.Core.Features.Done;
 
 public partial class DoneHandler(
-    DataContext db,
+    NinoDbContext db,
     IUserVerificationService verificationService,
     IEventBus eventBus,
     ILogger<DoneHandler> logger
@@ -48,7 +48,13 @@ public partial class DoneHandler(
         await db.SaveChangesAsync();
 
         await eventBus.PublishAsync(
-            new TaskCompletedEvent(projectId, episodeId, abbreviation, false, DateTimeOffset.UtcNow)
+            new TaskCompletedEvent(
+                projectId,
+                episode.Id,
+                abbreviation,
+                false,
+                DateTimeOffset.UtcNow
+            )
         );
 
         return new Result<bool>(ResultStatus.Success, episode.Tasks.All(t => t.IsDone));

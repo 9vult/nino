@@ -8,7 +8,7 @@ using Nino.Core.Utilities;
 namespace Nino.Core.Features.AdditionalStaff.Remove;
 
 public sealed class RemoveAdditionalStaffHandler(
-    DataContext db,
+    NinoDbContext db,
     IUserVerificationService verificationService,
     ILogger<RemoveAdditionalStaffHandler> logger
 )

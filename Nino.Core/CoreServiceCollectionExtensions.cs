@@ -35,7 +35,7 @@ public static class CoreServiceCollectionExtensions
         IConfiguration configuration
     )
     {
-        services.AddDbContext<DataContext>(db =>
+        services.AddDbContext<NinoDbContext>(db =>
             db.UseSqlite(configuration.GetConnectionString("DefaultConnection"))
         );
         services.AddSingleton<IEventBus, InMemoryEventBus>();

@@ -8,7 +8,7 @@ using Nino.Core.Services;
 namespace Nino.Core.Features.Episodes.Remove;
 
 public partial class RemoveEpisodeHandler(
-    DataContext db,
+    NinoDbContext db,
     IUserVerificationService verificationService,
     ILogger<RemoveEpisodeHandler> logger
 )

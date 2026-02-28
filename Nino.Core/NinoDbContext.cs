@@ -8,7 +8,7 @@ using Nino.Core.Entities;
 
 namespace Nino.Core;
 
-public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
+public class NinoDbContext(DbContextOptions<NinoDbContext> options) : DbContext(options)
 {
     private static readonly JsonSerializerOptions JsonSerializerOptions = new();
 

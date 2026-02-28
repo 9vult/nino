@@ -7,7 +7,7 @@ using Nino.Core.Services;
 namespace Nino.Core.Features.KeyStaff.SetWeight;
 
 public sealed class SetKeyStaffWeightHandler(
-    DataContext db,
+    NinoDbContext db,
     IUserVerificationService verificationService,
     ILogger<SetKeyStaffWeightHandler> logger
 )

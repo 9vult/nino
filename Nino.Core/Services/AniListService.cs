@@ -10,7 +10,7 @@ using Nino.Core.Enums;
 
 namespace Nino.Core.Services;
 
-public class AniListService(DataContext db, HttpClient client, ILogger<AniListService> logger)
+public class AniListService(NinoDbContext db, HttpClient client, ILogger<AniListService> logger)
     : IAniListService
 {
     private const string BaseUrl = "https://graphql.anilist.co";

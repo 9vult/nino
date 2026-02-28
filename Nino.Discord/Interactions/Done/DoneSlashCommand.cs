@@ -10,6 +10,7 @@ namespace Nino.Discord.Interactions.Done;
 
 public partial class DoneModule
 {
+    [SlashCommand("done", "Mark a task complete")]
     public async Task<RuntimeResult> HandleDoneAsync(
         [MaxLength(32)] string alias,
         [MaxLength(16)] string abbreviation,

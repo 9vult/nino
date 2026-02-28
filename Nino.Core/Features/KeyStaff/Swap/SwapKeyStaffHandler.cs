@@ -7,7 +7,7 @@ using Nino.Core.Services;
 namespace Nino.Core.Features.KeyStaff.Swap;
 
 public sealed class SwapKeyStaffHandler(
-    DataContext db,
+    NinoDbContext db,
     IUserVerificationService verificationService,
     ILogger<SwapKeyStaffHandler> logger
 )

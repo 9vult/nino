@@ -9,7 +9,7 @@ using Nino.Core.Services;
 namespace Nino.Core.Features.Project.Create;
 
 public sealed class CreateProjectHandler(
-    DataContext db,
+    NinoDbContext db,
     IAniListService aniListService,
     IUserVerificationService verificationService,
     ILogger<CreateProjectHandler> logger

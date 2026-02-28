@@ -7,7 +7,7 @@ using Nino.Core.Enums;
 
 namespace Nino.Core.Services;
 
-public class DataService(DataContext db, IAniListService aniListService) : IDataService
+public class DataService(NinoDbContext db, IAniListService aniListService) : IDataService
 {
     /// <inheritdoc />
     public async Task<AirNotificationDto> GetAirNotificationDataAsync(
@@ -63,10 +63,24 @@ public class DataService(DataContext db, IAniListService aniListService) : IData
         string abbreviation
     )
     {
-        var project = await db.Projects.SingleAsync(p => p.Id == projectId);
-        var episode = await db.Episodes.SingleAsync(e =>
-            e.ProjectId == projectId && e.Number == episodeNumber
-        );
+        var episodeId = await db
+            .Episodes.Where(e => e.ProjectId == projectId && e.Number == episodeNumber)
+            .Select(e => e.Id)
+            .SingleAsync();
+        return await GetTaskProgressDataAsync(projectId, episodeId, abbreviation);
+    }
+
+    /// <inheritdoc />
+    public async Task<TaskProgressDto> GetTaskProgressDataAsync(
+        Guid projectId,
+        Guid episodeId,
+        string abbreviation
+    )
+    {
+        var project = await db
+            .Projects.Include(project => project.UpdateChannel)
+            .SingleAsync(p => p.Id == projectId);
+        var episode = await db.Episodes.SingleAsync(e => e.Id == episodeId);
         var config = await db
             .Groups.Where(g => g.Id == project.GroupId)
             .Select(g => g.Configuration)
@@ -74,13 +88,16 @@ public class DataService(DataContext db, IAniListService aniListService) : IData
 
         return new TaskProgressDto
         {
+            EpisodeNumber = episode.Number,
             Abbreviation = abbreviation,
             FullName = project
                 .KeyStaff.Concat(episode.AdditionalStaff)
                 .Single(s => s.Role.Abbreviation == abbreviation)
                 .Role.Abbreviation,
+            UpdateChannel = MappedIdDto.FromMappedId(project.UpdateChannel),
             ProgressResponseType = config.ProgressResponseType,
             ProgressPublishType = config.ProgressPublishType,
+            Locale = config.Locale,
         };
     }
 
@@ -93,6 +110,9 @@ public class DataService(DataContext db, IAniListService aniListService) : IData
                 Nickname: p.Nickname,
                 Title: p.Title,
                 Type: p.Type,
+                AniListUrl: p.AniListUrl,
+                PosterUrl: p.PosterUrl,
+                Owner: MappedIdDto.FromMappedId(p.Owner),
                 IsPrivate: p.IsPrivate
             ))
             .SingleAsync();
@@ -163,6 +183,7 @@ public class DataService(DataContext db, IAniListService aniListService) : IData
         var candidates = await db
             .Episodes.Where(e => e.ProjectId == projectId && !e.IsDone)
             .Select(e => new { e.Number, e.Tasks })
+            .AsNoTracking()
             .ToListAsync();
 
         if (candidates.Count == 0)

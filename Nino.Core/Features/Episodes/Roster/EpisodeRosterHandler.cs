@@ -8,7 +8,7 @@ using Nino.Core.Services;
 namespace Nino.Core.Features.Episodes.Roster;
 
 public partial class EpisodeRosterHandler(
-    DataContext db,
+    NinoDbContext db,
     IDataService dataService,
     IUserVerificationService verificationService,
     ILogger<EpisodeRosterHandler> logger

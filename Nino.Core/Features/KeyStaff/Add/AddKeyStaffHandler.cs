@@ -8,7 +8,7 @@ using Task = Nino.Core.Entities.Task;
 namespace Nino.Core.Features.KeyStaff.Add;
 
 public sealed class AddKeyStaffHandler(
-    DataContext db,
+    NinoDbContext db,
     IUserVerificationService verificationService,
     ILogger<AddKeyStaffHandler> logger
 )

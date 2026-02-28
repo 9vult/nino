@@ -9,7 +9,7 @@ using Nino.Core.Services;
 namespace Nino.Core.Features.Project.Export;
 
 public class ExportProjectHandler(
-    DataContext db,
+    NinoDbContext db,
     IUserVerificationService verificationService,
     ILogger<ExportProjectHandler> logger
 )

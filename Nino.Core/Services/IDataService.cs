@@ -28,6 +28,19 @@ public interface IDataService
     );
 
     /// <summary>
+    /// Get the data required to publish a progress update
+    /// </summary>
+    /// <param name="projectId">Project ID</param>
+    /// <param name="episodeId">Episode ID</param>
+    /// <param name="abbreviation">Task abbreviation</param>
+    /// <returns>Required data for publishing a progress update</returns>
+    Task<TaskProgressDto> GetTaskProgressDataAsync(
+        Guid projectId,
+        Guid episodeId,
+        string abbreviation
+    );
+
+    /// <summary>
     /// Get basic information about a project
     /// </summary>
     /// <param name="projectId">Project ID</param>

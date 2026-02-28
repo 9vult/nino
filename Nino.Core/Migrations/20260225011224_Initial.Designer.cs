@@ -10,7 +10,7 @@ using Nino.Core;
 
 namespace Nino.Core.Migrations
 {
-    [DbContext(typeof(DataContext))]
+    [DbContext(typeof(NinoDbContext))]
     [Migration("20260225011224_Initial")]
     partial class Initial
     {
