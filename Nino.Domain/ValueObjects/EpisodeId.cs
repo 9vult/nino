@@ -2,7 +2,7 @@
 
 namespace Nino.Domain.ValueObjects;
 
-public readonly record struct EpisodeId(Guid Value)
+public readonly record struct EpisodeId(Guid Value) : IId<EpisodeId>
 {
     public static EpisodeId New() => new(Guid.NewGuid());
 
