@@ -3,6 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Nino.Core;
 using Nino.Discord;
 using Serilog;
@@ -33,6 +34,16 @@ try
         var db = scope.ServiceProvider.GetRequiredService<NinoDbContext>();
         await db.Database.MigrateAsync();
     }
+
+    using var globalLogScope = host
+        .Services.GetRequiredService<ILogger<Program>>()
+        .BeginScope(
+            new Dictionary<string, object>
+            {
+                ["CorrelationId"] = "Global",
+                ["InteractionType"] = "System",
+            }
+        );
 
     await host.RunAsync();
 }

@@ -24,4 +24,9 @@
     <ProjectReference Include="..\Nino.Core\Nino.Core.csproj" />
     <ProjectReference Include="..\Nino.Discord\Nino.Discord.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Update="@(Content)">
+      <Visible Condition="'%(NuGetItemType)' == 'Content'">false</Visible>
+    </Content>
+  </ItemGroup>
 </Project>
