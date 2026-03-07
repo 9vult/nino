@@ -60,6 +60,8 @@ public sealed class Project
     public ICollection<Alias> Aliases { get; set; } = [];
     public ICollection<Staff> KeyStaff { get; set; } = [];
     public ICollection<Administrator> Administrators { get; set; } = [];
+    public ICollection<Episode> Episodes { get; set; } = [];
+    public ICollection<Observer> Observers { get; set; } = [];
 
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }

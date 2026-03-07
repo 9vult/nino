@@ -9,6 +9,9 @@ public sealed class Task
 {
     public TaskId Id { get; set; } = TaskId.New();
 
+    public required EpisodeId EpisodeId { get; set; }
+    public Episode Episode { get; set; } = null!;
+
     [MaxLength(16)]
     public required string Abbreviation { get; set; }
     public required bool IsDone { get; set; }

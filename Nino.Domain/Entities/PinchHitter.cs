@@ -10,6 +10,9 @@ public sealed class PinchHitter
     public PinchHitterId Id { get; set; } = PinchHitterId.New();
     public required UserId UserId { get; set; }
 
+    public EpisodeId EpisodeId { get; set; }
+    public Episode Episode { get; set; } = null!;
+
     [MaxLength(16)]
     public required string Abbreviation { get; set; }
 
