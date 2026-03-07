@@ -2,6 +2,7 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Nino.Core.Services;
 
 namespace Nino.Core;
 
@@ -13,6 +14,10 @@ public static class CoreServiceCollectionExtensions
     )
     {
         services.AddHttpClient();
+
+        // Services
+        services.AddScoped<IIdentityService, IdentityService>();
+
         return services;
     }
 }
