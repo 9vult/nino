@@ -4,9 +4,4 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Folder Include="Dtos\" />
-    <Folder Include="Entities\" />
-  </ItemGroup>
 </Project>
