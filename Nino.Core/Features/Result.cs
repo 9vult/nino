@@ -4,10 +4,12 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Nino.Core.Features;
 
+public interface IResult;
+
 /// <summary>
 /// Represents the outcome of an operation that does not return a value.
 /// </summary>
-public sealed record Result
+public sealed record Result : IResult
 {
     /// <summary>
     /// The outcome of the operation.
@@ -46,8 +48,7 @@ public sealed record Result
 /// Represents the outcome of an operation that returns a <typeparamref name="TValue"/> on success.
 /// </summary>
 /// <typeparam name="TValue">The type of the value produced by a successful operation.</typeparam>
-public sealed record Result<TValue>
-    where TValue : new()
+public sealed record Result<TValue> : IResult
 {
     /// <summary>
     /// The outcome of the operation.
@@ -85,7 +86,7 @@ public sealed record Result<TValue>
     /// </summary>
     /// <param name="status">A non-success status describing the category of failure.</param>
     /// <param name="message">A human-readable explanation of the failure.</param>
-    public static Result<TValue> Fail(ResultStatus status, string message) =>
+    public static Result<TValue> Fail(ResultStatus status, string? message = null) =>
         new() { Status = status, Message = message };
 
     private Result() { }
