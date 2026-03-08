@@ -1,0 +1,132 @@
+// SPDX-License-Identifier: MPL-2.0
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Nino.Domain.Entities;
+using Nino.Domain.Enums;
+using Nino.Domain.ValueObjects;
+
+namespace Nino.Core.Services;
+
+public class UserVerificationService(NinoDbContext db, ILogger<UserVerificationService> logger)
+    : IUserVerificationService
+{
+    /// <inheritdoc />
+    public async Task<bool> VerifyTaskPermissionsAsync(
+        ProjectId projectId,
+        EpisodeId episodeId,
+        UserId userId,
+        string abbreviation
+    )
+    {
+        var project = await db.Projects.SingleOrDefaultAsync(p => p.Id == projectId);
+        if (project is null)
+        {
+            logger.LogWarning("Project {ProjectId} was not found", projectId);
+            return false;
+        }
+        var episode = await db.Episodes.SingleOrDefaultAsync(e => e.Id == episodeId);
+        if (episode is null)
+        {
+            logger.LogWarning("Episode {EpisodeId} was not found", episodeId);
+            return false;
+        }
+        var task = episode.Tasks.SingleOrDefault(t => t.Abbreviation == abbreviation);
+        if (task is null)
+        {
+            logger.LogWarning("Task {Abbreviation} was not found", abbreviation);
+            return false;
+        }
+
+        var projectPermissions = await GetProjectPermissionsAsync(project, userId);
+        if (projectPermissions >= PermissionsLevel.Administrator)
+            return true;
+
+        var staff = project
+            .KeyStaff.Concat(episode.AdditionalStaff)
+            .SingleOrDefault(s => s.Role.Abbreviation == abbreviation);
+        if (staff?.UserId == userId)
+            return true;
+
+        var pinchHitter = episode.PinchHitters.SingleOrDefault(h => h.Abbreviation == abbreviation);
+        if (pinchHitter?.UserId == userId)
+            return true;
+        return false;
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> VerifyProjectPermissionsAsync(
+        ProjectId projectId,
+        UserId userId,
+        PermissionsLevel minimumPermissions
+    )
+    {
+        var project = await db.Projects.SingleOrDefaultAsync(p => p.Id == projectId);
+        if (project is null)
+        {
+            logger.LogWarning("Project {ProjectId} was not found", projectId);
+            return false;
+        }
+
+        var effectivePermissions = await GetProjectPermissionsAsync(project, userId);
+        return effectivePermissions >= minimumPermissions;
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> VerifyGroupPermissionsAsync(
+        GroupId groupId,
+        UserId userId,
+        PermissionsLevel minimumPermissions
+    )
+    {
+        var group = await db.Groups.SingleOrDefaultAsync(g => g.Id == groupId);
+        if (group is null)
+        {
+            logger.LogWarning("Group {GroupId} was not found", groupId);
+            return false;
+        }
+
+        var effectivePermissions = GetGroupPermissions(group, userId);
+        return effectivePermissions >= minimumPermissions;
+    }
+
+    /// <inheritdoc />
+    public async Task<PermissionsLevel> GetProjectPermissionsAsync(Project project, UserId userId)
+    {
+        if (project.OwnerId == userId)
+            return PermissionsLevel.Owner;
+
+        if (project.Administrators.Any(a => a.UserId == userId))
+            return PermissionsLevel.Administrator;
+
+        var groupAdmins = await db
+            .Groups.Where(g => g.Id == project.GroupId)
+            .Select(g => g.Configuration.Administrators)
+            .SingleOrDefaultAsync();
+        if ((groupAdmins ?? []).Any(a => a.UserId == userId))
+            return PermissionsLevel.Administrator;
+
+        if (project.KeyStaff.Any(s => s.UserId == userId))
+            return PermissionsLevel.Staff;
+
+        var isEpisodeStaff = await db
+            .Episodes.Where(e => e.ProjectId == project.Id)
+            .AnyAsync(e =>
+                e.AdditionalStaff.Any(s => s.UserId == userId)
+                || e.PinchHitters.Any(s => s.UserId == userId)
+            );
+
+        if (isEpisodeStaff)
+            return PermissionsLevel.Staff;
+
+        return project.IsPrivate ? PermissionsLevel.None : PermissionsLevel.User;
+    }
+
+    /// <inheritdoc />
+    public PermissionsLevel GetGroupPermissions(Group group, UserId userId)
+    {
+        return group.Configuration.Administrators.Any(a => a.UserId == userId)
+            ? PermissionsLevel.Administrator
+            : PermissionsLevel.User;
+    }
+}
