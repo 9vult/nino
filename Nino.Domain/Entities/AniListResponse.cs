@@ -15,9 +15,6 @@ public class AniListResponse
     public DateTimeOffset FetchedAt { get; set; } = DateTimeOffset.UtcNow;
 
     [NotMapped]
-    public int StatusCode { get; set; }
-
-    [NotMapped]
     public string? Title => Data?.Data?.Media?.Title?.Romaji;
 
     [NotMapped]
