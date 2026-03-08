@@ -2,6 +2,7 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Nino.Core.Features.Queries.Project.Resolve;
 using Nino.Core.Services;
 
 namespace Nino.Core;
@@ -18,6 +19,11 @@ public static class CoreServiceCollectionExtensions
         // Services
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IUserVerificationService, UserVerificationService>();
+
+        // Command handlers
+
+        // Query handlers
+        services.AddScoped<ResolveProjectHandler>();
 
         return services;
     }
