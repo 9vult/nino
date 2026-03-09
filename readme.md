@@ -19,22 +19,16 @@ Pull requests are always welcome.
 
 ## Setup for Hosting and Development
 
-- Nino uses a SQLite database. The database should be created and migrated automatically
-  on application startup, but if it doesn't, you can use `dotnet ef database update` to do so manually.
+### Local Development
 
-- Create an `appsettings.json` file. For development, place it in `Nino/bin/Debug/net8.0`,
-  or wherever the built executable is. For hosting, place it next to the executable.
+Configure user secrets for `Nino.Host`:
 
-`appsettings.json` schema:
-
-```json
-{
-  "Configuration": {
-    "DiscordApiToken": "",
-    "OwnerId": 1234
-  }
-}
-```
+```bash
+dotnet user-secrets init --project Nino.Host
+dotnet user-secrets set "Discord:Token" "your-token-here" --project Nino.Host
+dotnet user-secrets set "Discord:GuildId" "0123456789" --project Nino.Host
+dotnet user-secrets set "Discord:OwnerId" "0123456789" --project Nino.Host
+````
 
 ## Localization
 
@@ -54,8 +48,8 @@ Big thanks to everyone who's contributed!
 
 ## License
 
-Nino is licensed under the BSD 3-clause license
+Nino is licensed under the MPL 2.0 license.
 
 -----
 
-© 2025 9volt.
+© 2026 9volt.

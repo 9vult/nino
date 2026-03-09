@@ -12,6 +12,11 @@ public static class DiscordBotServiceCollectionExtensions
         IConfiguration configuration
     )
     {
+        services
+            .AddOptionsWithValidateOnStart<DiscordOptions>()
+            .BindConfiguration(DiscordOptions.Section)
+            .ValidateDataAnnotations();
+
         services.AddHostedService<DiscordBotHostedService>();
         return services;
     }

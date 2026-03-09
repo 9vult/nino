@@ -1,20 +1,19 @@
 // SPDX-License-Identifier: MPL-2.0
 
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Nino.Discord;
 
-public sealed class DiscordBotHostedService : IHostedService
+public sealed class DiscordBotHostedService(
+    IOptions<DiscordOptions> options,
+    ILogger<DiscordBotHostedService> logger
+) : IHostedService
 {
     /// <inheritdoc />
-    public Task StartAsync(CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
+    public async Task StartAsync(CancellationToken cancellationToken) { }
 
     /// <inheritdoc />
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
+    public async Task StopAsync(CancellationToken cancellationToken) { }
 }

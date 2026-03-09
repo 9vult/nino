@@ -12,7 +12,7 @@ using Nino.Domain.ValueObjects;
 
 namespace Nino.Core;
 
-public class NinoDbContext : DbContext
+public class NinoDbContext(DbContextOptions<NinoDbContext> options) : DbContext(options)
 {
     private static readonly JsonSerializerOptions JsonSerializerOptions = new();
 
