@@ -21,6 +21,12 @@ public sealed class EpisodeConfiguration : IEntityTypeConfiguration<Episode>
             .HasForeignKey(e => e.ProjectId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        episode
+            .HasOne(e => e.Group)
+            .WithMany()
+            .HasForeignKey(e => e.GroupId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         episode.Navigation(e => e.Tasks).AutoInclude();
         episode.Navigation(e => e.PinchHitters).AutoInclude();
         episode.Navigation(e => e.AdditionalStaff).AutoInclude();

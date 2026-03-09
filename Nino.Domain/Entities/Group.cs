@@ -14,7 +14,7 @@ public sealed class Group : MappedId<GroupId>
     public string Name { get; set; } = string.Empty;
 
     public ConfigurationId ConfigurationId { get; set; }
-    public Configuration? Configuration { get; set; }
+    public Configuration Configuration { get; set; } = null!;
 
     public ICollection<Project> Projects { get; set; } = [];
 

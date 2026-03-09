@@ -55,7 +55,7 @@ public sealed class Project
 
     public bool CongaRemindersEnabled { get; set; } = false;
     public TimeSpan CongaReminderPeriod { get; set; } = TimeSpan.Zero;
-    public required CongaGraph CongaParticipants { get; set; } = new();
+    public CongaGraph CongaParticipants { get; set; } = new();
 
     public ICollection<Alias> Aliases { get; set; } = [];
     public ICollection<Staff> KeyStaff { get; set; } = [];

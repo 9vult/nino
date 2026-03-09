@@ -56,4 +56,9 @@ public enum ResultStatus
     /// Generic not found condition
     /// </summary>
     NotFound = 9,
+
+    /// <summary>
+    /// Error occured with AniList
+    /// </summary>
+    AniListError = 10,
 }
