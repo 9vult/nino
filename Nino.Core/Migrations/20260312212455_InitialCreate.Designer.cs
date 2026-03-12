@@ -11,7 +11,7 @@ using Nino.Core;
 namespace Nino.Core.Migrations
 {
     [DbContext(typeof(NinoDbContext))]
-    [Migration("20260309152930_InitialCreate")]
+    [Migration("20260312212455_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -47,12 +47,7 @@ namespace Nino.Core.Migrations
                     b.Property<string>("DiscordId")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("GroupId")
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("GroupId");
 
                     b.ToTable("Channels");
                 });
@@ -438,17 +433,6 @@ namespace Nino.Core.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("Nino.Domain.Entities.Channel", b =>
-                {
-                    b.HasOne("Nino.Domain.Entities.Group", "Group")
-                        .WithMany()
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Group");
                 });
 
             modelBuilder.Entity("Nino.Domain.Entities.Configuration", b =>

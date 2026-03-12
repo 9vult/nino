@@ -10,5 +10,6 @@ public sealed record CreateProjectResponse(
     string ProjectNickname,
     string ProjectTitle,
     int ProjectLength,
+    decimal ProjectFirstEpisode,
     ProjectType ProjectType
 );

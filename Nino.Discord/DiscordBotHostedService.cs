@@ -23,7 +23,7 @@ public sealed class DiscordBotHostedService(
         client.Log += OnLog;
 
         await interactionHandler.InitializeAsync();
-        // Load localizations
+        LoadLocalizations(new Uri(Path.Combine(AppContext.BaseDirectory, "I18N", "strings")));
 
         await client.LoginAsync(TokenType.Bot, options.Value.Token);
         await client.StartAsync();

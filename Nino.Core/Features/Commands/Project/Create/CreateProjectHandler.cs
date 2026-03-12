@@ -110,6 +110,7 @@ public sealed class CreateProjectHandler(
             project.Id
         );
 
+        await db.Projects.AddAsync(project);
         await db.Episodes.AddRangeAsync(episodes);
         await db.SaveChangesAsync();
 
@@ -120,6 +121,7 @@ public sealed class CreateProjectHandler(
                 project.Nickname,
                 project.Title,
                 episodes.Count,
+                input.FirstEpisode,
                 project.Type
             )
         );

@@ -61,6 +61,8 @@
     "error.episodeNotFound": "Episode not found",
     "error.generic": "An error occured",
     "error.hijack": "And what made you think you could click that button?",
+    "error.missingMessagePerms": "I do not have sufficient permissions for {channel_1}!\nPlease ensure I have `VIEW_CHANNEL`, `SEND MESSAGES`, and `EMBED_LINKS` permissions!",
+    "error.missingReleasePerms": "I do not have sufficient permissions for {channel_1}!\nPlease ensure I have `VIEW_CHANNEL`, `SEND MESSAGES`, `MENTION_EVERYONE`, `MANAGE_MESSAGES`, and `EMBED_LINKS` permissions!",
     "error.permissions": "You do not have permission to perform this action.",
     "error.projectNotFound": "Project not found",
     "error.taskNotFound": "Task {abbreviation_1} does not exist!",
@@ -80,7 +82,10 @@
     "project.creation.conflict": "A project with the name `{nickname_1}` already exists!",
     "project.creation.failed.badRequest": "An error occured while creating the project.\nPlease make sure the AniList ID is correct or that all fields are present.",
     "project.creation.failed.generic": "An error occured while creating the project.",
+    "project.creation.firstEpisodeNote": "First episode **{episode_1}** is non-standard and may cause misalignment with AniList.\nConsider using `/project edit AniListOffset` to align with AniList.",
+    "project.creation.publishPrivateProgressInfo": "**Note**: By default, progress updates are published for private projects.\nThis can be configured with `/server display publish-private-progress`.",
     "project.creation.success": "I created project `{nickname_1}` for you. You may want to consider the following:\n1. `/keystaff add` to add positions\n2. `/keystaff set-weight` to re-order positions\n3. `/project edit`: `AniList` to set airing date/times, and `/air-reminder enable` to get airing notifications.",
+    "project.creation.title": "Project Creation",
     "project.delete.complete": "Cleaned out the **{title_1}** project for you. 残念。",
     "project.delete.question": "Are you sure you want to delete **{title_1}**?\nThis action is irreversible.",
     "project.delete.title": "Project Deletion",
@@ -93,7 +98,8 @@
     "task.complete.success": "Nice job getting the **{taskName_1}** for episode {episode_2} done.",
     "task.complete.title": "Task Complete",
     "task.complete.unaired.question": "It doesn't look like episode {episode_1} has aired yet. Continue?",
-    "task.complete.unaired.response": "Alrighty then! Full steam ahead!"
+    "task.complete.unaired.response": "Alrighty then! Full steam ahead!",
+    "warning": "Warning"
   },
   "plural": {
     "keyStaff.deleted.completedEpisodes": {

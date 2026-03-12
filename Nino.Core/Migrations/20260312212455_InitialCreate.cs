@@ -25,6 +25,19 @@ namespace Nino.Core.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Channels",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DiscordId = table.Column<string>(type: "TEXT", nullable: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Channels", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "MentionRoles",
                 columns: table => new
                 {
@@ -82,26 +95,6 @@ namespace Nino.Core.Migrations
                         column: x => x.OwnerId,
                         principalTable: "Users",
                         principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Channels",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    GroupId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    DiscordId = table.Column<string>(type: "TEXT", nullable: true),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Channels", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Channels_Groups_GroupId",
-                        column: x => x.GroupId,
-                        principalTable: "Groups",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -434,11 +427,6 @@ namespace Nino.Core.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Channels_GroupId",
-                table: "Channels",
-                column: "GroupId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Configuration_GroupId",
                 table: "Configuration",
                 column: "GroupId",
@@ -609,10 +597,10 @@ namespace Nino.Core.Migrations
                 name: "Channels");
 
             migrationBuilder.DropTable(
-                name: "MentionRoles");
+                name: "Groups");
 
             migrationBuilder.DropTable(
-                name: "Groups");
+                name: "MentionRoles");
 
             migrationBuilder.DropTable(
                 name: "Users");

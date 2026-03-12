@@ -18,4 +18,8 @@
     <ProjectReference Include="..\Nino.Domain\Nino.Domain.csproj" />
     <ProjectReference Include="..\Nino.Localization\Nino.Localization.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Include="I18N\**\*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>
