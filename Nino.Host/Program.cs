@@ -3,16 +3,12 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Nino.Core;
 using Nino.Discord;
 using Nino.Web;
 using Serilog;
 
-Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
-    .Enrich.FromLogContext()
-    .CreateBootstrapLogger();
+Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateBootstrapLogger();
 
 try
 {
@@ -20,10 +16,10 @@ try
 
     var builder = WebApplication.CreateBuilder(args);
 
-    builder.Services.AddSerilog(
-        (services, config) =>
+    builder.Host.UseSerilog(
+        (context, services, config) =>
             config
-                .ReadFrom.Configuration(builder.Configuration)
+                .ReadFrom.Configuration(context.Configuration)
                 .ReadFrom.Services(services)
                 .Enrich.FromLogContext()
     );
@@ -40,15 +36,17 @@ try
         await db.Database.MigrateAsync();
     }
 
-    using var globalLogScope = host
-        .Services.GetRequiredService<ILogger<Program>>()
-        .BeginScope(
-            new Dictionary<string, object>
-            {
-                ["CorrelationId"] = "Global",
-                ["InteractionType"] = "System",
-            }
-        );
+    // using var globalLogScope = host
+    //     .Services.GetRequiredService<ILogger<Program>>()
+    //     .BeginScope(
+    //         new Dictionary<string, object>
+    //         {
+    //             ["CorrelationId"] = "Global",
+    //             ["InteractionType"] = "System",
+    //         }
+    //     );
+
+    Log.Information("Hi");
 
     // Configure API
     host.UseWebApi();
