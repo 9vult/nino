@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Nino.Core;
 using Nino.Discord;
 using Nino.Web;
@@ -36,17 +37,18 @@ try
         await db.Database.MigrateAsync();
     }
 
-    // using var globalLogScope = host
-    //     .Services.GetRequiredService<ILogger<Program>>()
-    //     .BeginScope(
-    //         new Dictionary<string, object>
-    //         {
-    //             ["CorrelationId"] = "Global",
-    //             ["InteractionType"] = "System",
-    //         }
-    //     );
+    using var globalLogScope = host
+        .Services.GetRequiredService<ILogger<Program>>()
+        .BeginScope(
+            new Dictionary<string, object>
+            {
+                ["CorrelationId"] = "Global",
+                ["InteractionType"] = "System",
+            }
+        );
 
-    Log.Information("Hi");
+    host.Services.GetRequiredService<ILogger<Program>>()
+        .LogInformation("Hello! This is a test for {Item1} and {Item2}!", "abc", 123);
 
     // Configure API
     host.UseWebApi();

@@ -28,9 +28,16 @@ public sealed class InteractionHandler(
     private async Task OnClientReadyAsync()
     {
         if (options.Value.GuildId is null)
+        {
+            logger.LogInformation("Registering commands globally...");
             await handler.RegisterCommandsGloballyAsync();
+        }
         else
-            await handler.RegisterCommandsToGuildAsync(options.Value.GuildId.Value);
+        {
+            var guildId = options.Value.GuildId.Value;
+            logger.LogInformation("Registering commands to guild {GuildId}...", guildId);
+            await handler.RegisterCommandsToGuildAsync(guildId);
+        }
     }
 
     private async Task OnSlashCommandInteraction(SocketSlashCommand interaction)
