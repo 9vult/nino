@@ -58,20 +58,20 @@ public sealed record Result<TValue> : IResult
     /// <summary>
     /// <see langword="true"/> if the operation succeeded.
     /// </summary>
+    [MemberNotNullWhen(true, nameof(Value))]
+    [MemberNotNullWhen(false, nameof(Message))]
     public bool IsSuccess => Status == ResultStatus.Success;
 
     /// <summary>
     /// The value produced by the operation. Guaranteed non-null when
     /// <see cref="IsSuccess"/> is <see langword="true"/>.
     /// </summary>
-    [MemberNotNullWhen(true, nameof(IsSuccess))]
     public TValue? Value { get; init; }
 
     /// <summary>
     /// An explanation of why the operation failed. Guaranteed non-null when
     /// <see cref="IsSuccess"/> is <see langword="false"/>.
     /// </summary>
-    [MemberNotNullWhen(false, nameof(IsSuccess))]
     public string? Message { get; init; }
 
     /// <summary>
