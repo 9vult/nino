@@ -5,6 +5,7 @@ using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nino.Discord.Handlers;
+using Nino.Discord.Services;
 
 namespace Nino.Discord;
 
@@ -26,6 +27,8 @@ public static class DiscordBotServiceCollectionExtensions
         ));
 
         // Services
+        services.AddScoped<IInteractionIdentityService, InteractionIdentityService>();
+        services.AddScoped<IBotPermissionsService, BotPermissionsService>();
 
         // Handlers
         services.AddSingleton<InteractionHandler>();
