@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MPL-2.0
 
-using System.ComponentModel.DataAnnotations;
 using Nino.Domain.ValueObjects;
 
 namespace Nino.Domain.Entities;

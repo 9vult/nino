@@ -4,12 +4,11 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Nino.Core.Features;
 using Nino.Domain.Dtos.AniList;
 using Nino.Domain.Entities;
 using Nino.Domain.ValueObjects;
+using Task = System.Threading.Tasks.Task;
 
 namespace Nino.Core.Services;
 
@@ -48,7 +47,7 @@ public sealed class AniListService(
                 while (page < (data?.Data?.Media?.AiringSchedule?.PageInfo?.LastPage ?? 1))
                 {
                     // Sleep to try and avoid rate limiting
-                    await System.Threading.Tasks.Task.Delay(1000);
+                    await Task.Delay(1000);
 
                     page++;
                     response = await client.PostAsync(BaseUrl, CreateQuery(aniListId, page));

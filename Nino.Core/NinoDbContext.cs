@@ -2,13 +2,13 @@
 
 using System.Globalization;
 using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Nino.Domain.Dtos;
 using Nino.Domain.Dtos.AniList;
 using Nino.Domain.Entities;
 using Nino.Domain.Entities.Conga;
 using Nino.Domain.ValueObjects;
+using Task = Nino.Domain.Entities.Task;
 
 namespace Nino.Core;
 
@@ -26,7 +26,7 @@ public class NinoDbContext(DbContextOptions<NinoDbContext> options) : DbContext(
     public DbSet<Observer> Observers { get; init; } = null!;
 
     public DbSet<Staff> Staff { get; init; } = null!;
-    public DbSet<Domain.Entities.Task> Tasks { get; init; } = null!;
+    public DbSet<Task> Tasks { get; init; } = null!;
     public DbSet<PinchHitter> PinchHitters { get; init; } = null!;
 
     public DbSet<State> StateCache { get; init; } = null!;

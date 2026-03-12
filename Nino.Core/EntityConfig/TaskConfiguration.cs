@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: MPL-2.0
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Nino.Domain.Entities;
+using Task = Nino.Domain.Entities.Task;
 
 namespace Nino.Core.EntityConfig;
 
-public sealed class TaskConfiguration : IEntityTypeConfiguration<Domain.Entities.Task>
+public sealed class TaskConfiguration : IEntityTypeConfiguration<Task>
 {
     /// <inheritdoc />
-    public void Configure(EntityTypeBuilder<Domain.Entities.Task> task)
+    public void Configure(EntityTypeBuilder<Task> task)
     {
         task.HasKey(t => t.Id);
 

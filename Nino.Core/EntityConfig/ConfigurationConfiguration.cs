@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MPL-2.0
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Nino.Domain.Entities;
 

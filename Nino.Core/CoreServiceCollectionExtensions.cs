@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MPL-2.0
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nino.Core.Features.Queries.Project.Resolve;

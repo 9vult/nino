@@ -3,7 +3,6 @@
 using System.Reflection;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Nino.Discord.Handlers;

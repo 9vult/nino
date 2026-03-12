@@ -17,4 +17,10 @@
     <Folder Include="Interactions\" />
     <Folder Include="Services\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nino.Core\Nino.Core.csproj" />
+    <ProjectReference Include="..\Nino.Domain\Nino.Domain.csproj" />
+    <ProjectReference Include="..\Nino.Localization\Nino.Localization.csproj" />
+  </ItemGroup>
 </Project>
