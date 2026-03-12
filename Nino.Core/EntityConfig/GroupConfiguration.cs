@@ -12,9 +12,6 @@ public sealed class GroupConfiguration : IEntityTypeConfiguration<Group>
     {
         group.HasKey(g => g.Id);
 
-        group
-            .HasOne(g => g.Configuration)
-            .WithOne(c => c.Group)
-            .HasForeignKey<Configuration>(c => c.GroupId);
+        group.HasOne(g => g.Configuration).WithOne().HasForeignKey<Configuration>(c => c.GroupId);
     }
 }

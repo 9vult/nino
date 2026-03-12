@@ -11,7 +11,6 @@ public sealed class Configuration
     public ConfigurationId Id { get; set; } = ConfigurationId.New();
 
     public GroupId GroupId { get; set; }
-    public Group Group { get; set; } = null!;
 
     public required ProgressResponseType ProgressResponseType { get; set; }
     public required ProgressPublishType ProgressPublishType { get; set; }

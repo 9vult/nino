@@ -11,7 +11,7 @@ using Nino.Core;
 namespace Nino.Core.Migrations
 {
     [DbContext(typeof(NinoDbContext))]
-    [Migration("20260312212455_InitialCreate")]
+    [Migration("20260312215022_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -437,7 +437,7 @@ namespace Nino.Core.Migrations
 
             modelBuilder.Entity("Nino.Domain.Entities.Configuration", b =>
                 {
-                    b.HasOne("Nino.Domain.Entities.Group", "Group")
+                    b.HasOne("Nino.Domain.Entities.Group", null)
                         .WithOne("Configuration")
                         .HasForeignKey("Nino.Domain.Entities.Configuration", "GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -473,8 +473,6 @@ namespace Nino.Core.Migrations
                         });
 
                     b.Navigation("Administrators");
-
-                    b.Navigation("Group");
                 });
 
             modelBuilder.Entity("Nino.Domain.Entities.Episode", b =>

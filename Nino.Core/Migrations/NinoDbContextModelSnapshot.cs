@@ -434,7 +434,7 @@ namespace Nino.Core.Migrations
 
             modelBuilder.Entity("Nino.Domain.Entities.Configuration", b =>
                 {
-                    b.HasOne("Nino.Domain.Entities.Group", "Group")
+                    b.HasOne("Nino.Domain.Entities.Group", null)
                         .WithOne("Configuration")
                         .HasForeignKey("Nino.Domain.Entities.Configuration", "GroupId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -470,8 +470,6 @@ namespace Nino.Core.Migrations
                         });
 
                     b.Navigation("Administrators");
-
-                    b.Navigation("Group");
                 });
 
             modelBuilder.Entity("Nino.Domain.Entities.Episode", b =>

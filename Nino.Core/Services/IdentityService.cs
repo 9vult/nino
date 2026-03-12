@@ -60,7 +60,14 @@ public sealed class IdentityService(NinoDbContext db, ILogger<IdentityService> l
             return resolvedId;
         }
 
-        var group = new Group { DiscordId = discordId };
+        var config = Configuration.CreateDefault();
+
+        var group = new Group
+        {
+            DiscordId = discordId,
+            Configuration = config,
+            ConfigurationId = config.Id,
+        };
         await db.Groups.AddAsync(group);
 
         try
