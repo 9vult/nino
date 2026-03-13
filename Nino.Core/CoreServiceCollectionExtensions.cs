@@ -6,6 +6,7 @@ using Nino.Core.Features.Commands.KeyStaff.Add;
 using Nino.Core.Features.Commands.Project.Create;
 using Nino.Core.Features.Queries.Episode.Resolve;
 using Nino.Core.Features.Queries.Project.Resolve;
+using Nino.Core.Features.Queries.Project.Status;
 using Nino.Core.Features.Queries.Task.Resolve;
 using Nino.Core.Services;
 
@@ -37,9 +38,12 @@ public static class CoreServiceCollectionExtensions
         services.AddScoped<AddKeyStaffHandler>();
 
         // Query handlers
+        // Resolvers
         services.AddScoped<ResolveProjectHandler>();
         services.AddScoped<ResolveEpisodeHandler>();
         services.AddScoped<ResolveTaskHandler>();
+
+        services.AddScoped<ProjectStatusHandler>();
 
         return services;
     }
