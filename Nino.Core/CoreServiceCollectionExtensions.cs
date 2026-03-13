@@ -27,6 +27,7 @@ public static class CoreServiceCollectionExtensions
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IUserVerificationService, UserVerificationService>();
         services.AddScoped<IAniListService, AniListService>();
+        services.AddScoped<IStateService, StateService>();
 
         // Command handlers
         // Project
