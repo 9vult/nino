@@ -12,6 +12,11 @@ public sealed class ResolveProjectHandler(
     ILogger<ResolveProjectHandler> logger
 )
 {
+    /// <summary>
+    /// Resolve an alias to a project
+    /// </summary>
+    /// <param name="query">Query object</param>
+    /// <returns>The <see cref="ProjectId"/> of the project, or <see cref="ResultStatus.ProjectNotFound"/></returns>
     public async Task<Result<ProjectId>> HandleAsync(ResolveProjectQuery query)
     {
         var (alias, groupId, requestedBy, includeObservers) = query;
