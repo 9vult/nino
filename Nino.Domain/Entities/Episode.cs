@@ -16,7 +16,7 @@ public sealed class Episode
     public required GroupId GroupId { get; set; }
     public Group Group { get; set; } = null!;
 
-    [MaxLength(32)]
+    [MaxLength(Length.EpisodeNumber)]
     public required string Number { get; set; }
     public required bool IsDone { get; set; }
 

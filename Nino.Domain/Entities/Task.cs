@@ -12,7 +12,7 @@ public sealed class Task
     public required EpisodeId EpisodeId { get; set; }
     public Episode Episode { get; set; } = null!;
 
-    [MaxLength(16)]
+    [MaxLength(Length.Abbreviation)]
     public required string Abbreviation { get; set; }
     public required bool IsDone { get; set; }
     public DateTimeOffset? UpdatedAt { get; set; }

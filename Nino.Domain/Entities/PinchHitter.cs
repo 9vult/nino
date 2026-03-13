@@ -13,7 +13,7 @@ public sealed class PinchHitter
     public EpisodeId EpisodeId { get; set; }
     public Episode Episode { get; set; } = null!;
 
-    [MaxLength(16)]
+    [MaxLength(Length.Abbreviation)]
     public required string Abbreviation { get; set; }
 
     public User User { get; set; } = null!;

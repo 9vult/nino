@@ -9,6 +9,6 @@ public sealed class Alias
 {
     public AliasId Id { get; set; } = AliasId.New();
 
-    [MaxLength(32)]
+    [MaxLength(Length.Alias)]
     public required string Value { get; set; }
 }

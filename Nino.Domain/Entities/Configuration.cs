@@ -16,7 +16,7 @@ public sealed class Configuration
     public required ProgressPublishType ProgressPublishType { get; set; }
     public required CongaPrefixType CongaPrefix { get; set; }
 
-    [MaxLength(128)]
+    [MaxLength(Length.ReleasePrefix)]
     public required string ReleasePrefix { get; set; }
 
     // public Locale Locale { get; set; }

@@ -8,10 +8,10 @@ namespace Nino.Domain.Entities;
 [Owned]
 public sealed class Role
 {
-    [MaxLength(16)]
+    [MaxLength(Length.Abbreviation)]
     public required string Abbreviation { get; set; }
 
-    [MaxLength(32)]
+    [MaxLength(Length.RoleName)]
     public required string Name { get; set; }
 
     public required decimal Weight { get; set; }

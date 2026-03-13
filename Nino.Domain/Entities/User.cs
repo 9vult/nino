@@ -7,7 +7,7 @@ namespace Nino.Domain.Entities;
 
 public sealed class User : MappedId<UserId>
 {
-    [MaxLength(64)]
+    [MaxLength(Length.UserName)]
     public string Name { get; set; } = string.Empty;
 
     /// <inheritdoc />

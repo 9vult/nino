@@ -19,16 +19,16 @@ public sealed class Project
 
     public required ProjectType Type { get; set; }
 
-    [MaxLength(32)]
+    [MaxLength(Length.Alias)]
     public required string Nickname { get; set; }
 
-    [MaxLength(128)]
+    [MaxLength(Length.Title)]
     public required string Title { get; set; }
 
-    [MaxLength(256)]
+    [MaxLength(Length.PosterUrl)]
     public required string PosterUrl { get; set; }
 
-    [MaxLength(256)]
+    [MaxLength(Length.Motd)]
     public string Motd { get; set; } = string.Empty;
 
     public required AniListId AniListId { get; set; }

@@ -10,7 +10,7 @@ public sealed class Group : MappedId<GroupId>
     public UserId? OwnerId { get; set; }
     public User? Owner { get; set; }
 
-    [MaxLength(64)]
+    [MaxLength(Length.GroupName)]
     public string Name { get; set; } = string.Empty;
 
     public required ConfigurationId ConfigurationId { get; set; }
