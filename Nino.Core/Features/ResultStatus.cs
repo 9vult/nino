@@ -53,12 +53,17 @@ public enum ResultStatus
     TaskNotFound = 8,
 
     /// <summary>
+    /// Staff does not exist
+    /// </summary>
+    StaffNotFound = 9,
+
+    /// <summary>
     /// Generic not found condition
     /// </summary>
-    NotFound = 9,
+    NotFound = 10,
 
     /// <summary>
     /// Error occured with AniList
     /// </summary>
-    AniListError = 10,
+    AniListError = 11,
 }

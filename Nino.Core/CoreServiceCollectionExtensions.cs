@@ -10,6 +10,7 @@ using Nino.Core.Features.Commands.Project.Create;
 using Nino.Core.Features.Queries.Episode.Resolve;
 using Nino.Core.Features.Queries.Project.Resolve;
 using Nino.Core.Features.Queries.Project.Status;
+using Nino.Core.Features.Queries.Staff.Resolve;
 using Nino.Core.Features.Queries.Task.Resolve;
 using Nino.Core.Services;
 
@@ -54,6 +55,7 @@ public static class CoreServiceCollectionExtensions
         services.AddScoped<ResolveProjectHandler>();
         services.AddScoped<ResolveEpisodeHandler>();
         services.AddScoped<ResolveTaskHandler>();
+        services.AddScoped<ResolveStaffHandler>();
 
         services.AddScoped<ProjectStatusHandler>();
 
