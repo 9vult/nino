@@ -72,7 +72,7 @@ public partial class AdditionalStaffModule
             EpisodeId: episodeId,
             RequestedBy: requestedBy,
             Abbreviation: abbreviation,
-            FullName: fullName,
+            Name: fullName,
             MemberId: memberId,
             IsPseudo: isPseudo
         );

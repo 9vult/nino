@@ -37,7 +37,7 @@ public sealed class AddAdditionalStaffHandler(
             Role = new Role
             {
                 Abbreviation = input.Abbreviation,
-                Name = input.FullName,
+                Name = input.Name,
                 Weight = DefaultWeight,
             },
             IsPseudo = input.IsPseudo,

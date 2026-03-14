@@ -52,7 +52,7 @@ public partial class KeyStaffModule
             ProjectId: projectId,
             RequestedBy: requestedBy,
             Abbreviation: abbreviation,
-            FullName: fullName,
+            Name: fullName,
             MemberId: memberId,
             IsPseudo: isPseudo,
             MarkDoneForDoneEpisodes: false

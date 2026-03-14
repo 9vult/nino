@@ -9,7 +9,7 @@ public sealed record AddAdditionalStaffCommand(
     EpisodeId EpisodeId,
     UserId RequestedBy,
     string Abbreviation,
-    string FullName,
+    string Name,
     UserId MemberId,
     bool IsPseudo
 );

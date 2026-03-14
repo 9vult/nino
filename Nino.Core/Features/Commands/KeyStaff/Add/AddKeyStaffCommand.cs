@@ -8,7 +8,7 @@ public sealed record AddKeyStaffCommand(
     ProjectId ProjectId,
     UserId RequestedBy,
     string Abbreviation,
-    string FullName,
+    string Name,
     UserId MemberId,
     bool IsPseudo,
     bool MarkDoneForDoneEpisodes

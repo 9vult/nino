@@ -41,7 +41,7 @@ public sealed class AddKeyStaffHandler(
             Role = new Role
             {
                 Abbreviation = input.Abbreviation,
-                Name = input.FullName,
+                Name = input.Name,
                 Weight = maxWeight + 1,
             },
             IsPseudo = input.IsPseudo,
