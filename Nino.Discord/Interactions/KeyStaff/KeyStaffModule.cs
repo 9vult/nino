@@ -4,8 +4,10 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Nino.Core.Features.Commands.KeyStaff.Add;
+using Nino.Core.Features.Commands.KeyStaff.Rename;
 using Nino.Core.Features.Queries.Project.Resolve;
 using Nino.Core.Features.Queries.Project.Status;
+using Nino.Core.Features.Queries.Staff.Resolve;
 using Nino.Core.Services;
 using Nino.Discord.Services;
 
@@ -19,7 +21,9 @@ public partial class KeyStaffModule(
     IStateService stateService,
     IUserVerificationService userVerificationService,
     ResolveProjectHandler projectResolver,
+    ResolveStaffHandler staffResolver,
     ProjectStatusHandler projectStatusHandler,
     AddKeyStaffHandler addHandler,
+    RenameKeyStaffHandler renameHandler,
     ILogger<KeyStaffModule> logger
 ) : InteractionModuleBase<IInteractionContext> { }
