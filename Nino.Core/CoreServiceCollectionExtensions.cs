@@ -2,6 +2,7 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Nino.Core.Features.Commands.AdditionalStaff.Add;
 using Nino.Core.Features.Commands.KeyStaff.Add;
 using Nino.Core.Features.Commands.Project.Create;
 using Nino.Core.Features.Queries.Episode.Resolve;
@@ -36,6 +37,9 @@ public static class CoreServiceCollectionExtensions
 
         // Key Staff
         services.AddScoped<AddKeyStaffHandler>();
+
+        // Additional Staff
+        services.AddScoped<AddAdditionalStaffHandler>();
 
         // Query handlers
         // Resolvers
