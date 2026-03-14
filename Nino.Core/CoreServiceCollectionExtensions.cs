@@ -7,6 +7,7 @@ using Nino.Core.Features.Commands.AdditionalStaff.Rename;
 using Nino.Core.Features.Commands.AdditionalStaff.SetWeight;
 using Nino.Core.Features.Commands.AdditionalStaff.Swap;
 using Nino.Core.Features.Commands.KeyStaff.Add;
+using Nino.Core.Features.Commands.KeyStaff.Remove;
 using Nino.Core.Features.Commands.KeyStaff.Rename;
 using Nino.Core.Features.Commands.KeyStaff.SetWeight;
 using Nino.Core.Features.Commands.KeyStaff.Swap;
@@ -51,12 +52,14 @@ public static class CoreServiceCollectionExtensions
         services.AddScoped<RenameKeyStaffHandler>();
         services.AddScoped<SwapKeyStaffHandler>();
         services.AddScoped<SetKeyStaffWeightHandler>();
+        services.AddScoped<RemoveKeyStaffHandler>();
 
         // Additional Staff
         services.AddScoped<AddAdditionalStaffHandler>();
         services.AddScoped<RenameAdditionalStaffHandler>();
         services.AddScoped<SwapAdditionalStaffHandler>();
         services.AddScoped<SetAdditionalStaffWeightHandler>();
+        services.AddScoped<RemoveKeyStaffHandler>();
 
         // Query handlers
         // Resolvers
