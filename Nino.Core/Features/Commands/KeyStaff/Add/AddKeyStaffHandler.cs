@@ -15,12 +15,10 @@ public sealed class AddKeyStaffHandler(
 {
     public async Task<Result<GenericResponse>> HandleAsync(AddKeyStaffCommand input)
     {
-        var (projectId, requestedBy, markDone) = input;
-
         if (
             !await verificationService.VerifyProjectPermissionsAsync(
-                projectId,
-                requestedBy,
+                input.ProjectId,
+                input.RequestedBy,
                 PermissionsLevel.Administrator
             )
         )
@@ -28,7 +26,7 @@ public sealed class AddKeyStaffHandler(
 
         var project = await db
             .Projects.Include(p => p.Episodes)
-            .SingleAsync(p => p.Id == projectId);
+            .SingleAsync(p => p.Id == input.ProjectId);
 
         if (
             project.Episodes.SelectMany(e => e.Tasks).Any(t => t.Abbreviation == input.Abbreviation)
@@ -58,7 +56,7 @@ public sealed class AddKeyStaffHandler(
                 {
                     EpisodeId = episode.Id,
                     Abbreviation = input.Abbreviation,
-                    IsDone = episode.IsDone && markDone,
+                    IsDone = episode.IsDone && input.MarkDoneForDoneEpisodes,
                 }
             );
         }

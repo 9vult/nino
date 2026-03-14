@@ -67,13 +67,15 @@ public partial class AdditionalStaffModule
             member.Username
         );
 
-        var command = new AddAdditionalStaffCommand(projectId, episodeId, requestedBy)
-        {
-            Abbreviation = abbreviation,
-            FullName = fullName,
-            MemberId = memberId,
-            IsPseudo = isPseudo,
-        };
+        var command = new AddAdditionalStaffCommand(
+            ProjectId: projectId,
+            EpisodeId: episodeId,
+            RequestedBy: requestedBy,
+            Abbreviation: abbreviation,
+            FullName: fullName,
+            MemberId: memberId,
+            IsPseudo: isPseudo
+        );
 
         var result = await addHandler.HandleAsync(command);
 

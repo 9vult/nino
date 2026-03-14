@@ -48,13 +48,15 @@ public partial class KeyStaffModule
             member.Username
         );
 
-        var command = new AddKeyStaffCommand(projectId, requestedBy, false)
-        {
-            Abbreviation = abbreviation,
-            FullName = fullName,
-            MemberId = memberId,
-            IsPseudo = isPseudo,
-        };
+        var command = new AddKeyStaffCommand(
+            ProjectId: projectId,
+            RequestedBy: requestedBy,
+            Abbreviation: abbreviation,
+            FullName: fullName,
+            MemberId: memberId,
+            IsPseudo: isPseudo,
+            MarkDoneForDoneEpisodes: false
+        );
 
         // Some episodes are completed, so we need direction from the user
         if (completedEpisodeCount > 0)

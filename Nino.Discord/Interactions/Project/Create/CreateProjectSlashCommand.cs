@@ -32,7 +32,7 @@ public partial class ProjectModule
         var locale = interaction.UserLocale;
 
         // Cleanup
-        nickname = nickname.Trim();
+        nickname = nickname.Trim().ToLowerInvariant().Replace(" ", string.Empty);
         title = title?.Trim();
         posterUrl = posterUrl?.Trim();
 
@@ -52,20 +52,22 @@ public partial class ProjectModule
             releaseChannel.Id
         );
 
-        var command = new CreateProjectCommand(groupId, userId, isDiscordAdmin)
-        {
-            Nickname = nickname,
-            AniListId = AniListId.From(anilistId),
-            IsPrivate = isPrivate,
-            ProjectChannelId = projectChannelId,
-            UpdateChannelId = updateChannelId,
-            ReleaseChannelId = releaseChannelId,
-            Title = title,
-            Type = type,
-            Length = length,
-            PosterUrl = posterUrl,
-            FirstEpisode = firstEpisode,
-        };
+        var command = new CreateProjectCommand(
+            GroupId: groupId,
+            OwnerId: userId,
+            OverrideVerification: isDiscordAdmin,
+            Nickname: nickname,
+            AniListId: AniListId.From(anilistId),
+            IsPrivate: isPrivate,
+            ProjectChannelId: projectChannelId,
+            UpdateChannelId: updateChannelId,
+            ReleaseChannelId: releaseChannelId,
+            Title: title,
+            Type: type,
+            Length: length,
+            PosterUrl: posterUrl,
+            FirstEpisode: firstEpisode
+        );
 
         var response = await createHandler.HandleAsync(command);
 

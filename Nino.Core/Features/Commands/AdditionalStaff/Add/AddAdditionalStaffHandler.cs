@@ -17,18 +17,16 @@ public sealed class AddAdditionalStaffHandler(
 
     public async Task<Result<GenericResponse>> HandleAsync(AddAdditionalStaffCommand input)
     {
-        var (projectId, episodeId, requestedBy) = input;
-
         if (
             !await verificationService.VerifyProjectPermissionsAsync(
-                projectId,
-                requestedBy,
+                input.ProjectId,
+                input.RequestedBy,
                 PermissionsLevel.Administrator
             )
         )
             return Result<GenericResponse>.Fail(ResultStatus.Unauthorized);
 
-        var episode = await db.Episodes.SingleAsync(e => e.Id == episodeId);
+        var episode = await db.Episodes.SingleAsync(e => e.Id == input.EpisodeId);
 
         if (episode.Tasks.Any(t => t.Abbreviation == input.Abbreviation))
             return Result<GenericResponse>.Fail(ResultStatus.Conflict);
@@ -43,13 +41,13 @@ public sealed class AddAdditionalStaffHandler(
                 Weight = DefaultWeight,
             },
             IsPseudo = input.IsPseudo,
-            EpisodeId = episodeId,
+            EpisodeId = input.EpisodeId,
         };
         episode.AdditionalStaff.Add(newStaff);
 
         var newTask = new Task
         {
-            EpisodeId = episodeId,
+            EpisodeId = input.EpisodeId,
             Abbreviation = input.Abbreviation,
             IsDone = false,
         };
@@ -60,7 +58,7 @@ public sealed class AddAdditionalStaffHandler(
         await db.SaveChangesAsync();
 
         var response = await db
-            .Projects.Where(p => p.Id == projectId)
+            .Projects.Where(p => p.Id == input.ProjectId)
             .Select(p => new GenericResponse(p.Title, p.Type, p.PosterUrl))
             .SingleAsync();
 

@@ -4,14 +4,12 @@ using Nino.Domain.ValueObjects;
 
 namespace Nino.Core.Features.Commands.KeyStaff.Add;
 
-public record AddKeyStaffCommand(
+public sealed record AddKeyStaffCommand(
     ProjectId ProjectId,
     UserId RequestedBy,
+    string Abbreviation,
+    string FullName,
+    UserId MemberId,
+    bool IsPseudo,
     bool MarkDoneForDoneEpisodes
-)
-{
-    public required string Abbreviation { get; set; }
-    public required string FullName { get; set; }
-    public required UserId MemberId { get; set; }
-    public required bool IsPseudo { get; set; }
-}
+);

@@ -7,11 +7,9 @@ namespace Nino.Core.Features.Commands.AdditionalStaff.Add;
 public sealed record AddAdditionalStaffCommand(
     ProjectId ProjectId,
     EpisodeId EpisodeId,
-    UserId RequestedBy
-)
-{
-    public required string Abbreviation { get; set; }
-    public required string FullName { get; set; }
-    public required UserId MemberId { get; set; }
-    public required bool IsPseudo { get; set; }
-}
+    UserId RequestedBy,
+    string Abbreviation,
+    string FullName,
+    UserId MemberId,
+    bool IsPseudo
+);

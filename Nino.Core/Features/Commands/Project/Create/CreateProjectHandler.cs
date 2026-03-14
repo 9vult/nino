@@ -18,15 +18,13 @@ public sealed class CreateProjectHandler(
 
     public async Task<Result<CreateProjectResponse>> HandleAsync(CreateProjectCommand input)
     {
-        var (groupId, ownerId, overrideVerification) = input;
-
         // Check permissions
         // Override means the user is authorized through the provider (e.g. Discord Admin)
         if (
-            !overrideVerification
+            !input.OverrideVerification
             && !await verificationService.VerifyGroupPermissionsAsync(
-                groupId,
-                ownerId,
+                input.GroupId,
+                input.OwnerId,
                 PermissionsLevel.Administrator
             )
         )
@@ -34,11 +32,11 @@ public sealed class CreateProjectHandler(
             return Result<CreateProjectResponse>.Fail(ResultStatus.Unauthorized);
         }
 
-        // Sanitize inputs
-        input.Nickname = input.Nickname.Trim().ToLowerInvariant().Replace(" ", string.Empty);
-        input.Title = input.Title?.Trim();
-
-        if (await db.Projects.AnyAsync(p => p.GroupId == groupId && p.Nickname == input.Nickname))
+        if (
+            await db.Projects.AnyAsync(p =>
+                p.GroupId == input.GroupId && p.Nickname == input.Nickname
+            )
+        )
             return Result<CreateProjectResponse>.Fail(ResultStatus.Conflict);
 
         var autoFields = GetAutoFields(input);
@@ -60,10 +58,13 @@ public sealed class CreateProjectHandler(
         if (animeLookup.IsSuccess)
         {
             var anime = animeLookup.Value!;
-            input.Title ??= anime.Title;
-            input.Length ??= anime.EpisodeCount;
-            input.Type ??= anime.Type;
-            input.PosterUrl ??= anime.PosterUrl ?? FallbackPosterUrl;
+            input = input with
+            {
+                Title = input.Title ?? anime.Title,
+                Length = input.Length ?? anime.EpisodeCount,
+                Type = input.Type ?? anime.Type,
+                PosterUrl = input.PosterUrl ?? anime.PosterUrl ?? FallbackPosterUrl,
+            };
         }
 
         if (
@@ -76,8 +77,8 @@ public sealed class CreateProjectHandler(
 
         var project = new Domain.Entities.Project
         {
-            GroupId = groupId,
-            OwnerId = ownerId,
+            GroupId = input.GroupId,
+            OwnerId = input.OwnerId,
             Type = input.Type.Value,
             Nickname = input.Nickname,
             Title = input.Title,
@@ -97,7 +98,7 @@ public sealed class CreateProjectHandler(
             var episode = new Episode
             {
                 ProjectId = project.Id,
-                GroupId = groupId,
+                GroupId = input.GroupId,
                 Number = Convert.ToString(i, CultureInfo.InvariantCulture),
                 IsDone = false,
             };
