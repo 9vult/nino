@@ -4,8 +4,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nino.Core.Features.Commands.AdditionalStaff.Add;
 using Nino.Core.Features.Commands.AdditionalStaff.Rename;
+using Nino.Core.Features.Commands.AdditionalStaff.Swap;
 using Nino.Core.Features.Commands.KeyStaff.Add;
 using Nino.Core.Features.Commands.KeyStaff.Rename;
+using Nino.Core.Features.Commands.KeyStaff.Swap;
 using Nino.Core.Features.Commands.Project.Create;
 using Nino.Core.Features.Queries.Episode.Resolve;
 using Nino.Core.Features.Queries.Project.Resolve;
@@ -45,10 +47,12 @@ public static class CoreServiceCollectionExtensions
         // Key Staff
         services.AddScoped<AddKeyStaffHandler>();
         services.AddScoped<RenameKeyStaffHandler>();
+        services.AddScoped<SwapKeyStaffHandler>();
 
         // Additional Staff
         services.AddScoped<AddAdditionalStaffHandler>();
         services.AddScoped<RenameAdditionalStaffHandler>();
+        services.AddScoped<SwapAdditionalStaffHandler>();
 
         // Query handlers
         // Resolvers
