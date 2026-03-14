@@ -7,6 +7,8 @@ using Nino.Core.Features.Commands.AdditionalStaff.Rename;
 using Nino.Core.Features.Commands.AdditionalStaff.SetWeight;
 using Nino.Core.Features.Commands.AdditionalStaff.Swap;
 using Nino.Core.Features.Commands.KeyStaff.Add;
+using Nino.Core.Features.Commands.KeyStaff.PinchHitter.Remove;
+using Nino.Core.Features.Commands.KeyStaff.PinchHitter.Set;
 using Nino.Core.Features.Commands.KeyStaff.Remove;
 using Nino.Core.Features.Commands.KeyStaff.Rename;
 using Nino.Core.Features.Commands.KeyStaff.SetWeight;
@@ -53,6 +55,8 @@ public static class CoreServiceCollectionExtensions
         services.AddScoped<SwapKeyStaffHandler>();
         services.AddScoped<SetKeyStaffWeightHandler>();
         services.AddScoped<RemoveKeyStaffHandler>();
+        services.AddScoped<SetPinchHitterHandler>();
+        services.AddScoped<RemovePinchHitterHandler>();
 
         // Additional Staff
         services.AddScoped<AddAdditionalStaffHandler>();
