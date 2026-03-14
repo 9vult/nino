@@ -4,9 +4,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nino.Core.Features.Commands.AdditionalStaff.Add;
 using Nino.Core.Features.Commands.AdditionalStaff.Rename;
+using Nino.Core.Features.Commands.AdditionalStaff.SetWeight;
 using Nino.Core.Features.Commands.AdditionalStaff.Swap;
 using Nino.Core.Features.Commands.KeyStaff.Add;
 using Nino.Core.Features.Commands.KeyStaff.Rename;
+using Nino.Core.Features.Commands.KeyStaff.SetWeight;
 using Nino.Core.Features.Commands.KeyStaff.Swap;
 using Nino.Core.Features.Commands.Project.Create;
 using Nino.Core.Features.Queries.Episode.Resolve;
@@ -48,11 +50,13 @@ public static class CoreServiceCollectionExtensions
         services.AddScoped<AddKeyStaffHandler>();
         services.AddScoped<RenameKeyStaffHandler>();
         services.AddScoped<SwapKeyStaffHandler>();
+        services.AddScoped<SetKeyStaffWeightHandler>();
 
         // Additional Staff
         services.AddScoped<AddAdditionalStaffHandler>();
         services.AddScoped<RenameAdditionalStaffHandler>();
         services.AddScoped<SwapAdditionalStaffHandler>();
+        services.AddScoped<SetAdditionalStaffWeightHandler>();
 
         // Query handlers
         // Resolvers
