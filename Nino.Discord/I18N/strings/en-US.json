@@ -54,6 +54,7 @@
     "episode.aired.title": "Episode {number_1} has aired!",
     "episode.allComplete": "All episodes are complete!",
     "episode.creation.badRequest": "To add multiple episodes, the starting episode must be either a decimal number (ex: 3.5) or use the template syntax $(n), where n is a decimal number (ex: \"OVA $(3.5)\".",
+    "episode.resolution.failed": "Could not find episode {number_1}",
     "episode.roster.empty": "There aren't any tasks!",
     "episode.roster.title": "Episode {episode_1} Roster",
     "episode.title": "Episode {episode_1}",

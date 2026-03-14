@@ -15,6 +15,7 @@ namespace Nino.Discord.Interactions.KeyStaff;
 
 public partial class KeyStaffModule
 {
+    [SlashCommand("add", "Add a Key Staff to the project")]
     public async Task<RuntimeResult> AddAsync(
         [MaxLength(Length.Alias)] string alias,
         SocketUser member,
@@ -108,16 +109,14 @@ public partial class KeyStaffModule
         {
             Dictionary<string, object> errorParams = new() { ["abbreviation"] = abbreviation };
             return await interaction.FailAsync(
-                T(
-                    result.Status switch
-                    {
-                        ResultStatus.Unauthorized => "error.permissions",
-                        ResultStatus.Conflict => "keyStaff.creation.conflict",
-                        _ => "error.generic",
-                    },
-                    locale,
-                    errorParams
-                )
+                result.Status switch
+                {
+                    ResultStatus.Unauthorized => "error.permissions",
+                    ResultStatus.Conflict => "keyStaff.creation.conflict",
+                    _ => "error.generic",
+                },
+                locale,
+                errorParams
             );
         }
 
