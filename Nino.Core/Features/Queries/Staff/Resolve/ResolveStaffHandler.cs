@@ -6,7 +6,7 @@ namespace Nino.Core.Features.Queries.Staff.Resolve;
 
 public sealed class ResolveStaffHandler(NinoDbContext db)
 {
-    public async Task<Result<StaffId>> HandleAsync(ResolveKeyStaffQuery query)
+    public async Task<Result<StaffId>> ResolveAsync(ResolveKeyStaffQuery query)
     {
         var (projectId, abbreviation) = query;
 
@@ -20,7 +20,7 @@ public sealed class ResolveStaffHandler(NinoDbContext db)
             : Result<StaffId>.Fail(ResultStatus.StaffNotFound);
     }
 
-    public async Task<Result<StaffId>> HandleAsync(ResolveAdditionalStaffQuery query)
+    public async Task<Result<StaffId>> ResolveAsync(ResolveAdditionalStaffQuery query)
     {
         var (episodeId, abbreviation) = query;
 

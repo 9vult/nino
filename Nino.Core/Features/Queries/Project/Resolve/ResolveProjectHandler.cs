@@ -17,7 +17,7 @@ public sealed class ResolveProjectHandler(
     /// </summary>
     /// <param name="query">Query object</param>
     /// <returns>The <see cref="ProjectId"/> of the project, or <see cref="ResultStatus.ProjectNotFound"/></returns>
-    public async Task<Result<ProjectId>> HandleAsync(ResolveProjectQuery query)
+    public async Task<Result<ProjectId>> ResolveAsync(ResolveProjectQuery query)
     {
         var (alias, groupId, requestedBy, includeObservers) = query;
         var project = await db

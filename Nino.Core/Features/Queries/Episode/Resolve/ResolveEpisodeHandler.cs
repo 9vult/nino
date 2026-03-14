@@ -6,7 +6,7 @@ namespace Nino.Core.Features.Queries.Episode.Resolve;
 
 public sealed class ResolveEpisodeHandler(NinoDbContext db)
 {
-    public async Task<Result<EpisodeId>> HandleAsync(ResolveEpisodeQuery query)
+    public async Task<Result<EpisodeId>> ResolveAsync(ResolveEpisodeQuery query)
     {
         var (projectId, number) = query;
 

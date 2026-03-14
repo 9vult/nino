@@ -34,7 +34,7 @@ public partial class KeyStaffModule
 
         var (requestedBy, groupId) = await interactionIdService.GetUserAndGroupAsync(interaction);
         var resolved = await projectResolver
-            .HandleAsync(new ResolveProjectQuery(alias, groupId, requestedBy))
+            .ResolveAsync(new ResolveProjectQuery(alias, groupId, requestedBy))
             .BindAsync(id => projectStatusHandler.HandleAsync(new ProjectStatusQuery(id)));
         if (!resolved.IsSuccess)
             return await interaction.FailAsync(T("project.resolution.failed", locale, alias));

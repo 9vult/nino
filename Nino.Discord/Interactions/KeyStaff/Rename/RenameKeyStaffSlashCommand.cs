@@ -33,9 +33,9 @@ public partial class KeyStaffModule
         var (requestedBy, groupId) = await interactionIdService.GetUserAndGroupAsync(interaction);
 
         var resolve = await projectResolver
-            .HandleAsync(new ResolveProjectQuery(alias, groupId, requestedBy))
+            .ResolveAsync(new ResolveProjectQuery(alias, groupId, requestedBy))
             .ThenAsync(prjId =>
-                staffResolver.HandleAsync(new ResolveKeyStaffQuery(prjId, abbreviation))
+                staffResolver.ResolveAsync(new ResolveKeyStaffQuery(prjId, abbreviation))
             );
 
         if (!resolve.IsSuccess)

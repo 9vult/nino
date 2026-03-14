@@ -36,9 +36,9 @@ public partial class AdditionalStaffModule
         var (requestedBy, groupId) = await interactionIdService.GetUserAndGroupAsync(interaction);
 
         var resolve = await projectResolver
-            .HandleAsync(new ResolveProjectQuery(alias, groupId, requestedBy))
+            .ResolveAsync(new ResolveProjectQuery(alias, groupId, requestedBy))
             .ThenAsync(prjId =>
-                episodeResolver.HandleAsync(new ResolveEpisodeQuery(prjId, episodeNumber))
+                episodeResolver.ResolveAsync(new ResolveEpisodeQuery(prjId, episodeNumber))
             );
 
         if (!resolve.IsSuccess)
