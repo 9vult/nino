@@ -30,9 +30,10 @@ public static class CoreServiceCollectionExtensions
         IConfiguration configuration
     )
     {
+        // HttpClient
         services.AddHttpClient();
 
-        // Services
+        // Database
         services.AddDbContext<NinoDbContext>(options =>
             options.UseSqlite(
                 configuration.GetConnectionString("Nino"),
@@ -40,6 +41,8 @@ public static class CoreServiceCollectionExtensions
                     sqliteOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery)
             )
         );
+
+        // Services
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IUserVerificationService, UserVerificationService>();
         services.AddScoped<IAniListService, AniListService>();
