@@ -24,7 +24,11 @@ public static class CoreServiceCollectionExtensions
 
         // Services
         services.AddDbContext<NinoDbContext>(options =>
-            options.UseSqlite(configuration.GetConnectionString("Nino"))
+            options.UseSqlite(
+                configuration.GetConnectionString("Nino"),
+                sqliteOptions =>
+                    sqliteOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery)
+            )
         );
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IUserVerificationService, UserVerificationService>();

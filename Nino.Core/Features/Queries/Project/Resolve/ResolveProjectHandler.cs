@@ -28,7 +28,6 @@ public sealed class ResolveProjectHandler(
                 ) && (p.Nickname == alias || p.Aliases.Any(a => a.Value == alias))
             )
             .Select(p => new { p.Id, p.IsPrivate })
-            .AsSingleQuery()
             .SingleOrDefaultAsync();
 
         if (project is null)
