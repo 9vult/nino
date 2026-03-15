@@ -6,6 +6,8 @@ using Nino.Core.Features.Commands.AdditionalStaff.Add;
 using Nino.Core.Features.Commands.AdditionalStaff.Rename;
 using Nino.Core.Features.Commands.AdditionalStaff.SetWeight;
 using Nino.Core.Features.Commands.AdditionalStaff.Swap;
+using Nino.Core.Features.Commands.Episodes.Add;
+using Nino.Core.Features.Commands.Episodes.Remove;
 using Nino.Core.Features.Commands.KeyStaff.Add;
 using Nino.Core.Features.Commands.KeyStaff.PinchHitter.Remove;
 using Nino.Core.Features.Commands.KeyStaff.PinchHitter.Set;
@@ -67,6 +69,10 @@ public static class CoreServiceCollectionExtensions
         services.AddScoped<SwapAdditionalStaffHandler>();
         services.AddScoped<SetAdditionalStaffWeightHandler>();
         services.AddScoped<RemoveKeyStaffHandler>();
+
+        // Episodes
+        services.AddScoped<AddEpisodeHandler>();
+        services.AddScoped<RemoveEpisodeHandler>();
 
         // Query handlers
         // Resolvers
