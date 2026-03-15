@@ -16,6 +16,7 @@ using Nino.Core.Features.Commands.KeyStaff.Rename;
 using Nino.Core.Features.Commands.KeyStaff.SetWeight;
 using Nino.Core.Features.Commands.KeyStaff.Swap;
 using Nino.Core.Features.Commands.Project.Create;
+using Nino.Core.Features.Commands.Project.Edit;
 using Nino.Core.Features.Queries.Episode.Resolve;
 using Nino.Core.Features.Queries.Project.Resolve;
 using Nino.Core.Features.Queries.Project.Status;
@@ -53,6 +54,7 @@ public static class CoreServiceCollectionExtensions
         // Command handlers
         // Project
         services.AddScoped<CreateProjectHandler>();
+        services.AddScoped<EditProjectHandler>();
 
         // Key Staff
         services.AddScoped<AddKeyStaffHandler>();
