@@ -1,20 +1,70 @@
 // SPDX-License-Identifier: MPL-2.0
 
+using Discord;
+using Discord.WebSocket;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Nino.Discord.Handlers;
 
 namespace Nino.Discord;
 
-public sealed class DiscordBotHostedService : IHostedService
+public sealed class DiscordBotHostedService(
+    DiscordSocketClient client,
+    InteractionHandler interactionHandler,
+    IOptions<DiscordOptions> options,
+    ILogger<DiscordBotHostedService> logger
+) : IHostedService
 {
     /// <inheritdoc />
-    public Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        logger.LogInformation("Starting Nino Discord Bot...");
+        client.Ready += OnReady;
+        client.Log += OnLog;
+
+        await interactionHandler.InitializeAsync();
+        // TODO: LoadLocalizations(new Uri(Path.Combine(AppContext.BaseDirectory, "I18N", "strings")));
+
+        await client.LoginAsync(TokenType.Bot, options.Value.Token);
+        await client.StartAsync();
     }
 
     /// <inheritdoc />
-    public Task StopAsync(CancellationToken cancellationToken)
+    public async Task StopAsync(CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        logger.LogInformation("Stopping Nino Discord Bot...");
+
+        await client.LogoutAsync();
+        await client.StopAsync();
+    }
+
+    private Task OnLog(LogMessage message)
+    {
+        logger.Log(
+            logLevel: message.Severity switch
+            {
+                LogSeverity.Critical => LogLevel.Critical,
+                LogSeverity.Error => LogLevel.Error,
+                LogSeverity.Warning => LogLevel.Warning,
+                LogSeverity.Info => LogLevel.Information,
+                LogSeverity.Verbose => LogLevel.Debug,
+                LogSeverity.Debug => LogLevel.Trace,
+                _ => LogLevel.Information,
+            },
+            exception: message.Exception,
+            message: "{DiscordMessage}",
+            args: message.Message
+        );
+        return Task.CompletedTask;
+    }
+
+    private Task OnReady()
+    {
+        logger.LogInformation(
+            "Successfully logged in to Discord as {Username}",
+            client.CurrentUser.Username
+        );
+        return Task.CompletedTask;
     }
 }

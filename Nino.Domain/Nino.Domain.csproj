@@ -4,11 +4,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" />
     <PackageReference Include="Vogen" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Nino.Localization\Nino.Localization.csproj" />
   </ItemGroup>
