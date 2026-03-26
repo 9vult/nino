@@ -5,4 +5,4 @@ using Vogen;
 namespace Nino.Domain.ValueObjects;
 
 [ValueObject<Guid>]
-public readonly partial struct MentionRoleId;
+public readonly partial struct RoleId;

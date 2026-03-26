@@ -6,7 +6,7 @@ using Vogen;
 namespace Nino.Domain.ValueObjects;
 
 [ValueObject<string>]
-public readonly partial struct EpisodeNumber
+public readonly partial struct Number
 {
     public bool IsDecimal(out decimal value)
     {
