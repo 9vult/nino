@@ -1,23 +1,35 @@
 <Project>
-  <PropertyGroup>
-    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <CentralPackageTransitivePinningEnabled>false</CentralPackageTransitivePinningEnabled>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.0" />
-    <PackageVersion Include="Serilog" Version="4.3.1" />
-    <PackageVersion Include="Serilog.Extensions.Hosting" Version="10.0.0" />
-    <PackageVersion Include="Serilog.Settings.Configuration" Version="10.0.0" />
-    <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
-    <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
-    <PackageVersion Include="Vogen" Version="8.0.5" />
-  </ItemGroup>
+    <PropertyGroup>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+        <CentralPackageTransitivePinningEnabled>false</CentralPackageTransitivePinningEnabled>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageVersion Include="Asp.Versioning.Mvc" Version="8.1.1" />
+        <PackageVersion Include="Discord.Net" Version="3.19.0" />
+        <PackageVersion Include="Discord.Net.WebSocket" Version="3.19.1" />
+        <PackageVersion Include="ICU4N" Version="60.1.0-alpha.439" />
+        <PackageVersion Include="Imposter" Version="0.1.8" />
+        <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.3" />
+        <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
+        <PackageVersion Include="Microsoft.EntityFrameworkCore.Abstractions" Version="10.0.0" />
+        <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0" />
+        <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.0" />
+        <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.0" />
+        <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
+        <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
+        <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.0" />
+        <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.0" />
+        <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.0" />
+        <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.0" />
+        <PackageVersion Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.0" />
+        <PackageVersion Include="NaturalSort.Extension" Version="4.4.1" />
+        <PackageVersion Include="Serilog" Version="4.3.1" />
+        <PackageVersion Include="Serilog.Extensions.Hosting" Version="10.0.0" />
+        <PackageVersion Include="Serilog.Formatting.Compact" Version="3.0.0" />
+        <PackageVersion Include="Serilog.Settings.Configuration" Version="10.0.0" />
+        <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
+        <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
+        <PackageVersion Include="TUnit" Version="1.19.74" />
+        <PackageVersion Include="Vogen" Version="8.0.5" />
+    </ItemGroup>
 </Project>
