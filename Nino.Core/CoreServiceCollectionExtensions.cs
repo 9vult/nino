@@ -2,6 +2,8 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Nino.Core.Features.Commands;
+using Nino.Core.Features.Queries;
 
 namespace Nino.Core;
 
@@ -13,6 +15,25 @@ public static class CoreServiceCollectionExtensions
     )
     {
         services.AddHttpClient();
+
+        // Add command, query handlers
+        var handlers = typeof(CoreServiceCollectionExtensions)
+            .Assembly.GetTypes()
+            .Where(t => t is { IsAbstract: false, IsInterface: false })
+            .Where(t =>
+                t.GetInterfaces()
+                    .Any(i =>
+                        i.IsGenericType
+                        && (
+                            i.GetGenericTypeDefinition() == typeof(ICommandHandler<,>)
+                            || i.GetGenericTypeDefinition() == typeof(IQueryHandler<,>)
+                        )
+                    )
+            )
+            .ToList();
+        foreach (var handler in handlers)
+            services.AddScoped(handler);
+
         return services;
     }
 }
