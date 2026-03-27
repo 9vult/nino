@@ -25,6 +25,7 @@ public static class DbSeeder
 
         var user1Id = await identityService.GetOrCreateUserByDiscordIdAsync(1234, "TestUser1");
         var user2Id = await identityService.GetOrCreateUserByDiscordIdAsync(5678, "TestUser2");
+        var user3Id = await identityService.GetOrCreateUserByDiscordIdAsync(1234, "TestUser3");
         var groupId = await identityService.GetOrCreateGroupByDiscordIdAsync(1234);
         var pChannelId = await identityService.GetOrCreateChannelByDiscordIdAsync(1111);
         var uChannelId = await identityService.GetOrCreateChannelByDiscordIdAsync(2222);
@@ -46,14 +47,22 @@ public static class DbSeeder
         };
         await db.Projects.AddAsync(project);
 
-        var episode = new Episode
+        var episode1 = new Episode
         {
             ProjectId = project.Id,
             GroupId = groupId,
             Number = Number.From("1"),
+            IsDone = true,
+        };
+        project.Episodes.Add(episode1);
+        var episode2 = new Episode
+        {
+            ProjectId = project.Id,
+            GroupId = groupId,
+            Number = Number.From("2"),
             IsDone = false,
         };
-        project.Episodes.Add(episode);
+        project.Episodes.Add(episode2);
 
         var templateStaff1 = new TemplateStaff
         {
@@ -77,9 +86,43 @@ public static class DbSeeder
         };
         project.TemplateStaff.Add(templateStaff2);
 
-        var templateTask1 = new Task
+        var template1Task1 = new Task
         {
-            EpisodeId = episode.Id,
+            EpisodeId = episode1.Id,
+            AssigneeId = user1Id,
+            Abbreviation = Abbreviation.From("ED"),
+            Name = "Editing",
+            Weight = 0,
+            IsPseudo = false,
+            IsDone = true,
+        };
+        var template2Task1 = new Task
+        {
+            EpisodeId = episode1.Id,
+            AssigneeId = user2Id,
+            Abbreviation = Abbreviation.From("TLC"),
+            Name = "Translation Checking",
+            Weight = 1,
+            IsPseudo = false,
+            IsDone = true,
+        };
+        var additional1Task1 = new Task
+        {
+            EpisodeId = episode1.Id,
+            AssigneeId = user2Id,
+            Abbreviation = Abbreviation.From("STL"),
+            Name = "Song Translation",
+            Weight = 3,
+            IsPseudo = false,
+            IsDone = true,
+        };
+        episode1.Tasks.Add(template1Task1);
+        episode1.Tasks.Add(template2Task1);
+        episode1.Tasks.Add(additional1Task1);
+
+        var template1Task2 = new Task
+        {
+            EpisodeId = episode2.Id,
             AssigneeId = user1Id,
             Abbreviation = Abbreviation.From("ED"),
             Name = "Editing",
@@ -87,9 +130,9 @@ public static class DbSeeder
             IsPseudo = false,
             IsDone = false,
         };
-        var templateTask2 = new Task
+        var template2Task2 = new Task
         {
-            EpisodeId = episode.Id,
+            EpisodeId = episode2.Id,
             AssigneeId = user2Id,
             Abbreviation = Abbreviation.From("TLC"),
             Name = "Translation Checking",
@@ -97,10 +140,9 @@ public static class DbSeeder
             IsPseudo = false,
             IsDone = false,
         };
-
-        var additionalTask = new Task
+        var additional1Task2 = new Task
         {
-            EpisodeId = episode.Id,
+            EpisodeId = episode2.Id,
             AssigneeId = user2Id,
             Abbreviation = Abbreviation.From("KFX"),
             Name = "Song Styling",
@@ -108,23 +150,28 @@ public static class DbSeeder
             IsPseudo = false,
             IsDone = false,
         };
-        episode.Tasks.Add(templateTask1);
-        episode.Tasks.Add(templateTask2);
-        episode.Tasks.Add(additionalTask);
+        episode2.Tasks.Add(template1Task2);
+        episode2.Tasks.Add(template2Task2);
+        episode2.Tasks.Add(additional1Task2);
 
         await db.SaveChangesAsync();
 
         return new SeedInfo(
             user1Id,
             user2Id,
+            user3Id,
             groupId,
             project.Id,
-            episode.Id,
+            episode1.Id,
+            episode2.Id,
             templateStaff1.Id,
             templateStaff2.Id,
-            templateTask1.Id,
-            templateTask2.Id,
-            additionalTask.Id
+            template1Task1.Id,
+            template1Task1.Id,
+            additional1Task1.Id,
+            template1Task2.Id,
+            template1Task2.Id,
+            additional1Task2.Id
         );
     }
 }
