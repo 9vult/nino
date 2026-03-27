@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Nino.Core.Events;
 using Nino.Core.Features.Commands;
 using Nino.Core.Features.Queries;
 
@@ -15,6 +17,10 @@ public static class CoreServiceCollectionExtensions
     )
     {
         services.AddHttpClient();
+
+        // Database
+        services.AddDbContext<NinoDbContext>(ConfigureDb);
+        services.AddDbContext<ReadOnlyNinoDbContext>(ConfigureDb);
 
         // Add command, query handlers
         var handlers = typeof(CoreServiceCollectionExtensions)
@@ -34,6 +40,15 @@ public static class CoreServiceCollectionExtensions
         foreach (var handler in handlers)
             services.AddScoped(handler);
 
+        // Events
+        services.AddScoped<IEventBus, InMemoryEventBus>();
+
         return services;
+
+        void ConfigureDb(DbContextOptionsBuilder options) =>
+            options.UseSqlite(
+                configuration.GetConnectionString("Nino"),
+                sqlite => sqlite.UseQuerySplittingBehavior(QuerySplittingBehavior.SingleQuery)
+            );
     }
 }

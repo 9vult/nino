@@ -9,11 +9,11 @@ public sealed class TemplateStaff
 {
     public TemplateStaffId Id { get; set; } = TemplateStaffId.FromNewGuid();
 
-    public required UserId AssigneeId { get; set; }
-    public User Assignee { get; set; } = null!;
-
     public required ProjectId ProjectId { get; set; }
     public Project Project { get; set; } = null!;
+
+    public required UserId AssigneeId { get; set; }
+    public User Assignee { get; set; } = null!;
 
     [MaxLength(Length.Abbreviation)]
     public required Abbreviation Abbreviation { get; set; }

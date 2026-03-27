@@ -53,7 +53,7 @@ public sealed class Project
     public UserId? AirNotificationUserId { get; set; } = null;
     public User? AirNotificationUser { get; set; } = null;
     public RoleId? AirNotificationRoleId { get; set; } = null;
-    public RoleId? AirNotificationRole { get; set; } = null;
+    public Role? AirNotificationRole { get; set; } = null;
 
     public bool CongaRemindersEnabled { get; set; } = false;
 
