@@ -13,16 +13,14 @@ public sealed class Configuration
 
     public GroupId GroupId { get; set; }
 
-    public required ProgressResponseType ProgressResponseType { get; set; } =
-        ProgressResponseType.Succinct;
+    public ProgressResponseType ProgressResponseType { get; set; } = ProgressResponseType.Succinct;
 
-    public required ProgressPublishType ProgressPublishType { get; set; } =
-        ProgressPublishType.Normal;
+    public ProgressPublishType ProgressPublishType { get; set; } = ProgressPublishType.Normal;
 
-    public required CongaPrefixType CongaPrefixType { get; set; } = CongaPrefixType.None;
+    public CongaPrefixType CongaPrefixType { get; set; } = CongaPrefixType.None;
 
     [MaxLength(Length.ReleasePrefix)]
-    public required string ReleasePrefix { get; set; } = string.Empty;
+    public string ReleasePrefix { get; set; } = string.Empty;
 
     public Locale Locale { get; set; } = Locale.EnglishUS;
 

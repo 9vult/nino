@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Nino.Core.Events;
 using Nino.Core.Features.Commands;
 using Nino.Core.Features.Queries;
+using Nino.Core.Services;
 
 namespace Nino.Core;
 
@@ -42,6 +43,9 @@ public static class CoreServiceCollectionExtensions
 
         // Events
         services.AddScoped<IEventBus, InMemoryEventBus>();
+
+        // Services
+        services.AddScoped<IIdentityService, IdentityService>();
 
         return services;
 
