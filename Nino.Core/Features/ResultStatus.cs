@@ -48,11 +48,6 @@ public enum ResultStatus
     TaskConflict,
 
     /// <summary>
-    /// Action can't be completed due to a staff naming conflict
-    /// </summary>
-    StaffConflict,
-
-    /// <summary>
     /// Action can't be completed due to a conga participant naming conflict
     /// </summary>
     CongaConflict,
