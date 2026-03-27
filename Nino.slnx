@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/Nino.Core.Tests/Nino.Core.Tests.csproj" />
+  </Folder>
   <Project Path="Nino.Core/Nino.Core.csproj" />
   <Project Path="Nino.Discord/Nino.Discord.csproj" />
   <Project Path="Nino.Domain/Nino.Domain.csproj" />
