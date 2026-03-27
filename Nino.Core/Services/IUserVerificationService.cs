@@ -33,11 +33,13 @@ public interface IUserVerificationService
     /// <param name="projectId">Project ID</param>
     /// <param name="userId">User ID</param>
     /// <param name="minimumPermissions">Level of permissions required</param>
+    /// <param name="allowArchived">Don't reject if the project is archived</param>
     /// <returns>Success if the user has the required <paramref name="minimumPermissions"/></returns>
     Task<Result> VerifyProjectPermissionsAsync(
         ProjectId projectId,
         UserId userId,
-        PermissionsLevel minimumPermissions
+        PermissionsLevel minimumPermissions,
+        bool allowArchived = false
     );
 
     /// <summary>

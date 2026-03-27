@@ -29,6 +29,10 @@ public class UserVerificationService(
             logger.LogWarning("Project {ProjectId} was not found", projectId);
             return Fail(ResultStatus.ProjectNotFound);
         }
+
+        if (project.IsArchived)
+            return Fail(ResultStatus.Archived);
+
         var episode = await db.Episodes.SingleOrDefaultAsync(e => e.Id == episodeId);
         if (episode is null)
         {
@@ -56,7 +60,8 @@ public class UserVerificationService(
     public async Task<Result> VerifyProjectPermissionsAsync(
         ProjectId projectId,
         UserId userId,
-        PermissionsLevel minimumPermissions
+        PermissionsLevel minimumPermissions,
+        bool allowArchived
     )
     {
         var project = await db.Projects.FirstOrDefaultAsync(p => p.Id == projectId);
@@ -65,6 +70,9 @@ public class UserVerificationService(
             logger.LogWarning("Project {ProjectId} was not found", projectId);
             return Fail(ResultStatus.ProjectNotFound);
         }
+
+        if (project.IsArchived && !allowArchived)
+            return Fail(ResultStatus.Archived);
 
         var effectivePermissions = await GetProjectPermissionsAsync(project, userId);
         return effectivePermissions >= minimumPermissions
