@@ -4,33 +4,32 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 using Nino.Core.Features;
 using Nino.Core.Features.Commands.TemplateStaff;
-using Nino.Core.Features.Commands.TemplateStaff.Add;
+using Nino.Core.Features.Commands.TemplateStaff.Edit;
 using Nino.Domain.ValueObjects;
 
 namespace Nino.Core.Tests.Commands.TemplateStaff;
 
-public class AddTemplateStaffHandlerTests : TestBase
+public class EditTemplateStaffHandlerTests : TestBase
 {
     [Test]
-    public async Task AllEpisodes_Selection_Adds_To_All_Episodes_And_Project()
+    public async Task AllEpisodes_Selection_Edits_All_Episodes_And_Project()
     {
         var seed = await Db.SeedAsync(IdentityService);
         var db = Db.Context;
 
-        var handler = new AddTemplateStaffHandler(
+        var handler = new EditTemplateStaffHandler(
             db,
             UserVerificationService,
-            NullLogger<AddTemplateStaffHandler>.Instance
+            NullLogger<EditTemplateStaffHandler>.Instance
         );
 
-        var command = new AddTemplateStaffCommand(
+        var command = new EditTemplateStaffCommand(
             seed.ProjectId,
+            seed.TemplateStaff1Id,
             seed.User1Id,
             TemplateStaffApplicator.AllEpisodes,
-            seed.User1Id,
-            Abbreviation.From("TL"),
-            "Translation",
-            false
+            AssigneeId: seed.User3Id,
+            Name: "Test"
         );
 
         var result = await handler.HandleAsync(command);
@@ -41,40 +40,41 @@ public class AddTemplateStaffHandlerTests : TestBase
             .Projects.Include(p => p.Episodes)
             .FirstAsync(p => p.Id == command.ProjectId);
 
-        // All episodes are incomplete
-        await Assert.That(project.Episodes).All(e => !e.IsDone);
+        // Staff entry was edited
+        var staff = project.TemplateStaff.First(s => s.Id == seed.TemplateStaff1Id);
+        await Assert.That(staff.AssigneeId).IsEqualTo(seed.User3Id);
+        await Assert.That(staff.Name).IsEqualTo("Test");
 
-        // All episodes have task
+        // All episodes were edited
+        var episode1 = project.Episodes.First(e => e.Id == seed.Episode1Id);
+        var episode2 = project.Episodes.First(e => e.Id == seed.Episode2Id);
         await Assert
-            .That(project.Episodes)
-            .All(e => e.Tasks.Any(t => t.Abbreviation == command.Abbreviation));
-
-        // Project has template staff
+            .That(episode1.Tasks)
+            .Contains(t => t.AssigneeId == seed.User3Id && t.Name == "Test");
         await Assert
-            .That(project.TemplateStaff)
-            .Contains(s => s.Abbreviation == command.Abbreviation);
+            .That(episode2.Tasks)
+            .Contains(t => t.AssigneeId == seed.User3Id && t.Name == "Test");
     }
 
     [Test]
-    public async Task IncompleteEpisodes_Selection_Adds_To_Incomplete_Episodes_And_Project()
+    public async Task IncompleteEpisodes_Selection_Edits_Incomplete_Episodes_And_Project()
     {
         var seed = await Db.SeedAsync(IdentityService);
         var db = Db.Context;
 
-        var handler = new AddTemplateStaffHandler(
+        var handler = new EditTemplateStaffHandler(
             db,
             UserVerificationService,
-            NullLogger<AddTemplateStaffHandler>.Instance
+            NullLogger<EditTemplateStaffHandler>.Instance
         );
 
-        var command = new AddTemplateStaffCommand(
+        var command = new EditTemplateStaffCommand(
             seed.ProjectId,
+            seed.TemplateStaff1Id,
             seed.User1Id,
             TemplateStaffApplicator.IncompleteEpisodes,
-            seed.User1Id,
-            Abbreviation.From("TL"),
-            "Translation",
-            false
+            AssigneeId: seed.User3Id,
+            Name: "Test"
         );
 
         var result = await handler.HandleAsync(command);
@@ -88,41 +88,34 @@ public class AddTemplateStaffHandlerTests : TestBase
         var episode2 = project.Episodes.First(e => e.Id == seed.Episode2Id);
 
         // Episode 1 is already done
-        await Assert.That(episode1.IsDone).IsTrue();
-        await Assert
-            .That(episode1.Tasks)
-            .DoesNotContain(t => t.Abbreviation == command.Abbreviation);
+        await Assert.That(episode1.Tasks).DoesNotContain(t => t.Name == command.Name);
 
         // Episode 2 is incomplete
-        await Assert.That(episode2.IsDone).IsFalse();
-        await Assert.That(episode2.Tasks).Contains(t => t.Abbreviation == command.Abbreviation);
+        await Assert.That(episode2.Tasks).Contains(t => t.Name == command.Name);
 
-        // Project has template staff
-        await Assert
-            .That(project.TemplateStaff)
-            .Contains(s => s.Abbreviation == command.Abbreviation);
+        // Staff was edited
+        await Assert.That(project.TemplateStaff).Contains(s => s.Name == command.Name);
     }
 
     [Test]
-    public async Task FutureEpisodes_Selection_Adds_To_No_Episodes_And_Project()
+    public async Task FutureEpisodes_Selection_Edits_No_Episodes_And_Project()
     {
         var seed = await Db.SeedAsync(IdentityService);
         var db = Db.Context;
 
-        var handler = new AddTemplateStaffHandler(
+        var handler = new EditTemplateStaffHandler(
             db,
             UserVerificationService,
-            NullLogger<AddTemplateStaffHandler>.Instance
+            NullLogger<EditTemplateStaffHandler>.Instance
         );
 
-        var command = new AddTemplateStaffCommand(
+        var command = new EditTemplateStaffCommand(
             seed.ProjectId,
+            seed.TemplateStaff1Id,
             seed.User1Id,
             TemplateStaffApplicator.FutureEpisodes,
-            seed.User1Id,
-            Abbreviation.From("TL"),
-            "Translation",
-            false
+            AssigneeId: seed.User3Id,
+            Name: "Test"
         );
 
         var result = await handler.HandleAsync(command);
@@ -133,44 +126,31 @@ public class AddTemplateStaffHandlerTests : TestBase
             .Projects.Include(p => p.Episodes)
             .FirstAsync(p => p.Id == command.ProjectId);
 
-        var episode1 = project.Episodes.First(e => e.Id == seed.Episode1Id);
-        var episode2 = project.Episodes.First(e => e.Id == seed.Episode2Id);
-
-        // No change to completion
-        await Assert.That(episode1.IsDone).IsTrue();
-        await Assert.That(episode2.IsDone).IsFalse();
-
         // No episodes have task
-        await Assert
-            .That(project.Episodes)
-            .All(e => e.Tasks.All(t => t.Abbreviation != command.Abbreviation));
+        await Assert.That(project.Episodes).All(e => e.Tasks.All(t => t.Name != command.Name));
 
         // Project has template staff
-        await Assert
-            .That(project.TemplateStaff)
-            .Contains(s => s.Abbreviation == command.Abbreviation);
+        await Assert.That(project.TemplateStaff).Contains(s => s.Name == command.Name);
     }
 
     [Test]
-    public async Task AllEpisodes_Selection_Does_Not_Add_When_Conflict_Exists_In_Any_Episode()
+    public async Task AllEpisodes_Selection_Does_Not_Edit_When_Conflict_Exists_In_Any_Episode()
     {
         var seed = await Db.SeedAsync(IdentityService);
         var db = Db.Context;
 
-        var handler = new AddTemplateStaffHandler(
+        var handler = new EditTemplateStaffHandler(
             db,
             UserVerificationService,
-            NullLogger<AddTemplateStaffHandler>.Instance
+            NullLogger<EditTemplateStaffHandler>.Instance
         );
 
-        var command = new AddTemplateStaffCommand(
+        var command = new EditTemplateStaffCommand(
             seed.ProjectId,
+            seed.TemplateStaff1Id,
             seed.User1Id,
             TemplateStaffApplicator.AllEpisodes,
-            seed.User1Id,
-            Abbreviation.From("TLC"),
-            "Translation Checking",
-            false
+            Abbreviation: Abbreviation.From("TLC")
         );
 
         var result = await handler.HandleAsync(command);
@@ -180,25 +160,23 @@ public class AddTemplateStaffHandlerTests : TestBase
     }
 
     [Test]
-    public async Task IncompleteEpisodes_Selection_Does_Not_Add_When_Conflict_Exists_In_Incomplete_Episode()
+    public async Task IncompleteEpisodes_Selection_Does_Not_Edit_When_Conflict_Exists_In_Incomplete_Episode()
     {
         var seed = await Db.SeedAsync(IdentityService);
         var db = Db.Context;
 
-        var handler = new AddTemplateStaffHandler(
+        var handler = new EditTemplateStaffHandler(
             db,
             UserVerificationService,
-            NullLogger<AddTemplateStaffHandler>.Instance
+            NullLogger<EditTemplateStaffHandler>.Instance
         );
 
-        var command = new AddTemplateStaffCommand(
+        var command = new EditTemplateStaffCommand(
             seed.ProjectId,
+            seed.TemplateStaff1Id,
             seed.User1Id,
             TemplateStaffApplicator.IncompleteEpisodes,
-            seed.User1Id,
-            Abbreviation.From("KFX"),
-            "Karaoke",
-            false
+            Abbreviation: Abbreviation.From("KFX")
         );
 
         var result = await handler.HandleAsync(command);
@@ -213,20 +191,18 @@ public class AddTemplateStaffHandlerTests : TestBase
         var seed = await Db.SeedAsync(IdentityService);
         var db = Db.Context;
 
-        var handler = new AddTemplateStaffHandler(
+        var handler = new EditTemplateStaffHandler(
             db,
             UserVerificationService,
-            NullLogger<AddTemplateStaffHandler>.Instance
+            NullLogger<EditTemplateStaffHandler>.Instance
         );
 
-        var command = new AddTemplateStaffCommand(
+        var command = new EditTemplateStaffCommand(
             seed.ProjectId,
+            seed.TemplateStaff1Id,
             seed.User1Id,
             TemplateStaffApplicator.IncompleteEpisodes,
-            seed.User1Id,
-            Abbreviation.From("STL"),
-            "Translation",
-            false
+            Abbreviation: Abbreviation.From("STL")
         );
 
         var result = await handler.HandleAsync(command);
@@ -240,20 +216,18 @@ public class AddTemplateStaffHandlerTests : TestBase
         var seed = await Db.SeedAsync(IdentityService);
         var db = Db.Context;
 
-        var handler = new AddTemplateStaffHandler(
+        var handler = new EditTemplateStaffHandler(
             db,
             UserVerificationService,
-            NullLogger<AddTemplateStaffHandler>.Instance
+            NullLogger<EditTemplateStaffHandler>.Instance
         );
 
-        var command = new AddTemplateStaffCommand(
+        var command = new EditTemplateStaffCommand(
             seed.ProjectId,
+            seed.TemplateStaff1Id,
             seed.User1Id,
             TemplateStaffApplicator.FutureEpisodes,
-            seed.User1Id,
-            Abbreviation.From("STL"),
-            "Translation",
-            false
+            Abbreviation: Abbreviation.From("STL")
         );
 
         var result = await handler.HandleAsync(command);
@@ -267,20 +241,18 @@ public class AddTemplateStaffHandlerTests : TestBase
         var seed = await Db.SeedAsync(IdentityService);
         var db = Db.Context;
 
-        var handler = new AddTemplateStaffHandler(
+        var handler = new EditTemplateStaffHandler(
             db,
             UserVerificationService,
-            NullLogger<AddTemplateStaffHandler>.Instance
+            NullLogger<EditTemplateStaffHandler>.Instance
         );
 
-        var command = new AddTemplateStaffCommand(
+        var command = new EditTemplateStaffCommand(
             seed.ProjectId,
+            seed.TemplateStaff1Id,
             seed.User2Id,
-            TemplateStaffApplicator.FutureEpisodes,
-            seed.User1Id,
-            Abbreviation.From("STL"),
-            "Translation",
-            false
+            TemplateStaffApplicator.IncompleteEpisodes,
+            Abbreviation: Abbreviation.From("TLC")
         );
 
         var result = await handler.HandleAsync(command);

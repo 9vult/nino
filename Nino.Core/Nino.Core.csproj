@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Features\Commands\TemplateStaff\Remove\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
 </Project>
