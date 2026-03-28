@@ -99,6 +99,7 @@ public sealed class AddTemplateStaffHandler(
                 }
             );
             episode.IsDone = false;
+            episode.UpdatedAt = DateTime.UtcNow;
         }
 
         logger.LogInformation(
