@@ -12,6 +12,7 @@ public abstract class TestBase : IAsyncDisposable
     protected TestDatabase Db { get; private set; } = null!;
 
     protected IEventBus EventBus { get; private set; } = null!;
+    protected IEventBusImposter BusImposter { get; private set; } = null!;
 
     protected IIdentityService IdentityService { get; private set; } = null!;
 
@@ -22,8 +23,8 @@ public abstract class TestBase : IAsyncDisposable
     {
         Db = await TestDatabase.CreateAsync();
 
-        var busImposter = IEventBus.Imposter();
-        EventBus = busImposter.Instance();
+        BusImposter = IEventBus.Imposter();
+        EventBus = BusImposter.Instance();
 
         IdentityService = new IdentityService(
             Db.Context,
