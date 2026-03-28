@@ -85,9 +85,9 @@ public sealed class EditTemplateStaffHandler(
                 staff.Id,
                 command.AssigneeId
             );
-            staff.AssigneeId = command.AssigneeId.Value;
-            foreach (var task in tasks)
+            foreach (var task in tasks.Where(task => task.AssigneeId == staff.AssigneeId))
                 task.AssigneeId = command.AssigneeId.Value;
+            staff.AssigneeId = command.AssigneeId.Value;
         }
 
         if (command.Abbreviation is not null)
@@ -97,9 +97,9 @@ public sealed class EditTemplateStaffHandler(
                 staff.Id,
                 command.Abbreviation.Value
             );
-            staff.Abbreviation = command.Abbreviation.Value;
-            foreach (var task in tasks)
+            foreach (var task in tasks.Where(task => task.Abbreviation == staff.Abbreviation))
                 task.Abbreviation = command.Abbreviation.Value;
+            staff.Abbreviation = command.Abbreviation.Value;
         }
 
         if (command.Name is not null)
@@ -109,9 +109,9 @@ public sealed class EditTemplateStaffHandler(
                 staff.Id,
                 command.Name
             );
-            staff.Name = command.Name;
-            foreach (var task in tasks)
+            foreach (var task in tasks.Where(task => task.Name == staff.Name))
                 task.Name = command.Name;
+            staff.Name = command.Name;
         }
 
         if (command.Weight is not null)
@@ -121,9 +121,9 @@ public sealed class EditTemplateStaffHandler(
                 staff.Id,
                 command.Weight.Value
             );
-            staff.Weight = command.Weight.Value;
-            foreach (var task in tasks)
+            foreach (var task in tasks.Where(task => task.Weight == staff.Weight))
                 task.Weight = command.Weight.Value;
+            staff.Weight = command.Weight.Value;
         }
 
         if (command.IsPseudo is not null)
@@ -133,9 +133,9 @@ public sealed class EditTemplateStaffHandler(
                 staff.Id,
                 command.IsPseudo.Value
             );
-            staff.IsPseudo = command.IsPseudo.Value;
-            foreach (var task in tasks)
+            foreach (var task in tasks.Where(task => task.IsPseudo == staff.IsPseudo))
                 task.IsPseudo = command.IsPseudo.Value;
+            staff.IsPseudo = command.IsPseudo.Value;
         }
 
         await db.SaveChangesAsync();

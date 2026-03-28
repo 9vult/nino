@@ -236,6 +236,57 @@ public class EditTemplateStaffHandlerTests : TestBase
     }
 
     [Test]
+    public async Task Edits_Do_Not_Edit_Differing_Task_Values()
+    {
+        var seed = await Db.SeedAsync(IdentityService);
+        var db = Db.Context;
+
+        // Change name of episode 2's task
+        var e2Task = await db.Tasks.FirstAsync(t => t.Id == seed.Task1Id2);
+        e2Task.Name = "ERIS";
+        await db.SaveChangesAsync();
+
+        var handler = new EditTemplateStaffHandler(
+            db,
+            UserVerificationService,
+            NullLogger<EditTemplateStaffHandler>.Instance
+        );
+
+        var command = new EditTemplateStaffCommand(
+            seed.ProjectId,
+            seed.TemplateStaff1Id,
+            seed.User1Id,
+            TemplateStaffApplicator.AllEpisodes,
+            AssigneeId: seed.User3Id,
+            Name: "Test"
+        );
+
+        var result = await handler.HandleAsync(command);
+
+        await Assert.That(result.IsSuccess).IsTrue().Because($"Handler failed: {result.Status}");
+
+        var project = await db
+            .Projects.Include(p => p.Episodes)
+            .FirstAsync(p => p.Id == command.ProjectId);
+
+        // Staff entry was edited
+        var staff = project.TemplateStaff.First(s => s.Id == seed.TemplateStaff1Id);
+        await Assert.That(staff.AssigneeId).IsEqualTo(seed.User3Id);
+        await Assert.That(staff.Name).IsEqualTo("Test");
+
+        // All episodes were edited, but only episode 1's name
+        var episode1 = project.Episodes.First(e => e.Id == seed.Episode1Id);
+        var episode2 = project.Episodes.First(e => e.Id == seed.Episode2Id);
+
+        await Assert.That(episode1.Tasks).Contains(t => t.AssigneeId == seed.User3Id);
+        await Assert.That(episode1.Tasks).Contains(t => t.Name == "Test");
+
+        await Assert.That(episode2.Tasks).Contains(t => t.AssigneeId == seed.User3Id);
+        await Assert.That(episode2.Tasks).DoesNotContain(t => t.Name == "Test");
+        await Assert.That(episode2.Tasks).Contains(t => t.Name == "ERIS");
+    }
+
+    [Test]
     public async Task Unauthorized_ReturnsUnauthorized()
     {
         var seed = await Db.SeedAsync(IdentityService);
