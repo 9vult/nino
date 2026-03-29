@@ -2,7 +2,6 @@
 
 using Microsoft.Extensions.Logging.Abstractions;
 using Nino.Core.Features;
-using Nino.Core.Features.Commands.Projects.AirNotifications.Enable;
 using Nino.Core.Features.Commands.Projects.DelegateObserver.Remove;
 using Nino.Domain.Entities;
 using Task = System.Threading.Tasks.Task;
