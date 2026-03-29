@@ -61,7 +61,7 @@ public class UserVerificationService(
         ProjectId projectId,
         UserId userId,
         PermissionsLevel minimumPermissions,
-        bool allowArchived
+        bool allowArchived = false
     )
     {
         var project = await db.Projects.FirstOrDefaultAsync(p => p.Id == projectId);
