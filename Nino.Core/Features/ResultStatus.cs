@@ -83,6 +83,11 @@ public enum ResultStatus
     GroupNotFound,
 
     /// <summary>
+    /// Observer does not exist
+    /// </summary>
+    ObserverNotFound,
+
+    /// <summary>
     /// Generic not found condition
     /// </summary>
     NotFound,

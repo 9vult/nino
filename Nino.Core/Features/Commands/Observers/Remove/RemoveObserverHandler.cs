@@ -22,7 +22,7 @@ public sealed class RemoveObserverHandler(
         var observer = await db.Observers.FirstOrDefaultAsync(o => o.Id == command.ObserverId);
 
         if (observer is null)
-            return Fail(ResultStatus.NotFound);
+            return Fail(ResultStatus.ObserverNotFound);
 
         // Proceed only if the user a) made the observer or b) is an admin in the observing group
         var verification = await verificationService.VerifyGroupPermissionsAsync(
