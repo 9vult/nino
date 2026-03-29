@@ -25,7 +25,7 @@ public static class DbSeeder
 
         var user1Id = await identityService.GetOrCreateUserByDiscordIdAsync(1234, "TestUser1");
         var user2Id = await identityService.GetOrCreateUserByDiscordIdAsync(5678, "TestUser2");
-        var user3Id = await identityService.GetOrCreateUserByDiscordIdAsync(1234, "TestUser3");
+        var user3Id = await identityService.GetOrCreateUserByDiscordIdAsync(9101112, "TestUser3");
         var groupId = await identityService.GetOrCreateGroupByDiscordIdAsync(1234);
         var pChannelId = await identityService.GetOrCreateChannelByDiscordIdAsync(1111);
         var uChannelId = await identityService.GetOrCreateChannelByDiscordIdAsync(2222);
