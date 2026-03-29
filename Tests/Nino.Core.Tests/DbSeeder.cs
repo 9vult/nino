@@ -157,21 +157,21 @@ public static class DbSeeder
         await db.SaveChangesAsync();
 
         return new SeedInfo(
-            user1Id,
-            user2Id,
-            user3Id,
-            groupId,
-            project.Id,
-            episode1.Id,
-            episode2.Id,
-            templateStaff1.Id,
-            templateStaff2.Id,
-            template1Task1.Id,
-            template1Task1.Id,
-            additional1Task1.Id,
-            template1Task2.Id,
-            template1Task2.Id,
-            additional1Task2.Id
+            User1Id: user1Id,
+            User2Id: user2Id,
+            User3Id: user3Id,
+            GroupId: groupId,
+            ProjectId: project.Id,
+            Episode1Id: episode1.Id,
+            Episode2Id: episode2.Id,
+            TemplateStaff1Id: templateStaff1.Id,
+            TemplateStaff2Id: templateStaff2.Id,
+            Task1Id1: template1Task1.Id,
+            Task2Id1: template2Task1.Id,
+            Task3Id1: additional1Task1.Id,
+            Task1Id2: template1Task2.Id,
+            Task2Id2: template2Task2.Id,
+            Task3Id2: additional1Task2.Id
         );
     }
 }
