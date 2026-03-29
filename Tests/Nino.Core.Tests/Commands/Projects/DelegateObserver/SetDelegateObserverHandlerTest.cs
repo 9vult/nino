@@ -48,6 +48,33 @@ public class SetDelegateObserverHandlerTest : TestBase
     }
 
     [Test]
+    public async Task No_Project_Channel_ReturnsError()
+    {
+        var seed = await Db.SeedAsync(IdentityService);
+        var db = Db.Context;
+
+        var project = db.Projects.First(p => p.Id == seed.ProjectId);
+        project.ProjectChannelId = ChannelId.Unset;
+        await db.SaveChangesAsync();
+
+        var handler = new SetDelegateObserverHandler(
+            db,
+            UserVerificationService,
+            NullLogger<SetDelegateObserverHandler>.Instance
+        );
+
+        var command = new SetDelegateObserverCommand(
+            seed.ProjectId,
+            ObserverId.FromNewGuid(),
+            seed.User1Id
+        );
+        var result = await handler.HandleAsync(command);
+
+        await Assert.That(result.IsSuccess).IsFalse();
+        await Assert.That(result.Status).IsEqualTo(ResultStatus.MissingProjectChannel);
+    }
+
+    [Test]
     public async Task Unauthorized_ReturnsUnauthorized()
     {
         var seed = await Db.SeedAsync(IdentityService);
