@@ -4,16 +4,17 @@ using Imposter.Abstractions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Nino.Core.Events;
 using Nino.Core.Features;
-using Nino.Core.Features.Commands.Projects.Archive;
+using Nino.Core.Features.Commands.Projects.Release.Episode;
 using Nino.Domain.Entities;
+using Nino.Domain.ValueObjects;
 using Task = System.Threading.Tasks.Task;
 
-namespace Nino.Core.Tests.Commands.Projects;
+namespace Nino.Core.Tests.Commands.Projects.Release;
 
-public class ArchiveProjectHandlerTests : TestBase
+public class ReleaseEpisodeHandlerTests : TestBase
 {
     [Test]
-    public async Task Command_Archives_Project_And_Publishes_Notifications()
+    public async Task Command_Publishes_Notifications()
     {
         var seed = await Db.SeedAsync(IdentityService);
         var db = Db.Context;
@@ -31,23 +32,25 @@ public class ArchiveProjectHandlerTests : TestBase
         await db.Observers.AddAsync(observer);
         await db.SaveChangesAsync();
 
-        var handler = new ArchiveProjectHandler(
+        var handler = new ReleaseEpisodeHandler(
             db,
             UserVerificationService,
             EventBus,
-            NullLogger<ArchiveProjectHandler>.Instance
+            NullLogger<ReleaseEpisodeHandler>.Instance
         );
 
-        var command = new ArchiveProjectCommand(seed.ProjectId, seed.User1Id);
+        var command = new ReleaseEpisodeCommand(
+            seed.ProjectId,
+            seed.User1Id,
+            Number.From("1v2"),
+            string.Empty
+        );
         var result = await handler.HandleAsync(command);
 
         await Assert.That(result.IsSuccess).IsTrue().Because($"Handler failed: {result.Status}");
 
-        var project = db.Projects.First(t => t.Id == command.ProjectId);
-
-        await Assert.That(project.IsArchived).IsTrue();
-        BusImposter.PublishAsync(Arg<ProjectArchivedEvent>.Any()).Called(Count.Once());
-        BusImposter.PublishAsync(Arg<ProjectArchivedObserverEvent>.Any()).Called(Count.Once());
+        BusImposter.PublishAsync(Arg<EpisodeReleasedEvent>.Any()).Called(Count.Once());
+        BusImposter.PublishAsync(Arg<EpisodeReleasedObserverEvent>.Any()).Called(Count.Once());
     }
 
     [Test]
@@ -56,14 +59,19 @@ public class ArchiveProjectHandlerTests : TestBase
         var seed = await Db.SeedAsync(IdentityService);
         var db = Db.Context;
 
-        var handler = new ArchiveProjectHandler(
+        var handler = new ReleaseEpisodeHandler(
             db,
             UserVerificationService,
             EventBus,
-            NullLogger<ArchiveProjectHandler>.Instance
+            NullLogger<ReleaseEpisodeHandler>.Instance
         );
 
-        var command = new ArchiveProjectCommand(seed.ProjectId, seed.User3Id);
+        var command = new ReleaseEpisodeCommand(
+            seed.ProjectId,
+            seed.User3Id,
+            Number.From("1v2"),
+            string.Empty
+        );
         var result = await handler.HandleAsync(command);
 
         await Assert.That(result.IsSuccess).IsFalse();
