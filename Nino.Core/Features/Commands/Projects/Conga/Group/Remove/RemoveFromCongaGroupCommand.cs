@@ -6,7 +6,7 @@ namespace Nino.Core.Features.Commands.Projects.Conga.Group.Remove;
 
 public sealed record RemoveFromCongaGroupCommand(
     ProjectId ProjectId,
-    Alias GroupName,
-    Alias Alias,
+    Abbreviation GroupName,
+    Abbreviation Alias,
     UserId RequestedBy
 );

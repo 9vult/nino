@@ -1,199 +1,107 @@
 // SPDX-License-Identifier: MPL-2.0
 
-using System.Collections.ObjectModel;
-using System.Text.Json.Serialization;
-using Nino.Domain.Dtos;
 using Nino.Domain.Enums;
 using Nino.Domain.ValueObjects;
 
 namespace Nino.Domain.Entities.Conga;
 
-public class CongaGraph
+public sealed class CongaGraph
 {
-    /// <summary>
-    /// Special nodes available for the current position
-    /// </summary>
-    public static readonly string[] CurrentSpecials = ["$AIR"];
-
-    /// <summary>
-    /// Special nodes available for the next position
-    /// </summary>
-    public static readonly string[] NextSpecials = [];
-
     private readonly Dictionary<Abbreviation, CongaNode> _nodes = [];
+    private readonly List<CongaNode> _children = [];
 
-    /// <summary>
-    /// All the nodes
-    /// </summary>
-    [JsonIgnore]
-    public ReadOnlyCollection<CongaNode> Nodes => _nodes.Values.ToList().AsReadOnly();
+    public IReadOnlyList<CongaNode> Nodes => _nodes.Values.ToList();
+    public IReadOnlyList<CongaNode> Children => _children;
 
-    /// <summary>
-    /// Add a new link to the graph
-    /// </summary>
-    /// <param name="current">Current task abbreviation</param>
-    /// <param name="next">Next task abbreviation</param>
-    /// <param name="currentType">Type of the current node</param>
-    /// <param name="nextType">Type of the next node</param>
-    public void Add(
-        Abbreviation current,
-        Abbreviation next,
-        CongaNodeType currentType = CongaNodeType.KeyStaff,
-        CongaNodeType nextType = CongaNodeType.KeyStaff
-    )
+    // TODO: Create/remove groups, add/remove from groups
+    // TODO: Activation evaluations
+    // Note that Groups need to differentiate between root and non-root nodes for activations
+
+    public CongaModificationResult AddEdge(Abbreviation from, Abbreviation to)
     {
-        var currentNode = GetOrCreateNode(current, currentType);
-        var nextNode = GetOrCreateNode(next, nextType);
-
-        currentNode.Dependents.Add(nextNode);
-        nextNode.Prerequisites.Add(currentNode);
-    }
-
-    /// <summary>
-    /// Remove a link from the graph
-    /// </summary>
-    /// <param name="current">Current task abbreviation</param>
-    /// <param name="next">Next task abbreviation</param>
-    public void Remove(Abbreviation current, Abbreviation next)
-    {
-        if (
-            !_nodes.TryGetValue(current, out var currentNode)
-            || !_nodes.TryGetValue(next, out var nextNode)
-        )
-            return;
-
-        currentNode.Dependents.Remove(nextNode);
-        nextNode.Prerequisites.Remove(currentNode);
-
-        if (currentNode.Dependents.Count == 0 && currentNode.Prerequisites.Count == 0)
-            _nodes.Remove(current);
-        if (nextNode.Dependents.Count == 0 && nextNode.Prerequisites.Count == 0)
-            _nodes.Remove(next);
-    }
-
-    /// <summary>
-    /// Get prerequisites for a task
-    /// </summary>
-    /// <param name="abbreviation">Task to look up</param>
-    /// <returns>Prerequisite nodes</returns>
-    public IEnumerable<CongaNode> GetPrerequisitesFor(Abbreviation abbreviation)
-    {
-        return _nodes.TryGetValue(abbreviation, out var node)
-            ? node.Prerequisites
-            : Enumerable.Empty<CongaNode>();
-    }
-
-    /// <summary>
-    /// Get dependents of a task
-    /// </summary>
-    /// <param name="abbreviation">Task to look up</param>
-    /// <returns>Dependent nodes</returns>
-    public IEnumerable<CongaNode> GetDependentsOf(Abbreviation abbreviation)
-    {
-        return _nodes.TryGetValue(abbreviation, out var node)
-            ? node.Dependents
-            : Enumerable.Empty<CongaNode>();
-    }
-
-    /// <summary>
-    /// Get if a task is part of the graph
-    /// </summary>
-    /// <param name="abbreviation">Task to look up</param>
-    /// <returns><see langword="true"/> if the task exists in the graph</returns>
-    public bool Contains(Abbreviation abbreviation)
-    {
-        return _nodes.ContainsKey(abbreviation);
-    }
-
-    /// <summary>
-    /// Get a node
-    /// </summary>
-    /// <param name="abbreviation">Task to look up</param>
-    /// <returns>The node, or <see langword="null"/></returns>
-    public CongaNode? Get(Abbreviation abbreviation)
-    {
-        return _nodes.GetValueOrDefault(abbreviation);
-    }
-
-    /// <summary>
-    /// Gets or creates a node
-    /// </summary>
-    /// <param name="abbreviation">Task to get or create</param>
-    /// <param name="type">Type of conga node</param>
-    /// <returns>The node</returns>
-    private CongaNode GetOrCreateNode(
-        Abbreviation abbreviation,
-        CongaNodeType type = CongaNodeType.KeyStaff
-    )
-    {
-        if (_nodes.TryGetValue(abbreviation, out var node))
-            return node;
-
-        node = new CongaNode { Abbreviation = abbreviation, Type = type };
-        _nodes[abbreviation] = node;
-        return node;
-    }
-
-    /// <summary>
-    /// Get a list of the edges in the graph
-    /// </summary>
-    /// <returns>List of edges in the graph</returns>
-    public List<CongaEdge> GetEdges()
-    {
-        var participants = new List<CongaEdge>();
-        foreach (var node in Nodes)
+        switch (_nodes.TryGetValue(from, out var fromNode), _nodes.TryGetValue(to, out var toNode))
         {
-            participants.AddRange(
-                node.Dependents.Select(dep => new CongaEdge
+            case (true, true):
+                if (fromNode is null || toNode is null)
+                    throw new NullReferenceException();
+                if (fromNode == toNode)
+                    return CongaModificationResult.SelfLoop;
+
+                var fromGroup = GetContainingGroup(fromNode);
+                var toGroup = GetContainingGroup(toNode);
+
+                switch (fromGroup is null, toGroup is null)
                 {
-                    Current = node.Abbreviation,
-                    Next = dep.Abbreviation,
-                })
-            );
+                    case (true, true): // both outer
+                    case (false, false) when fromGroup == toGroup: // both in same group
+                        fromNode.AddDependent(toNode);
+                        toNode.AddPrerequisite(fromNode);
+                        return CongaModificationResult.Success;
+
+                    case (false, false): // different groups
+                    case (true, false): // one outer, one internal
+                    case (false, true):
+                        return CongaModificationResult.MixedGroups;
+                }
+            case (true, false) or (false, true): // One of the nodes exists, the other doesn't
+                fromNode ??= new CongaNode.TaskNode(from);
+                toNode ??= new CongaNode.TaskNode(to);
+
+                fromNode.AddDependent(toNode);
+                toNode.AddPrerequisite(fromNode);
+
+                var group = GetContainingGroup(fromNode) ?? GetContainingGroup(toNode);
+                if (group is null)
+                {
+                    AddDirectChild(fromNode);
+                    AddDirectChild(toNode);
+                    return CongaModificationResult.Success;
+                }
+                group.AddChild(fromNode);
+                group.AddChild(toNode);
+                RegisterNode(fromNode);
+                RegisterNode(toNode);
+                return CongaModificationResult.Success;
+            case (false, false): // Neither node exists
+                fromNode ??= new CongaNode.TaskNode(from);
+                toNode ??= new CongaNode.TaskNode(to);
+
+                fromNode.AddDependent(toNode);
+                toNode.AddPrerequisite(fromNode);
+
+                AddDirectChild(fromNode);
+                AddDirectChild(toNode);
+                return CongaModificationResult.Success;
         }
-        return participants;
     }
 
-    /// <summary>
-    /// Serialize the graph into a flat list
-    /// </summary>
-    /// <returns>Flat list</returns>
-    public CongaNodeDto[] Serialize()
+    private void AddDirectChild(CongaNode node)
     {
-        return Nodes
-            .Select(n => new CongaNodeDto
-            {
-                Abbreviation = n.Abbreviation.Value,
-                Type = n.Type,
-                Dependents = n.Dependents.Select(d => d.Abbreviation.Value).ToArray(),
-            })
-            .ToArray();
+        if (!_children.Contains(node))
+            _children.Add(node);
+        _nodes.TryAdd(node.Name, node);
     }
 
-    /// <summary>
-    /// Deserialize a flat list to a graph
-    /// </summary>
-    /// <param name="dtos">Flat list of nodes</param>
-    /// <returns>Graph</returns>
-    public static CongaGraph Deserialize(CongaNodeDto[] dtos)
+    private void RegisterNode(CongaNode node)
     {
-        var graph = new CongaGraph();
+        _nodes.TryAdd(node.Name, node);
+    }
 
-        // First pass: Create nodes
-        foreach (var dto in dtos)
-        {
-            graph.GetOrCreateNode(Abbreviation.From(dto.Abbreviation), dto.Type);
-        }
+    private void RemoveDirectChild(CongaNode node)
+    {
+        _children.Remove(node);
+        _nodes.Remove(node.Name);
+    }
 
-        // Second pass: Create edges
-        foreach (var dto in dtos)
-        {
-            foreach (var dep in dto.Dependents)
-            {
-                graph.Add(Abbreviation.From(dto.Abbreviation), Abbreviation.From(dep));
-            }
-        }
+    private void UnregisterNode(CongaNode node)
+    {
+        _nodes.Remove(node.Name);
+    }
 
-        return graph;
+    private CongaNode.GroupNode? GetContainingGroup(CongaNode node)
+    {
+        return _nodes
+            .Values.OfType<CongaNode.GroupNode>()
+            .FirstOrDefault(g => g.Children.Any(m => m.Name == node.Name));
     }
 }

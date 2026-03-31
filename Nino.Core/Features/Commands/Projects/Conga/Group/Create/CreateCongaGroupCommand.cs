@@ -6,6 +6,7 @@ namespace Nino.Core.Features.Commands.Projects.Conga.Group.Create;
 
 public sealed record CreateCongaGroupCommand(
     ProjectId ProjectId,
-    Alias GroupName,
+    Abbreviation GroupName,
+    Abbreviation FirstChild,
     UserId RequestedBy
 );

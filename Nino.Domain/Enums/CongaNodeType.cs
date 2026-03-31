@@ -8,14 +8,11 @@ namespace Nino.Domain.Enums;
 public enum CongaNodeType
 {
     /// <summary>
-    /// Node represents a Key Staff position
+    /// Node represents a task
     /// </summary>
-    KeyStaff = 0,
+    Task = 0,
 
-    /// <summary>
-    /// Node represents an Additional Staff position
-    /// </summary>
-    AdditionalStaff = 1,
+    // AdditionalStaff = 1,
 
     /// <summary>
     /// Node represents a special condition (e.g. Episode Aired)

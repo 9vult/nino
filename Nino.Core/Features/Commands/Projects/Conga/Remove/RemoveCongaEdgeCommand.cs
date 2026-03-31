@@ -6,7 +6,7 @@ namespace Nino.Core.Features.Commands.Projects.Conga.Remove;
 
 public sealed record RemoveCongaEdgeCommand(
     ProjectId ProjectId,
-    Alias Current,
-    Alias Next,
+    Abbreviation Current,
+    Abbreviation Next,
     UserId RequestedBy
 ) : ICommand;

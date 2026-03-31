@@ -1,123 +1,55 @@
 // SPDX-License-Identifier: MPL-2.0
 
-using Nino.Domain.Enums;
 using Nino.Domain.ValueObjects;
 
 namespace Nino.Domain.Entities.Conga;
 
-/// <summary>
-/// A node in a <see cref="CongaGraph"/>
-/// </summary>
-public class CongaNode
+public abstract class CongaNode(Abbreviation name)
 {
-    /// <summary>
-    /// Abbreviation of the task represented by the node
-    /// </summary>
-    public required Abbreviation Abbreviation { get; set; }
+    public Abbreviation Name { get; } = name;
 
-    /// <summary>
-    /// Type of node. Defaults to <see cref="CongaNodeType.KeyStaff"/>.
-    /// </summary>
-    public required CongaNodeType Type { get; set; } = CongaNodeType.KeyStaff;
+    private readonly HashSet<CongaNode> _prerequisites = [];
+    private readonly HashSet<CongaNode> _dependents = [];
 
-    /// <summary>
-    /// List of nodes depending on this node
-    /// </summary>
-    public HashSet<CongaNode> Dependents { get; set; } = [];
+    public IReadOnlySet<CongaNode> Prerequisites => _prerequisites;
+    public IReadOnlySet<CongaNode> Dependents => _dependents;
 
-    /// <summary>
-    /// List of nodes this node depends on
-    /// </summary>
-    public HashSet<CongaNode> Prerequisites { get; set; } = [];
+    public bool IsRootNode => Prerequisites.Count == 0;
 
-    /// <summary>
-    /// Check if the node is complete
-    /// </summary>
-    /// <param name="episode">Episode to check for</param>
-    /// <remarks>If a task is not applicable, it is treated as complete.</remarks>
-    /// <returns><see langword="true"/> if complete</returns>
-    private bool IsComplete(Episode episode)
+    internal void AddDependent(CongaNode node) => _dependents.Add(node);
+
+    internal void AddPrerequisite(CongaNode node) => _prerequisites.Add(node);
+
+    public abstract bool IsComplete(IList<Task> tasks);
+
+    public sealed class TaskNode(Abbreviation name) : CongaNode(name)
     {
-        switch (Type)
-        {
-            case CongaNodeType.KeyStaff:
-            case CongaNodeType.AdditionalStaff:
-                return episode.Tasks.FirstOrDefault(t => t.Abbreviation == Abbreviation)?.IsDone
-                    ?? true;
-            case CongaNodeType.Group:
-                var members = Dependents.Where(d => d.Dependents.Contains(this));
-                return members.All(t => t.IsComplete(episode));
-            default:
-                return true;
-        }
+        /// <inheritdoc />
+        public override bool IsComplete(IList<Task> tasks) =>
+            tasks.FirstOrDefault(t => t.Abbreviation == Name)?.IsDone ?? true;
     }
 
-    /// <summary>
-    /// Check if the node can be activated
-    /// </summary>
-    /// <param name="episode">Episode to check for</param>
-    /// <remarks>If a task is not applicable, it is treated as unactivatable.</remarks>
-    /// <returns><see langword="true"/> if activatable</returns>
-    private bool CanActivate(Episode episode)
+    public sealed class GroupNode(Abbreviation name) : CongaNode(name)
     {
-        switch (Type)
-        {
-            case CongaNodeType.KeyStaff:
-            case CongaNodeType.AdditionalStaff:
-                return Prerequisites.All(p => p.IsComplete(episode));
-            case CongaNodeType.Group:
-                var members = Dependents.Where(d => d.Dependents.Contains(this));
-                var upstream = Prerequisites.Where(p => !members.Contains(p));
-                return upstream.All(t => t.IsComplete(episode));
-            default:
-                return false;
-        }
-    }
+        private readonly List<CongaNode> _children = [];
 
-    /// <summary>
-    /// Get the nodes that can be activated
-    /// </summary>
-    /// <param name="episode">Episode to check for</param>
-    /// <returns>List of nodes that can be activated</returns>
-    public List<CongaNode> GetActivatedNodes(Episode episode)
-    {
-        var result = new List<CongaNode>();
-        foreach (var dependent in Dependents)
-        {
-            if (!dependent.CanActivate(episode))
-                continue;
+        public IReadOnlyList<CongaNode> Children => _children;
 
-            switch (dependent.Type)
-            {
-                case CongaNodeType.KeyStaff:
-                case CongaNodeType.AdditionalStaff:
-                    if (!dependent.IsComplete(episode))
-                        result.Add(dependent);
-                    break;
-                case CongaNodeType.Group:
-                    // If group members aren't done, only ping group members
-                    var members = dependent
-                        .Dependents.Where(d => d.Dependents.Contains(dependent))
-                        .ToList();
-                    var incompleteMembers = members
-                        .Where(member => !member.IsComplete(episode))
-                        .ToList();
-                    if (incompleteMembers.Count != 0)
-                    {
-                        result.AddRange(incompleteMembers);
-                        break;
-                    }
-                    // Otherwise, only ping non-members
-                    result.AddRange(
-                        dependent.Dependents.Where(d =>
-                            !members.Contains(d) && !d.IsComplete(episode) && d.CanActivate(episode)
-                        )
-                    );
-                    break;
-                default:
-                    continue;
-            }
+        internal void AddChild(CongaNode node)
+        {
+            if (!_children.Contains(node))
+                _children.Add(node);
         }
-        return result;
+
+        internal void RemoveChild(CongaNode node)
+        {
+            _children.Remove(node);
+        }
+
+        /// <inheritdoc />
+        public override bool IsComplete(IList<Task> tasks)
+        {
+            return _children.All(n => n.IsComplete(tasks));
+        }
     }
 }
