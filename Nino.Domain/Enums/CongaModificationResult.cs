@@ -7,5 +7,10 @@ public enum CongaModificationResult
     Success,
     MixedGroups,
     SelfLoop,
-    Loop,
+    Cycle,
+    Duplicate,
+    NoGroup,
+    IllegalTree,
+    NotFound,
+    NoLink,
 }

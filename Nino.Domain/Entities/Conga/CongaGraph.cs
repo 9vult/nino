@@ -19,13 +19,16 @@ public sealed class CongaGraph
 
     public CongaModificationResult AddEdge(Abbreviation from, Abbreviation to)
     {
+        if (from == to)
+            return CongaModificationResult.SelfLoop;
+
         switch (_nodes.TryGetValue(from, out var fromNode), _nodes.TryGetValue(to, out var toNode))
         {
             case (true, true):
                 if (fromNode is null || toNode is null)
                     throw new NullReferenceException();
-                if (fromNode == toNode)
-                    return CongaModificationResult.SelfLoop;
+                if (DetectCycle(toNode, fromNode))
+                    return CongaModificationResult.Cycle;
 
                 var fromGroup = GetContainingGroup(fromNode);
                 var toGroup = GetContainingGroup(toNode);
@@ -34,6 +37,20 @@ public sealed class CongaGraph
                 {
                     case (true, true): // both outer
                     case (false, false) when fromGroup == toGroup: // both in same group
+                        if (fromNode.Dependents.Contains(toNode))
+                            return CongaModificationResult.Duplicate;
+
+                        // Check for illegal tree
+                        var fromRoot = fromNode;
+                        var toRoot = toNode;
+                        while (!fromRoot.IsRootNode)
+                            fromRoot = fromRoot.Prerequisites.First();
+                        while (!toRoot.IsRootNode)
+                            toRoot = toRoot.Prerequisites.First();
+                        if (fromRoot != toRoot)
+                            return CongaModificationResult.IllegalTree;
+
+                        // We're all set!
                         fromNode.AddDependent(toNode);
                         toNode.AddPrerequisite(fromNode);
                         return CongaModificationResult.Success;
@@ -57,6 +74,13 @@ public sealed class CongaGraph
                     AddDirectChild(toNode);
                     return CongaModificationResult.Success;
                 }
+
+                // Configure the group relation
+                if (fromNode is CongaNode.TaskNode fromTaskNode)
+                    fromTaskNode.ContainingGroup = group;
+                if (toNode is CongaNode.TaskNode toTaskNode)
+                    toTaskNode.ContainingGroup = group;
+
                 group.AddChild(fromNode);
                 group.AddChild(toNode);
                 RegisterNode(fromNode);
@@ -73,6 +97,130 @@ public sealed class CongaGraph
                 AddDirectChild(toNode);
                 return CongaModificationResult.Success;
         }
+    }
+
+    public CongaModificationResult AddGroup(Abbreviation name)
+    {
+        if (_nodes.TryGetValue(name, out _))
+            return CongaModificationResult.Duplicate;
+        var group = new CongaNode.GroupNode(name);
+        AddDirectChild(group);
+        return CongaModificationResult.Success;
+    }
+
+    public CongaModificationResult AddGroupMember(Abbreviation groupName, Abbreviation name)
+    {
+        if (
+            !_nodes.TryGetValue(groupName, out var groupNode)
+            || groupNode is not CongaNode.GroupNode group
+        )
+            return CongaModificationResult.NoGroup;
+        if (_nodes.TryGetValue(name, out _))
+            return CongaModificationResult.Duplicate;
+
+        var newNode = new CongaNode.TaskNode(name, group);
+        group.AddChild(newNode);
+        RegisterNode(newNode);
+        return CongaModificationResult.Success;
+    }
+
+    public CongaModificationResult RemoveEdge(Abbreviation from, Abbreviation to)
+    {
+        if (_nodes.TryGetValue(from, out var fromNode) && _nodes.TryGetValue(to, out var toNode))
+        {
+            if (!fromNode.Dependents.Contains(toNode))
+                return CongaModificationResult.NoLink;
+
+            fromNode.RemoveDependent(toNode);
+            toNode.RemovePrerequisite(fromNode);
+
+            if (fromNode.Dependents.Count == 0 && fromNode.Prerequisites.Count == 0)
+            {
+                switch (fromNode)
+                {
+                    case CongaNode.TaskNode { ContainingGroup: not null } taskNode:
+                        taskNode.ContainingGroup.RemoveChild(fromNode);
+                        UnregisterNode(fromNode);
+                        break;
+                    case CongaNode.TaskNode:
+                        RemoveDirectChild(fromNode);
+                        break;
+                    case CongaNode.GroupNode:
+                        break;
+                }
+            }
+            if (toNode.Dependents.Count == 0 && toNode.Prerequisites.Count == 0)
+            {
+                switch (toNode)
+                {
+                    case CongaNode.TaskNode { ContainingGroup: not null } taskNode:
+                        taskNode.ContainingGroup.RemoveChild(toNode);
+                        UnregisterNode(toNode);
+                        break;
+                    case CongaNode.TaskNode:
+                        RemoveDirectChild(toNode);
+                        break;
+                    case CongaNode.GroupNode:
+                        break;
+                }
+            }
+            return CongaModificationResult.Success;
+        }
+        return CongaModificationResult.NotFound;
+    }
+
+    public CongaModificationResult RemoveGroup(Abbreviation name)
+    {
+        if (
+            !_nodes.TryGetValue(name, out var groupNode)
+            || groupNode is not CongaNode.GroupNode group
+        )
+            return CongaModificationResult.NoGroup;
+
+        foreach (var pre in group.Prerequisites)
+        {
+            pre.RemoveDependent(groupNode);
+            if (pre.Dependents.Count == 0 && pre.Prerequisites.Count == 0)
+            {
+                switch (pre)
+                {
+                    case CongaNode.TaskNode { ContainingGroup: not null } taskNode:
+                        taskNode.ContainingGroup.RemoveChild(pre);
+                        UnregisterNode(pre);
+                        break;
+                    case CongaNode.TaskNode:
+                        RemoveDirectChild(pre);
+                        break;
+                    case CongaNode.GroupNode:
+                        break;
+                }
+            }
+        }
+        foreach (var dep in group.Dependents)
+        {
+            dep.RemovePrerequisite(groupNode);
+            if (dep.Dependents.Count == 0 && dep.Prerequisites.Count == 0)
+            {
+                switch (dep)
+                {
+                    case CongaNode.TaskNode { ContainingGroup: not null } taskNode:
+                        taskNode.ContainingGroup.RemoveChild(dep);
+                        UnregisterNode(dep);
+                        break;
+                    case CongaNode.TaskNode:
+                        RemoveDirectChild(dep);
+                        break;
+                    case CongaNode.GroupNode:
+                        break;
+                }
+            }
+        }
+
+        foreach (var child in group.Children)
+            UnregisterNode(child);
+
+        RemoveDirectChild(groupNode);
+        return CongaModificationResult.Success;
     }
 
     private void AddDirectChild(CongaNode node)
@@ -96,6 +244,26 @@ public sealed class CongaGraph
     private void UnregisterNode(CongaNode node)
     {
         _nodes.Remove(node.Name);
+    }
+
+    private static bool DetectCycle(CongaNode toNode, CongaNode fromNode)
+    {
+        var visited = new HashSet<CongaNode>();
+        var stack = new Stack<CongaNode>();
+        stack.Push(toNode);
+
+        while (stack.TryPop(out var current))
+        {
+            if (!visited.Add(current))
+                continue;
+            foreach (var dep in current.Dependents)
+            {
+                if (dep == fromNode)
+                    return true; // found a path back to the new prerequisite
+                stack.Push(dep);
+            }
+        }
+        return false;
     }
 
     private CongaNode.GroupNode? GetContainingGroup(CongaNode node)
