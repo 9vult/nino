@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
+using Nino.Domain.Dtos;
 using Nino.Domain.Enums;
 using Nino.Domain.ValueObjects;
 
@@ -12,10 +13,6 @@ public sealed class CongaGraph
 
     public IReadOnlyList<CongaNode> Nodes => _nodes.Values.ToList();
     public IReadOnlyList<CongaNode> Children => _children;
-
-    // TODO: Create/remove groups, add/remove from groups
-    // TODO: Activation evaluations
-    // Note that Groups need to differentiate between root and non-root nodes for activations
 
     public CongaModificationResult AddEdge(Abbreviation from, Abbreviation to)
     {
@@ -221,6 +218,101 @@ public sealed class CongaGraph
 
         RemoveDirectChild(groupNode);
         return CongaModificationResult.Success;
+    }
+
+    public static CongaGraph FromDto(CongaGraphDto dto)
+    {
+        var graph = new CongaGraph();
+
+        foreach (var groupDto in dto.Groups)
+        {
+            var group = new CongaNode.GroupNode(groupDto.Name);
+            graph.AddDirectChild(group);
+            foreach (var edge in groupDto.Edges)
+            {
+                // Root child node with no deps
+                if (edge.From == group.Name)
+                {
+                    var child = new CongaNode.TaskNode(edge.To);
+                    group.AddChild(child);
+                    graph.RegisterNode(child);
+                    continue;
+                }
+
+                var from = group.Children.FirstOrDefault(x => x.Name == edge.From);
+                var to = group.Children.FirstOrDefault(x => x.Name == edge.To);
+
+                if (from is null)
+                {
+                    from = new CongaNode.TaskNode(edge.From);
+                    group.AddChild(from);
+                    graph.RegisterNode(from);
+                }
+
+                if (to is null)
+                {
+                    to = new CongaNode.TaskNode(edge.To);
+                    group.AddChild(to);
+                    graph.RegisterNode(to);
+                }
+
+                from.AddDependent(to);
+                to.AddPrerequisite(from);
+            }
+        }
+
+        foreach (var edge in dto.Edges)
+        {
+            var from = graph.Children.FirstOrDefault(x => x.Name == edge.From);
+            var to = graph.Children.FirstOrDefault(x => x.Name == edge.To);
+
+            if (from is null)
+            {
+                from = new CongaNode.TaskNode(edge.From);
+                graph.AddDirectChild(from);
+            }
+
+            if (to is null)
+            {
+                to = new CongaNode.TaskNode(edge.To);
+                graph.AddDirectChild(to);
+            }
+
+            from.AddDependent(to);
+            to.AddPrerequisite(from);
+        }
+
+        return graph;
+    }
+
+    public CongaGraphDto ToDto()
+    {
+        var dto = new CongaGraphDto { Edges = [], Groups = [] };
+
+        foreach (var group in Nodes.OfType<CongaNode.GroupNode>())
+        {
+            var groupDto = new CongaNodeDto.GroupNodeDto { Name = group.Name, Edges = [] };
+            foreach (var child in group.Children)
+            {
+                // Root child node with no deps
+                if (child is { IsRootNode: true, Dependents.Count: 0 })
+                {
+                    groupDto.Edges.Add(new CongaEdgeDto { From = group.Name, To = child.Name });
+                    continue;
+                }
+
+                foreach (var dep in child.Dependents)
+                    groupDto.Edges.Add(new CongaEdgeDto { From = child.Name, To = dep.Name });
+            }
+            dto.Groups.Add(groupDto);
+        }
+
+        foreach (var child in Children)
+        {
+            foreach (var dep in child.Dependents)
+                dto.Edges.Add(new CongaEdgeDto { From = child.Name, To = dep.Name });
+        }
+        return dto;
     }
 
     private void AddDirectChild(CongaNode node)

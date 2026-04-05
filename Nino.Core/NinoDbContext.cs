@@ -72,11 +72,11 @@ public class NinoDbContext(DbContextOptions<NinoDbContext> options) : DbContext(
 
     private class CongaGraphConverter()
         : ValueConverter<CongaGraph, string>(
-            graph => JsonSerializer.Serialize(graph.Serialize(), JsonSerializerOptions),
+            graph => JsonSerializer.Serialize(graph.ToDto(), JsonSerializerOptions),
             json =>
-                CongaGraph.Deserialize(
-                    JsonSerializer.Deserialize<CongaNodeDto[]>(json, JsonSerializerOptions)
-                        ?? Array.Empty<CongaNodeDto>()
+                CongaGraph.FromDto(
+                    JsonSerializer.Deserialize<CongaGraphDto>(json, JsonSerializerOptions)
+                        ?? CongaGraphDto.Empty
                 )
         );
 

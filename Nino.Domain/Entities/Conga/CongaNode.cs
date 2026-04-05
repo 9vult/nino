@@ -187,7 +187,7 @@ public abstract class CongaNode(Abbreviation name)
         public IReadOnlyList<CongaNode> Children => _children;
 
         /// <summary>
-        /// Add a root node to the group
+        /// Add a node to the group
         /// </summary>
         /// <param name="node"></param>
         internal void AddChild(CongaNode node)
@@ -197,7 +197,7 @@ public abstract class CongaNode(Abbreviation name)
         }
 
         /// <summary>
-        /// Remove a root node from the group
+        /// Remove a node from the group
         /// </summary>
         /// <param name="node"></param>
         internal void RemoveChild(CongaNode node)

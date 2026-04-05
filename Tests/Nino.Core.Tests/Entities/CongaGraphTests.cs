@@ -764,6 +764,61 @@ public class CongaGraphTests
         await Assert.That(c).IsNotNull();
     }
 
+    [Test]
+    public async Task Graph_Dto_Roundtrip_Is_Successful()
+    {
+        var g = new CongaGraph();
+        g.AddGroup(Group1);
+
+        g.AddGroupMember(Group1, B);
+        g.AddGroupMember(Group1, D);
+        g.AddEdge(B, C);
+
+        g.AddEdge(A, Group1);
+        g.AddEdge(Group1, E);
+
+        var dto = g.ToDto();
+
+        await Assert.That(dto.Groups).Contains(n => n.Name == Group1);
+        await Assert.That(dto.Edges.Count).IsEqualTo(2);
+
+        var groupDto = dto.Groups.SingleOrDefault(n => n.Name == Group1);
+        await Assert.That(groupDto).IsNotNull();
+        await Assert.That(groupDto.Edges.Count).IsEqualTo(2);
+
+        var g2 = CongaGraph.FromDto(dto);
+
+        var group = g2.Nodes.SingleOrDefault(n => n.Name == Group1) as CongaNode.GroupNode;
+        var a = g2.Nodes.SingleOrDefault(n => n.Name == A);
+        var b = g2.Nodes.SingleOrDefault(n => n.Name == B);
+        var c = g2.Nodes.SingleOrDefault(n => n.Name == C);
+        var d = g2.Nodes.SingleOrDefault(n => n.Name == D);
+        var e = g2.Nodes.SingleOrDefault(n => n.Name == E);
+
+        await Assert.That(group).IsNotNull();
+        await Assert.That(a).IsNotNull();
+        await Assert.That(b).IsNotNull();
+        await Assert.That(c).IsNotNull();
+        await Assert.That(d).IsNotNull();
+        await Assert.That(e).IsNotNull();
+
+        await Assert.That(g2.Children).Contains(group);
+        await Assert.That(g2.Children).Contains(a);
+        await Assert.That(g2.Children).Contains(e);
+
+        await Assert.That(a.Dependents).Contains(group);
+        await Assert.That(group.Prerequisites).Contains(a);
+        await Assert.That(group.Dependents).Contains(e);
+        await Assert.That(e.Prerequisites).Contains(group);
+
+        await Assert.That(group.Children).Contains(b);
+        await Assert.That(group.Children).Contains(c);
+        await Assert.That(group.Children).Contains(d);
+
+        await Assert.That(b.Dependents).Contains(c);
+        await Assert.That(c.Prerequisites).Contains(b);
+    }
+
     private static Domain.Entities.Task CreateTask(
         Abbreviation abbreviation,
         bool isDone,
