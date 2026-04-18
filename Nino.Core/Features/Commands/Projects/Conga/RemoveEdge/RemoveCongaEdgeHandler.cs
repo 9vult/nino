@@ -32,13 +32,13 @@ public sealed class RemoveCongaEdgeHandler(
             return Fail(ResultStatus.ProjectNotFound);
 
         logger.LogInformation(
-            "Removing {Current} → {Next} from project {ProjectId}'s Conga graph",
-            command.Current,
-            command.Next,
+            "Removing {From} → {To} from project {ProjectId}'s Conga graph",
+            command.From,
+            command.To,
             project.Id
         );
 
-        var result = project.CongaParticipants.RemoveEdge(command.Current, command.Next);
+        var result = project.CongaParticipants.RemoveEdge(command.From, command.To);
         if (result is CongaModificationResult.Success)
         {
             await db.SaveChangesAsync();

@@ -6,7 +6,7 @@ namespace Nino.Core.Features.Commands.Projects.Conga.AddEdge;
 
 public sealed record AddCongaEdgeCommand(
     ProjectId ProjectId,
-    Abbreviation Current,
-    Abbreviation Next,
+    Abbreviation From,
+    Abbreviation To,
     UserId RequestedBy
 ) : ICommand;

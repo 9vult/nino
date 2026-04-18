@@ -4,5 +4,5 @@ using Nino.Domain.ValueObjects;
 
 namespace Nino.Core.Features.Commands.Projects.Conga.Import;
 
-public sealed record ImportCongaEdgesCommand(ProjectId ProjectId, string Data, UserId RequestedBy)
+public sealed record ImportCongaCommand(ProjectId ProjectId, string Data, UserId RequestedBy)
     : ICommand;

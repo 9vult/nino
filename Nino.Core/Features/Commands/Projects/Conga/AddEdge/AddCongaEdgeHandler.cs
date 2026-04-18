@@ -34,27 +34,27 @@ public sealed class AddCongaEdgeHandler(
         var tasks = project.Episodes.SelectMany(e => e.Tasks).ToList();
 
         if (
-            !command.Current.Value.StartsWith('$')
-            && !command.Current.Value.StartsWith('@')
-            && tasks.All(t => t.Abbreviation != command.Current)
+            !command.From.Value.StartsWith('$')
+            && !command.From.Value.StartsWith('@')
+            && tasks.All(t => t.Abbreviation != command.From)
         )
-            return Fail(ResultStatus.TaskNotFound, "current");
+            return Fail(ResultStatus.TaskNotFound, "from");
 
         if (
-            !command.Next.Value.StartsWith('$')
-            && !command.Next.Value.StartsWith('@')
-            && tasks.All(t => t.Abbreviation != command.Next)
+            !command.To.Value.StartsWith('$')
+            && !command.To.Value.StartsWith('@')
+            && tasks.All(t => t.Abbreviation != command.To)
         )
-            return Fail(ResultStatus.TaskNotFound, "next");
+            return Fail(ResultStatus.TaskNotFound, "to");
 
         logger.LogInformation(
-            "Adding {Current} → {Next} to project {ProjectId}'s Conga graph",
-            command.Current,
-            command.Next,
+            "Adding {From} → {To} to project {ProjectId}'s Conga graph",
+            command.From,
+            command.To,
             project.Id
         );
 
-        var result = project.CongaParticipants.AddEdge(command.Current, command.Next);
+        var result = project.CongaParticipants.AddEdge(command.From, command.To);
         if (result is CongaModificationResult.Success)
         {
             await db.SaveChangesAsync();
