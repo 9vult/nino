@@ -55,10 +55,14 @@ public sealed class AddCongaEdgeHandler(
         );
 
         var result = project.CongaParticipants.AddEdge(command.Current, command.Next);
+        if (result is CongaModificationResult.Success)
+        {
+            await db.SaveChangesAsync();
+            return Success();
+        }
 
         return result switch
         {
-            CongaModificationResult.Success => Success(),
             CongaModificationResult.MixedGroups => Fail(ResultStatus.BadRequest, "mixedGroups"),
             CongaModificationResult.SelfLoop => Fail(ResultStatus.BadRequest, "selfLoop"),
             CongaModificationResult.Cycle => Fail(ResultStatus.BadRequest, "cycle"),

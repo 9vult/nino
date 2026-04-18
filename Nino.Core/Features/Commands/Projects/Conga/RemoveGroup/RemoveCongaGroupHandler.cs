@@ -41,10 +41,14 @@ public sealed class RemoveCongaGroupHandler(
         );
 
         var result = project.CongaParticipants.RemoveGroup(name);
+        if (result is CongaModificationResult.Success)
+        {
+            await db.SaveChangesAsync();
+            return Success();
+        }
 
         return result switch
         {
-            CongaModificationResult.Success => Success(),
             CongaModificationResult.NoGroup => Fail(ResultStatus.NotFound),
             _ => Fail(ResultStatus.Error),
         };

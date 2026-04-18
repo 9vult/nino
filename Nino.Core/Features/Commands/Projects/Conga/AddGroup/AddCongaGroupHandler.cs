@@ -41,10 +41,14 @@ public sealed class AddCongaGroupHandler(
         );
 
         var result = project.CongaParticipants.AddGroup(name);
+        if (result is CongaModificationResult.Success)
+        {
+            await db.SaveChangesAsync();
+            return Success();
+        }
 
         return result switch
         {
-            CongaModificationResult.Success => Success(),
             CongaModificationResult.Duplicate => Fail(ResultStatus.CongaConflict),
             _ => Fail(ResultStatus.Error),
         };

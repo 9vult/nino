@@ -42,10 +42,14 @@ public sealed class RemoveCongaGroupMemberHandler(
             command.GroupName,
             command.NodeName
         );
+        if (result is CongaModificationResult.Success)
+        {
+            await db.SaveChangesAsync();
+            return Success();
+        }
 
         return result switch
         {
-            CongaModificationResult.Success => Success(),
             CongaModificationResult.NoGroup => Fail(ResultStatus.GroupNotFound),
             CongaModificationResult.NotFound => Fail(ResultStatus.NotFound),
             _ => Fail(ResultStatus.Error),

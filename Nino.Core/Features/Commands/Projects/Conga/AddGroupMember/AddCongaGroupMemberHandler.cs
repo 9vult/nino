@@ -40,10 +40,14 @@ public sealed class AddCongaGroupMemberHandler(
         );
 
         var result = project.CongaParticipants.AddGroupMember(command.GroupName, command.NodeName);
+        if (result is CongaModificationResult.Success)
+        {
+            await db.SaveChangesAsync();
+            return Success();
+        }
 
         return result switch
         {
-            CongaModificationResult.Success => Success(),
             CongaModificationResult.NoGroup => Fail(ResultStatus.GroupNotFound),
             CongaModificationResult.Duplicate => Fail(ResultStatus.CongaConflict),
             _ => Fail(ResultStatus.Error),

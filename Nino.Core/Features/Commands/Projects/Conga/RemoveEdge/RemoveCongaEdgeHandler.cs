@@ -39,10 +39,14 @@ public sealed class RemoveCongaEdgeHandler(
         );
 
         var result = project.CongaParticipants.RemoveEdge(command.Current, command.Next);
+        if (result is CongaModificationResult.Success)
+        {
+            await db.SaveChangesAsync();
+            return Success();
+        }
 
         return result switch
         {
-            CongaModificationResult.Success => Success(),
             CongaModificationResult.NoLink => Fail(ResultStatus.BadRequest, "noLink"),
             CongaModificationResult.NotFound => Fail(ResultStatus.BadRequest, "notFound"),
             _ => Fail(ResultStatus.Error),
