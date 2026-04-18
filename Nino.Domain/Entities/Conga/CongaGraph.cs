@@ -37,15 +37,21 @@ public sealed class CongaGraph
                         if (fromNode.Dependents.Contains(toNode))
                             return CongaModificationResult.Duplicate;
 
-                        // Check for illegal tree
-                        var fromRoot = fromNode;
-                        var toRoot = toNode;
-                        while (!fromRoot.IsRootNode)
-                            fromRoot = fromRoot.Prerequisites.First();
-                        while (!toRoot.IsRootNode)
-                            toRoot = toRoot.Prerequisites.First();
-                        if (fromRoot != toRoot)
-                            return CongaModificationResult.IllegalTree;
+                        // Check for illegal tree if no group nodes involved
+                        if (
+                            fromNode is not CongaNode.GroupNode
+                            && toNode is not CongaNode.GroupNode
+                        )
+                        {
+                            var fromRoot = fromNode;
+                            var toRoot = toNode;
+                            while (!fromRoot.IsRootNode)
+                                fromRoot = fromRoot.Prerequisites.First();
+                            while (!toRoot.IsRootNode)
+                                toRoot = toRoot.Prerequisites.First();
+                            if (fromRoot != toRoot)
+                                return CongaModificationResult.IllegalTree;
+                        }
 
                         // We're all set!
                         fromNode.AddDependent(toNode);

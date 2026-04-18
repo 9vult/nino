@@ -85,6 +85,53 @@ public class CongaGraphTests
     }
 
     [Test]
+    public async Task Add_Edge_With_New_Group_Creates_Group_and_Links()
+    {
+        var g = new CongaGraph();
+
+        g.AddEdge(A, B);
+        g.AddEdge(B, Group1);
+
+        await Assert.That(g.Children).Contains(n => n.Name == A);
+        await Assert.That(g.Children).Contains(n => n.Name == B);
+        await Assert.That(g.Children).Contains(n => n.Name == Group1);
+
+        var a = g.Nodes.Single(n => n.Name == A);
+        var b = g.Nodes.Single(n => n.Name == B);
+        var group = g.Nodes.Single(n => n.Name == Group1);
+
+        await Assert.That(a.Dependents).Contains(b);
+        await Assert.That(b.Prerequisites).Contains(a);
+
+        await Assert.That(b.Dependents).Contains(group);
+        await Assert.That(group.Prerequisites).Contains(b);
+    }
+
+    [Test]
+    public async Task Add_Edge_With_Existing_Group_Links()
+    {
+        var g = new CongaGraph();
+
+        g.AddEdge(A, B);
+        g.AddGroup(Group1);
+        g.AddEdge(B, Group1);
+
+        await Assert.That(g.Children).Contains(n => n.Name == A);
+        await Assert.That(g.Children).Contains(n => n.Name == B);
+        await Assert.That(g.Children).Contains(n => n.Name == Group1);
+
+        var a = g.Nodes.Single(n => n.Name == A);
+        var b = g.Nodes.Single(n => n.Name == B);
+        var group = g.Nodes.Single(n => n.Name == Group1);
+
+        await Assert.That(a.Dependents).Contains(b);
+        await Assert.That(b.Prerequisites).Contains(a);
+
+        await Assert.That(b.Dependents).Contains(group);
+        await Assert.That(group.Prerequisites).Contains(b);
+    }
+
+    [Test]
     public async Task Add_Duplicate_Edge_Returns_Error()
     {
         var g = new CongaGraph();
@@ -278,6 +325,31 @@ public class CongaGraphTests
         var result = g.AddEdge(B, C);
 
         await Assert.That(result).IsEqualTo(CongaModificationResult.IllegalTree);
+    }
+
+    [Test]
+    public async Task Remove_Member_From_Group_Removes_Member_From_Group()
+    {
+        var g = new CongaGraph();
+
+        g.AddGroup(Group1);
+        g.AddGroupMember(Group1, A);
+        g.AddEdge(A, B);
+
+        var result = g.RemoveGroupMember(Group1, A);
+
+        await Assert.That(result).IsEqualTo(CongaModificationResult.Success);
+        await Assert.That(g.Children).Contains(n => n.Name == Group1);
+        await Assert.That(g.Nodes).DoesNotContain(n => n.Name == A);
+        await Assert.That(g.Children).DoesNotContain(n => n.Name == A);
+        await Assert.That(g.Nodes).DoesNotContain(n => n.Name == B);
+        await Assert.That(g.Children).DoesNotContain(n => n.Name == B);
+
+        var group = g.Nodes.Single(n => n.Name == Group1) as CongaNode.GroupNode;
+
+        await Assert.That(group).IsNotNull();
+        await Assert.That(group.Children).DoesNotContain(n => n.Name == A);
+        await Assert.That(group.Children).DoesNotContain(n => n.Name == B);
     }
 
     [Test]
