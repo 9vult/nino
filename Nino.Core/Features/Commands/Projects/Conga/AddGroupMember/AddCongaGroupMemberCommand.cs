@@ -2,11 +2,11 @@
 
 using Nino.Domain.ValueObjects;
 
-namespace Nino.Core.Features.Commands.Projects.Conga.Group.Add;
+namespace Nino.Core.Features.Commands.Projects.Conga.AddGroupMember;
 
-public sealed record AddToCongaGroupCommand(
+public sealed record AddCongaGroupMemberCommand(
     ProjectId ProjectId,
     Abbreviation GroupName,
-    Abbreviation Alias,
+    Abbreviation NodeName,
     UserId RequestedBy
 ) : ICommand;

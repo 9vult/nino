@@ -58,8 +58,12 @@ public sealed class CongaGraph
                         return CongaModificationResult.MixedGroups;
                 }
             case (true, false) or (false, true): // One of the nodes exists, the other doesn't
-                fromNode ??= new CongaNode.TaskNode(from);
-                toNode ??= new CongaNode.TaskNode(to);
+                fromNode ??= from.Value.StartsWith('@')
+                    ? new CongaNode.GroupNode(from)
+                    : new CongaNode.TaskNode(from);
+                toNode ??= to.Value.StartsWith('@')
+                    ? new CongaNode.GroupNode(to)
+                    : new CongaNode.TaskNode(to);
 
                 fromNode.AddDependent(toNode);
                 toNode.AddPrerequisite(fromNode);
@@ -217,6 +221,27 @@ public sealed class CongaGraph
             UnregisterNode(child);
 
         RemoveDirectChild(groupNode);
+        return CongaModificationResult.Success;
+    }
+
+    public CongaModificationResult RemoveGroupMember(Abbreviation groupName, Abbreviation name)
+    {
+        if (
+            !_nodes.TryGetValue(groupName, out var groupNode)
+            || groupNode is not CongaNode.GroupNode group
+        )
+            return CongaModificationResult.NoGroup;
+        if (!_nodes.TryGetValue(name, out var node))
+            return CongaModificationResult.NotFound;
+
+        group.RemoveChild(node);
+        UnregisterNode(node);
+
+        foreach (var dep in CongaNode.GetSubtree(node))
+        {
+            group.RemoveChild(dep);
+            UnregisterNode(dep);
+        }
         return CongaModificationResult.Success;
     }
 

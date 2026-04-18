@@ -6,7 +6,7 @@ using Nino.Core.Services;
 using Nino.Domain.Enums;
 using static Nino.Core.Features.Result;
 
-namespace Nino.Core.Features.Commands.Projects.Conga.Add;
+namespace Nino.Core.Features.Commands.Projects.Conga.AddEdge;
 
 public sealed class AddCongaEdgeHandler(
     NinoDbContext db,
@@ -31,35 +31,20 @@ public sealed class AddCongaEdgeHandler(
         if (project is null)
             return Fail(ResultStatus.ProjectNotFound);
 
-        // Validate edge doesn't already exist
-        if (
-            project.CongaParticipants.Contains(command.Current)
-            && project
-                .CongaParticipants.GetDependentsOf(command.Current)
-                .Any(n => n.Abbreviation == command.Next)
-        )
-            return Fail(ResultStatus.CongaConflict);
-
-        CongaNodeType currentType;
-        CongaNodeType nextType;
         var tasks = project.Episodes.SelectMany(e => e.Tasks).ToList();
 
-        if (command.Current.Value.StartsWith('$'))
-            currentType = CongaNodeType.Special;
-        else if (command.Current.Value.StartsWith('@'))
-            currentType = CongaNodeType.Group;
-        else if (tasks.Any(t => t.Abbreviation == command.Current))
-            currentType = CongaNodeType.Task;
-        else
+        if (
+            !command.Current.Value.StartsWith('$')
+            && !command.Current.Value.StartsWith('@')
+            && tasks.All(t => t.Abbreviation != command.Current)
+        )
             return Fail(ResultStatus.TaskNotFound, "current");
 
-        if (command.Next.Value.StartsWith('$'))
-            nextType = CongaNodeType.Special;
-        else if (command.Next.Value.StartsWith('@'))
-            nextType = CongaNodeType.Group;
-        else if (tasks.Any(t => t.Abbreviation == command.Next))
-            nextType = CongaNodeType.Task;
-        else
+        if (
+            !command.Next.Value.StartsWith('$')
+            && !command.Next.Value.StartsWith('@')
+            && tasks.All(t => t.Abbreviation != command.Next)
+        )
             return Fail(ResultStatus.TaskNotFound, "next");
 
         logger.LogInformation(
@@ -69,9 +54,17 @@ public sealed class AddCongaEdgeHandler(
             project.Id
         );
 
-        project.CongaParticipants.Add(command.Current, command.Next, currentType, nextType);
+        var result = project.CongaParticipants.AddEdge(command.Current, command.Next);
 
-        await db.SaveChangesAsync();
-        return Success();
+        return result switch
+        {
+            CongaModificationResult.Success => Success(),
+            CongaModificationResult.MixedGroups => Fail(ResultStatus.BadRequest, "mixedGroups"),
+            CongaModificationResult.SelfLoop => Fail(ResultStatus.BadRequest, "selfLoop"),
+            CongaModificationResult.Cycle => Fail(ResultStatus.BadRequest, "cycle"),
+            CongaModificationResult.Duplicate => Fail(ResultStatus.CongaConflict),
+            CongaModificationResult.IllegalTree => Fail(ResultStatus.BadRequest, "illegalTree"),
+            _ => Fail(ResultStatus.Error),
+        };
     }
 }

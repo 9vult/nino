@@ -2,9 +2,9 @@
 
 using Nino.Domain.ValueObjects;
 
-namespace Nino.Core.Features.Commands.Projects.Conga.Remove;
+namespace Nino.Core.Features.Commands.Projects.Conga.AddEdge;
 
-public sealed record RemoveCongaEdgeCommand(
+public sealed record AddCongaEdgeCommand(
     ProjectId ProjectId,
     Abbreviation Current,
     Abbreviation Next,

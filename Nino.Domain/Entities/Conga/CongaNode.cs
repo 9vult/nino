@@ -82,7 +82,7 @@ public abstract class CongaNode(Abbreviation name)
     /// </summary>
     /// <param name="root">Root node</param>
     /// <returns>List of all descendents of the <paramref name="root"/> node</returns>
-    protected static IReadOnlyList<CongaNode> GetSubtree(CongaNode root)
+    public static IReadOnlyList<CongaNode> GetSubtree(CongaNode root)
     {
         var result = new List<CongaNode>();
         var queue = new Queue<CongaNode>();
