@@ -1,0 +1,52 @@
+// SPDX-License-Identifier: MPL-2.0
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Nino.Core.Services;
+using Nino.Domain.Enums;
+using Nino.Domain.ValueObjects;
+using static Nino.Core.Features.Result;
+
+namespace Nino.Core.Features.Commands.Projects.Conga.RemoveGroup;
+
+public sealed class RemoveCongaGroupHandler(
+    NinoDbContext db,
+    IUserVerificationService verificationService,
+    ILogger<RemoveCongaGroupHandler> logger
+) : ICommandHandler<RemoveCongaGroupCommand, Result>
+{
+    /// <inheritdoc />
+    public async Task<Result> HandleAsync(RemoveCongaGroupCommand command)
+    {
+        var verification = await verificationService.VerifyProjectPermissionsAsync(
+            command.ProjectId,
+            command.RequestedBy,
+            PermissionsLevel.Administrator
+        );
+        if (!verification.IsSuccess)
+            return Fail(verification.Status);
+
+        var project = await db
+            .Projects.Include(p => p.Episodes)
+            .FirstOrDefaultAsync(p => p.Id == command.ProjectId);
+        if (project is null)
+            return Fail(ResultStatus.ProjectNotFound);
+
+        var name = Abbreviation.From('@' + command.Name.Value.TrimStart('@'));
+
+        logger.LogInformation(
+            "Removing Group {GroupName} from project {ProjectId}'s Conga graph",
+            name,
+            project.Id
+        );
+
+        var result = project.CongaParticipants.RemoveGroup(name);
+
+        return result switch
+        {
+            CongaModificationResult.Success => Success(),
+            CongaModificationResult.NoGroup => Fail(ResultStatus.NotFound),
+            _ => Fail(ResultStatus.Error),
+        };
+    }
+}
