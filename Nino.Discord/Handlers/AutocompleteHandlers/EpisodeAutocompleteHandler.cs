@@ -48,7 +48,9 @@ public sealed class EpisodeAutocompleteHandler : AutocompleteHandler
             return AutocompletionResult.FromSuccess();
 
         return AutocompletionResult.FromSuccess(
-            result.Value.Take(25).Select(r => new AutocompleteResult(r.Number.Value, r))
+            result
+                .Value.Take(25)
+                .Select(r => new AutocompleteResult(r.Number.Value, r.Number.Value))
         );
     }
 }

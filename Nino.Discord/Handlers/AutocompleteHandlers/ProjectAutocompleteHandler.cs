@@ -39,7 +39,7 @@ public sealed class ProjectAutocompleteHandler : AutocompleteHandler
             return AutocompletionResult.FromSuccess();
 
         return AutocompletionResult.FromSuccess(
-            result.Value.Take(25).Select(r => new AutocompleteResult(r.Value, r))
+            result.Value.Take(25).Select(r => new AutocompleteResult(r.Value, r.Value))
         );
     }
 }

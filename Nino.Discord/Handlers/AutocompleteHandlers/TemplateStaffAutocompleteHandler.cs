@@ -48,7 +48,9 @@ public sealed class KeyStaffAutocompleteHandler : AutocompleteHandler
             return AutocompletionResult.FromSuccess();
 
         return AutocompletionResult.FromSuccess(
-            result.Value.Take(25).Select(r => new AutocompleteResult(r.Abbreviation.Value, r))
+            result
+                .Value.Take(25)
+                .Select(r => new AutocompleteResult(r.Abbreviation.Value, r.Abbreviation.Value))
         );
     }
 }

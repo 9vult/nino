@@ -17,6 +17,5 @@ public partial class ProjectModule(
     IInteractionIdentityService interactionIdService,
     IBotPermissionsService botPermissionsService,
     GetGenericProjectDataHandler getProjectDataHandler,
-    CreateProjectHandler createHandler,
-    ILogger<ProjectModule> logger
+    CreateProjectHandler createHandler
 ) : InteractionModuleBase<IInteractionContext> { }
