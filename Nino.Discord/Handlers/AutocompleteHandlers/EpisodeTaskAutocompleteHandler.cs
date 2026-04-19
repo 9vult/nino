@@ -32,6 +32,7 @@ public sealed class EpisodeTaskAutocompleteHandler : AutocompleteHandler
         )
             return AutocompletionResult.FromSuccess();
 
+        var focusedOption = interaction.Data.Current;
         var includeObservers = interaction.Data.CommandName is "blame" or "blameall";
 
         await using var scope = services.CreateAsyncScope();
@@ -59,7 +60,13 @@ public sealed class EpisodeTaskAutocompleteHandler : AutocompleteHandler
 
         return AutocompletionResult.FromSuccess(
             result
-                .Value.Take(25)
+                .Value.Where(r =>
+                    r.Abbreviation.Value.StartsWith(
+                        (string)focusedOption.Value,
+                        StringComparison.InvariantCultureIgnoreCase
+                    )
+                )
+                .Take(25)
                 .Select(r => new AutocompleteResult(r.Abbreviation.Value, r.Abbreviation.Value))
         );
     }

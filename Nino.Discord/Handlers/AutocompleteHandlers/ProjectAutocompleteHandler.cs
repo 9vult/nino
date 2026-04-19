@@ -22,6 +22,7 @@ public sealed class ProjectAutocompleteHandler : AutocompleteHandler
         if (context.Interaction is not SocketAutocompleteInteraction interaction)
             return AutocompletionResult.FromSuccess();
 
+        var focusedOption = interaction.Data.Current;
         var includeObservers = interaction.Data.CommandName is "blame" or "blameall";
         var includeArchived =
             includeObservers || interaction.Data.Options.FirstOrDefault()?.Name == "delete";
@@ -39,7 +40,15 @@ public sealed class ProjectAutocompleteHandler : AutocompleteHandler
             return AutocompletionResult.FromSuccess();
 
         return AutocompletionResult.FromSuccess(
-            result.Value.Take(25).Select(r => new AutocompleteResult(r.Value, r.Value))
+            result
+                .Value.Where(r =>
+                    r.Value.StartsWith(
+                        (string)focusedOption.Value,
+                        StringComparison.InvariantCultureIgnoreCase
+                    )
+                )
+                .Take(25)
+                .Select(r => new AutocompleteResult(r.Value, r.Value))
         );
     }
 }
