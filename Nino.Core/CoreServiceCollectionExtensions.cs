@@ -47,6 +47,7 @@ public static class CoreServiceCollectionExtensions
         // Services
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IUserVerificationService, UserVerificationService>();
+        services.AddScoped<IAniListService, AniListService>();
 
         return services;
 
