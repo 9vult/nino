@@ -150,7 +150,7 @@ public class EditTemplateStaffHandlerTests : TestBase
             seed.TemplateStaff1Id,
             seed.User1Id,
             TemplateStaffApplicator.AllEpisodes,
-            Abbreviation: Abbreviation.From("TLC")
+            NewAbbreviation: Abbreviation.From("TLC")
         );
 
         var result = await handler.HandleAsync(command);
@@ -176,7 +176,7 @@ public class EditTemplateStaffHandlerTests : TestBase
             seed.TemplateStaff1Id,
             seed.User1Id,
             TemplateStaffApplicator.IncompleteEpisodes,
-            Abbreviation: Abbreviation.From("KFX")
+            NewAbbreviation: Abbreviation.From("KFX")
         );
 
         var result = await handler.HandleAsync(command);
@@ -202,7 +202,7 @@ public class EditTemplateStaffHandlerTests : TestBase
             seed.TemplateStaff1Id,
             seed.User1Id,
             TemplateStaffApplicator.IncompleteEpisodes,
-            Abbreviation: Abbreviation.From("STL")
+            NewAbbreviation: Abbreviation.From("STL")
         );
 
         var result = await handler.HandleAsync(command);
@@ -227,7 +227,7 @@ public class EditTemplateStaffHandlerTests : TestBase
             seed.TemplateStaff1Id,
             seed.User1Id,
             TemplateStaffApplicator.FutureEpisodes,
-            Abbreviation: Abbreviation.From("STL")
+            NewAbbreviation: Abbreviation.From("STL")
         );
 
         var result = await handler.HandleAsync(command);
@@ -303,7 +303,7 @@ public class EditTemplateStaffHandlerTests : TestBase
             seed.TemplateStaff1Id,
             seed.User2Id,
             TemplateStaffApplicator.IncompleteEpisodes,
-            Abbreviation: Abbreviation.From("TLC")
+            NewAbbreviation: Abbreviation.From("TLC")
         );
 
         var result = await handler.HandleAsync(command);

@@ -12,7 +12,7 @@ using Nino.Domain.ValueObjects;
 
 namespace Nino.Discord.Handlers.AutocompleteHandlers;
 
-public sealed class KeyStaffAutocompleteHandler : AutocompleteHandler
+public sealed class TemplateStaffAutocompleteHandler : AutocompleteHandler
 {
     /// <inheritdoc />
     public override async Task<AutocompletionResult> GenerateSuggestionsAsync(

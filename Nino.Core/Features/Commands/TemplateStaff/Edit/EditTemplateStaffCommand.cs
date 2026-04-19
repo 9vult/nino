@@ -10,7 +10,7 @@ public sealed record EditTemplateStaffCommand(
     UserId RequestedBy,
     TemplateStaffApplicator Applicator,
     UserId? AssigneeId = null,
-    Abbreviation? Abbreviation = null,
+    Abbreviation? NewAbbreviation = null,
     string? Name = null,
     decimal? Weight = null,
     bool? IsPseudo = null

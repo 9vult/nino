@@ -6,7 +6,7 @@ using static Nino.Core.Features.Result<Nino.Domain.ValueObjects.TemplateStaffId>
 
 namespace Nino.Core.Features.Queries.TemplateStaff.Resolve;
 
-public sealed class ResolveTaskHandler(ReadOnlyNinoDbContext db)
+public sealed class ResolveTemplateStaffHandler(ReadOnlyNinoDbContext db)
     : IQueryHandler<ResolveTemplateStaffQuery, Result<TemplateStaffId>>
 {
     public async Task<Result<TemplateStaffId>> HandleAsync(ResolveTemplateStaffQuery query)

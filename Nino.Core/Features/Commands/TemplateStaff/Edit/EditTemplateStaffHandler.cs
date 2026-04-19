@@ -36,9 +36,9 @@ public sealed class EditTemplateStaffHandler(
             return Fail(ResultStatus.TemplateStaffNotFound);
 
         // Check for conflicts, if applicable
-        if (command.Abbreviation is not null)
+        if (command.NewAbbreviation is not null)
         {
-            if (project.TemplateStaff.Any(s => s.Abbreviation == command.Abbreviation.Value))
+            if (project.TemplateStaff.Any(s => s.Abbreviation == command.NewAbbreviation.Value))
                 return Fail(ResultStatus.TaskConflict);
 
             switch (command.Applicator)
@@ -50,7 +50,7 @@ public sealed class EditTemplateStaffHandler(
                         project
                             .Episodes.Where(e => !e.IsDone)
                             .SelectMany(e => e.Tasks)
-                            .Any(t => t.Abbreviation == command.Abbreviation.Value)
+                            .Any(t => t.Abbreviation == command.NewAbbreviation.Value)
                     )
                         return Fail(ResultStatus.TaskConflict);
                     break;
@@ -58,7 +58,7 @@ public sealed class EditTemplateStaffHandler(
                     if (
                         project
                             .Episodes.SelectMany(e => e.Tasks)
-                            .Any(t => t.Abbreviation == command.Abbreviation.Value)
+                            .Any(t => t.Abbreviation == command.NewAbbreviation.Value)
                     )
                         return Fail(ResultStatus.TaskConflict);
                     break;
@@ -90,16 +90,16 @@ public sealed class EditTemplateStaffHandler(
             staff.AssigneeId = command.AssigneeId.Value;
         }
 
-        if (command.Abbreviation is not null)
+        if (command.NewAbbreviation is not null)
         {
             logger.LogInformation(
                 "Setting Template Staff {StaffId}'s Abbreviation to {Abbreviation}.",
                 staff.Id,
-                command.Abbreviation.Value
+                command.NewAbbreviation.Value
             );
             foreach (var task in tasks.Where(task => task.Abbreviation == staff.Abbreviation))
-                task.Abbreviation = command.Abbreviation.Value;
-            staff.Abbreviation = command.Abbreviation.Value;
+                task.Abbreviation = command.NewAbbreviation.Value;
+            staff.Abbreviation = command.NewAbbreviation.Value;
         }
 
         if (command.Name is not null)
