@@ -4,8 +4,10 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Nino.Core.Events;
 using Nino.Discord.Handlers;
 using Nino.Discord.Interactions;
+using Nino.Discord.Services;
 using Nino.Domain.ValueObjects;
 
 namespace Nino.Discord;
@@ -39,17 +41,17 @@ public static class DiscordBotServiceCollectionExtensions
         });
 
         // Services
-        // services.AddScoped<IInteractionIdentityService, InteractionIdentityService>();
-        // services.AddScoped<IBotPermissionsService, BotPermissionsService>();
+        services.AddScoped<IInteractionIdentityService, InteractionIdentityService>();
+        services.AddScoped<IBotPermissionsService, BotPermissionsService>();
 
         // Handlers
         services.AddSingleton<InteractionHandler>();
         // services.AddScoped<IEventHandler<EpisodeAiredEvent>, EpisodeAiredEventHandler>();
         // services.AddScoped<IEventHandler<CongaNotificationEvent>, CongaNotificationEventHandler>();
-        // services.AddScoped<
-        //     IEventHandler<PartialGroupCreatedFromDiscordEvent>,
-        //     PartialGroupCreatedEventHandler
-        // >();
+        services.AddScoped<
+            IEventHandler<PartialGroupCreatedFromDiscordEvent>,
+            PartialGroupCreatedEventHandler
+        >();
 
         services.AddHostedService<DiscordBotHostedService>();
         return services;
