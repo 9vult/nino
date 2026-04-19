@@ -8,7 +8,6 @@ using Nino.Core.Features.Commands.Tasks.Remove;
 using Nino.Core.Features.Queries.Episodes.Resolve;
 using Nino.Core.Features.Queries.Projects.GetGenericData;
 using Nino.Core.Features.Queries.Projects.Resolve;
-using Nino.Core.Features.Queries.Tasks.Resolve;
 using Nino.Core.Services;
 using Nino.Discord.Services;
 
@@ -21,8 +20,7 @@ public partial class TaskModule(
     GetGenericProjectDataHandler getProjectDataHandler,
     ResolveProjectHandler projectResolver,
     ResolveEpisodeHandler episodeResolver,
-    ResolveTaskHandler taskResolver,
     AddTaskHandler addHandler,
     RemoveTaskHandler removeHandler,
-    EditTaskHandler swapHandler
+    EditTaskHandler editHandler
 ) : InteractionModuleBase<IInteractionContext> { }
