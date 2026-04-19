@@ -4,7 +4,9 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Nino.Core.Features.Commands.Projects.Create;
+using Nino.Core.Features.Commands.Projects.Edit;
 using Nino.Core.Features.Queries.Projects.GetGenericData;
+using Nino.Core.Features.Queries.Projects.Resolve;
 using Nino.Core.Services;
 using Nino.Discord.Services;
 
@@ -16,6 +18,8 @@ public partial class ProjectModule(
     IIdentityService identityService,
     IInteractionIdentityService interactionIdService,
     IBotPermissionsService botPermissionsService,
+    ResolveProjectHandler projectResolver,
     GetGenericProjectDataHandler getProjectDataHandler,
-    CreateProjectHandler createHandler
+    CreateProjectHandler createHandler,
+    EditProjectHandler editHandler
 ) : InteractionModuleBase<IInteractionContext> { }

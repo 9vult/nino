@@ -66,6 +66,8 @@
     "project.creation.publishPrivateProgressInfo": "**Note**: By default, progress updates are published for private projects.\nThis can be configured with `/server display publish-private-progress`.",
     "project.creation.success": "I created project `{nickname_1}` for you. You may want to consider the following:\n1. `/task (/template-staff) add` to add positions\n2. `/task (/template-staff) edit weight` to re-order positions\n3. `/project edit AniList` to set airing date/times, and `/project air-reminder enable` to get airing notifications.",
     "project.creation.title": "Project Creation",
+    "project.edit.clearable": "Note: To clear the MOTD, set the MOTD to `-`.",
+    "project.edit.success": "Edit successful!",
     "project.modification.title": "Project Modification",
     "project.notFound": "Project not found.",
     "project.resolutionFailed": "Could not resolve alias `{alias_1}` to a project.",
