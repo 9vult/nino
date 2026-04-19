@@ -3,6 +3,6 @@
 #region
 
 global using Microsoft.Extensions.Logging;
-// TODO: global using static Nino.Localization.Localizer;
+global using static Nino.Localization.Localizer;
 
 #endregion

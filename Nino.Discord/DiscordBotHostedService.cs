@@ -3,7 +3,6 @@
 using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nino.Discord.Handlers;
 
@@ -24,7 +23,7 @@ public sealed class DiscordBotHostedService(
         client.Log += OnLog;
 
         await interactionHandler.InitializeAsync();
-        // TODO: LoadLocalizations(new Uri(Path.Combine(AppContext.BaseDirectory, "I18N", "strings")));
+        LoadLocalizations(new Uri(Path.Combine(AppContext.BaseDirectory, "I18N", "strings")));
 
         await client.LoginAsync(TokenType.Bot, options.Value.Token);
         await client.StartAsync();
