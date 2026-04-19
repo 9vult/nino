@@ -88,6 +88,7 @@ public static class DbSeeder
 
         var template1Task1 = new Task
         {
+            ProjectId = project.Id,
             EpisodeId = episode1.Id,
             AssigneeId = user1Id,
             Abbreviation = Abbreviation.From("ED"),
@@ -98,6 +99,7 @@ public static class DbSeeder
         };
         var template2Task1 = new Task
         {
+            ProjectId = project.Id,
             EpisodeId = episode1.Id,
             AssigneeId = user2Id,
             Abbreviation = Abbreviation.From("TLC"),
@@ -108,6 +110,7 @@ public static class DbSeeder
         };
         var additional1Task1 = new Task
         {
+            ProjectId = project.Id,
             EpisodeId = episode1.Id,
             AssigneeId = user2Id,
             Abbreviation = Abbreviation.From("STL"),
@@ -122,6 +125,7 @@ public static class DbSeeder
 
         var template1Task2 = new Task
         {
+            ProjectId = project.Id,
             EpisodeId = episode2.Id,
             AssigneeId = user1Id,
             Abbreviation = Abbreviation.From("ED"),
@@ -132,6 +136,7 @@ public static class DbSeeder
         };
         var template2Task2 = new Task
         {
+            ProjectId = project.Id,
             EpisodeId = episode2.Id,
             AssigneeId = user2Id,
             Abbreviation = Abbreviation.From("TLC"),
@@ -142,6 +147,7 @@ public static class DbSeeder
         };
         var additional1Task2 = new Task
         {
+            ProjectId = project.Id,
             EpisodeId = episode2.Id,
             AssigneeId = user2Id,
             Abbreviation = Abbreviation.From("KFX"),

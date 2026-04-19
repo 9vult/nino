@@ -24,6 +24,7 @@ public static class InteractionModuleBaseExtensions
 
         return embed
             .WithAuthor(name: header.ToString(), url: data.AniListUrl)
-            .WithThumbnailUrl(data.PosterUrl);
+            .WithThumbnailUrl(data.PosterUrl)
+            .WithCurrentTimestamp();
     }
 }

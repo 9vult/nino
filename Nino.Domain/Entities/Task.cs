@@ -9,6 +9,9 @@ public sealed class Task
 {
     public TaskId Id { get; set; } = TaskId.FromNewGuid();
 
+    public required ProjectId ProjectId { get; set; }
+    public Project Project { get; set; } = null!;
+
     public required EpisodeId EpisodeId { get; set; }
     public Episode Episode { get; set; } = null!;
 

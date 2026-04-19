@@ -184,39 +184,6 @@ namespace Nino.Core.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Tasks",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    EpisodeId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    AssigneeId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Abbreviation = table.Column<string>(type: "TEXT", maxLength: 16, nullable: false),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 32, nullable: false),
-                    Weight = table.Column<decimal>(type: "TEXT", nullable: false),
-                    IsPseudo = table.Column<bool>(type: "INTEGER", nullable: false),
-                    IsDone = table.Column<bool>(type: "INTEGER", nullable: false),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
-                    LastRemindedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Tasks", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Tasks_Episodes_EpisodeId",
-                        column: x => x.EpisodeId,
-                        principalTable: "Episodes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Tasks_Users_AssigneeId",
-                        column: x => x.AssigneeId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Observers",
                 columns: table => new
                 {
@@ -392,6 +359,46 @@ namespace Nino.Core.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Tasks",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ProjectId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    EpisodeId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    AssigneeId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Abbreviation = table.Column<string>(type: "TEXT", maxLength: 16, nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 32, nullable: false),
+                    Weight = table.Column<decimal>(type: "TEXT", nullable: false),
+                    IsPseudo = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsDone = table.Column<bool>(type: "INTEGER", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
+                    LastRemindedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tasks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Tasks_Episodes_EpisodeId",
+                        column: x => x.EpisodeId,
+                        principalTable: "Episodes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Tasks_Projects_ProjectId",
+                        column: x => x.ProjectId,
+                        principalTable: "Projects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Tasks_Users_AssigneeId",
+                        column: x => x.AssigneeId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TemplateStaff",
                 columns: table => new
                 {
@@ -551,6 +558,11 @@ namespace Nino.Core.Migrations
                 name: "IX_Tasks_EpisodeId",
                 table: "Tasks",
                 column: "EpisodeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tasks_ProjectId",
+                table: "Tasks",
+                column: "ProjectId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TemplateStaff_AssigneeId",

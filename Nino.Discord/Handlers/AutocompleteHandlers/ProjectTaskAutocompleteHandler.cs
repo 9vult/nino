@@ -7,13 +7,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Nino.Core.Features;
 using Nino.Core.Features.Queries.Episodes.Resolve;
 using Nino.Core.Features.Queries.Projects.Resolve;
-using Nino.Core.Features.Queries.Tasks.List;
+using Nino.Core.Features.Queries.Tasks.ListForEpisode;
+using Nino.Core.Features.Queries.Tasks.ListForProject;
 using Nino.Discord.Services;
 using Nino.Domain.ValueObjects;
 
 namespace Nino.Discord.Handlers.AutocompleteHandlers;
 
-public sealed class TaskAutocompleteHandler : AutocompleteHandler
+public sealed class ProjectTaskAutocompleteHandler : AutocompleteHandler
 {
     /// <inheritdoc />
     public override async Task<AutocompletionResult> GenerateSuggestionsAsync(
@@ -27,8 +28,6 @@ public sealed class TaskAutocompleteHandler : AutocompleteHandler
             context.Interaction is not SocketAutocompleteInteraction interaction
             || interaction.Data.Options.FirstOrDefault(o => o.Name == "alias")?.Value
                 is not string alias
-            || interaction.Data.Options.FirstOrDefault(o => o.Name == "episode-number")?.Value
-                is not string number
         )
             return AutocompletionResult.FromSuccess();
 
@@ -37,8 +36,7 @@ public sealed class TaskAutocompleteHandler : AutocompleteHandler
         await using var scope = services.CreateAsyncScope();
         var idService = scope.ServiceProvider.GetRequiredService<IInteractionIdentityService>();
         var projectResolver = scope.ServiceProvider.GetRequiredService<ResolveProjectHandler>();
-        var episodeResolver = scope.ServiceProvider.GetRequiredService<ResolveEpisodeHandler>();
-        var handler = scope.ServiceProvider.GetRequiredService<ListTasksHandler>();
+        var handler = scope.ServiceProvider.GetRequiredService<ListTasksForProjectHandler>();
 
         var (userId, groupId) = await idService.GetUserAndGroupAsync(interaction);
 
@@ -46,18 +44,15 @@ public sealed class TaskAutocompleteHandler : AutocompleteHandler
             .HandleAsync(
                 new ResolveProjectQuery(Alias.From(alias), groupId, userId, includeObservers)
             )
-            .BindAsync(projectId =>
-                episodeResolver
-                    .HandleAsync(new ResolveEpisodeQuery(projectId, Number.From(number)))
-                    .BindAsync(episodeId => handler.HandleAsync(new ListTasksQuery(episodeId)))
-            );
+            .BindAsync(projectId => handler.HandleAsync(new ListTasksForProjectQuery(projectId)));
 
         if (!result.IsSuccess)
             return AutocompletionResult.FromSuccess();
 
         return AutocompletionResult.FromSuccess(
             result
-                .Value.Take(25)
+                .Value.DistinctBy(r => r.Abbreviation)
+                .Take(25)
                 .Select(r => new AutocompleteResult(r.Abbreviation.Value, r.Abbreviation.Value))
         );
     }

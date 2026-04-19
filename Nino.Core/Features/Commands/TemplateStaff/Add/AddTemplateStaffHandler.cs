@@ -89,6 +89,7 @@ public sealed class AddTemplateStaffHandler(
             episode.Tasks.Add(
                 new Task
                 {
+                    ProjectId = project.Id,
                     EpisodeId = episode.Id,
                     AssigneeId = command.AssigneeId,
                     Abbreviation = command.Abbreviation,

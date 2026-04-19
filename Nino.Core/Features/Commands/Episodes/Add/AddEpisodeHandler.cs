@@ -101,6 +101,7 @@ public sealed class AddEpisodeHandler(
         {
             var tasks = project.TemplateStaff.Select(s => new Task
             {
+                ProjectId = episode.ProjectId,
                 EpisodeId = episode.Id,
                 AssigneeId = s.AssigneeId,
                 Abbreviation = s.Abbreviation,

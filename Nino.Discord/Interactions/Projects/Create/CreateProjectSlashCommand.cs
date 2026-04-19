@@ -136,7 +136,6 @@ public partial class ProjectModule
             .WithProjectInfo(pData, locale)
             .WithTitle(T("project.creation.title", locale))
             .WithDescription(body.ToString())
-            .WithCurrentTimestamp()
             .Build();
 
         await interaction.FollowupAsync(embed: successEmbed);

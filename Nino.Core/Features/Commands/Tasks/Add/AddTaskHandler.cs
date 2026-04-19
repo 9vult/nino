@@ -53,6 +53,7 @@ public sealed class AddTaskHandler(
             episode.Tasks.Add(
                 new Task
                 {
+                    ProjectId = command.ProjectId,
                     EpisodeId = episode.Id,
                     AssigneeId = command.AssigneeId,
                     Abbreviation = command.Abbreviation,

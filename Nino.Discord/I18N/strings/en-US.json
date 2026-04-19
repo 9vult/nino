@@ -70,6 +70,10 @@
     "project.notFound": "Project not found.",
     "project.resolutionFailed": "Could not resolve alias `{alias_1}` to a project.",
     "task.conflict": "A task with the abbreviation {abbreviation_1} already exists!",
+    "task.creation.success": "Assigned {assignee_1} to new task **{task_2}** for episode {episode_3}.",
+    "task.creation.range": "Assigned {assignee_1} to new task **{task_2}** for episodes {first_3}-{last_4}.",
+    "task.delete.success": "Removed task {abbreviation_1} from episode {episode_2}.",
+    "task.delete.success.range": "Removed task {abbreviation_1} from episodes {first_2}-{last_3}.",
     "task.notFound": "Task not found.",
     "task.resolutionFailed": "A task with the abbreviation {abbreviation_1} was not found.",
     "templateStaff.notFound": "Template staff not found.",
@@ -83,6 +87,10 @@
     "episode.delete.success": {
       "one": "I removed {number_1} episode for you.",
       "other": "I removed {number_1} episodes for you."
+    },
+    "task.deleted.completedEpisodes": {
+      "one": "Also, {number_1} episode is now complete:",
+      "other": "Also, {number_1} episodes are now complete:"
     }
   }
 }

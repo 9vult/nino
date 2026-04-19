@@ -11,7 +11,7 @@ using Nino.Core;
 namespace Nino.Core.Migrations
 {
     [DbContext(typeof(NinoDbContext))]
-    [Migration("20260327150018_InitialCreate")]
+    [Migration("20260419195644_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -385,6 +385,9 @@ namespace Nino.Core.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("TEXT");
 
@@ -396,6 +399,8 @@ namespace Nino.Core.Migrations
                     b.HasIndex("AssigneeId");
 
                     b.HasIndex("EpisodeId");
+
+                    b.HasIndex("ProjectId");
 
                     b.ToTable("Tasks");
                 });
@@ -735,9 +740,17 @@ namespace Nino.Core.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Nino.Domain.Entities.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Assignee");
 
                     b.Navigation("Episode");
+
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("Nino.Domain.Entities.TemplateStaff", b =>

@@ -899,6 +899,7 @@ public class CongaGraphTests
     {
         return new Domain.Entities.Task
         {
+            ProjectId = ProjectId.FromNewGuid(),
             EpisodeId = EpisodeId.FromNewGuid(),
             AssigneeId = UserId.FromNewGuid(),
             Abbreviation = abbreviation,
