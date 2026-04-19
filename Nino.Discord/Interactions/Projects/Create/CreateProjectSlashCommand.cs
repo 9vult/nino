@@ -133,10 +133,9 @@ public partial class ProjectModule
         }
 
         var successEmbed = new EmbedBuilder()
-            .WithHeader(pData, locale)
+            .WithProjectInfo(pData, locale)
             .WithTitle(T("project.creation.title", locale))
             .WithDescription(body.ToString())
-            .WithThumbnailUrl(pData.PosterUrl)
             .WithCurrentTimestamp()
             .Build();
 

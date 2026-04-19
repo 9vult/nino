@@ -9,7 +9,7 @@ namespace Nino.Discord.Interactions;
 
 public static class InteractionModuleBaseExtensions
 {
-    public static EmbedBuilder WithHeader(
+    public static EmbedBuilder WithProjectInfo(
         this EmbedBuilder embed,
         GetGenericProjectDataResponse data,
         string locale
@@ -22,6 +22,8 @@ public static class InteractionModuleBaseExtensions
 
         header.Append($"{data.ProjectTitle} ({data.ProjectType.ToFriendlyString(locale)})");
 
-        return embed.WithAuthor(name: header.ToString(), url: data.AniListUrl);
+        return embed
+            .WithAuthor(name: header.ToString(), url: data.AniListUrl)
+            .WithThumbnailUrl(data.PosterUrl);
     }
 }
