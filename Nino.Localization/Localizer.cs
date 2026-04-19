@@ -52,7 +52,7 @@ public static class Localizer
     /// <param name="args">Positional inputs</param>
     /// <returns>Localized string</returns>
     /// <exception cref="LocalizationException">Key was not found</exception>
-    public static string T(string key, string locale, params object[] args)
+    public static string T(string key, string locale, params object?[] args)
     {
         if (_locales is null)
             throw new LocalizationException("Locales were not set up!");

@@ -43,8 +43,8 @@ internal static partial class StringParser
     /// <param name="part">Part to replace</param>
     /// <param name="value">Value to replace with</param>
     /// <returns>The updated string</returns>
-    public static string Interpolate(string input, StringPart part, object value)
+    public static string Interpolate(string input, StringPart part, object? value)
     {
-        return input.Replace(part.Match, value.ToString());
+        return input.Replace(part.Match, value?.ToString() ?? "null");
     }
 }
