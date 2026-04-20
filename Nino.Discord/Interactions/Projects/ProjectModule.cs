@@ -5,6 +5,8 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Nino.Core.Features.Commands.Projects.Admins.Add;
 using Nino.Core.Features.Commands.Projects.Admins.Remove;
+using Nino.Core.Features.Commands.Projects.AirNotifications.Disable;
+using Nino.Core.Features.Commands.Projects.AirNotifications.Enable;
 using Nino.Core.Features.Commands.Projects.Aliases.Add;
 using Nino.Core.Features.Commands.Projects.Aliases.Remove;
 using Nino.Core.Features.Commands.Projects.Create;
@@ -44,6 +46,16 @@ public partial class ProjectModule(
         ResolveProjectHandler projectResolver,
         AddAliasHandler addAliasHandler,
         RemoveAliasHandler removeAliasHandler,
+        GetGenericProjectDataHandler getGenericDataHandler
+    ) : InteractionModuleBase<IInteractionContext>;
+
+    [Group("air-notifications", "Air Notification management")]
+    public partial class AirNotificationsModule(
+        IIdentityService identityService,
+        IInteractionIdentityService interactionIdService,
+        ResolveProjectHandler projectResolver,
+        EnableAirNotificationsHandler enableHandler,
+        DisableAirNotificationsHandler disableHandler,
         GetGenericProjectDataHandler getGenericDataHandler
     ) : InteractionModuleBase<IInteractionContext>;
 }

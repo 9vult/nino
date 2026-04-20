@@ -63,6 +63,7 @@ public static class InteractionExtensions
                 ResultStatus.EpisodeResolutionFailed => "episode.resolutionFailed",
                 ResultStatus.TaskResolutionFailed => "task.resolutionFailed",
                 ResultStatus.TemplateStaffResolutionFailed => "templateStaff.resolutionFailed",
+                ResultStatus.MissingProjectChannel => "error.missingProjectChannel",
                 _ => "error.generic",
             };
 
