@@ -5,12 +5,13 @@ using System.Text.Json;
 using Discord;
 using Discord.Interactions;
 using Nino.Core.Features;
-using Nino.Core.Features.Commands.Projects.Conga.AddGroup;
+using Nino.Core.Features.Commands.Projects.Conga.RemoveGroup;
 using Nino.Core.Features.Queries.Projects.Conga.GetDot;
 using Nino.Core.Features.Queries.Projects.GetGenericData;
 using Nino.Core.Features.Queries.Projects.Resolve;
 using Nino.Discord.Entities;
 using Nino.Discord.Handlers.AutocompleteHandlers;
+using Nino.Discord.Handlers.AutocompleteHandlers.Conga;
 using Nino.Domain;
 using Nino.Domain.ValueObjects;
 
@@ -20,17 +21,15 @@ public partial class CongaModule
 {
     public partial class GroupModule
     {
-        [SlashCommand("create", "Add a group to a project's Conga graph")]
-        public async Task<RuntimeResult> CreateGroupAsync(
+        [SlashCommand("delete", "Remove a group from a project's Conga graph")]
+        public async Task<RuntimeResult> DeleteGroupAsync(
             [MaxLength(Length.Alias), Autocomplete(typeof(ProjectAutocompleteHandler))] Alias alias,
-            [MaxLength(Length.Abbreviation)] Abbreviation name
+            [MaxLength(Length.Abbreviation), Autocomplete(typeof(CongaGroupsAutocompleteHandler))]
+                Abbreviation name
         )
         {
             var interaction = Context.Interaction;
             var locale = interaction.UserLocale;
-
-            // Cleanup
-            name = Abbreviation.From('@' + name.Value.TrimStart('@'));
 
             var (requestedBy, groupId) = await interactionIdService.GetUserAndGroupAsync(
                 interaction
@@ -51,13 +50,13 @@ public partial class CongaModule
 
             var projectId = resolve.Value;
 
-            var command = new AddCongaGroupCommand(
+            var command = new RemoveCongaGroupCommand(
                 ProjectId: projectId,
                 RequestedBy: requestedBy,
                 Name: name
             );
 
-            var result = await createGroupHandler
+            var result = await deleteGroupHandler
                 .HandleAsync(command)
                 .BindAsync(() =>
                     getProjectDataHandler.HandleAsync(new GetGenericProjectDataQuery(projectId))
@@ -71,7 +70,7 @@ public partial class CongaModule
                 {
                     ResultStatus.Unauthorized => "error.permissions",
                     ResultStatus.ProjectNotFound => "project.notFound",
-                    ResultStatus.CongaConflict => "conga.group.add.conflict",
+                    ResultStatus.NotFound => "conga.group.remove.notfound",
                     _ => "error.generic",
                 };
                 var args = new Dictionary<string, object> { ["alias"] = alias, ["name"] = name };
@@ -91,8 +90,7 @@ public partial class CongaModule
             // Success!
             var successEmbed = new EmbedBuilder()
                 .WithProjectInfo(pData, locale)
-                .WithTitle(T("project.modification.title", locale))
-                .WithDescription(T("conga.group.add.success", locale, name));
+                .WithTitle(T("project.modification.title", locale));
 
             if (!string.IsNullOrEmpty(dot))
             {
@@ -117,7 +115,9 @@ public partial class CongaModule
                     using var stream = new MemoryStream(
                         await response.Content.ReadAsByteArrayAsync()
                     );
-                    successEmbed = successEmbed.WithImageUrl("attachment://congo.png");
+                    successEmbed = successEmbed
+                        .WithImageUrl("attachment://congo.png")
+                        .WithDescription(T("conga.group.remove.success", locale, name));
                     await interaction.FollowupWithFileAsync(
                         stream,
                         "congo.png",
@@ -132,6 +132,10 @@ public partial class CongaModule
                     response.ReasonPhrase
                 );
             }
+
+            successEmbed = successEmbed.WithDescription(
+                T("conga.group.remove.success.empty", locale, name)
+            );
 
             await interaction.FollowupAsync(embed: successEmbed.Build());
             return ExecutionResult.Success;

@@ -1,19 +1,18 @@
 // SPDX-License-Identifier: MPL-2.0
 
-using System.Text.Json;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Nino.Core.Features;
-using Nino.Core.Features.Queries.Projects.Conga.ListEdges;
+using Nino.Core.Features.Queries.Projects.Conga.ListGroups;
 using Nino.Core.Features.Queries.Projects.Resolve;
 using Nino.Discord.Services;
 using Nino.Domain.ValueObjects;
 
 namespace Nino.Discord.Handlers.AutocompleteHandlers.Conga;
 
-public sealed class CongaEdgesAutocompleteHandler : AutocompleteHandler
+public sealed class CongaGroupsAutocompleteHandler : AutocompleteHandler
 {
     /// <inheritdoc />
     public override async Task<AutocompletionResult> GenerateSuggestionsAsync(
@@ -36,7 +35,7 @@ public sealed class CongaEdgesAutocompleteHandler : AutocompleteHandler
         await using var scope = services.CreateAsyncScope();
         var idService = scope.ServiceProvider.GetRequiredService<IInteractionIdentityService>();
         var projectResolver = scope.ServiceProvider.GetRequiredService<ResolveProjectHandler>();
-        var handler = scope.ServiceProvider.GetRequiredService<ListCongaEdgesHandler>();
+        var handler = scope.ServiceProvider.GetRequiredService<ListCongaGroupsHandler>();
 
         var (userId, groupId) = await idService.GetUserAndGroupAsync(interaction);
 
@@ -44,7 +43,7 @@ public sealed class CongaEdgesAutocompleteHandler : AutocompleteHandler
             .HandleAsync(
                 new ResolveProjectQuery(Alias.From(alias), groupId, userId, includeObservers)
             )
-            .BindAsync(projectId => handler.HandleAsync(new ListCongaEdgesQuery(projectId)));
+            .BindAsync(projectId => handler.HandleAsync(new ListCongaGroupsQuery(projectId)));
 
         if (!result.IsSuccess)
             return AutocompletionResult.FromSuccess();
@@ -52,20 +51,14 @@ public sealed class CongaEdgesAutocompleteHandler : AutocompleteHandler
         return AutocompletionResult.FromSuccess(
             result
                 .Value.Where(r =>
-                    r.From.Value.StartsWith(
-                        (string)focusedOption.Value,
-                        StringComparison.InvariantCultureIgnoreCase
-                    )
-                    || r.To.Value.StartsWith(
-                        (string)focusedOption.Value,
-                        StringComparison.InvariantCultureIgnoreCase
-                    )
+                    r.Value.TrimStart('@')
+                        .StartsWith(
+                            ((string)focusedOption.Value).TrimStart('@'),
+                            StringComparison.InvariantCultureIgnoreCase
+                        )
                 )
                 .Take(25)
-                .Select(r => new AutocompleteResult(
-                    $"{r.From} → {r.To}",
-                    JsonSerializer.Serialize(r)
-                ))
+                .Select(r => new AutocompleteResult(r.Value, r.Value))
         );
     }
 }
