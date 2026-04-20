@@ -12,6 +12,7 @@ using Nino.Core.Features.Commands.Projects.Conga.RemoveGroup;
 using Nino.Core.Features.Commands.Projects.Conga.RemoveGroupMember;
 using Nino.Core.Features.Commands.Projects.CongaReminders.Disable;
 using Nino.Core.Features.Commands.Projects.CongaReminders.Enable;
+using Nino.Core.Features.Queries.Projects.Conga.GetDot;
 using Nino.Core.Features.Queries.Projects.GetGenericData;
 using Nino.Core.Features.Queries.Projects.Resolve;
 using Nino.Core.Services;
@@ -25,14 +26,27 @@ public partial class CongaModule(
     IIdentityService identityService,
     IInteractionIdentityService interactionIdService,
     ResolveProjectHandler projectResolver,
+    ImportCongaHandler importHandler,
     GetGenericProjectDataHandler getProjectDataHandler,
-    AddCongaEdgeHandler addEdgeHandler,
-    RemoveCongaEdgeHandler removeEdgeHandler,
-    ImportCongaHandler importHandler
+    GetCongaDotHandler getDotHandler,
+    ILogger<CongaModule> logger
 ) : InteractionModuleBase<IInteractionContext>
 {
+    [Group("edge", "Group management")]
+    public partial class EdgeModule(
+        IIdentityService identityService,
+        IInteractionIdentityService interactionIdService,
+        ResolveProjectHandler projectResolver,
+        AddCongaEdgeHandler addEdgeHandler,
+        RemoveCongaEdgeHandler removeEdgeHandler,
+        GetGenericProjectDataHandler getProjectDataHandler,
+        GetCongaDotHandler getDotHandler,
+        HttpClient httpClient,
+        ILogger<EdgeModule> logger
+    ) : InteractionModuleBase<IInteractionContext>;
+
     [Group("group", "Group management")]
-    public partial class AdminModule(
+    public partial class GroupModule(
         IIdentityService identityService,
         IInteractionIdentityService interactionIdService,
         ResolveProjectHandler projectResolver,
@@ -40,15 +54,18 @@ public partial class CongaModule(
         RemoveCongaGroupHandler deleteGroupHandler,
         AddCongaGroupMemberHandler addMemberHandler,
         RemoveCongaGroupMemberHandler removeMemberHandler,
-        GetGenericProjectDataHandler getGenericDataHandler
+        GetGenericProjectDataHandler getProjectDataHandler,
+        GetCongaDotHandler getDotHandler,
+        HttpClient httpClient,
+        ILogger<GroupModule> logger
     ) : InteractionModuleBase<IInteractionContext>;
 
     [Group("reminders", "Reminder management")]
-    public partial class AliasModule(
+    public partial class RemindersModule(
         IInteractionIdentityService interactionIdService,
         ResolveProjectHandler projectResolver,
         EnableCongaRemindersHandler enableHandler,
         DisableCongaRemindersHandler disableHandler,
-        GetGenericProjectDataHandler getGenericDataHandler
+        GetGenericProjectDataHandler getProjectDataHandler
     ) : InteractionModuleBase<IInteractionContext>;
 }
