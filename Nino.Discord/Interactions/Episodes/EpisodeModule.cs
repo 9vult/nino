@@ -19,4 +19,4 @@ public partial class EpisodesModule(
     ResolveEpisodeHandler episodeResolver,
     AddEpisodeHandler addHandler,
     RemoveEpisodeHandler removeHandler
-) : InteractionModuleBase<IInteractionContext> { }
+) : InteractionModuleBase<IInteractionContext>;

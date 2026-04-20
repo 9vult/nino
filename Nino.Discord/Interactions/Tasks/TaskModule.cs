@@ -23,4 +23,4 @@ public partial class TaskModule(
     AddTaskHandler addHandler,
     RemoveTaskHandler removeHandler,
     EditTaskHandler editHandler
-) : InteractionModuleBase<IInteractionContext> { }
+) : InteractionModuleBase<IInteractionContext>;

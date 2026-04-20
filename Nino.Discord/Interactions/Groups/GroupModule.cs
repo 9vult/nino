@@ -15,10 +15,18 @@ namespace Nino.Discord.Interactions.Groups;
 [Group("group", "Group management")]
 public partial class GroupModule(
     DiscordSocketClient client,
-    IIdentityService identityService,
     IInteractionIdentityService interactionIdService,
     EditGroupHandler editHandler,
-    AddGroupAdminHandler addAdminHandler,
-    RemoveGroupAdminHandler removeAdminHandler,
     GetGenericGroupDataHandler getGenericDataHandler
-) : InteractionModuleBase<IInteractionContext> { }
+) : InteractionModuleBase<IInteractionContext>
+{
+    [Group("admin", "Admin management")]
+    public partial class AdminModule(
+        DiscordSocketClient client,
+        IIdentityService identityService,
+        IInteractionIdentityService interactionIdService,
+        AddGroupAdminHandler addAdminHandler,
+        RemoveGroupAdminHandler removeAdminHandler,
+        GetGenericGroupDataHandler getGenericDataHandler
+    ) : InteractionModuleBase<IInteractionContext>;
+}

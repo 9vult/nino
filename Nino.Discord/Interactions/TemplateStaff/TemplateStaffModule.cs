@@ -23,4 +23,4 @@ public partial class TemplateStaffModule(
     AddTemplateStaffHandler addHandler,
     RemoveTemplateStaffHandler removeHandler,
     EditTemplateStaffHandler editHandler
-) : InteractionModuleBase<IInteractionContext> { }
+) : InteractionModuleBase<IInteractionContext>;

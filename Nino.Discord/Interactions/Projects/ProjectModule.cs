@@ -22,4 +22,4 @@ public partial class ProjectModule(
     GetGenericProjectDataHandler getProjectDataHandler,
     CreateProjectHandler createHandler,
     EditProjectHandler editHandler
-) : InteractionModuleBase<IInteractionContext> { }
+) : InteractionModuleBase<IInteractionContext>;
