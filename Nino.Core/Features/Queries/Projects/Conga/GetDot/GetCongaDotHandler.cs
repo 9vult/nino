@@ -58,7 +58,7 @@ public sealed class GetCongaDotHandler(ReadOnlyNinoDbContext db)
         // Add groups
         foreach (var group in graph.Children.OfType<CongaNode.GroupNode>())
         {
-            b.AppendLine($"subgraph \"{group.Name}\" {{");
+            b.AppendLine($"subgraph \"cluster_{group.Name}\" {{");
             b.AppendLine($"label=\"{group.Name}\"");
             b.AppendLine("style=rounded");
             b.AppendLine("bgcolor=\"#f5f5f5\"");
@@ -112,11 +112,11 @@ public sealed class GetCongaDotHandler(ReadOnlyNinoDbContext db)
                     {
                         (false, false) => $""" "{from.Name}" -> "{to.Name}" """,
                         (true, false) =>
-                            $""" "{from.Name}_anchor" -> "{to.Name}" [ltail="{from.Name}"]""",
+                            $""" "{from.Name}_anchor" -> "{to.Name}" [ltail="cluster_{from.Name}"]""",
                         (false, true) =>
-                            $""" "{from.Name}" -> "{to.Name}_anchor" [lhead="{to.Name}"]""",
+                            $""" "{from.Name}" -> "{to.Name}_anchor" [lhead="cluster_{to.Name}"]""",
                         (true, true) =>
-                            $""" "{from.Name}_anchor" -> "{to.Name}_anchor" [ltail="{from.Name}",lhead="{to.Name}"]""",
+                            $""" "{from.Name}_anchor" -> "{to.Name}_anchor" [ltail="cluster_{from.Name}",lhead="cluster_{to.Name}"]""",
                     }
                 );
             }

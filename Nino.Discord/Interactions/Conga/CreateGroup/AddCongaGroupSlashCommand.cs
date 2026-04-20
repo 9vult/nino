@@ -5,13 +5,12 @@ using System.Text.Json;
 using Discord;
 using Discord.Interactions;
 using Nino.Core.Features;
-using Nino.Core.Features.Commands.Projects.Conga.AddEdge;
+using Nino.Core.Features.Commands.Projects.Conga.AddGroup;
 using Nino.Core.Features.Queries.Projects.Conga.GetDot;
 using Nino.Core.Features.Queries.Projects.GetGenericData;
 using Nino.Core.Features.Queries.Projects.Resolve;
 using Nino.Discord.Entities;
 using Nino.Discord.Handlers.AutocompleteHandlers;
-using Nino.Discord.Handlers.AutocompleteHandlers.Conga;
 using Nino.Domain;
 using Nino.Domain.ValueObjects;
 
@@ -19,19 +18,19 @@ namespace Nino.Discord.Interactions.Conga;
 
 public partial class CongaModule
 {
-    public partial class EdgeModule
+    public partial class GroupModule
     {
-        [SlashCommand("add", "Add an edge to a project's Conga graph")]
-        public async Task<RuntimeResult> AddEdgeAsync(
+        [SlashCommand("create", "Add a group to a project's Conga graph")]
+        public async Task<RuntimeResult> CreateGroupAsync(
             [MaxLength(Length.Alias), Autocomplete(typeof(ProjectAutocompleteHandler))] Alias alias,
-            [MaxLength(Length.Abbreviation), Autocomplete(typeof(CongaFromAutocompleteHandler))]
-                Abbreviation from,
-            [MaxLength(Length.Abbreviation), Autocomplete(typeof(CongaToAutocompleteHandler))]
-                Abbreviation to
+            [MaxLength(Length.Abbreviation)] Abbreviation name
         )
         {
             var interaction = Context.Interaction;
             var locale = interaction.UserLocale;
+
+            // Cleanup
+            name = Abbreviation.From('@' + name.Value.TrimStart('@'));
 
             var (requestedBy, groupId) = await interactionIdService.GetUserAndGroupAsync(
                 interaction
@@ -52,14 +51,13 @@ public partial class CongaModule
 
             var projectId = resolve.Value;
 
-            var command = new AddCongaEdgeCommand(
+            var command = new AddCongaGroupCommand(
                 ProjectId: projectId,
                 RequestedBy: requestedBy,
-                From: from,
-                To: to
+                Name: name
             );
 
-            var result = await addEdgeHandler
+            var result = await createGroupHandler
                 .HandleAsync(command)
                 .BindAsync(() =>
                     getProjectDataHandler.HandleAsync(new GetGenericProjectDataQuery(projectId))
@@ -71,18 +69,10 @@ public partial class CongaModule
             {
                 var key = result.Status switch
                 {
-                    ResultStatus.Unauthorized => "error.permissions",
-                    ResultStatus.ProjectNotFound => "project.notFound",
-                    ResultStatus.TaskNotFound => "task.resolutionFailed",
-                    ResultStatus.BadRequest => $"conga.{result.Message}",
-                    ResultStatus.CongaConflict => "conga.edge.add.conflict",
+                    ResultStatus.CongaConflict => "conga.group.add.conflict",
                     _ => "error.generic",
                 };
-                var args = new Dictionary<string, object>
-                {
-                    ["alias"] = alias,
-                    ["abbreviation"] = result.Message == "from" ? from : to,
-                };
+                var args = new Dictionary<string, object> { ["alias"] = alias, ["name"] = name };
 
                 var embed = new EmbedBuilder()
                     .WithTitle("Baka.")
@@ -100,7 +90,7 @@ public partial class CongaModule
             var successEmbed = new EmbedBuilder()
                 .WithProjectInfo(pData, locale)
                 .WithTitle(T("project.modification.title", locale))
-                .WithDescription(T("conga.edge.add.success", locale, from, to));
+                .WithDescription(T("conga.group.add.success", locale, name));
 
             if (!string.IsNullOrEmpty(dot))
             {
