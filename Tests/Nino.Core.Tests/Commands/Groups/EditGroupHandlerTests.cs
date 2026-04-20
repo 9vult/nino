@@ -28,6 +28,7 @@ public class EditGroupHandlerTests : TestBase
             seed.User1Id,
             true,
             Locale.Polish,
+            PublishPrivateProgress: null,
             null,
             null,
             CongaPrefixType.Title
@@ -60,6 +61,7 @@ public class EditGroupHandlerTests : TestBase
             seed.User3Id,
             false,
             Locale.Polish,
+            PublishPrivateProgress: null,
             null,
             null,
             CongaPrefixType.Title

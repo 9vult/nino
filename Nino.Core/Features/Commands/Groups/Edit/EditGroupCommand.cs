@@ -11,6 +11,7 @@ public sealed record EditGroupCommand(
     UserId RequestedBy,
     bool OverrideVerification,
     Locale? Locale = null,
+    bool? PublishPrivateProgress = null,
     ProgressResponseType? ProgressResponseType = null,
     ProgressPublishType? ProgressPublishType = null,
     CongaPrefixType? CongaPrefixType = null,

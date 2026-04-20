@@ -40,6 +40,16 @@ public sealed class EditGroupHandler(
             config.Locale = command.Locale.Value;
         }
 
+        if (command.PublishPrivateProgress is not null)
+        {
+            logger.LogTrace(
+                "Setting group {GroupId}'s publish private progress to {PublishPrivateProgress}",
+                group.Id,
+                command.PublishPrivateProgress.Value
+            );
+            config.PublishPrivateProgress = command.PublishPrivateProgress.Value;
+        }
+
         if (command.ProgressResponseType is not null)
         {
             logger.LogTrace(
