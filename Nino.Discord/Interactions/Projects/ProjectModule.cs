@@ -3,6 +3,8 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Nino.Core.Features.Commands.Projects.Admins.Add;
+using Nino.Core.Features.Commands.Projects.Admins.Remove;
 using Nino.Core.Features.Commands.Projects.Create;
 using Nino.Core.Features.Commands.Projects.Edit;
 using Nino.Core.Features.Queries.Projects.GetGenericData;
@@ -22,4 +24,16 @@ public partial class ProjectModule(
     GetGenericProjectDataHandler getProjectDataHandler,
     CreateProjectHandler createHandler,
     EditProjectHandler editHandler
-) : InteractionModuleBase<IInteractionContext>;
+) : InteractionModuleBase<IInteractionContext>
+{
+    [Group("admin", "Admin management")]
+    public partial class AdminModule(
+        DiscordSocketClient client,
+        IIdentityService identityService,
+        IInteractionIdentityService interactionIdService,
+        ResolveProjectHandler projectResolver,
+        AddProjectAdminHandler addAdminHandler,
+        RemoveProjectAdminHandler removeAdminHandler,
+        GetGenericProjectDataHandler getGenericDataHandler
+    ) : InteractionModuleBase<IInteractionContext>;
+}
