@@ -63,6 +63,7 @@ public partial class ImportCongaHandler(
 
         project.CongaParticipants = g;
 
+        db.Entry(project).Property(p => p.CongaParticipants).IsModified = true;
         await db.SaveChangesAsync();
         return Success();
     }

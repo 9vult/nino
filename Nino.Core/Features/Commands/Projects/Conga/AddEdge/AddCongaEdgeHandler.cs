@@ -57,6 +57,7 @@ public sealed class AddCongaEdgeHandler(
         var result = project.CongaParticipants.AddEdge(command.From, command.To);
         if (result is CongaModificationResult.Success)
         {
+            db.Entry(project).Property(p => p.CongaParticipants).IsModified = true;
             await db.SaveChangesAsync();
             return Success();
         }

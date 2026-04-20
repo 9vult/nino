@@ -41,6 +41,7 @@ public sealed class RemoveCongaEdgeHandler(
         var result = project.CongaParticipants.RemoveEdge(command.From, command.To);
         if (result is CongaModificationResult.Success)
         {
+            db.Entry(project).Property(p => p.CongaParticipants).IsModified = true;
             await db.SaveChangesAsync();
             return Success();
         }

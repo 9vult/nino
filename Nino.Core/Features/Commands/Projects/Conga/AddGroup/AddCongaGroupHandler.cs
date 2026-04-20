@@ -43,6 +43,7 @@ public sealed class AddCongaGroupHandler(
         var result = project.CongaParticipants.AddGroup(name);
         if (result is CongaModificationResult.Success)
         {
+            db.Entry(project).Property(p => p.CongaParticipants).IsModified = true;
             await db.SaveChangesAsync();
             return Success();
         }

@@ -44,6 +44,7 @@ public sealed class RemoveCongaGroupMemberHandler(
         );
         if (result is CongaModificationResult.Success)
         {
+            db.Entry(project).Property(p => p.CongaParticipants).IsModified = true;
             await db.SaveChangesAsync();
             return Success();
         }

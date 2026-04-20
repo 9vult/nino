@@ -42,6 +42,7 @@ public sealed class AddCongaGroupMemberHandler(
         var result = project.CongaParticipants.AddGroupMember(command.GroupName, command.NodeName);
         if (result is CongaModificationResult.Success)
         {
+            db.Entry(project).Property(p => p.CongaParticipants).IsModified = true;
             await db.SaveChangesAsync();
             return Success();
         }

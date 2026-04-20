@@ -43,6 +43,7 @@ public sealed class RemoveCongaGroupHandler(
         var result = project.CongaParticipants.RemoveGroup(name);
         if (result is CongaModificationResult.Success)
         {
+            db.Entry(project).Property(p => p.CongaParticipants).IsModified = true;
             await db.SaveChangesAsync();
             return Success();
         }

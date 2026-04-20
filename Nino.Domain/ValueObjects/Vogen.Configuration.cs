@@ -3,7 +3,7 @@
 using Vogen;
 
 [assembly: VogenDefaults(
-    conversions: Conversions.EfCoreValueConverter,
+    conversions: Conversions.EfCoreValueConverter | Conversions.SystemTextJson,
     customizations: Customizations.AddFactoryMethodForGuids,
     staticAbstractsGeneration: StaticAbstractsGeneration.MostCommon
 )]
