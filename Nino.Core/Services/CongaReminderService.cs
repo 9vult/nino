@@ -37,15 +37,14 @@ public sealed class CongaReminderService(
             var db = scope.ServiceProvider.GetRequiredService<NinoDbContext>();
             var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
 
-            var episodes = await db
-                .Episodes.Include(e => e.Project)
-                .Where(e =>
-                    !e.Project.IsArchived
-                    && e.Project.CongaRemindersEnabled
-                    && e.Project.CongaParticipants.Nodes.Count > 0
-                    && !e.IsDone
-                )
-                .ToListAsync();
+            var episodes = (
+                await db
+                    .Episodes.Include(e => e.Project)
+                    .Where(e =>
+                        !e.Project.IsArchived && e.Project.CongaRemindersEnabled && !e.IsDone
+                    )
+                    .ToListAsync()
+            ).Where(e => e.Project.CongaParticipants.Nodes.Count > 0);
 
             List<Task> awaitable = [];
             foreach (var episode in episodes)

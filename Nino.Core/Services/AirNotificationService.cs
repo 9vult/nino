@@ -38,16 +38,17 @@ public sealed class AirNotificationService(
             var aniListService = scope.ServiceProvider.GetRequiredService<IAniListService>();
             var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
 
-            var episodes = await db
-                .Episodes.Include(e => e.Project)
-                .Where(e =>
-                    !e.Project.IsArchived
-                    && e.Project.AirNotificationsEnabled
-                    && e.Project.AniListId.Value > 0
-                    && !e.IsDone
-                    && !e.AirNotificationPosted
-                )
-                .ToListAsync();
+            var episodes = (
+                await db
+                    .Episodes.Include(e => e.Project)
+                    .Where(e =>
+                        !e.Project.IsArchived
+                        && e.Project.AirNotificationsEnabled
+                        && !e.IsDone
+                        && !e.AirNotificationPosted
+                    )
+                    .ToListAsync()
+            ).Where(e => e.Project.AniListId.Value > 0);
 
             foreach (var episode in episodes)
             {
