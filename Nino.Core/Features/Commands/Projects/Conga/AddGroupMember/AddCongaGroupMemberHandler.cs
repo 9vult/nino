@@ -49,7 +49,7 @@ public sealed class AddCongaGroupMemberHandler(
 
         return result switch
         {
-            CongaModificationResult.NoGroup => Fail(ResultStatus.GroupNotFound),
+            CongaModificationResult.NoGroup => Fail(ResultStatus.BadRequest, "noGroup"),
             CongaModificationResult.Duplicate => Fail(ResultStatus.CongaConflict),
             _ => Fail(ResultStatus.Error),
         };

@@ -51,7 +51,7 @@ public sealed class RemoveCongaGroupMemberHandler(
 
         return result switch
         {
-            CongaModificationResult.NoGroup => Fail(ResultStatus.GroupNotFound),
+            CongaModificationResult.NoGroup => Fail(ResultStatus.BadRequest, "noGroup"),
             CongaModificationResult.NotFound => Fail(ResultStatus.NotFound),
             _ => Fail(ResultStatus.Error),
         };
