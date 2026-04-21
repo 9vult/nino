@@ -34,13 +34,15 @@ public sealed class GetCongaDotHandler(ReadOnlyNinoDbContext db)
         b.AppendLine("digraph conga {");
         b.AppendLine("compound=true");
         b.AppendLine("rankdir=LR");
-        b.AppendLine("node [shape=circle fixedsize=false width=0.8]");
+        b.AppendLine("node [shape=circle fixedsize=true width=0.9]");
 
         // Add root nodes
         foreach (var node in graph.Children.OfType<CongaNode.TaskNode>())
         {
             var task = tasks.FirstOrDefault(t => t.Abbreviation == node.Name);
 
+            var label = node.Name.Value;
+            var size = node.Name.Value.Length <= 6 ? 12 : 11 - (node.Name.Value.Length - 6) * 0.5;
             var style = task?.IsPseudo ?? false ? "filled,dashed" : "filled";
             var color = "white";
             if (query.EpisodeId.HasValue)
@@ -51,10 +53,13 @@ public sealed class GetCongaDotHandler(ReadOnlyNinoDbContext db)
                     color = "green";
                 else
                     color = "orange";
+
+                if (!node.Name.Value.StartsWith('$') && task is null)
+                    label = $"<S>{label}</S>";
             }
 
             b.AppendLine(
-                $""" "{node.Name}" [label="{node.Name}",style="{style}",fillcolor="{color}"]"""
+                $""" "{node.Name}" [label=<{label}>,style="{style}",fillcolor="{color}",fontsize={size}]"""
             );
         }
 
@@ -81,6 +86,9 @@ public sealed class GetCongaDotHandler(ReadOnlyNinoDbContext db)
             {
                 var task = tasks.FirstOrDefault(t => t.Abbreviation == node.Name);
 
+                var label = node.Name.Value;
+                var size =
+                    node.Name.Value.Length <= 6 ? 12 : 11 - (node.Name.Value.Length - 6) * 0.5;
                 var style = task?.IsPseudo ?? false ? "filled,dashed" : "filled";
                 var color = "white";
                 if (query.EpisodeId.HasValue)
@@ -91,10 +99,13 @@ public sealed class GetCongaDotHandler(ReadOnlyNinoDbContext db)
                         color = "green";
                     else
                         color = "orange";
+
+                    if (!node.Name.Value.StartsWith('$') && task is null)
+                        label = $"<S>{label}</S>";
                 }
 
                 b.AppendLine(
-                    $""" "{node.Name}" [label="{node.Name}",style="{style}",fillcolor="{color}"]"""
+                    $""" "{node.Name}" [label=<{label}>,style="{style}",fillcolor="{color}",fontsize={size}]"""
                 );
             }
 
