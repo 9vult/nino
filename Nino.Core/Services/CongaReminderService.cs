@@ -12,7 +12,6 @@ namespace Nino.Core.Services;
 
 public sealed class CongaReminderService(
     IServiceScopeFactory scopeFactory,
-    IEventBus eventBus,
     ILogger<CongaReminderService> logger
 ) : BackgroundService
 {
@@ -36,6 +35,7 @@ public sealed class CongaReminderService(
         {
             await using var scope = scopeFactory.CreateAsyncScope();
             var db = scope.ServiceProvider.GetRequiredService<NinoDbContext>();
+            var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
 
             var episodes = await db
                 .Episodes.Include(e => e.Project)

@@ -12,7 +12,6 @@ namespace Nino.Core.Services;
 
 public sealed class AirNotificationService(
     IServiceScopeFactory scopeFactory,
-    IEventBus eventBus,
     ILogger<AirNotificationService> logger
 ) : BackgroundService
 {
@@ -37,6 +36,7 @@ public sealed class AirNotificationService(
             await using var scope = scopeFactory.CreateAsyncScope();
             var db = scope.ServiceProvider.GetRequiredService<NinoDbContext>();
             var aniListService = scope.ServiceProvider.GetRequiredService<IAniListService>();
+            var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
 
             var episodes = await db
                 .Episodes.Include(e => e.Project)

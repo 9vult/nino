@@ -46,8 +46,8 @@ public static class DiscordBotServiceCollectionExtensions
 
         // Handlers
         services.AddSingleton<InteractionHandler>();
-        // services.AddScoped<IEventHandler<EpisodeAiredEvent>, EpisodeAiredEventHandler>();
-        // services.AddScoped<IEventHandler<CongaNotificationEvent>, CongaNotificationEventHandler>();
+        services.AddScoped<IEventHandler<EpisodeAiredEvent>, EpisodeAiredEventHandler>();
+        services.AddScoped<IEventHandler<CongaNotificationEvent>, CongaNotificationEventHandler>();
         services.AddScoped<
             IEventHandler<PartialGroupCreatedFromDiscordEvent>,
             PartialGroupCreatedEventHandler
