@@ -88,6 +88,7 @@
     "episode.creation.error.tooLong": "One or more of the episode numbers is too long! Try using a shorter `format`.",
     "episode.notFound": "Episode not found.",
     "episode.resolutionFailed": "Could not find episode {episode_1}.",
+    "episode.title": "Episode {episode_1}",
     "group.configuration.title": "Group Configuration",
     "group.edit.clearable": "Note: To clear the Release Prefix, set the Release Prefix to `-`.",
     "group.edit.success": "Edit successful!",

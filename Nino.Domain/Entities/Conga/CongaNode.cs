@@ -100,6 +100,29 @@ public abstract class CongaNode(Abbreviation name)
         return result;
     }
 
+    /// <summary>
+    /// Get the node in a subtree furthest away from the root
+    /// </summary>
+    /// <param name="root">Root node</param>
+    /// <returns>Furthest away node from the subtree root</returns>
+    public static CongaNode GetFurthestLeaf(CongaNode root)
+    {
+        var queue = new Queue<CongaNode>();
+        var visited = new HashSet<CongaNode>();
+        var last = root;
+
+        queue.Enqueue(root);
+        while (queue.TryDequeue(out var node))
+        {
+            if (!visited.Add(node))
+                continue;
+            last = node;
+            foreach (var dep in node.Dependents)
+                queue.Enqueue(dep);
+        }
+        return last;
+    }
+
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is CongaNode node && node.Name.Equals(Name);
 

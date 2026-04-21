@@ -3,6 +3,7 @@
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Nino.Domain.Entities.Conga;
+using Nino.Domain.ValueObjects;
 using static Nino.Core.Features.Result<string>;
 
 namespace Nino.Core.Features.Queries.Projects.Conga.GetDot;
@@ -26,6 +27,8 @@ public sealed class GetCongaDotHandler(ReadOnlyNinoDbContext db)
         var tasks = query.EpisodeId.HasValue
             ? await db.Tasks.Where(t => t.EpisodeId == query.EpisodeId.Value).ToListAsync()
             : await db.Tasks.Where(t => t.ProjectId == query.ProjectId).ToListAsync();
+
+        Dictionary<Abbreviation, (string, string)> groupTargets = [];
 
         var b = new StringBuilder();
         b.AppendLine("digraph conga {");
@@ -63,10 +66,15 @@ public sealed class GetCongaDotHandler(ReadOnlyNinoDbContext db)
             b.AppendLine("style=rounded");
             b.AppendLine("bgcolor=\"#f5f5f5\"");
             b.AppendLine("pencolor=\"#aaaaaa\"");
-            b.AppendLine("margin=12");
 
-            // Add anchor node
-            b.AppendLine($""" "{group.Name}_anchor" [style=invis width=0 height=0 label=""]""");
+            // If no children, add an anchor node and continue
+            if (group.Children.Count == 0)
+            {
+                b.AppendLine($""" "{group.Name}_anchor" [style=invis width=0 height=0 label=""]""");
+                groupTargets[group.Name] = ($"{group.Name}_anchor", $"{group.Name}_anchor");
+                b.AppendLine("}");
+                continue;
+            }
 
             // Add group children
             foreach (var node in group.Children.OfType<CongaNode.TaskNode>())
@@ -99,6 +107,21 @@ public sealed class GetCongaDotHandler(ReadOnlyNinoDbContext db)
                 }
             }
 
+            // Try to determine arrow targets
+            var roots = group.Children.Where(n => n.IsRootNode).ToList();
+            var inTarget = roots[roots.Count / 2]; // middle
+
+            var longest = -1;
+            var outTarget = inTarget;
+            foreach (var node in roots)
+            {
+                if (CongaNode.GetSubtree(node).Count <= longest)
+                    continue;
+                longest = CongaNode.GetSubtree(node).Count;
+                outTarget = CongaNode.GetFurthestLeaf(node);
+            }
+            groupTargets[group.Name] = (inTarget.Name.Value, outTarget.Name.Value);
+
             b.AppendLine("}");
         }
 
@@ -112,11 +135,11 @@ public sealed class GetCongaDotHandler(ReadOnlyNinoDbContext db)
                     {
                         (false, false) => $""" "{from.Name}" -> "{to.Name}" """,
                         (true, false) =>
-                            $""" "{from.Name}_anchor" -> "{to.Name}" [ltail="cluster_{from.Name}"]""",
+                            $""" "{groupTargets[from.Name].Item2}" -> "{to.Name}" [ltail="cluster_{from.Name}"]""",
                         (false, true) =>
-                            $""" "{from.Name}" -> "{to.Name}_anchor" [lhead="cluster_{to.Name}"]""",
+                            $""" "{from.Name}" -> "{groupTargets[to.Name].Item1}" [lhead="cluster_{to.Name}"]""",
                         (true, true) =>
-                            $""" "{from.Name}_anchor" -> "{to.Name}_anchor" [ltail="cluster_{from.Name}",lhead="cluster_{to.Name}"]""",
+                            $""" "{groupTargets[from.Name].Item2}" -> "{groupTargets[to.Name].Item1}" [ltail="cluster_{from.Name}",lhead="cluster_{to.Name}"]""",
                     }
                 );
             }

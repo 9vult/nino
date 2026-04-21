@@ -12,10 +12,10 @@ using Nino.Core.Features.Commands.Projects.Conga.RemoveGroup;
 using Nino.Core.Features.Commands.Projects.Conga.RemoveGroupMember;
 using Nino.Core.Features.Commands.Projects.CongaReminders.Disable;
 using Nino.Core.Features.Commands.Projects.CongaReminders.Enable;
+using Nino.Core.Features.Queries.Episodes.Resolve;
 using Nino.Core.Features.Queries.Projects.Conga.GetDot;
 using Nino.Core.Features.Queries.Projects.GetGenericData;
 using Nino.Core.Features.Queries.Projects.Resolve;
-using Nino.Core.Services;
 using Nino.Discord.Services;
 
 namespace Nino.Discord.Interactions.Conga;
@@ -23,18 +23,18 @@ namespace Nino.Discord.Interactions.Conga;
 [Group("conga", "Conga management")]
 public partial class CongaModule(
     DiscordSocketClient client,
-    IIdentityService identityService,
     IInteractionIdentityService interactionIdService,
     ResolveProjectHandler projectResolver,
+    ResolveEpisodeHandler episodeResolver,
     ImportCongaHandler importHandler,
     GetGenericProjectDataHandler getProjectDataHandler,
     GetCongaDotHandler getDotHandler,
+    HttpClient httpClient,
     ILogger<CongaModule> logger
 ) : InteractionModuleBase<IInteractionContext>
 {
     [Group("edge", "Group management")]
     public partial class EdgeModule(
-        IIdentityService identityService,
         IInteractionIdentityService interactionIdService,
         ResolveProjectHandler projectResolver,
         AddCongaEdgeHandler addEdgeHandler,
@@ -47,7 +47,6 @@ public partial class CongaModule(
 
     [Group("group", "Group management")]
     public partial class GroupModule(
-        IIdentityService identityService,
         IInteractionIdentityService interactionIdService,
         ResolveProjectHandler projectResolver,
         AddCongaGroupHandler createGroupHandler,
