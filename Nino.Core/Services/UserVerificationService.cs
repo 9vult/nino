@@ -23,7 +23,7 @@ public class UserVerificationService(
         UserId userId
     )
     {
-        var project = await db.Projects.SingleOrDefaultAsync(p => p.Id == projectId);
+        var project = await db.Projects.FirstOrDefaultAsync(p => p.Id == projectId);
         if (project is null)
         {
             logger.LogWarning("Project {ProjectId} was not found", projectId);
@@ -33,13 +33,7 @@ public class UserVerificationService(
         if (project.IsArchived)
             return Fail(ResultStatus.Archived);
 
-        var episode = await db.Episodes.SingleOrDefaultAsync(e => e.Id == episodeId);
-        if (episode is null)
-        {
-            logger.LogWarning("Episode {EpisodeId} was not found", episodeId);
-            return Fail(ResultStatus.EpisodeNotFound);
-        }
-        var task = episode.Tasks.SingleOrDefault(t => t.Id == taskId);
+        var task = await db.Tasks.FirstOrDefaultAsync(t => t.Id == taskId);
         if (task is null)
         {
             logger.LogWarning("Task {TasKId} was not found", taskId);
@@ -117,8 +111,8 @@ public class UserVerificationService(
             return PermissionsLevel.Administrator;
 
         var isStaff = await db
-            .Episodes.Where(e => e.ProjectId == project.Id)
-            .AnyAsync(e => e.Tasks.Any(s => s.AssigneeId == userId));
+            .Tasks.Where(t => t.ProjectId == project.Id)
+            .AnyAsync(t => t.AssigneeId == userId);
 
         if (isStaff)
             return PermissionsLevel.Staff;
