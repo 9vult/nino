@@ -100,7 +100,7 @@ public partial class TaskModule
             return await interaction.FailAsync(
                 result.Status,
                 locale,
-                new FailureContext { Alias = alias }
+                new FailureContext { Alias = alias, Task = abbreviation }
             );
         }
 
