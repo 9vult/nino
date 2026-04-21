@@ -94,8 +94,12 @@ public sealed class CongaGraph
                 RegisterNode(toNode);
                 return CongaModificationResult.Success;
             case (false, false): // Neither node exists
-                fromNode ??= new CongaNode.TaskNode(from);
-                toNode ??= new CongaNode.TaskNode(to);
+                fromNode ??= from.Value.StartsWith('@')
+                    ? new CongaNode.GroupNode(from)
+                    : new CongaNode.TaskNode(from);
+                toNode ??= to.Value.StartsWith('@')
+                    ? new CongaNode.GroupNode(to)
+                    : new CongaNode.TaskNode(to);
 
                 fromNode.AddDependent(toNode);
                 toNode.AddPrerequisite(fromNode);

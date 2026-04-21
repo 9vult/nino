@@ -71,6 +71,6 @@ public partial class ImportCongaHandler(
     [GeneratedRegex("^(.+)->(.+)$")]
     private static partial Regex EdgeRegex();
 
-    [GeneratedRegex("^(.+)+(.+)$")]
+    [GeneratedRegex("^(.+)\\+(.+)$")]
     private static partial Regex GroupMemberRegex();
 }

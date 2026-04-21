@@ -62,6 +62,8 @@
     "conga.group.remove.success": "Removed group {name_1} from the Conga graph:",
     "conga.group.remove.success.empty": "Removed group {name_1} from the Conga graph.",
     "conga.illegalTree": "Group member trees can't intermingle!",
+    "conga.import.failed": "Failed to read the import file.",
+    "conga.import.success": "Successfully imported the Conga file:",
     "conga.member.add.success": "Added {name_1} to group {group_2}:",
     "conga.member.add.conflict": "{name_1} already exists in {group_2}!",
     "conga.member.remove.notFound": "{name_1} does not exist in {group_2}!",
