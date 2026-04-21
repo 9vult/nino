@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
+using System.Diagnostics.CodeAnalysis;
 using Nino.Domain.Dtos;
 using Nino.Domain.Enums;
 using Nino.Domain.ValueObjects;
@@ -253,6 +254,17 @@ public sealed class CongaGraph
             UnregisterNode(dep);
         }
         return CongaModificationResult.Success;
+    }
+
+    /// <summary>
+    /// Try to get a node
+    /// </summary>
+    /// <param name="abbreviation">Node name</param>
+    /// <param name="node">Node if it exists, or <see langword="null"/></param>
+    /// <returns><see langword="true"/> if the node exists</returns>
+    public bool TryGetNode(Abbreviation abbreviation, [NotNullWhen(true)] out CongaNode? node)
+    {
+        return _nodes.TryGetValue(abbreviation, out node);
     }
 
     public static CongaGraph FromDto(CongaGraphDto dto)

@@ -49,6 +49,10 @@ public static class CoreServiceCollectionExtensions
         services.AddScoped<IUserVerificationService, UserVerificationService>();
         services.AddScoped<IAniListService, AniListService>();
 
+        // Background Services
+        services.AddHostedService<AirNotificationService>();
+        services.AddHostedService<CongaReminderService>();
+
         return services;
 
         void ConfigureDb(DbContextOptionsBuilder options) =>
