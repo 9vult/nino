@@ -3,6 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Nino.Core.EventHandlers;
 using Nino.Core.Events;
 using Nino.Core.Features.Commands;
 using Nino.Core.Features.Queries;
@@ -52,6 +53,9 @@ public static class CoreServiceCollectionExtensions
         // Background Services
         services.AddHostedService<AirNotificationService>();
         services.AddHostedService<CongaReminderService>();
+
+        // EventHandlers
+        services.AddScoped<IEventHandler<TaskProgressEvent>, CongaTaskProgressEventHandler>();
 
         return services;
 
