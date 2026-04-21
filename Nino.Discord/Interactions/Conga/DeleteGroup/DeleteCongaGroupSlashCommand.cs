@@ -89,7 +89,7 @@ public partial class CongaModule
 
             // Success!
             var successEmbed = new EmbedBuilder()
-                .WithProjectInfo(pData, locale)
+                .WithProjectInfo(pData, locale, includePoster: false)
                 .WithTitle(T("project.modification.title", locale));
 
             if (!string.IsNullOrEmpty(dot))

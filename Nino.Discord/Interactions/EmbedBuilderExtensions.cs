@@ -12,7 +12,8 @@ public static class InteractionModuleBaseExtensions
     public static EmbedBuilder WithProjectInfo(
         this EmbedBuilder embed,
         GetGenericProjectDataResponse data,
-        string locale
+        string locale,
+        bool includePoster = true
     )
     {
         var header = new StringBuilder();
@@ -24,7 +25,7 @@ public static class InteractionModuleBaseExtensions
 
         return embed
             .WithAuthor(name: header.ToString(), url: data.AniListUrl)
-            .WithThumbnailUrl(data.PosterUrl)
+            .WithThumbnailUrl(includePoster ? data.PosterUrl : string.Empty)
             .WithCurrentTimestamp();
     }
 }

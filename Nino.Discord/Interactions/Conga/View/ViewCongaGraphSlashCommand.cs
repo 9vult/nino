@@ -74,7 +74,7 @@ public partial class CongaModule
         var pData = result.Value.Item2;
 
         // Success!
-        var successEmbed = new EmbedBuilder().WithProjectInfo(pData, locale);
+        var successEmbed = new EmbedBuilder().WithProjectInfo(pData, locale, includePoster: false);
 
         if (episode is not null)
             successEmbed = successEmbed.WithTitle(T("episode.title", locale, episode));
