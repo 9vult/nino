@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: MPL-2.0
 
+using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Nino.Domain.Dtos;
@@ -17,7 +19,10 @@ namespace Nino.Core;
 
 public class NinoDbContext(DbContextOptions<NinoDbContext> options) : DbContext(options)
 {
-    private static readonly JsonSerializerOptions JsonSerializerOptions = new();
+    private static readonly JsonSerializerOptions JsonSerializerOptions = new()
+    {
+        Converters = { new JsonStringEnumConverter() },
+    };
 
     public DbSet<User> Users { get; init; } = null!;
     public DbSet<Group> Groups { get; init; } = null!;

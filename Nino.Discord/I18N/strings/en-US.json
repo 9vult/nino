@@ -70,7 +70,6 @@
     "conga.group.remove.success": "Removed group {name_1} from the Conga graph:",
     "conga.group.remove.success.empty": "Removed group {name_1} from the Conga graph.",
     "conga.illegalTree": "Group member trees can't intermingle!",
-    "conga.import.failed": "Failed to read the import file.",
     "conga.import.success": "Successfully imported the Conga file:",
     "conga.member.add.success": "Added {name_1} to group {group_2}:",
     "conga.member.add.conflict": "{name_1} already exists in {group_2}!",
@@ -108,6 +107,7 @@
     "group.configuration.title": "Group Configuration",
     "group.edit.clearable": "Note: To clear the Release Prefix, set the Release Prefix to `-`.",
     "group.edit.success": "Edit successful!",
+    "import.failed": "Failed to read the import file.",
     "project.alias.add.badRequest": "That's already an alias!",
     "project.alias.add.success": "Added `{alias_1}` as an alias.",
     "project.alias.remove.badRequest": "That's not an alias!",
@@ -154,6 +154,14 @@
     "task.deleted.completedEpisodes": {
       "one": "Also, {number_1} episode is now complete:",
       "other": "Also, {number_1} episodes are now complete:"
+    },
+    "task.import.success": {
+      "one": "I imported {number_1} task for you.",
+      "other": "I imported {number_1} tasks for you."
+    },
+    "templateStaff.import.success": {
+      "one": "I imported {number_1} template staff for you.",
+      "other": "I imported {number_1} template staff for you."
     }
   }
 }

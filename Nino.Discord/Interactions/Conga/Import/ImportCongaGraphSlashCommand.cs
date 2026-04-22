@@ -62,7 +62,7 @@ public partial class CongaModule
                     Alias = alias,
                     Overrides = new Dictionary<ResultStatus, string>
                     {
-                        [ResultStatus.BadRequest] = "conga.import.failed",
+                        [ResultStatus.BadRequest] = "import.failed",
                     },
                 }
             );

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Nino.Core.Dtos;
@@ -19,6 +20,11 @@ public sealed class ImportTemplateStaffHandler(
     ILogger<AddTaskHandler> logger
 ) : ICommandHandler<ImportTemplateStaffCommand, Result<ImportTemplateStaffResponse>>
 {
+    private static readonly JsonSerializerOptions JsonSerializerOptions = new()
+    {
+        Converters = { new JsonStringEnumConverter() },
+    };
+
     /// <inheritdoc />
     public async Task<Result<ImportTemplateStaffResponse>> HandleAsync(
         ImportTemplateStaffCommand command
@@ -42,7 +48,10 @@ public sealed class ImportTemplateStaffHandler(
         var lines = command.Data.Split(Environment.NewLine);
         foreach (var line in lines)
         {
-            var input = JsonSerializer.Deserialize<TemplateStaffImportDto>(line);
+            var input = JsonSerializer.Deserialize<TemplateStaffImportDto>(
+                line,
+                JsonSerializerOptions
+            );
             if (input is null)
             {
                 logger.LogWarning("Failed to deserialize template staff import \"{Input}\"", line);

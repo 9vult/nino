@@ -4,6 +4,7 @@ using Discord;
 using Discord.Interactions;
 using Nino.Core.Features.Commands.TemplateStaff.Add;
 using Nino.Core.Features.Commands.TemplateStaff.Edit;
+using Nino.Core.Features.Commands.TemplateStaff.Import;
 using Nino.Core.Features.Commands.TemplateStaff.Remove;
 using Nino.Core.Features.Queries.Projects.GetGenericData;
 using Nino.Core.Features.Queries.Projects.Resolve;
@@ -22,5 +23,8 @@ public partial class TemplateStaffModule(
     ResolveTemplateStaffHandler staffResolver,
     AddTemplateStaffHandler addHandler,
     RemoveTemplateStaffHandler removeHandler,
-    EditTemplateStaffHandler editHandler
+    EditTemplateStaffHandler editHandler,
+    ImportTemplateStaffHandler importHandler,
+    HttpClient httpClient,
+    ILogger<TemplateStaffModule> logger
 ) : InteractionModuleBase<IInteractionContext>;

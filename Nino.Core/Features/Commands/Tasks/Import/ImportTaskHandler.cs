@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NaturalSort.Extension;
@@ -20,6 +21,11 @@ public sealed class ImportTaskHandler(
     ILogger<AddTaskHandler> logger
 ) : ICommandHandler<ImportTaskCommand, Result<ImportTaskResponse>>
 {
+    private static readonly JsonSerializerOptions JsonSerializerOptions = new()
+    {
+        Converters = { new JsonStringEnumConverter() },
+    };
+
     /// <inheritdoc />
     public async Task<Result<ImportTaskResponse>> HandleAsync(ImportTaskCommand command)
     {
@@ -31,7 +37,7 @@ public sealed class ImportTaskHandler(
         if (!verification.IsSuccess)
             return Fail(verification.Status);
 
-        var episodes = (
+        var allEpisodes = (
             await db.Episodes.Where(e => e.ProjectId == command.ProjectId).ToListAsync()
         )
             .OrderBy(e => e.Number.Value, StringComparison.OrdinalIgnoreCase.WithNaturalSort())
@@ -41,7 +47,7 @@ public sealed class ImportTaskHandler(
         var lines = command.Data.Split(Environment.NewLine);
         foreach (var line in lines)
         {
-            var input = JsonSerializer.Deserialize<TaskImportDto>(line);
+            var input = JsonSerializer.Deserialize<TaskImportDto>(line, JsonSerializerOptions);
             if (input is null)
             {
                 logger.LogWarning("Failed to deserialize task import \"{Input}\"", line);
@@ -59,8 +65,8 @@ public sealed class ImportTaskHandler(
             else
                 continue;
 
-            var firstIdx = episodes.FindIndex(e => e.Number == input.First);
-            var lastIdx = episodes.FindIndex(e => e.Number == (input.Last ?? input.First)) + 1;
+            var firstIdx = allEpisodes.FindIndex(e => e.Number == input.First);
+            var lastIdx = allEpisodes.FindIndex(e => e.Number == (input.Last ?? input.First)) + 1;
 
             if (firstIdx < 0)
             {
@@ -82,7 +88,7 @@ public sealed class ImportTaskHandler(
                 continue;
             }
 
-            episodes = episodes[firstIdx..lastIdx].ToList();
+            var episodes = allEpisodes[firstIdx..lastIdx].ToList();
 
             // Check for conflicts
             if (episodes.Any(e => e.Tasks.Any(t => t.Abbreviation == input.Abbreviation)))

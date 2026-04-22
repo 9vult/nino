@@ -4,6 +4,7 @@ using Discord;
 using Discord.Interactions;
 using Nino.Core.Features.Commands.Tasks.Add;
 using Nino.Core.Features.Commands.Tasks.Edit;
+using Nino.Core.Features.Commands.Tasks.Import;
 using Nino.Core.Features.Commands.Tasks.Remove;
 using Nino.Core.Features.Queries.Episodes.Resolve;
 using Nino.Core.Features.Queries.Projects.GetGenericData;
@@ -22,5 +23,8 @@ public partial class TaskModule(
     ResolveEpisodeHandler episodeResolver,
     AddTaskHandler addHandler,
     RemoveTaskHandler removeHandler,
-    EditTaskHandler editHandler
+    EditTaskHandler editHandler,
+    ImportTaskHandler importHandler,
+    HttpClient httpClient,
+    ILogger<TaskModule> logger
 ) : InteractionModuleBase<IInteractionContext>;
