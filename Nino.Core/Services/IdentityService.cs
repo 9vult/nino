@@ -278,4 +278,16 @@ public sealed class IdentityService(
         await db.SaveChangesAsync();
         return true;
     }
+
+    /// <inheritdoc />
+    public async Task<string?> GetUserNameAsync(UserId userId)
+    {
+        return await db.Users.Where(u => u.Id == userId).Select(u => u.Name).FirstOrDefaultAsync();
+    }
+
+    /// <inheritdoc />
+    public Task<string?> GetGroupNameAsync(GroupId groupId)
+    {
+        return db.Groups.Where(g => g.Id == groupId).Select(g => g.Name).FirstOrDefaultAsync();
+    }
 }

@@ -2,6 +2,7 @@
 
 using Nino.Domain.Entities;
 using Nino.Domain.ValueObjects;
+using Task = System.Threading.Tasks.Task;
 
 namespace Nino.Core.Services;
 
@@ -87,4 +88,18 @@ public interface IIdentityService
     /// <param name="newGroupName">Group's new name</param>
     /// <returns><see langword="true"/> if successful</returns>
     Task<bool> UpdateGroupNameAsync(GroupId groupId, string newGroupName);
+
+    /// <summary>
+    /// Get the name of a <see cref="User"/>
+    /// </summary>
+    /// <param name="userId">User's ID</param>
+    /// <returns>The user's name, or <see langword="null"/> if not found.</returns>
+    Task<string?> GetUserNameAsync(UserId userId);
+
+    /// <summary>
+    /// Get the name of a <see cref="Group"/>
+    /// </summary>
+    /// <param name="groupId">Group's ID</param>
+    /// <returns>The group's name, or <see langword="null"/> if not found.</returns>
+    Task<string?> GetGroupNameAsync(GroupId groupId);
 }
