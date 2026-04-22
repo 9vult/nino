@@ -2,7 +2,6 @@
 
 using Nino.Domain.Entities;
 using Nino.Domain.ValueObjects;
-using Task = System.Threading.Tasks.Task;
 
 namespace Nino.Core.Services;
 
@@ -20,6 +19,14 @@ public interface IIdentityService
     /// <returns>The corresponding <see cref="UserId"/>.</returns>
     /// <remarks>Creates a new <see cref="User"/> if not found.</remarks>
     Task<UserId> GetOrCreateUserByDiscordIdAsync(ulong discordId, string discordUsername);
+
+    /// <summary>
+    /// Get the <see cref="User"/> ID for a given Discord ID.
+    /// </summary>
+    /// <param name="discordId">Discord user ID.</param>
+    /// <returns>The corresponding <see cref="UserId"/>.</returns>
+    /// <remarks>Creates a new <see cref="User"/> if not found.</remarks>
+    Task<UserId> GetOrCreateUserByDiscordIdAsync(ulong discordId);
 
     /// <summary>
     /// Get the <see cref="Group"/> ID for a given Discord ID.

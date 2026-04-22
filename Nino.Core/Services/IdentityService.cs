@@ -63,6 +63,54 @@ public sealed class IdentityService(
     }
 
     /// <inheritdoc />
+    public async Task<UserId> GetOrCreateUserByDiscordIdAsync(ulong discordId)
+    {
+        var resolvedId = await db
+            .Users.AsNoTracking()
+            .Where(u => u.DiscordId == discordId)
+            .Select(u => (UserId?)u.Id)
+            .SingleOrDefaultAsync();
+
+        if (resolvedId is not null)
+        {
+            logger.LogTrace(
+                "Resolved Discord ID {DiscordId} to user {UserId}",
+                discordId,
+                resolvedId.Value
+            );
+            return resolvedId.Value;
+        }
+
+        var user = new User { DiscordId = discordId, Name = string.Empty };
+        await db.Users.AddAsync(user);
+
+        try
+        {
+            await db.SaveChangesAsync();
+            logger.LogTrace("Created user {User} for Discord ID {DiscordId}", user, discordId);
+
+            // Fire event for name enrichment
+            await eventBus.PublishAsync(new PartialUserCreatedFromDiscordEvent(user.Id, discordId));
+            return user.Id;
+        }
+        catch (DbUpdateException)
+        {
+            // Race condition handler
+            resolvedId = await db
+                .Users.AsNoTracking()
+                .Where(u => u.DiscordId == discordId)
+                .Select(u => u.Id)
+                .SingleAsync();
+            logger.LogTrace(
+                "Resolved Discord ID {DiscordId} to user {UserId}",
+                discordId,
+                resolvedId.Value
+            );
+            return resolvedId.Value;
+        }
+    }
+
+    /// <inheritdoc />
     public async Task<GroupId> GetOrCreateGroupByDiscordIdAsync(ulong discordId)
     {
         var resolvedId = await db
