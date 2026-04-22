@@ -126,6 +126,7 @@
     "project.modification.title": "Project Modification",
     "project.notFound": "Project not found.",
     "project.resolutionFailed": "Could not resolve alias `{alias_1}` to a project.",
+    "project.roster.title": "Roster",
     "task.conflict": "A task with the abbreviation {abbreviation_1} already exists!",
     "task.creation.success": "Assigned {assignee_1} to **{task_2}** for episode {episode_3}.",
     "task.creation.success.range": "Assigned {assignee_1} to **{task_2}** for episodes {first_3}-{last_4}.",

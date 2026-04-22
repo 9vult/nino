@@ -13,6 +13,7 @@ using Nino.Core.Features.Commands.Projects.Create;
 using Nino.Core.Features.Commands.Projects.Edit;
 using Nino.Core.Features.Queries.Projects.GetGenericData;
 using Nino.Core.Features.Queries.Projects.Resolve;
+using Nino.Core.Features.Queries.Projects.Roster;
 using Nino.Core.Services;
 using Nino.Discord.Services;
 
@@ -27,7 +28,8 @@ public partial class ProjectModule(
     ResolveProjectHandler projectResolver,
     GetGenericProjectDataHandler getProjectDataHandler,
     CreateProjectHandler createHandler,
-    EditProjectHandler editHandler
+    EditProjectHandler editHandler,
+    ProjectRosterHandler rosterHandler
 ) : InteractionModuleBase<IInteractionContext>
 {
     [Group("admin", "Admin management")]
