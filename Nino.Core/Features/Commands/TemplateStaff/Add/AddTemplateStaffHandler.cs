@@ -69,7 +69,7 @@ public sealed class AddTemplateStaffHandler(
                 AssigneeId = command.AssigneeId,
                 Abbreviation = command.Abbreviation,
                 Name = command.Name,
-                Weight = maxWeight,
+                Weight = maxWeight + 1,
                 IsPseudo = command.IsPseudo,
             }
         );

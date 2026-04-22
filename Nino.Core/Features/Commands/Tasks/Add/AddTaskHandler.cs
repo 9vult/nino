@@ -58,7 +58,7 @@ public sealed class AddTaskHandler(
                     AssigneeId = command.AssigneeId,
                     Abbreviation = command.Abbreviation,
                     Name = command.Name,
-                    Weight = episode.Tasks.Select(s => s.Weight).DefaultIfEmpty(0).Max(),
+                    Weight = episode.Tasks.Select(s => s.Weight).DefaultIfEmpty(0).Max() + 1,
                     IsPseudo = command.IsPseudo,
                     IsDone = false,
                 }
