@@ -71,7 +71,7 @@ public sealed class BlameHandler(
         if (result is null)
             return Fail(ResultStatus.EpisodeNotFound);
 
-        if (!result.EpisodeNumber.IsInteger(out var number))
+        if (result.Statuses.All(t => t.IsDone) || !result.EpisodeNumber.IsInteger(out var number))
             return Success(result);
 
         var alResult = await aniListService.GetEpisodeAirTimeAsync(result.AniListId, number);
