@@ -44,7 +44,7 @@ public class ReleaseBatchHandlerTests : TestBase
             seed.User1Id,
             Number.From("2"),
             Number.From("23"),
-            string.Empty
+            []
         );
         var result = await handler.HandleAsync(command);
 
@@ -72,7 +72,7 @@ public class ReleaseBatchHandlerTests : TestBase
             seed.User3Id,
             Number.From("2"),
             Number.From("23"),
-            string.Empty
+            []
         );
         var result = await handler.HandleAsync(command);
 

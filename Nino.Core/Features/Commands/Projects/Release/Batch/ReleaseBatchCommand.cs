@@ -9,7 +9,7 @@ public sealed record ReleaseBatchCommand(
     UserId RequestedBy,
     Number FirstNumber,
     Number LastNumber,
-    string Url,
+    List<string> Urls,
     RoleId? PrimaryRoleId = null,
     RoleId? SecondaryRoleId = null,
     RoleId? TertiaryRoleId = null

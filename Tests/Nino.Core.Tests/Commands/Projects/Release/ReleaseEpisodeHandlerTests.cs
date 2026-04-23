@@ -43,7 +43,7 @@ public class ReleaseEpisodeHandlerTests : TestBase
             seed.ProjectId,
             seed.User1Id,
             Number.From("1v2"),
-            string.Empty
+            []
         );
         var result = await handler.HandleAsync(command);
 
@@ -70,7 +70,7 @@ public class ReleaseEpisodeHandlerTests : TestBase
             seed.ProjectId,
             seed.User3Id,
             Number.From("1v2"),
-            string.Empty
+            []
         );
         var result = await handler.HandleAsync(command);
 

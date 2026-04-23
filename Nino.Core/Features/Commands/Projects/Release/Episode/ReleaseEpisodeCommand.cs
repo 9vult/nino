@@ -5,10 +5,10 @@ using Nino.Domain.ValueObjects;
 namespace Nino.Core.Features.Commands.Projects.Release.Episode;
 
 public sealed record ReleaseEpisodeCommand(
-    ProjectId ProjectId, 
-    UserId RequestedBy, 
+    ProjectId ProjectId,
+    UserId RequestedBy,
     Number Number,
-    string Url,
+    List<string> Urls,
     RoleId? PrimaryRoleId = null,
     RoleId? SecondaryRoleId = null,
     RoleId? TertiaryRoleId = null

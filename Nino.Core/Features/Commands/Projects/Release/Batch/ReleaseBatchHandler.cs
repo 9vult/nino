@@ -55,7 +55,7 @@ public sealed class ReleaseBatchHandler(
                     ProjectId: command.ProjectId,
                     FirstNumber: command.FirstNumber,
                     LastNumber: command.LastNumber,
-                    Url: command.Url,
+                    Urls: command.Urls,
                     Publish: project.DelegateObserver is null,
                     PrimaryRoleId: command.PrimaryRoleId,
                     SecondaryRoleId: command.SecondaryRoleId,
@@ -69,7 +69,7 @@ public sealed class ReleaseBatchHandler(
                         ObserverId: observer.Id,
                         FirstNumber: command.FirstNumber,
                         LastNumber: command.LastNumber,
-                        Url: command.Url,
+                        Urls: command.Urls,
                         Publish: observer.Id == project.DelegateObserverId
                     )
                 )

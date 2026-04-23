@@ -7,7 +7,7 @@ namespace Nino.Core.Events;
 public sealed record EpisodeReleasedEvent(
     ProjectId ProjectId,
     Number Number,
-    string Url,
+    List<string> Urls,
     bool Publish,
     RoleId? PrimaryRoleId = null,
     RoleId? SecondaryRoleId = null,

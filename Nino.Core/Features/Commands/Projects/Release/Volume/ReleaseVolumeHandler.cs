@@ -53,7 +53,7 @@ public sealed class ReleaseVolumeHandler(
                 new VolumeReleasedEvent(
                     ProjectId: command.ProjectId,
                     Number: command.Number,
-                    Url: command.Url,
+                    Urls: command.Urls,
                     Publish: project.DelegateObserver is null,
                     PrimaryRoleId: command.PrimaryRoleId,
                     SecondaryRoleId: command.SecondaryRoleId,
@@ -66,7 +66,7 @@ public sealed class ReleaseVolumeHandler(
                         ProjectId: command.ProjectId,
                         ObserverId: observer.Id,
                         Number: command.Number,
-                        Url: command.Url,
+                        Urls: command.Urls,
                         Publish: observer.Id == project.DelegateObserverId
                     )
                 )

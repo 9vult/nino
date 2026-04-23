@@ -8,7 +8,7 @@ public sealed record BatchReleasedEvent(
     ProjectId ProjectId,
     Number FirstNumber,
     Number LastNumber,
-    string Url,
+    List<string> Urls,
     bool Publish,
     RoleId? PrimaryRoleId = null,
     RoleId? SecondaryRoleId = null,

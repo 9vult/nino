@@ -43,7 +43,7 @@ public class ReleaseVolumeHandlerTests : TestBase
             seed.ProjectId,
             seed.User1Id,
             Number.From("1v2"),
-            string.Empty
+            []
         );
         var result = await handler.HandleAsync(command);
 
@@ -66,12 +66,7 @@ public class ReleaseVolumeHandlerTests : TestBase
             NullLogger<ReleaseVolumeHandler>.Instance
         );
 
-        var command = new ReleaseVolumeCommand(
-            seed.ProjectId,
-            seed.User3Id,
-            Number.From("1"),
-            string.Empty
-        );
+        var command = new ReleaseVolumeCommand(seed.ProjectId, seed.User3Id, Number.From("1"), []);
         var result = await handler.HandleAsync(command);
 
         await Assert.That(result.IsSuccess).IsFalse();

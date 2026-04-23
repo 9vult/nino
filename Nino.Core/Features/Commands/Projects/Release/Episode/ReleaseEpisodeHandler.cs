@@ -53,7 +53,7 @@ public sealed class ReleaseEpisodeHandler(
                 new EpisodeReleasedEvent(
                     ProjectId: command.ProjectId,
                     Number: command.Number,
-                    Url: command.Url,
+                    Urls: command.Urls,
                     Publish: project.DelegateObserver is null,
                     PrimaryRoleId: command.PrimaryRoleId,
                     SecondaryRoleId: command.SecondaryRoleId,
@@ -66,7 +66,7 @@ public sealed class ReleaseEpisodeHandler(
                         ProjectId: command.ProjectId,
                         ObserverId: observer.Id,
                         Number: command.Number,
-                        Url: command.Url,
+                        Urls: command.Urls,
                         Publish: observer.Id == project.DelegateObserverId
                     )
                 )

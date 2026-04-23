@@ -8,7 +8,7 @@ public sealed record ReleaseVolumeCommand(
     ProjectId ProjectId,
     UserId RequestedBy,
     Number Number,
-    string Url,
+    List<string> Urls,
     RoleId? PrimaryRoleId = null,
     RoleId? SecondaryRoleId = null,
     RoleId? TertiaryRoleId = null

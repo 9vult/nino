@@ -9,6 +9,6 @@ public sealed record BatchReleasedObserverEvent(
     ObserverId ObserverId,
     Number FirstNumber,
     Number LastNumber,
-    string Url,
+    List<string> Urls,
     bool Publish
 ) : IEvent;

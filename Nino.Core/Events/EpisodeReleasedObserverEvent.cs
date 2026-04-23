@@ -8,6 +8,6 @@ public sealed record EpisodeReleasedObserverEvent(
     ProjectId ProjectId,
     ObserverId ObserverId,
     Number Number,
-    string Url,
+    List<string> Urls,
     bool Publish
 ) : IEvent;
