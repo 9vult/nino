@@ -57,6 +57,13 @@ public static class DiscordBotServiceCollectionExtensions
             PartialUserCreatedEventHandler
         >();
 
+        // Release event handlers
+        services.AddScoped<IEventHandler<EpisodeReleasedEvent>, EpisodeReleasedEventHandler>();
+        services.AddScoped<
+            IEventHandler<EpisodeReleasedObserverEvent>,
+            EpisodeReleasedObserverEventHandler
+        >();
+
         services.AddHostedService<DiscordBotHostedService>();
         return services;
     }
