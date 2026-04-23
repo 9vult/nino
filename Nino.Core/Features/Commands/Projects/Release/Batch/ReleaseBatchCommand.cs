@@ -13,4 +13,4 @@ public sealed record ReleaseBatchCommand(
     RoleId? PrimaryRoleId = null,
     RoleId? SecondaryRoleId = null,
     RoleId? TertiaryRoleId = null
-) : ICommand;
+) : ReleaseCommandBase(ProjectId, RequestedBy), ICommand;

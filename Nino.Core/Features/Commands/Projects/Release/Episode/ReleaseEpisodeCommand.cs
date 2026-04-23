@@ -12,4 +12,4 @@ public sealed record ReleaseEpisodeCommand(
     RoleId? PrimaryRoleId = null,
     RoleId? SecondaryRoleId = null,
     RoleId? TertiaryRoleId = null
-) : ICommand;
+) : ReleaseCommandBase(ProjectId, RequestedBy), ICommand;
