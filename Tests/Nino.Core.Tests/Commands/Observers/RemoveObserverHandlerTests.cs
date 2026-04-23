@@ -27,7 +27,14 @@ public class RemoveObserverHandlerTests : TestBase
             NullLogger<AddObserverHandler>.Instance
         );
         await addHandler.HandleAsync(
-            new AddObserverCommand(seed.ProjectId, groupId, seed.User3Id, channelId, channelId)
+            new AddObserverCommand(
+                seed.ProjectId,
+                groupId,
+                seed.User3Id,
+                true,
+                channelId,
+                channelId
+            )
         );
 
         var observerId = await db.Observers.Select(o => o.Id).FirstAsync();
@@ -39,7 +46,7 @@ public class RemoveObserverHandlerTests : TestBase
             NullLogger<RemoveObserverHandler>.Instance
         );
 
-        var command = new RemoveObserverCommand(observerId, seed.User3Id);
+        var command = new RemoveObserverCommand(observerId, seed.User3Id, true);
 
         var result = await handler.HandleAsync(command);
         await Assert.That(result.IsSuccess).IsTrue().Because($"Handler failed: {result.Status}");
@@ -65,7 +72,14 @@ public class RemoveObserverHandlerTests : TestBase
             NullLogger<AddObserverHandler>.Instance
         );
         await addHandler.HandleAsync(
-            new AddObserverCommand(seed.ProjectId, groupId, seed.User3Id, channelId, channelId)
+            new AddObserverCommand(
+                seed.ProjectId,
+                groupId,
+                seed.User3Id,
+                true,
+                channelId,
+                channelId
+            )
         );
         var observerId = await db.Observers.Select(o => o.Id).FirstAsync();
         var project = await db.Projects.FirstAsync();
@@ -79,7 +93,7 @@ public class RemoveObserverHandlerTests : TestBase
             NullLogger<RemoveObserverHandler>.Instance
         );
 
-        var command = new RemoveObserverCommand(observerId, seed.User3Id);
+        var command = new RemoveObserverCommand(observerId, seed.User3Id, true);
 
         var result = await handler.HandleAsync(command);
         await Assert.That(result.IsSuccess).IsTrue().Because($"Handler failed: {result.Status}");

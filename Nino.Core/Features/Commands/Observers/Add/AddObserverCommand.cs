@@ -8,6 +8,7 @@ public sealed record AddObserverCommand(
     ProjectId ProjectId,
     GroupId GroupId,
     UserId RequestedBy,
+    bool OverrideVerification,
     ChannelId UpdateChannelId,
     ChannelId ReleaseChannelId,
     RoleId? PrimaryRoleId = null,

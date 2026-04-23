@@ -27,6 +27,7 @@ public class AddObserverHandlerTests : TestBase
             seed.ProjectId,
             groupId,
             seed.User3Id,
+            true,
             channelId,
             channelId
         );
@@ -62,13 +63,21 @@ public class AddObserverHandlerTests : TestBase
 
         // Setup
         await handler.HandleAsync(
-            new AddObserverCommand(seed.ProjectId, groupId, seed.User3Id, channelId, channelId)
+            new AddObserverCommand(
+                seed.ProjectId,
+                groupId,
+                seed.User3Id,
+                true,
+                channelId,
+                channelId
+            )
         );
 
         var command = new AddObserverCommand(
             seed.ProjectId,
             groupId,
             seed.User3Id,
+            true,
             channelId,
             channelId,
             PrimaryRoleId: roleId

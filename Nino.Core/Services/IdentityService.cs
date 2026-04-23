@@ -264,6 +264,26 @@ public sealed class IdentityService(
     }
 
     /// <inheritdoc />
+    public async Task<UserId?> GetUserByDiscordIdAsync(ulong discordId)
+    {
+        return await db
+            .Users.AsNoTracking()
+            .Where(g => g.DiscordId == discordId)
+            .Select(u => (UserId?)u.Id)
+            .SingleOrDefaultAsync();
+    }
+
+    /// <inheritdoc />
+    public async Task<GroupId?> GetGroupByDiscordIdAsync(ulong discordId)
+    {
+        return await db
+            .Groups.AsNoTracking()
+            .Where(g => g.DiscordId == discordId)
+            .Select(g => (GroupId?)g.Id)
+            .SingleOrDefaultAsync();
+    }
+
+    /// <inheritdoc />
     public async Task<ulong?> GetDiscordUserIdAsync(UserId userId)
     {
         return await db

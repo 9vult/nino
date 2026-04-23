@@ -53,6 +53,20 @@ public interface IIdentityService
     Task<RoleId> GetOrCreateRoleByDiscordIdAsync(ulong discordId);
 
     /// <summary>
+    /// Get the <see cref="User"/> ID for a given Discord ID.
+    /// </summary>
+    /// <param name="discordId">Discord user ID.</param>
+    /// <returns>The corresponding <see cref="UserId"/> or <see langword="null"/> if not found.</returns>
+    Task<UserId?> GetUserByDiscordIdAsync(ulong discordId);
+
+    /// <summary>
+    /// Get the <see cref="Group"/> ID for a given Discord ID.
+    /// </summary>
+    /// <param name="discordId">Discord group ID.</param>
+    /// <returns>The corresponding <see cref="GroupId"/> or <see langword="null"/> if not found.</returns>
+    Task<GroupId?> GetGroupByDiscordIdAsync(ulong discordId);
+
+    /// <summary>
     /// Get the Discord user ID for a given <see cref="User"/> ID.
     /// </summary>
     /// <param name="userId">The internal <see cref="UserId"/>.</param>

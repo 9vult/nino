@@ -30,7 +30,11 @@ public sealed class RemoveObserverHandler(
             command.RequestedBy,
             PermissionsLevel.Administrator
         );
-        if (observer.OwnerId != command.RequestedBy && !verification.IsSuccess)
+        if (
+            observer.OwnerId != command.RequestedBy
+            && !verification.IsSuccess
+            && !command.OverrideVerification
+        )
             return Fail(verification.Status);
 
         // Check if the deleted observer was a delegate; if so, we want to notify the project

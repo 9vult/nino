@@ -26,6 +26,13 @@ public sealed class AddObserverHandler(
         );
         if (!verification.IsSuccess)
             return Fail(verification.Status);
+        verification = await verificationService.VerifyGroupPermissionsAsync(
+            command.GroupId,
+            command.RequestedBy,
+            PermissionsLevel.Administrator
+        );
+        if (!verification.IsSuccess && !command.OverrideVerification)
+            return Fail(verification.Status);
 
         var observer = await db.Observers.FirstOrDefaultAsync(o =>
             o.ProjectId == command.ProjectId && o.GroupId == command.GroupId
