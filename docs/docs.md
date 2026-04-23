@@ -55,10 +55,12 @@ progress updates, but they are valid Conga targets.
 Nino has a very comprehensive task dependency system, here called the "Conga graph", an artifact from a simpler time
 when there was just a single "conga line" of tasks - one entry point, one exit point.
 
-When the Conga graph is in use, tasks will @mention downstream tasks upon completion. For example, if `ED` depends on
-`TL`'s completion, you can add `TL -> ED` to the graph, and `ED`'s assignee will be @mention'd when `TL` completes.
+When the Conga graph is in use, tasks will ping downstream tasks upon completion. For example, if `ED` depends on
+`TL`'s completion, you can add `TL -> ED` to the graph, and `ED`'s assignee will be pinged when `TL` completes.
 Tasks can have multiple dependants, where all dependents will be pinged, and multiple prerequisites, where the
 task won't be pinged until all prerequisites are complete.
+
+![](./conga.png)
 
 Another powerful feature is Groups. Conga Groups are intended for parallel workflows, but they can also be used for
 categorization. Just note that groups can't be nested.
@@ -70,6 +72,11 @@ then `TLC` will be re-pinged. `TLC` has a dependant task, `ATLC`, so when `TLC` 
 `TLC`'s entire subtree completed before `TM`, then `TM` would be re-pinged. This behavior works with as many group
 members as you need. When all members of the group are complete, any tasks downstream of the group (`QC1` in the
 example) will be pinged.
+
+![](./conga-group-label.png)
+
+In this example, the song tasks are grouped together for clarity. Because there's a single sub-tree, it's functionally
+the same as if the group wasn't there.
 
 Conga commands include `/conga edge add`, `/conga group create`, and `/conga group add-member`. Additionally, you can
 [import a Conga graph](#conga-import).
