@@ -59,9 +59,19 @@ public static class DiscordBotServiceCollectionExtensions
 
         // Release event handlers
         services.AddScoped<IEventHandler<EpisodeReleasedEvent>, EpisodeReleasedEventHandler>();
+        services.AddScoped<IEventHandler<VolumeReleasedEvent>, VolumeReleasedEventHandler>();
+        services.AddScoped<IEventHandler<BatchReleasedEvent>, BatchReleasedEventHandler>();
         services.AddScoped<
             IEventHandler<EpisodeReleasedObserverEvent>,
             EpisodeReleasedObserverEventHandler
+        >();
+        services.AddScoped<
+            IEventHandler<VolumeReleasedObserverEvent>,
+            VolumeReleasedObserverEventHandler
+        >();
+        services.AddScoped<
+            IEventHandler<BatchReleasedObserverEvent>,
+            BatchReleasedObserverEventHandler
         >();
 
         services.AddHostedService<DiscordBotHostedService>();
