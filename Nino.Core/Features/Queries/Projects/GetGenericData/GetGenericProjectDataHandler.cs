@@ -18,6 +18,7 @@ public sealed class GetGenericProjectDataHandler(ReadOnlyNinoDbContext db)
                 ProjectId: p.Id,
                 ProjectTitle: p.Title,
                 ProjectType: p.Type,
+                AniListId: p.AniListId,
                 PosterUrl: p.PosterUrl,
                 AniListUrl: p.AniListUrl,
                 IsPrivate: p.IsPrivate

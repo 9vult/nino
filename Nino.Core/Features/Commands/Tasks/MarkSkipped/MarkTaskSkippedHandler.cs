@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Nino.Core.Events;
 using Nino.Core.Services;
 using Nino.Domain.Enums;
-using static Nino.Core.Features.Result;
+using static Nino.Core.Features.Result<bool>;
 
 namespace Nino.Core.Features.Commands.Tasks.MarkSkipped;
 
@@ -14,10 +14,10 @@ public class MarkTaskSkippedHandler(
     IUserVerificationService verificationService,
     IEventBus eventBus,
     ILogger<MarkTaskSkippedHandler> logger
-) : ICommandHandler<MarkTaskSkippedCommand, Result>
+) : ICommandHandler<MarkTaskSkippedCommand, Result<bool>>
 {
     /// <inheritdoc />
-    public async Task<Result> HandleAsync(MarkTaskSkippedCommand command)
+    public async Task<Result<bool>> HandleAsync(MarkTaskSkippedCommand command)
     {
         var verification = await verificationService.VerifyTaskPermissionsAsync(
             command.ProjectId,
@@ -28,7 +28,10 @@ public class MarkTaskSkippedHandler(
         if (!verification.IsSuccess)
             return Fail(verification.Status);
 
-        var task = await db.Tasks.FirstOrDefaultAsync(t => t.Id == command.TaskId);
+        var task = await db
+            .Tasks.Include(t => t.Episode)
+            .FirstOrDefaultAsync(t => t.Id == command.TaskId);
+
         if (task is null)
             return Fail(ResultStatus.TaskNotFound);
 
@@ -74,6 +77,6 @@ public class MarkTaskSkippedHandler(
         ];
 
         await Task.WhenAll(publishTasks);
-        return Success();
+        return Success(task.Episode.Tasks.All(t => t.IsDone));
     }
 }

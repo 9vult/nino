@@ -17,6 +17,7 @@ public record GetGenericProjectDataResponse(
     ProjectId ProjectId,
     string ProjectTitle,
     ProjectType ProjectType,
+    AniListId AniListId,
     string PosterUrl,
     string AniListUrl,
     bool IsPrivate

@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Nino.Core.Events;
 using Nino.Core.Services;
 using Nino.Domain.Enums;
-using static Nino.Core.Features.Result;
+using static Nino.Core.Features.Result<bool>;
 
 namespace Nino.Core.Features.Commands.Tasks.MarkDone;
 
@@ -14,10 +14,10 @@ public class MarkTaskDoneHandler(
     IUserVerificationService verificationService,
     IEventBus eventBus,
     ILogger<MarkTaskDoneHandler> logger
-) : ICommandHandler<MarkTaskDoneCommand, Result>
+) : ICommandHandler<MarkTaskDoneCommand, Result<bool>>
 {
     /// <inheritdoc />
-    public async Task<Result> HandleAsync(MarkTaskDoneCommand command)
+    public async Task<Result<bool>> HandleAsync(MarkTaskDoneCommand command)
     {
         var verification = await verificationService.VerifyTaskPermissionsAsync(
             command.ProjectId,
@@ -28,7 +28,10 @@ public class MarkTaskDoneHandler(
         if (!verification.IsSuccess)
             return Fail(verification.Status);
 
-        var task = await db.Tasks.FirstOrDefaultAsync(t => t.Id == command.TaskId);
+        var task = await db
+            .Tasks.Include(t => t.Episode)
+            .FirstOrDefaultAsync(t => t.Id == command.TaskId);
+
         if (task is null)
             return Fail(ResultStatus.TaskNotFound);
 
@@ -74,6 +77,6 @@ public class MarkTaskDoneHandler(
         ];
 
         await Task.WhenAll(publishTasks);
-        return Success();
+        return Success(task.Episode.Tasks.All(t => t.IsDone));
     }
 }

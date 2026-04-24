@@ -83,6 +83,15 @@
     "conga.notification": "{staff_1}, episode {episode_2}'s **{role_3}** is At You!",
     "conga.notification.reminder": "{staff_1}, episode {episode_2}'s **{role_3}** is still At You!",
     "conga.selfLoop": "How do you expect me to link {abbreviation_1} to itself?",
+    "done.ahead.question": "Your team is still working on episode **{currentEpisode_1}**, but your task there is already done.\nThe next episode awaiting **{taskName_2}** is episode **{nextEpisode_3}**; did you want me to mark that one done instead?",
+    "done.badRequest": "That task is already done!",
+    "done.episodeComplete": "Also, episode {episode_1} is complete. Way to go!",
+    "done.noIncompleteEpisodes": "All episodes are complete!",
+    "done.noIncompleteTasks": "That task is already done for all episodes!",
+    "done.response.title": "Task Complete",
+    "done.success": "Nice job getting the **{taskName_1}** for episode {episode_2} done.",
+    "done.unaired.question": "It doesn't look like episode {episode_1} has aired yet. Continue?",
+    "done.unaired.response": "Alrighty then! Full steam ahead!",
     "error.aniListError": "Something went wrong with the AniList service. Try again later?",
     "error.badRequest": "Bad request. What did you expect me to do with <whatever you did>?",
     "error.generic": "An error occured. Next time will surely be different!",
@@ -160,6 +169,10 @@
     "templateStaff.resolutionFailed": "A template staff with the abbreviation {abbreviation_1} was not found."
   },
   "plural": {
+    "done.ahead.response": {
+      "one": "Right on! **{taskName_1}** is now {number_2} episode ahead.",
+      "other": "Right on! **{taskName_1}** is now {number_2} episodes ahead."
+    },
     "episode.creation.success": {
       "one": "I added {number_1} episode for you.",
       "other": "I added {number_1} episodes for you."

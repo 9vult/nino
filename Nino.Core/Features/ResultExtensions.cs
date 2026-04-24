@@ -201,7 +201,8 @@ public static class ResultExtensions
     /// allowing any prior value to be used or discarded.
     /// </param>
     /// <returns>
-    /// A successful <see cref="Result{TValue}"/> of <c>(<typeparamref name="T1"/>, <typeparamref name="T2"/>, <typeparamref name="T3"/>, <typeparamref name="TOut"/>)</c>
+    /// A successful <see cref="Result{TValue}"/> of <c>(<typeparamref name="T1"/>, <typeparamref name="T2"/>,
+    /// <typeparamref name="T3"/>, <typeparamref name="TOut"/>)</c>
     /// if both steps succeed; otherwise, a failed result carrying the status and message
     /// of whichever step failed first.
     /// </returns>
@@ -220,6 +221,55 @@ public static class ResultExtensions
                 (result.Value.Item1, result.Value.Item2, result.Value.Item3, nextResult.Value)
             )
             : Result<(T1, T2, T3, TOut)>.Fail(nextResult.Status, nextResult.Message);
+    }
+
+    /// <summary>
+    /// Awaits <paramref name="resultTask"/> and, if successful, passes the accumulated values to
+    /// <paramref name="next"/>, extending the result with the newly produced value.
+    /// Short-circuits on failure at either step.
+    /// </summary>
+    /// <typeparam name="T1">The first accumulated value type.</typeparam>
+    /// <typeparam name="T2">The second accumulated value type.</typeparam>
+    /// <typeparam name="T3">The third accumulated value type.</typeparam>
+    /// <typeparam name="T4">The fourth accumulated value type.</typeparam>
+    /// <typeparam name="TOut">The value type produced by <paramref name="next"/>.</typeparam>
+    /// <param name="resultTask">The task producing the three-element tuple result to inspect.</param>
+    /// <param name="next">
+    /// The async operation to invoke with the accumulated values as individual parameters,
+    /// allowing any prior value to be used or discarded.
+    /// </param>
+    /// <returns>
+    /// A successful <see cref="Result{TValue}"/> of <c>(<typeparamref name="T1"/>, <typeparamref name="T2"/>,
+    /// <typeparamref name="T3"/>, <typeparamref name="T4"/>, <typeparamref name="TOut"/>)</c>
+    /// if both steps succeed; otherwise, a failed result carrying the status and message
+    /// of whichever step failed first.
+    /// </returns>
+    public static async Task<Result<(T1, T2, T3, T4, TOut)>> ThenAsync<T1, T2, T3, T4, TOut>(
+        this Task<Result<(T1, T2, T3, T4)>> resultTask,
+        Func<T1, T2, T3, T4, Task<Result<TOut>>> next
+    )
+    {
+        var result = await resultTask;
+        if (!result.IsSuccess)
+            return Result<(T1, T2, T3, T4, TOut)>.Fail(result.Status, result.Message);
+
+        var nextResult = await next(
+            result.Value.Item1,
+            result.Value.Item2,
+            result.Value.Item3,
+            result.Value.Item4
+        );
+        return nextResult.IsSuccess
+            ? Result<(T1, T2, T3, T4, TOut)>.Success(
+                (
+                    result.Value.Item1,
+                    result.Value.Item2,
+                    result.Value.Item3,
+                    result.Value.Item4,
+                    nextResult.Value
+                )
+            )
+            : Result<(T1, T2, T3, T4, TOut)>.Fail(nextResult.Status, nextResult.Message);
     }
 
     /// <summary>

@@ -57,7 +57,7 @@ public static class DiscordBotServiceCollectionExtensions
             PartialUserCreatedEventHandler
         >();
 
-        // Release event handlers
+        // Broadcase event handlers
         services.AddScoped<IEventHandler<EpisodeReleasedEvent>, EpisodeReleasedEventHandler>();
         services.AddScoped<IEventHandler<VolumeReleasedEvent>, VolumeReleasedEventHandler>();
         services.AddScoped<IEventHandler<BatchReleasedEvent>, BatchReleasedEventHandler>();
@@ -72,6 +72,11 @@ public static class DiscordBotServiceCollectionExtensions
         services.AddScoped<
             IEventHandler<BatchReleasedObserverEvent>,
             BatchReleasedObserverEventHandler
+        >();
+        services.AddScoped<IEventHandler<TaskProgressEvent>, TaskProgressEventHandler>();
+        services.AddScoped<
+            IEventHandler<TaskProgressObserverEvent>,
+            TaskProgressObserverEventHandler
         >();
 
         services.AddHostedService<DiscordBotHostedService>();
