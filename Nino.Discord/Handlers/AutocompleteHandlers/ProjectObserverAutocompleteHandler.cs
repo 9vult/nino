@@ -4,12 +4,15 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
-using Nino.Core.Features.Queries.Observers.ListNames;
+using Nino.Core.Features;
+using Nino.Core.Features.Queries.Observers.ListNamesForProject;
+using Nino.Core.Features.Queries.Projects.Resolve;
 using Nino.Discord.Services;
+using Nino.Domain.ValueObjects;
 
 namespace Nino.Discord.Handlers.AutocompleteHandlers;
 
-public sealed class ObserverAutocompleteHandler : AutocompleteHandler
+public sealed class ProjectObserverAutocompleteHandler : AutocompleteHandler
 {
     /// <inheritdoc />
     public override async Task<AutocompletionResult> GenerateSuggestionsAsync(
@@ -19,25 +22,28 @@ public sealed class ObserverAutocompleteHandler : AutocompleteHandler
         IServiceProvider services
     )
     {
-        if (context.Interaction is not SocketAutocompleteInteraction interaction)
+        if (
+            context.Interaction is not SocketAutocompleteInteraction interaction
+            || interaction.Data.Options.FirstOrDefault(o => o.Name == "alias")?.Value
+                is not string alias
+        )
             return AutocompletionResult.FromSuccess();
 
         var focusedOption = interaction.Data.Current;
 
         await using var scope = services.CreateAsyncScope();
-        var handler = scope.ServiceProvider.GetRequiredService<ListObserverNamesHandler>();
         var idService = scope.ServiceProvider.GetRequiredService<IInteractionIdentityService>();
-        var client = scope.ServiceProvider.GetRequiredService<DiscordSocketClient>();
+        var projectResolver = scope.ServiceProvider.GetRequiredService<ResolveProjectHandler>();
+        var handler =
+            scope.ServiceProvider.GetRequiredService<ListObserverNamesForProjectHandler>();
 
         var (userId, groupId) = await idService.GetUserAndGroupAsync(interaction);
 
-        var guild = client.GetGuild(interaction.GuildId!.Value);
-        var member = guild.GetUser(interaction.User.Id);
-        var isDiscordAdmin = member.GuildPermissions.Administrator;
-
-        var result = await handler.HandleAsync(
-            new ListObserverNamesQuery(groupId, userId, isDiscordAdmin)
-        );
+        var result = await projectResolver
+            .HandleAsync(new ResolveProjectQuery(Alias.From(alias), groupId, userId))
+            .BindAsync(projectId =>
+                handler.HandleAsync(new ListObserverNamesForProjectQuery(projectId, userId))
+            );
 
         if (!result.IsSuccess)
             return AutocompletionResult.FromSuccess();
@@ -45,16 +51,13 @@ public sealed class ObserverAutocompleteHandler : AutocompleteHandler
         return AutocompletionResult.FromSuccess(
             result
                 .Value.Where(r =>
-                    r.Nickname.Value.StartsWith(
+                    r.GroupName.StartsWith(
                         (string)focusedOption.Value,
                         StringComparison.InvariantCultureIgnoreCase
                     )
                 )
                 .Take(25)
-                .Select(r => new AutocompleteResult(
-                    $"{r.Nickname} ({r.GroupName})",
-                    r.Id.Value.ToString()
-                ))
+                .Select(r => new AutocompleteResult(r.GroupName, r.Id.Value.ToString()))
         );
     }
 }

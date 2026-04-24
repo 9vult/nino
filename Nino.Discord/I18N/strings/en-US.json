@@ -119,6 +119,8 @@
     "group.edit.success": "Edit successful!",
     "import.failed": "Failed to read the import file.",
     "observer.creation.success": "Successfully created the observer!",
+    "observer.delegate.remove.success": "Delegate Observer removed.",
+    "observer.delegate.set.success": "Delegate Observer set.",
     "observer.delete.success": "Successfully removed the observer!",
     "observer.invalidServerId": "`{id_1}` is not a valid Discord server ID.",
     "observer.title": "Observer",

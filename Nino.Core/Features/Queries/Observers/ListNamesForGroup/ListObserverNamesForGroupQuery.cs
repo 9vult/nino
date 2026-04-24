@@ -2,9 +2,9 @@
 
 using Nino.Domain.ValueObjects;
 
-namespace Nino.Core.Features.Queries.Observers.ListNames;
+namespace Nino.Core.Features.Queries.Observers.ListNamesForGroup;
 
-public sealed record ListObserverNamesQuery(
+public sealed record ListObserverNamesForGroupQuery(
     GroupId GroupId,
     UserId RequestedBy,
     bool OverrideVerification

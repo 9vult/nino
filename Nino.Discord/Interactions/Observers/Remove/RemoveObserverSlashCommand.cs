@@ -13,7 +13,7 @@ public partial class ObserverModule
 {
     [SlashCommand("remove", "Remove an observer from a project")]
     public async Task<RuntimeResult> RemoveAsync(
-        [Summary(name: "observer"), Autocomplete(typeof(ObserverAutocompleteHandler))]
+        [Summary(name: "observer"), Autocomplete(typeof(GroupObserverAutocompleteHandler))]
             string rawObserverId
     )
     {
