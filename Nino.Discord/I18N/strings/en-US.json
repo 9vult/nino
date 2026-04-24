@@ -153,6 +153,9 @@
     "release.incomplete.episode": "Episode {episode_1} isn't done yet!",
     "release.title": "Released!",
     "release.volume.success": "Nice job releasing volume {episode_1}!",
+    "skip.appendage": "(Skipped)",
+    "skip.response.title": "Task Skipped",
+    "skip.success": "**{taskName_1}** for episode {episode_2} has been skipped.\nIf you wish to do it for realsies, `/undone` it first.",
     "task.conflict": "A task with the abbreviation {abbreviation_1} already exists!",
     "task.creation.success": "Assigned {assignee_1} to **{task_2}** for episode {episode_3}.",
     "task.creation.success.range": "Assigned {assignee_1} to **{task_2}** for episodes {first_3}-{last_4}.",
@@ -166,7 +169,10 @@
     "templateStaff.edit.success": "Edited {abbreviation_1} for {applicator_2}.",
     "templateStaff.delete.success": "Removed {abbreviation_1} for {applicator_2}.",
     "templateStaff.notFound": "Template staff not found.",
-    "templateStaff.resolutionFailed": "A template staff with the abbreviation {abbreviation_1} was not found."
+    "templateStaff.resolutionFailed": "A template staff with the abbreviation {abbreviation_1} was not found.",
+    "undone.badRequest": "That task isn't done!",
+    "undone.response.title": "Task Incomplete",
+    "undone.success": "So the episode {episode_1} **{taskName_2}** wasn't done, after all."
   },
   "plural": {
     "done.ahead.response": {

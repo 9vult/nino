@@ -81,8 +81,13 @@ public sealed class TaskProgressObserverEventHandler(
             ProgressType.Undone => '❌',
             _ => '❓',
         };
+        var appendage = progressType switch
+        {
+            ProgressType.Skipped => T("skip.appendage", locale),
+            _ => string.Empty,
+        };
         var body = new StringBuilder();
-        body.AppendLine($"{emoji} **{data.TaskName}**");
+        body.AppendLine($"{emoji} **{data.TaskName}** {appendage}");
 
         if (data.PublishType is ProgressPublishType.Normal)
         {

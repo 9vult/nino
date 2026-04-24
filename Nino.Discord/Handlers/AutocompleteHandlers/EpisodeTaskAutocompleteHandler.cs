@@ -27,7 +27,7 @@ public sealed class EpisodeTaskAutocompleteHandler : AutocompleteHandler
             context.Interaction is not SocketAutocompleteInteraction interaction
             || interaction.Data.Options.FirstOrDefault(o => o.Name == "alias")?.Value
                 is not string alias
-            || interaction.Data.Options.FirstOrDefault(o => o.Name == "episode-number")?.Value
+            || interaction.Data.Options.FirstOrDefault(o => o.Name == "episode")?.Value
                 is not string number
         )
             return AutocompletionResult.FromSuccess();

@@ -23,7 +23,7 @@ public partial class DoneModule
         [MaxLength(Length.Abbreviation), Autocomplete(typeof(ProjectTaskAutocompleteHandler))]
             Abbreviation abbreviation,
         [MaxLength(Length.Number), Autocomplete(typeof(EpisodeAutocompleteHandler))]
-            Number? episode = null
+            Number? episodeNumber = null
     )
     {
         var interaction = Context.Interaction;
@@ -38,12 +38,12 @@ public partial class DoneModule
         GetGenericProjectDataResponse pData;
         GetTaskInfoResponse tData;
 
-        if (episode.HasValue)
+        if (episodeNumber.HasValue)
         {
             var resolve = await projectResolver
                 .HandleAsync(new ResolveProjectQuery(alias, groupId, requestedBy))
                 .ThenAsync(pId =>
-                    episodeResolver.HandleAsync(new ResolveEpisodeQuery(pId, episode.Value))
+                    episodeResolver.HandleAsync(new ResolveEpisodeQuery(pId, episodeNumber.Value))
                 )
                 .ThenAsync(
                     (_, eId) => taskResolver.HandleAsync(new ResolveTaskQuery(eId, abbreviation))
@@ -62,7 +62,7 @@ public partial class DoneModule
                     new FailureContext
                     {
                         Alias = alias,
-                        Episode = episode,
+                        Episode = episodeNumber,
                         Task = abbreviation,
                     }
                 );
