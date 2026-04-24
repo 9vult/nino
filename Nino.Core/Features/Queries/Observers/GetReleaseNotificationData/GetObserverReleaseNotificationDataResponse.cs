@@ -8,6 +8,7 @@ namespace Nino.Core.Features.Queries.Observers.GetReleaseNotificationData;
 
 public sealed record GetObserverReleaseNotificationDataResponse(
     string ProjectTitle,
+    string ReleasePrefix,
     MappedIdDto<ChannelId> NotificationChannel,
     MappedIdDto<RoleId>? PrimaryRole,
     MappedIdDto<RoleId>? SecondaryRole,

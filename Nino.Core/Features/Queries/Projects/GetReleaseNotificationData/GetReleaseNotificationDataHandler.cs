@@ -20,6 +20,7 @@ public sealed class GetReleaseNotificationDataHandler(ReadOnlyNinoDbContext db)
             .Select(p => new
             {
                 p.Title,
+                p.Group.Configuration.ReleasePrefix,
                 p.ReleaseChannel,
                 p.Group.Configuration.Locale,
             })
@@ -40,6 +41,7 @@ public sealed class GetReleaseNotificationDataHandler(ReadOnlyNinoDbContext db)
         return Success(
             new GetReleaseNotificationDataResponse(
                 response.Title,
+                response.ReleasePrefix,
                 MappedIdDto<ChannelId>.From(response.ReleaseChannel),
                 MappedIdDto<RoleId>.From(primaryRole),
                 MappedIdDto<RoleId>.From(secondaryRole),

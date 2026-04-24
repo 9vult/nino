@@ -4,9 +4,7 @@ using System.Text;
 using Discord;
 using Discord.WebSocket;
 using Nino.Core.Events;
-using Nino.Core.Features.Queries.Episodes.GetAirNotificationData;
 using Nino.Core.Features.Queries.Projects.GetReleaseNotificationData;
-using Nino.Discord.Interactions;
 using Nino.Discord.Services;
 using Nino.Localization;
 
@@ -94,6 +92,9 @@ public sealed class EpisodeReleasedEventHandler(
 
         var locale = data.Locale.ToDiscordLocale();
         var b = new StringBuilder();
+
+        if (!string.IsNullOrEmpty(data.ReleasePrefix))
+            b.Append(data.ReleasePrefix + ' ');
 
         b.AppendLine(T("release.broadcast.episode", locale, data.ProjectTitle, episodeNumber));
         b.Append(string.Join(' ', primaryRoleMention, secondaryRoleMention, tertiaryRoleMention));

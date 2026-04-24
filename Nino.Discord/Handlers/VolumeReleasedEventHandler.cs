@@ -95,6 +95,9 @@ public sealed class VolumeReleasedEventHandler(
         var locale = data.Locale.ToDiscordLocale();
         var b = new StringBuilder();
 
+        if (!string.IsNullOrEmpty(data.ReleasePrefix))
+            b.Append(data.ReleasePrefix + ' ');
+
         b.AppendLine(T("release.broadcast.volume", locale, data.ProjectTitle, volumeNumber));
         b.Append(string.Join(' ', primaryRoleMention, secondaryRoleMention, tertiaryRoleMention));
 

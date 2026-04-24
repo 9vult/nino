@@ -80,6 +80,9 @@ public sealed class EpisodeReleasedObserverEventHandler(
         var locale = data.Locale.ToDiscordLocale();
         var b = new StringBuilder();
 
+        if (!string.IsNullOrEmpty(data.ReleasePrefix))
+            b.Append(data.ReleasePrefix + ' ');
+
         b.AppendLine(T("release.broadcast.episode", locale, data.ProjectTitle, episodeNumber));
         b.Append(string.Join(' ', primaryRoleMention, secondaryRoleMention, tertiaryRoleMention));
 

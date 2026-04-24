@@ -22,6 +22,7 @@ public sealed class GetObserverReleaseNotificationDataHandler(ReadOnlyNinoDbCont
             .Observers.Where(p => p.Id == query.ObserverId)
             .Select(o => new GetObserverReleaseNotificationDataResponse(
                 o.Project.Title,
+                o.OriginGroup.Configuration.ReleasePrefix,
                 MappedIdDto<ChannelId>.From(o.ReleaseChannel),
                 MappedIdDto<RoleId>.From(o.PrimaryRole),
                 MappedIdDto<RoleId>.From(o.SecondaryRole),
