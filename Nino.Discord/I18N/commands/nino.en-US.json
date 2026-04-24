@@ -153,7 +153,27 @@
     },
     "reminders": {
       "name": "reminders",
-      "description": "Reminder management"
+      "description": "Reminder management",
+      "disable": {
+        "name": "disable",
+        "description": "Disable Conga reminders for a project",
+        "alias": {
+          "name": "project",
+          "description": "Project alias"
+        }
+      },
+      "enable": {
+        "name": "enable",
+        "description": "Enable Conga reminders for a project",
+        "alias": {
+          "name": "project",
+          "description": "Project alias"
+        },
+        "days": {
+          "name": "days",
+          "description": "Reminder period"
+        }
+      }
     },
     "view": {
       "name": "view",
@@ -321,6 +341,30 @@
       "tertiary-role": {
         "name": "tertiary-role",
         "description": "Tertiary role for releases"
+      }
+    },
+    "delegate": {
+      "name": "delegate",
+      "description": "Manage delegate observers",
+      "set": {
+        "name": "set",
+        "description": "Set a delegate observer",
+        "alias": {
+          "name": "project",
+          "description": "Project alias"
+        },
+        "observer": {
+          "name": "observer",
+          "description": "Observer to delegate"
+        }
+      },
+      "remove": {
+        "name": "remove",
+        "description": "Remove a delegate observer",
+        "alias": {
+          "name": "project",
+          "description": "Project alias"
+        }
       }
     },
     "remove": {

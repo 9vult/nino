@@ -82,6 +82,8 @@
     "conga.notFound": "One or more of the requested nodes were not found.",
     "conga.notification": "{staff_1}, episode {episode_2}'s **{role_3}** is At You!",
     "conga.notification.reminder": "{staff_1}, episode {episode_2}'s **{role_3}** is still At You!",
+    "conga.reminders.disable.success": "Conga reminders disabled.",
+    "conga.reminders.enable.success": "Conga reminders enabled with a {hours_1} period.",
     "conga.selfLoop": "How do you expect me to link {abbreviation_1} to itself?",
     "done.ahead.question": "Your team is still working on episode **{currentEpisode_1}**, but your task there is already done.\nThe next episode awaiting **{taskName_2}** is episode **{nextEpisode_3}**; did you want me to mark that one done instead?",
     "done.badRequest": "That task is already done!",

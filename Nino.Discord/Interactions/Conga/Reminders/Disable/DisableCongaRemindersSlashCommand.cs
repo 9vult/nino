@@ -3,7 +3,7 @@
 using Discord;
 using Discord.Interactions;
 using Nino.Core.Features;
-using Nino.Core.Features.Commands.Projects.DelegateObserver.Set;
+using Nino.Core.Features.Commands.Projects.CongaReminders.Disable;
 using Nino.Core.Features.Queries.Projects.GetGenericData;
 using Nino.Core.Features.Queries.Projects.Resolve;
 using Nino.Discord.Entities;
@@ -11,29 +11,19 @@ using Nino.Discord.Handlers.AutocompleteHandlers;
 using Nino.Domain;
 using Nino.Domain.ValueObjects;
 
-namespace Nino.Discord.Interactions.Observers;
+namespace Nino.Discord.Interactions.Conga;
 
-public partial class ObserverModule
+public partial class CongaModule
 {
-    public partial class DelegateModule
+    public partial class RemindersModule
     {
-        [SlashCommand("set", "Set a delegate observer")]
-        public async Task<RuntimeResult> RemoveAsync(
-            [MaxLength(Length.Alias), Autocomplete(typeof(ProjectAutocompleteHandler))] Alias alias,
-            [Summary(name: "observer"), Autocomplete(typeof(ProjectObserverAutocompleteHandler))]
-                string rawObserverId
+        [SlashCommand("disable", "Disable Conga reminders for a project")]
+        public async Task<RuntimeResult> DisableAsync(
+            [MaxLength(Length.Alias), Autocomplete(typeof(ProjectAutocompleteHandler))] Alias alias
         )
         {
             var interaction = Context.Interaction;
             var locale = interaction.UserLocale;
-
-            // Cleanup
-            rawObserverId = rawObserverId.Trim();
-
-            if (!ObserverId.TryParse(rawObserverId, out var observerId))
-                return await interaction.FailAsync(
-                    T("observer.unknownObserver", locale, rawObserverId)
-                );
 
             var (requestedBy, groupId) = await interactionIdService.GetUserAndGroupAsync(
                 interaction
@@ -54,9 +44,12 @@ public partial class ObserverModule
 
             var projectId = resolve.Value;
 
-            var command = new SetDelegateObserverCommand(projectId, observerId, requestedBy);
+            var command = new DisableCongaRemindersCommand(
+                ProjectId: projectId,
+                RequestedBy: requestedBy
+            );
 
-            var result = await setHandler
+            var result = await disableHandler
                 .HandleAsync(command)
                 .BindAsync(() =>
                     getProjectDataHandler.HandleAsync(new GetGenericProjectDataQuery(projectId))
@@ -77,7 +70,7 @@ public partial class ObserverModule
             var successEmbed = new EmbedBuilder()
                 .WithProjectInfo(pData, locale)
                 .WithTitle(T("project.modification.title", locale))
-                .WithDescription(T("observer.delegate.set.success", locale))
+                .WithDescription(T("conga.reminders.disable.success", locale))
                 .Build();
 
             await interaction.FollowupAsync(embed: successEmbed);
