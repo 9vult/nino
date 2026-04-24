@@ -21,7 +21,7 @@ public partial class TaskModule
     public async Task<RuntimeResult> AddAsync(
         [MaxLength(Length.Alias), Autocomplete(typeof(ProjectAutocompleteHandler))] Alias alias,
         [MaxLength(Length.Abbreviation)] Abbreviation abbreviation,
-        [MaxLength(Length.RoleName)] string name,
+        [MaxLength(Length.RoleName)] string fullName,
         SocketUser assignee,
         bool isPseudo,
         [MaxLength(Length.Number), Autocomplete(typeof(EpisodeAutocompleteHandler))]
@@ -34,7 +34,7 @@ public partial class TaskModule
         var locale = interaction.UserLocale;
 
         // Cleanup
-        name = name.Trim();
+        fullName = fullName.Trim();
 
         var (requestedBy, groupId) = await interactionIdService.GetUserAndGroupAsync(interaction);
 
@@ -85,7 +85,7 @@ public partial class TaskModule
             RequestedBy: requestedBy,
             AssigneeId: assigneeId,
             Abbreviation: abbreviation,
-            Name: name,
+            Name: fullName,
             IsPseudo: isPseudo
         );
 
@@ -112,7 +112,7 @@ public partial class TaskModule
         var successEmbed = new EmbedBuilder()
             .WithProjectInfo(pData, locale)
             .WithTitle(T("project.modification.title", locale))
-            .WithDescription(T(locKey, locale, staffMention, name, firstEpisode, lastEpisode))
+            .WithDescription(T(locKey, locale, staffMention, fullName, firstEpisode, lastEpisode))
             .Build();
 
         await interaction.FollowupAsync(embed: successEmbed);

@@ -28,7 +28,7 @@ public sealed class BlameSlashCommand(
     public async Task<RuntimeResult> BlameAsync(
         [MaxLength(Length.Alias), Autocomplete(typeof(ProjectAutocompleteHandler))] Alias alias,
         [MaxLength(Length.Number), Autocomplete(typeof(EpisodeAutocompleteHandler))]
-            Number? episode = null,
+            Number? episodeNumber = null,
         bool explain = false,
         bool includePseudo = false
     )
@@ -54,17 +54,17 @@ public sealed class BlameSlashCommand(
         var projectId = projectResolve.Value;
 
         EpisodeId? episodeId = null;
-        if (episode.HasValue)
+        if (episodeNumber.HasValue)
         {
             var episodeResolve = await episodeResolver.HandleAsync(
-                new ResolveEpisodeQuery(projectId, episode.Value)
+                new ResolveEpisodeQuery(projectId, episodeNumber.Value)
             );
             if (!episodeResolve.IsSuccess)
             {
                 return await interaction.FailAsync(
                     episodeResolve.Status,
                     locale,
-                    new FailureContext { Alias = alias, Episode = episode }
+                    new FailureContext { Alias = alias, Episode = episodeNumber }
                 );
             }
             episodeId = episodeResolve.Value;
@@ -91,7 +91,7 @@ public sealed class BlameSlashCommand(
                 new FailureContext
                 {
                     Alias = alias,
-                    Episode = episode,
+                    Episode = episodeNumber,
                     Overrides = new Dictionary<ResultStatus, string>
                     {
                         [ResultStatus.BadRequest] = "blame.allComplete",

@@ -27,7 +27,7 @@ public partial class TaskModule
         [MaxLength(Length.Number), Autocomplete(typeof(EpisodeAutocompleteHandler))]
             Number? lastEpisode = null,
         [MaxLength(Length.Abbreviation)] Abbreviation? newAbbreviation = null,
-        [MaxLength(Length.RoleName)] string? name = null,
+        [MaxLength(Length.RoleName)] string? fullName = null,
         SocketUser? assignee = null,
         decimal? weight = null,
         bool? isPseudo = null
@@ -37,7 +37,7 @@ public partial class TaskModule
         var locale = interaction.UserLocale;
 
         // Cleanup
-        name = name?.Trim();
+        fullName = fullName?.Trim();
 
         var (requestedBy, groupId) = await interactionIdService.GetUserAndGroupAsync(interaction);
 
@@ -92,7 +92,7 @@ public partial class TaskModule
             Abbreviation: abbreviation,
             AssigneeId: assigneeId,
             NewAbbreviation: newAbbreviation,
-            Name: name,
+            Name: fullName,
             Weight: weight,
             IsPseudo: isPseudo
         );

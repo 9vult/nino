@@ -23,14 +23,14 @@ public partial class CongaModule
         [SlashCommand("create", "Add a group to a project's Conga graph")]
         public async Task<RuntimeResult> CreateGroupAsync(
             [MaxLength(Length.Alias), Autocomplete(typeof(ProjectAutocompleteHandler))] Alias alias,
-            [MaxLength(Length.Abbreviation)] Abbreviation name
+            [MaxLength(Length.Abbreviation)] Abbreviation groupName
         )
         {
             var interaction = Context.Interaction;
             var locale = interaction.UserLocale;
 
             // Cleanup
-            name = Abbreviation.From('@' + name.Value.TrimStart('@'));
+            groupName = Abbreviation.From('@' + groupName.Value.TrimStart('@'));
 
             var (requestedBy, groupId) = await interactionIdService.GetUserAndGroupAsync(
                 interaction
@@ -54,7 +54,7 @@ public partial class CongaModule
             var command = new AddCongaGroupCommand(
                 ProjectId: projectId,
                 RequestedBy: requestedBy,
-                Name: name
+                Name: groupName
             );
 
             var result = await createGroupHandler
@@ -74,7 +74,11 @@ public partial class CongaModule
                     ResultStatus.CongaConflict => "conga.group.add.conflict",
                     _ => "error.generic",
                 };
-                var args = new Dictionary<string, object> { ["alias"] = alias, ["name"] = name };
+                var args = new Dictionary<string, object>
+                {
+                    ["alias"] = alias,
+                    ["name"] = groupName,
+                };
 
                 var embed = new EmbedBuilder()
                     .WithTitle("Baka.")
@@ -92,7 +96,7 @@ public partial class CongaModule
             var successEmbed = new EmbedBuilder()
                 .WithProjectInfo(pData, locale, includePoster: false)
                 .WithTitle(T("project.modification.title", locale))
-                .WithDescription(T("conga.group.add.success", locale, name));
+                .WithDescription(T("conga.group.add.success", locale, groupName));
 
             if (!string.IsNullOrEmpty(dot))
             {

@@ -26,7 +26,7 @@ public partial class TemplateStaffModule
             Abbreviation abbreviation,
         TemplateStaffApplicator applyTo,
         [MaxLength(Length.Abbreviation)] Abbreviation? newAbbreviation = null,
-        [MaxLength(Length.RoleName)] string? name = null,
+        [MaxLength(Length.RoleName)] string? fullName = null,
         SocketUser? assignee = null,
         decimal? weight = null,
         bool? isPseudo = null
@@ -36,7 +36,7 @@ public partial class TemplateStaffModule
         var locale = interaction.UserLocale;
 
         // Cleanup
-        name = name?.Trim();
+        fullName = fullName?.Trim();
 
         var (requestedBy, groupId) = await interactionIdService.GetUserAndGroupAsync(interaction);
 
@@ -72,7 +72,7 @@ public partial class TemplateStaffModule
             Applicator: applyTo,
             AssigneeId: assigneeId,
             NewAbbreviation: newAbbreviation,
-            Name: name,
+            Name: fullName,
             Weight: weight,
             IsPseudo: isPseudo
         );

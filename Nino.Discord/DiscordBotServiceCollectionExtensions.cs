@@ -28,7 +28,14 @@ public static class DiscordBotServiceCollectionExtensions
         services.AddSingleton(p =>
         {
             var interactionService = new InteractionService(
-                p.GetRequiredService<DiscordSocketClient>()
+                p.GetRequiredService<DiscordSocketClient>(),
+                new InteractionServiceConfig
+                {
+                    LocalizationManager = new JsonLocalizationManager(
+                        Path.Combine(AppContext.BaseDirectory, "I18N", "commands"),
+                        "nino"
+                    ),
+                }
             );
 
             interactionService.AddTypeConverter<Alias>(new VogenTypeConverter<Alias>());

@@ -35,7 +35,8 @@ public class UndoneSlashCommand(
     [SlashCommand("skip", "Skip a task")]
     public async Task<RuntimeResult> HandleSkipAsync(
         [MaxLength(Length.Alias), Autocomplete(typeof(ProjectAutocompleteHandler))] Alias alias,
-        [MaxLength(Length.Number), Autocomplete(typeof(EpisodeAutocompleteHandler))] Number episode,
+        [MaxLength(Length.Number), Autocomplete(typeof(EpisodeAutocompleteHandler))]
+            Number episodeNumber,
         [MaxLength(Length.Abbreviation), Autocomplete(typeof(EpisodeTaskAutocompleteHandler))]
             Abbreviation abbreviation
     )
@@ -47,7 +48,9 @@ public class UndoneSlashCommand(
 
         var resolve = await projectResolver
             .HandleAsync(new ResolveProjectQuery(alias, groupId, requestedBy))
-            .ThenAsync(pId => episodeResolver.HandleAsync(new ResolveEpisodeQuery(pId, episode)))
+            .ThenAsync(pId =>
+                episodeResolver.HandleAsync(new ResolveEpisodeQuery(pId, episodeNumber))
+            )
             .ThenAsync(
                 (_, eId) => taskResolver.HandleAsync(new ResolveTaskQuery(eId, abbreviation))
             );
@@ -60,7 +63,7 @@ public class UndoneSlashCommand(
                 new FailureContext
                 {
                     Alias = alias,
-                    Episode = episode,
+                    Episode = episodeNumber,
                     Task = abbreviation,
                 }
             );

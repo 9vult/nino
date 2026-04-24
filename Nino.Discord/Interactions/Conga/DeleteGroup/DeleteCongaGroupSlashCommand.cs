@@ -25,7 +25,7 @@ public partial class CongaModule
         public async Task<RuntimeResult> DeleteGroupAsync(
             [MaxLength(Length.Alias), Autocomplete(typeof(ProjectAutocompleteHandler))] Alias alias,
             [MaxLength(Length.Abbreviation), Autocomplete(typeof(CongaGroupsAutocompleteHandler))]
-                Abbreviation name
+                Abbreviation groupName
         )
         {
             var interaction = Context.Interaction;
@@ -53,7 +53,7 @@ public partial class CongaModule
             var command = new RemoveCongaGroupCommand(
                 ProjectId: projectId,
                 RequestedBy: requestedBy,
-                Name: name
+                Name: groupName
             );
 
             var result = await deleteGroupHandler
@@ -73,7 +73,11 @@ public partial class CongaModule
                     ResultStatus.NotFound => "conga.group.remove.notfound",
                     _ => "error.generic",
                 };
-                var args = new Dictionary<string, object> { ["alias"] = alias, ["name"] = name };
+                var args = new Dictionary<string, object>
+                {
+                    ["alias"] = alias,
+                    ["name"] = groupName,
+                };
 
                 var embed = new EmbedBuilder()
                     .WithTitle("Baka.")
@@ -117,7 +121,7 @@ public partial class CongaModule
                     );
                     successEmbed = successEmbed
                         .WithImageUrl("attachment://congo.png")
-                        .WithDescription(T("conga.group.remove.success", locale, name));
+                        .WithDescription(T("conga.group.remove.success", locale, groupName));
                     await interaction.FollowupWithFileAsync(
                         stream,
                         "congo.png",
@@ -134,7 +138,7 @@ public partial class CongaModule
             }
 
             successEmbed = successEmbed.WithDescription(
-                T("conga.group.remove.success.empty", locale, name)
+                T("conga.group.remove.success.empty", locale, groupName)
             );
 
             await interaction.FollowupAsync(embed: successEmbed.Build());

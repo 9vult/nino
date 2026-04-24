@@ -21,7 +21,8 @@ public partial class EpisodesModule
     [SlashCommand("roster", "Show who's working on an episode")]
     public async Task<RuntimeResult> RosterAsync(
         [MaxLength(Length.Alias), Autocomplete(typeof(ProjectAutocompleteHandler))] Alias alias,
-        [MaxLength(Length.Number), Autocomplete(typeof(EpisodeAutocompleteHandler))] Number episode
+        [MaxLength(Length.Number), Autocomplete(typeof(EpisodeAutocompleteHandler))]
+            Number episodeNumber
     )
     {
         var interaction = Context.Interaction;
@@ -31,14 +32,16 @@ public partial class EpisodesModule
 
         var resolve = await projectResolver
             .HandleAsync(new ResolveProjectQuery(alias, groupId, requestedBy))
-            .ThenAsync(pId => episodeResolver.HandleAsync(new ResolveEpisodeQuery(pId, episode)));
+            .ThenAsync(pId =>
+                episodeResolver.HandleAsync(new ResolveEpisodeQuery(pId, episodeNumber))
+            );
 
         if (!resolve.IsSuccess)
         {
             return await interaction.FailAsync(
                 resolve.Status,
                 locale,
-                new FailureContext { Alias = alias, Episode = episode }
+                new FailureContext { Alias = alias, Episode = episodeNumber }
             );
         }
 
@@ -61,7 +64,7 @@ public partial class EpisodesModule
             return await interaction.FailAsync(
                 result.Status,
                 locale,
-                new FailureContext { Alias = alias, Episode = episode }
+                new FailureContext { Alias = alias, Episode = episodeNumber }
             );
         }
 

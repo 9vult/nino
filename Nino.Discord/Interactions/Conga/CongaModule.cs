@@ -33,7 +33,7 @@ public partial class CongaModule(
     ILogger<CongaModule> logger
 ) : InteractionModuleBase<IInteractionContext>
 {
-    [Group("edge", "Group management")]
+    [Group("edge", "Edge management")]
     public partial class EdgeModule(
         IInteractionIdentityService interactionIdService,
         ResolveProjectHandler projectResolver,

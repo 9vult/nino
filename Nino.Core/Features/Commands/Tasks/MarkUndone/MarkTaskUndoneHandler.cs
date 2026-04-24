@@ -38,6 +38,16 @@ public class MarkTaskUndoneHandler(
         task.IsDone = false;
         await db.SaveChangesAsync();
 
+        if (
+            !await db
+                .Projects.Where(p => p.Id == command.ProjectId)
+                .Select(p => p.Group.Configuration.PublishPrivateProgress)
+                .FirstOrDefaultAsync()
+        )
+        {
+            return Success();
+        }
+
         var observers = await db
             .Observers.Where(o => o.ProjectId == command.ProjectId)
             .ToListAsync();

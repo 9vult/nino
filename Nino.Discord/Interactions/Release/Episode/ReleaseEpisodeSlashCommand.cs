@@ -20,7 +20,7 @@ public partial class ReleaseModule
     [SlashCommand("episode", "Release an episode")]
     public async Task<RuntimeResult> ReleaseEpisodeAsync(
         [MaxLength(Length.Alias), Autocomplete(typeof(ProjectAutocompleteHandler))] Alias alias,
-        [MaxLength(Length.Number)] Number episode,
+        [MaxLength(Length.Number)] Number episodeNumber,
         string url,
         SocketRole? primaryRole = null,
         SocketRole? secondaryRole = null,
@@ -62,7 +62,7 @@ public partial class ReleaseModule
         var command = new ReleaseEpisodeCommand(
             projectId,
             requestedBy,
-            episode,
+            episodeNumber,
             urls,
             primaryRoleId,
             secondaryRoleId,
@@ -70,7 +70,7 @@ public partial class ReleaseModule
         );
 
         var validate = await validateReleaseHandler
-            .HandleAsync(new ValidateReleaseQuery(projectId, episode, episode))
+            .HandleAsync(new ValidateReleaseQuery(projectId, episodeNumber, episodeNumber))
             .ThenAsync(_ =>
                 getProjectDataHandler.HandleAsync(new GetGenericProjectDataQuery(projectId))
             );
@@ -99,7 +99,7 @@ public partial class ReleaseModule
             var successEmbed = new EmbedBuilder()
                 .WithProjectInfo(pData, locale)
                 .WithTitle(T("release.title", locale))
-                .WithDescription(T("release.episode.success", locale, episode))
+                .WithDescription(T("release.episode.success", locale, episodeNumber))
                 .Build();
 
             await interaction.FollowupAsync(embed: successEmbed);
@@ -110,7 +110,7 @@ public partial class ReleaseModule
         var questionEmbed = new EmbedBuilder()
             .WithProjectInfo(pData, locale)
             .WithTitle(T("release.incomplete.title", locale))
-            .WithDescription(T("release.incomplete.episode", locale, episode))
+            .WithDescription(T("release.incomplete.episode", locale, episodeNumber))
             .Build();
 
         var stateId = await stateService.SaveStateAsync(command);

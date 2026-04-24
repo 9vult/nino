@@ -27,7 +27,7 @@ public partial class CongaModule
             [MaxLength(Length.Abbreviation), Autocomplete(typeof(CongaGroupsAutocompleteHandler))]
                 Abbreviation group,
             [MaxLength(Length.Abbreviation), Autocomplete(typeof(ProjectTaskAutocompleteHandler))]
-                Abbreviation name
+                Abbreviation taskName
         )
         {
             var interaction = Context.Interaction;
@@ -56,7 +56,7 @@ public partial class CongaModule
                 ProjectId: projectId,
                 RequestedBy: requestedBy,
                 GroupName: group,
-                NodeName: name
+                NodeName: taskName
             );
 
             var result = await removeMemberHandler
@@ -80,7 +80,7 @@ public partial class CongaModule
                 var args = new Dictionary<string, object>
                 {
                     ["alias"] = alias,
-                    ["name"] = name,
+                    ["name"] = taskName,
                     ["group"] = group,
                 };
 
@@ -100,7 +100,7 @@ public partial class CongaModule
             var successEmbed = new EmbedBuilder()
                 .WithProjectInfo(pData, locale, includePoster: false)
                 .WithTitle(T("project.modification.title", locale))
-                .WithDescription(T("conga.member.remove.success", locale, name, group));
+                .WithDescription(T("conga.member.remove.success", locale, taskName, group));
 
             if (!string.IsNullOrEmpty(dot))
             {

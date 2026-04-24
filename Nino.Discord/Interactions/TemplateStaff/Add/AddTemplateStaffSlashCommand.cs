@@ -22,7 +22,7 @@ public partial class TemplateStaffModule
     public async Task<RuntimeResult> AddAsync(
         [MaxLength(Length.Alias), Autocomplete(typeof(ProjectAutocompleteHandler))] Alias alias,
         [MaxLength(Length.Abbreviation)] Abbreviation abbreviation,
-        [MaxLength(Length.RoleName)] string name,
+        [MaxLength(Length.RoleName)] string fullName,
         SocketUser assignee,
         bool isPseudo,
         TemplateStaffApplicator applyTo
@@ -32,7 +32,7 @@ public partial class TemplateStaffModule
         var locale = interaction.UserLocale;
 
         // Cleanup
-        name = name.Trim();
+        fullName = fullName.Trim();
 
         var (requestedBy, groupId) = await interactionIdService.GetUserAndGroupAsync(interaction);
 
@@ -62,7 +62,7 @@ public partial class TemplateStaffModule
             RequestedBy: requestedBy,
             AssigneeId: assigneeId,
             Abbreviation: abbreviation,
-            Name: name,
+            Name: fullName,
             IsPseudo: isPseudo
         );
 
@@ -93,7 +93,7 @@ public partial class TemplateStaffModule
                     "templateStaff.creation.success",
                     locale,
                     staffMention,
-                    name,
+                    fullName,
                     applyTo.ToFriendlyString(locale)
                 )
             )
