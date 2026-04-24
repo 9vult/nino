@@ -104,6 +104,10 @@ public sealed class BlameSlashCommand(
         var pData = result.Value.Item2;
 
         var b = new StringBuilder();
+
+        if (!string.IsNullOrEmpty(bData.Motd))
+            b.AppendLine(bData.Motd);
+
         if (!explain)
         {
             foreach (var task in bData.Statuses.OrderBy(t => t.Weight))

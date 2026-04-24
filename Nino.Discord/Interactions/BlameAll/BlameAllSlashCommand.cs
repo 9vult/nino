@@ -88,6 +88,9 @@ public sealed class BlameAllSlashCommand(
 
         var b = new StringBuilder();
 
+        if (!string.IsNullOrEmpty(bData.Motd))
+            b.AppendLine(bData.Motd);
+
         foreach (
             var episode in bData.Episodes.OrderBy(
                 e => e.EpisodeNumber.Value,

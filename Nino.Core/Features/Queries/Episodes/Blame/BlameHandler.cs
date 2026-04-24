@@ -64,7 +64,8 @@ public sealed class BlameHandler(
                         t.IsPseudo
                     ))
                     .ToList(),
-                e.Project.Type == ProjectType.Movie && e.Project.Episodes.Count == 1
+                e.Project.Type == ProjectType.Movie && e.Project.Episodes.Count == 1,
+                e.Project.Motd
             ))
             .FirstOrDefaultAsync();
 

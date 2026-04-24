@@ -93,6 +93,8 @@ public sealed class BlameAllHandler(
                 episodeStatuses.Add(status);
         }
 
-        return Success(new BlameAllResponse(episodeStatuses, (int)startPage, (int)pageCount));
+        return Success(
+            new BlameAllResponse(episodeStatuses, project.Motd, (int)startPage, (int)pageCount)
+        );
     }
 }

@@ -10,5 +10,6 @@ public sealed record BlameResponse(
     DateTimeOffset? AiredAt,
     DateTimeOffset? UpdatedAt,
     IReadOnlyList<BlameStatus> Statuses,
-    bool IsSingleEpisodeMovie
+    bool IsSingleEpisodeMovie,
+    string Motd
 );

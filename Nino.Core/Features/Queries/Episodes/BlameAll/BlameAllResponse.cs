@@ -4,6 +4,7 @@ namespace Nino.Core.Features.Queries.Episodes.BlameAll;
 
 public sealed record BlameAllResponse(
     IReadOnlyList<BlameAllEpisodeStatus> Episodes,
+    string Motd,
     int Page,
     int PageCount
 );
