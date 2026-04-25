@@ -51,6 +51,18 @@ public sealed class InteractionHandler(
             return;
         }
 
+        if (options.Value.MaintenanceGate && interaction.User.Id != options.Value.OwnerId)
+        {
+            await interaction.RespondAsync(
+                embed: new EmbedBuilder()
+                    .WithTitle(T("nino.maintenance.title", interaction.UserLocale))
+                    .WithDescription(T("nino.maintenance.body", interaction.UserLocale))
+                    .WithThumbnailUrl("https://files.catbox.moe/j3qizm.png")
+                    .Build(),
+                ephemeral: false
+            );
+        }
+
         using var scope = logger.BeginScope(
             new Dictionary<string, object>
             {
@@ -73,6 +85,18 @@ public sealed class InteractionHandler(
         {
             await interaction.RespondAsync("Nino commands must be run in a server!");
             return;
+        }
+
+        if (options.Value.MaintenanceGate && interaction.User.Id != options.Value.OwnerId)
+        {
+            await interaction.RespondAsync(
+                embed: new EmbedBuilder()
+                    .WithTitle(T("nino.maintenance.title", interaction.UserLocale))
+                    .WithDescription(T("nino.maintenance.body", interaction.UserLocale))
+                    .WithThumbnailUrl("https://files.catbox.moe/j3qizm.png")
+                    .Build(),
+                ephemeral: true
+            );
         }
 
         var buttonName = interaction.Data.CustomId[..interaction.Data.CustomId.IndexOf(':')];

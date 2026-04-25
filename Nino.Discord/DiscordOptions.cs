@@ -24,4 +24,9 @@ public sealed class DiscordOptions
     /// Development guild ID. Set to <see langword="null"/> in production.
     /// </summary>
     public ulong? GuildId { get; set; }
+
+    /// <summary>
+    /// If the bot is currently undergoing maintenance
+    /// </summary>
+    public bool MaintenanceGate { get; set; }
 }
