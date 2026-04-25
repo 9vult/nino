@@ -24,7 +24,7 @@
     }
   },
   "blameall": {
-    "name": "blame",
+    "name": "blameall",
     "description": "Check the status of a project",
     "alias": {
       "name": "project",
