@@ -98,9 +98,9 @@ public sealed class BlameAllSlashCommand(
             )
         )
         {
+            b.Append($"{episode.EpisodeNumber}: ");
             if (episode.Statuses.All(t => !t.IsDone))
             {
-                b.Append($"{episode.EpisodeNumber}: ");
                 if (episode.AiredAt is not null && episode.AiredAt.Value > DateTimeOffset.UtcNow)
                     b.AppendLine('*' + T("blameAll.notAired", locale) + '*');
                 else
