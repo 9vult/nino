@@ -61,6 +61,7 @@ public sealed class InteractionHandler(
                     .Build(),
                 ephemeral: false
             );
+            return;
         }
 
         using var scope = logger.BeginScope(
@@ -97,6 +98,7 @@ public sealed class InteractionHandler(
                     .Build(),
                 ephemeral: true
             );
+            return;
         }
 
         var buttonName = interaction.Data.CustomId[..interaction.Data.CustomId.IndexOf(':')];
