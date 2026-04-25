@@ -51,6 +51,9 @@ public static class CoreServiceCollectionExtensions
         services.AddScoped<IAniListService, AniListService>();
         services.AddScoped<IStateService, StateService>();
 
+        // Version service (singleton)
+        services.AddSingleton<VersionService>();
+
         // Background Services
         services.AddHostedService<AirNotificationService>();
         services.AddHostedService<CongaReminderService>();

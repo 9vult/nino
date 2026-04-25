@@ -1,4 +1,8 @@
 {
+  "about": {
+    "name": "about",
+    "description": "About Nino"
+  },
   "blame": {
     "name": "blame",
     "description": "Check the status of a project",
