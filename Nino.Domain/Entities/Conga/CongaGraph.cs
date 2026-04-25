@@ -34,6 +34,14 @@ public sealed class CongaGraph
                 switch (fromGroup is null, toGroup is null)
                 {
                     case (true, true): // both outer
+                        if (fromNode.Dependents.Contains(toNode))
+                            return CongaModificationResult.Duplicate;
+
+                        // We're all set!
+                        fromNode.AddDependent(toNode);
+                        toNode.AddPrerequisite(fromNode);
+                        return CongaModificationResult.Success;
+
                     case (false, false) when fromGroup == toGroup: // both in same group
                         if (fromNode.Dependents.Contains(toNode))
                             return CongaModificationResult.Duplicate;
