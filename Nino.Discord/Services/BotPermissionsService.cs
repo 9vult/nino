@@ -39,4 +39,14 @@ public class BotPermissionsService(DiscordSocketClient client) : IBotPermissions
         return perms
             is { ViewChannel: true, SendMessages: true, EmbedLinks: true, MentionEveryone: true };
     }
+
+    /// <inheritdoc />
+    public ChannelPermissions? GetChannelPermissions(ulong channelId)
+    {
+        var channel = client.GetChannel(channelId) as SocketTextChannel;
+        if (channel?.ChannelType is not (ChannelType.Text or ChannelType.News))
+            return null;
+
+        return channel.Guild.GetUser(client.CurrentUser.Id).GetPermissions(channel);
+    }
 }

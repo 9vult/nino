@@ -97,6 +97,14 @@
           "name": "project",
           "description": "project"
         }
+      },
+      "validate-channel": {
+        "name": "validate-channel",
+        "description": "Validate that Nino can use a Channel",
+        "channel": {
+          "name": "channel",
+          "description": "Channel to validate"
+        }
       }
     },
     "group": {
