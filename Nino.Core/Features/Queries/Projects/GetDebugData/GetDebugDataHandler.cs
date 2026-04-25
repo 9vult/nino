@@ -25,7 +25,8 @@ public sealed class GetDebugDataHandler(ReadOnlyNinoDbContext db)
                 IsArchived: p.IsArchived,
                 EpisodeCount: p.Episodes.Count,
                 TemplateStaffCount: p.TemplateStaff.Count,
-                TaskCount: p.Episodes.SelectMany(e => e.Tasks).Count()
+                TaskCount: p.Episodes.SelectMany(e => e.Tasks).Count(),
+                CongaCount: p.CongaParticipants.Nodes.Count
             ))
             .FirstOrDefaultAsync();
 

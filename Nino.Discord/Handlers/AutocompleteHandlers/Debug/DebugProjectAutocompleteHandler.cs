@@ -23,7 +23,8 @@ public sealed class DebugProjectAutocompleteHandler : AutocompleteHandler
         if (
             context.Interaction is not SocketAutocompleteInteraction interaction
             || interaction.Data.Options.FirstOrDefault(o => o.Name == "group")?.Value
-                is not string rawGroupId || !GroupId.TryParse(rawGroupId, out var groupId)
+                is not string rawGroupId
+            || !GroupId.TryParse(rawGroupId, out var groupId)
         )
             return AutocompletionResult.FromSuccess();
 
@@ -34,9 +35,7 @@ public sealed class DebugProjectAutocompleteHandler : AutocompleteHandler
         var idService = scope.ServiceProvider.GetRequiredService<IInteractionIdentityService>();
 
         var (userId, _) = await idService.GetUserAndGroupAsync(interaction);
-        var result = await handler.HandleAsync(
-            new ListProjectsForDebugQuery(groupId, userId)
-        );
+        var result = await handler.HandleAsync(new ListProjectsForDebugQuery(groupId, userId));
 
         if (!result.IsSuccess)
             return AutocompletionResult.FromSuccess();
@@ -50,7 +49,7 @@ public sealed class DebugProjectAutocompleteHandler : AutocompleteHandler
                     )
                 )
                 .Take(25)
-                .Select(r => new AutocompleteResult(r.Alias.Value, r.ProjectId.Value))
+                .Select(r => new AutocompleteResult(r.Alias.Value, r.ProjectId.Value.ToString()))
         );
     }
 }

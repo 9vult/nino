@@ -16,5 +16,6 @@ public sealed record GetDebugDataResponse(
     bool IsArchived,
     int EpisodeCount,
     int TemplateStaffCount,
-    int TaskCount
+    int TaskCount,
+    int CongaCount
 );

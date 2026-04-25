@@ -19,9 +19,7 @@ public sealed class DebugGroupAutocompleteHandler : AutocompleteHandler
         IServiceProvider services
     )
     {
-        if (
-            context.Interaction is not SocketAutocompleteInteraction interaction
-        )
+        if (context.Interaction is not SocketAutocompleteInteraction interaction)
             return AutocompletionResult.FromSuccess();
 
         var focusedOption = interaction.Data.Current;
@@ -31,9 +29,7 @@ public sealed class DebugGroupAutocompleteHandler : AutocompleteHandler
         var idService = scope.ServiceProvider.GetRequiredService<IInteractionIdentityService>();
 
         var (userId, _) = await idService.GetUserAndGroupAsync(interaction);
-        var result = await handler.HandleAsync(
-            new ListGroupsForDebugQuery(userId)
-        );
+        var result = await handler.HandleAsync(new ListGroupsForDebugQuery(userId));
 
         if (!result.IsSuccess)
             return AutocompletionResult.FromSuccess();
@@ -46,8 +42,9 @@ public sealed class DebugGroupAutocompleteHandler : AutocompleteHandler
                         StringComparison.InvariantCultureIgnoreCase
                     )
                 )
+                .Where(r => !string.IsNullOrEmpty(r.Name))
                 .Take(25)
-                .Select(r => new AutocompleteResult(r.Name, r.GroupId.Value))
+                .Select(r => new AutocompleteResult(r.Name, r.GroupId.Value.ToString()))
         );
     }
 }

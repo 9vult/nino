@@ -55,8 +55,10 @@ public static class CoreServiceCollectionExtensions
         services.AddSingleton<VersionService>();
 
         // Background Services
+#if !DEBUG
         services.AddHostedService<AirNotificationService>();
         services.AddHostedService<CongaReminderService>();
+#endif
 
         // EventHandlers
         services.AddScoped<IEventHandler<TaskProgressEvent>, CongaTaskProgressEventHandler>();
