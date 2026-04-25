@@ -83,6 +83,22 @@
         }
       }
     },
+    "debug": {
+      "name": "debug",
+      "description": "Debug commands",
+      "info": {
+        "name": "info",
+        "description": "Project information",
+        "group": {
+          "name": "group",
+          "description": "Group"
+        },
+        "project": {
+          "name": "project",
+          "description": "project"
+        }
+      }
+    },
     "group": {
       "name": "group",
       "description": "Group management",
