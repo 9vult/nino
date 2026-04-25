@@ -32,6 +32,10 @@ public sealed class AddCongaGroupMemberHandler(
         if (project is null)
             return Fail(ResultStatus.ProjectNotFound);
 
+        // Project channel required
+        if (project.ProjectChannelId.Value == ChannelId.Unset)
+            return Fail(ResultStatus.MissingProjectChannel);
+
         logger.LogInformation(
             "Adding node {NodeName} to Conga Group {GroupName} in project {ProjectId}'s Conga graph",
             command.NodeName,

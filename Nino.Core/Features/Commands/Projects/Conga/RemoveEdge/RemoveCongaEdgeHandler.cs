@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Nino.Core.Services;
 using Nino.Domain.Enums;
+using Nino.Domain.ValueObjects;
 using static Nino.Core.Features.Result;
 
 namespace Nino.Core.Features.Commands.Projects.Conga.RemoveEdge;
@@ -30,6 +31,10 @@ public sealed class RemoveCongaEdgeHandler(
             .FirstOrDefaultAsync(p => p.Id == command.ProjectId);
         if (project is null)
             return Fail(ResultStatus.ProjectNotFound);
+
+        // Project channel required
+        if (project.ProjectChannelId.Value == ChannelId.Unset)
+            return Fail(ResultStatus.MissingProjectChannel);
 
         logger.LogInformation(
             "Removing {From} → {To} from project {ProjectId}'s Conga graph",

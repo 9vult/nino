@@ -34,6 +34,10 @@ public partial class ImportCongaHandler(
         if (project is null)
             return Fail(ResultStatus.ProjectNotFound);
 
+        // Project channel required
+        if (project.ProjectChannelId.Value == ChannelId.Unset)
+            return Fail(ResultStatus.MissingProjectChannel);
+
         logger.LogInformation("Importing Conga Graph for project {ProjectId}", project.Id);
 
         var g = new CongaGraph();

@@ -32,6 +32,10 @@ public sealed class AddCongaGroupHandler(
         if (project is null)
             return Fail(ResultStatus.ProjectNotFound);
 
+        // Project channel required
+        if (project.ProjectChannelId.Value == ChannelId.Unset)
+            return Fail(ResultStatus.MissingProjectChannel);
+
         var name = Abbreviation.From('@' + command.Name.Value.TrimStart('@'));
 
         logger.LogInformation(
