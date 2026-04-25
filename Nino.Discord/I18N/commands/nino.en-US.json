@@ -696,6 +696,10 @@
       "description": "Task abbreviation"
     }
   },
+  "statistics": {
+    "name": "statistics",
+    "description": "Nino Statistics"
+  },
   "task": {
     "name": "task",
     "description": "Manage Tasks",
