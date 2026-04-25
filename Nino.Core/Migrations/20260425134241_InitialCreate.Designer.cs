@@ -11,7 +11,7 @@ using Nino.Core;
 namespace Nino.Core.Migrations
 {
     [DbContext(typeof(NinoDbContext))]
-    [Migration("20260419195644_InitialCreate")]
+    [Migration("20260425134241_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -454,6 +454,9 @@ namespace Nino.Core.Migrations
 
                     b.Property<string>("DiscordId")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsSystemAdministrator")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()

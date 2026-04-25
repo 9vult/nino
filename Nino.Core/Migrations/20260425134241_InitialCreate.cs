@@ -68,6 +68,7 @@ namespace Nino.Core.Migrations
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", maxLength: 64, nullable: false),
+                    IsSystemAdministrator = table.Column<bool>(type: "INTEGER", nullable: false),
                     DiscordId = table.Column<string>(type: "TEXT", nullable: true),
                     CreatedAt = table.Column<DateTimeOffset>(type: "TEXT", nullable: false)
                 },

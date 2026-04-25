@@ -452,6 +452,9 @@ namespace Nino.Core.Migrations
                     b.Property<string>("DiscordId")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsSystemAdministrator")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(64)

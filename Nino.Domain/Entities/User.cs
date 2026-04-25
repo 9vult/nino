@@ -9,4 +9,6 @@ public sealed class User : MappedId<UserId>
 {
     [MaxLength(Length.UserName)]
     public string Name { get; set; } = string.Empty;
+
+    public bool IsSystemAdministrator { get; set; } = false;
 }
