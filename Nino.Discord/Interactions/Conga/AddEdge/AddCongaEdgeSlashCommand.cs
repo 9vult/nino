@@ -76,6 +76,7 @@ public partial class CongaModule
                     ResultStatus.TaskNotFound => "task.resolutionFailed",
                     ResultStatus.BadRequest => $"conga.{result.Message}",
                     ResultStatus.CongaConflict => "conga.edge.add.conflict",
+                    ResultStatus.MissingProjectChannel => "error.missingProjectChannel",
                     _ => "error.generic",
                 };
                 var args = new Dictionary<string, object>
