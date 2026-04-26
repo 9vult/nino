@@ -40,6 +40,9 @@ public sealed class DiscordBotHostedService(
 
     private Task OnLog(LogMessage message)
     {
+        if (string.IsNullOrEmpty(message.Message) || message.Exception is GatewayReconnectException)
+            return Task.CompletedTask;
+
         logger.Log(
             logLevel: message.Severity switch
             {
