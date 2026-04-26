@@ -42,13 +42,17 @@ public class MarkTaskUndoneHandler(
         task.Episode.UpdatedAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync();
 
-        if (
-            !await db
-                .Projects.Where(p => p.Id == command.ProjectId)
-                .Select(p => p.Group.Configuration.PublishPrivateProgress)
-                .FirstOrDefaultAsync()
-        )
+        var shouldPublish = await db
+            .Projects.Where(p => p.Id == command.ProjectId)
+            .Select(p => !p.IsPrivate || p.Group.Configuration.PublishPrivateProgress)
+            .FirstOrDefaultAsync();
+
+        if (!shouldPublish)
         {
+            logger.LogInformation(
+                "Skipping publish of incompletion of task {TaskId} due to group configuration",
+                command.TaskId
+            );
             return Success();
         }
 
@@ -57,10 +61,8 @@ public class MarkTaskUndoneHandler(
             .ToListAsync();
 
         logger.LogInformation(
-            "Publishing incompletion of project {ProjectId} Episode {EpisodeId}'s {Abbreviation} to local group and {ObserverCount} observers",
-            command.ProjectId,
-            command.EpisodeId,
-            task.Abbreviation,
+            "Publishing incompletion of task {TaskId} to local group and {ObserverCount} observers",
+            task.Id,
             observers.Count
         );
 

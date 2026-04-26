@@ -73,6 +73,24 @@ public sealed class BulkMarkTasksHandler(
         }
         await db.SaveChangesAsync();
 
+        var shouldPublish = await db
+            .Projects.Where(p => p.Id == command.ProjectId)
+            .Select(p => !p.IsPrivate || p.Group.Configuration.PublishPrivateProgress)
+            .FirstOrDefaultAsync();
+
+        if (!shouldPublish)
+        {
+            logger.LogInformation(
+                "Skipping publish of  bulk {ProgressType} of project {ProjectId} Episode {FirstEpisodeId} thru {LastEpisodeId} {Abbreviation} due to group configuration",
+                command.ProgressType,
+                command.ProjectId,
+                command.FirstEpisodeId,
+                command.LastEpisodeId,
+                command.Abbreviation
+            );
+            return Success(new BulkMarkTasksResponse(completedEpisodes));
+        }
+
         var observers = await db
             .Observers.Where(o => o.ProjectId == command.ProjectId)
             .ToListAsync();
