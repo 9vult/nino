@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
+using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Microsoft.Extensions.Configuration;
@@ -23,6 +24,16 @@ public static class DiscordBotServiceCollectionExtensions
             .AddOptionsWithValidateOnStart<DiscordOptions>()
             .BindConfiguration(DiscordOptions.Section)
             .ValidateDataAnnotations();
+
+        services.AddSingleton(
+            new DiscordSocketConfig
+            {
+                GatewayIntents =
+                    GatewayIntents.AllUnprivileged
+                    ^ GatewayIntents.GuildScheduledEvents
+                    ^ GatewayIntents.GuildInvites,
+            }
+        );
 
         services.AddSingleton<DiscordSocketClient>();
         services.AddSingleton(p =>
