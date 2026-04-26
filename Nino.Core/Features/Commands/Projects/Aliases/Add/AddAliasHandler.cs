@@ -33,6 +33,12 @@ public sealed class AddAliasHandler(
         if (project.Aliases.Any(a => a.Value == command.Alias) || project.Nickname == command.Alias)
             return Fail(ResultStatus.BadRequest);
 
+        logger.LogInformation(
+            "Added alias {Alias} to project {ProjectId}",
+            command.Alias,
+            command.ProjectId
+        );
+
         project.Aliases.Add(new ProjectAlias { Value = command.Alias });
         await db.SaveChangesAsync();
         return Success();

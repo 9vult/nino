@@ -2,7 +2,6 @@
 
 using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
 using Nino.Core.Features.Commands.Projects.Conga.AddEdge;
 using Nino.Core.Features.Commands.Projects.Conga.AddGroup;
 using Nino.Core.Features.Commands.Projects.Conga.AddGroupMember;
@@ -22,7 +21,6 @@ namespace Nino.Discord.Interactions.Conga;
 
 [Group("conga", "Conga management")]
 public partial class CongaModule(
-    DiscordSocketClient client,
     IInteractionIdentityService interactionIdService,
     ResolveProjectHandler projectResolver,
     ResolveEpisodeHandler episodeResolver,

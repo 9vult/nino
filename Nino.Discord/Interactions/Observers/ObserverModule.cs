@@ -28,8 +28,6 @@ public partial class ObserverModule(
 {
     [Group("delegate", "Manage delegate observers")]
     public partial class DelegateModule(
-        DiscordSocketClient client,
-        IIdentityService identityService,
         IInteractionIdentityService interactionIdService,
         GetGenericProjectDataHandler getProjectDataHandler,
         ResolveProjectHandler projectResolver,

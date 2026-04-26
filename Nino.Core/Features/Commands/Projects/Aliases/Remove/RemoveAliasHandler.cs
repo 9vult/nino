@@ -33,6 +33,12 @@ public sealed class RemoveAliasHandler(
         if (alias is null)
             return Fail(ResultStatus.BadRequest);
 
+        logger.LogInformation(
+            "Removed alias {Alias} from project {ProjectId}",
+            command.Alias,
+            command.ProjectId
+        );
+
         project.Aliases.Remove(alias);
         await db.SaveChangesAsync();
         return Success();
