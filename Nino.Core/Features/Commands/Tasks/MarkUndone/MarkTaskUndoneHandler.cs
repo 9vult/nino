@@ -28,7 +28,9 @@ public class MarkTaskUndoneHandler(
         if (!verification.IsSuccess)
             return Fail(verification.Status);
 
-        var task = await db.Tasks.FirstOrDefaultAsync(t => t.Id == command.TaskId);
+        var task = await db
+            .Tasks.Include(t => t.Episode)
+            .FirstOrDefaultAsync(t => t.Id == command.TaskId);
         if (task is null)
             return Fail(ResultStatus.TaskNotFound);
 
@@ -36,6 +38,8 @@ public class MarkTaskUndoneHandler(
             return Fail(ResultStatus.BadRequest);
 
         task.IsDone = false;
+        task.UpdatedAt = DateTimeOffset.UtcNow;
+        task.Episode.UpdatedAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync();
 
         if (

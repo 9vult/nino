@@ -64,6 +64,7 @@ public sealed class BulkMarkTasksHandler(
 
             task.IsDone = command.ProgressType is ProgressType.Done or ProgressType.Skipped;
             task.UpdatedAt = DateTimeOffset.UtcNow;
+            task.Episode.UpdatedAt = DateTimeOffset.UtcNow;
 
             episode.IsDone = episode.Tasks.All(t => t.IsDone);
 

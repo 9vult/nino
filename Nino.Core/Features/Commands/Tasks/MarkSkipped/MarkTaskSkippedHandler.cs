@@ -39,6 +39,8 @@ public class MarkTaskSkippedHandler(
             return Fail(ResultStatus.BadRequest);
 
         task.IsDone = true;
+        task.UpdatedAt = DateTimeOffset.UtcNow;
+        task.Episode.UpdatedAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync();
 
         if (
