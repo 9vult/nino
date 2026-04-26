@@ -50,7 +50,7 @@ public sealed class CongaNotificationEventHandler(
         foreach (var chunk in data.Staff.Chunk(13))
         {
             var content = new StringBuilder();
-            foreach (var pingee in data.Staff)
+            foreach (var pingee in chunk)
             {
                 var userMention = $"<@{pingee.Assignee.DiscordId}>";
                 content.Append(
