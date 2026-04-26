@@ -48,6 +48,39 @@
       "description": "Include pseudo-tasks in the output"
     }
   },
+  "bulk": {
+    "name": "bulk",
+    "description": "Do many episodes' tasks at once",
+    "alias": {
+      "name": "project",
+      "description": "Project alias"
+    },
+    "abbreviation": {
+      "name": "abbreviation",
+      "description": "Task abbreviation"
+    },
+    "first-episode": {
+      "name": "first-episode",
+      "description": "First episode to add the task to"
+    },
+    "last-episode": {
+      "name": "last-episode",
+      "description": "Last episode to add the task to"
+    },
+    "action": {
+      "name": "action",
+      "description": "Action to perform",
+      "Done": {
+        "name": "Done"
+      },
+      "Undone": {
+        "name": "Undone"
+      },
+      "Skipped": {
+        "name": "Skip"
+      }
+    }
+  },
   "conga": {
     "name": "conga",
     "description": "Conga management",

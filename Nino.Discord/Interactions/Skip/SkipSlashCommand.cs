@@ -21,7 +21,7 @@ using Nino.Domain.ValueObjects;
 
 namespace Nino.Discord.Interactions.Skip;
 
-public class UndoneSlashCommand(
+public class SkipSlashCommand(
     IInteractionIdentityService interactionIdService,
     GetGenericProjectDataHandler getProjectDataHandler,
     GetProgressResponseDataHandler getProgressResponseDataHandler,
