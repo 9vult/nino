@@ -79,6 +79,7 @@ public partial class CongaModule
                         "conga.member.add.groupConflict",
                     ResultStatus.CongaConflict when result.Message is "graph" =>
                         "conga.member.add.graphConflict",
+                    ResultStatus.MissingProjectChannel => "error.missingProjectChannel",
                     _ => "error.generic",
                 };
                 var args = new Dictionary<string, object>

@@ -72,6 +72,7 @@ public partial class CongaModule
                     ResultStatus.Unauthorized => "error.permissions",
                     ResultStatus.ProjectNotFound => "project.notFound",
                     ResultStatus.CongaConflict => "conga.group.add.conflict",
+                    ResultStatus.MissingProjectChannel => "error.missingProjectChannel",
                     _ => "error.generic",
                 };
                 var args = new Dictionary<string, object>
