@@ -119,13 +119,38 @@ public partial class ObserverModule
 
         if (!canUseUpdateChannel || !canUseReleaseChannel)
         {
+            var passFail = new Dictionary<bool, string> { [true] = "✅ ", [false] = "❌ " };
+            var passWarn = new Dictionary<bool, string> { [true] = "✅ ", [false] = "⚠️ " };
             body.AppendLine();
             body.AppendLine($"**{T("warning", locale)}**");
 
             if (!canUseUpdateChannel)
+            {
                 body.AppendLine(T("error.missingMessagePerms", locale, $"<#{updateChannel.Id}>"));
+                var perms = botPermissionsService.GetChannelPermissions(updateChannel.Id)!;
+                var p = perms.Value;
+
+                body.AppendLine(passFail[p.ViewChannel] + T("nino.debug.channel.view", locale));
+                body.AppendLine(passFail[p.SendMessages] + T("nino.debug.channel.send", locale));
+                body.AppendLine(passFail[p.EmbedLinks] + T("nino.debug.channel.embed", locale));
+            }
             if (!canUseReleaseChannel)
+            {
                 body.AppendLine(T("error.missingMessagePerms", locale, $"<#{releaseChannel.Id}>"));
+                var perms = botPermissionsService.GetChannelPermissions(releaseChannel.Id)!;
+                var p = perms.Value;
+
+                body.AppendLine(passFail[p.ViewChannel] + T("nino.debug.channel.view", locale));
+                body.AppendLine(passFail[p.SendMessages] + T("nino.debug.channel.send", locale));
+                body.AppendLine(passFail[p.EmbedLinks] + T("nino.debug.channel.embed", locale));
+                body.AppendLine(
+                    passFail[p.MentionEveryone] + T("nino.debug.channel.mention", locale)
+                );
+                body.AppendLine(
+                    passWarn[releaseChannel.ChannelType is ChannelType.News]
+                        + T("nino.debug.channel.crosspost", locale)
+                );
+            }
         }
 
         // Success!

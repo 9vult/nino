@@ -128,15 +128,45 @@ public partial class ProjectModule
 
         if (!canUseProjectChannel || !canUseUpdateChannel || !canUseReleaseChannel)
         {
+            var passFail = new Dictionary<bool, string> { [true] = "✅ ", [false] = "❌ " };
+            var passWarn = new Dictionary<bool, string> { [true] = "✅ ", [false] = "⚠️ " };
             body.AppendLine();
             body.AppendLine($"**{T("warning", locale)}**");
 
             if (!canUseProjectChannel)
+            {
                 body.AppendLine(T("error.missingMessagePerms", locale, $"<#{projectChannel!.Id}>"));
+                var p = botPermissionsService.GetChannelPermissions(projectChannel.Id)!.Value;
+
+                body.AppendLine(passFail[p.ViewChannel] + T("nino.debug.channel.view", locale));
+                body.AppendLine(passFail[p.SendMessages] + T("nino.debug.channel.send", locale));
+                body.AppendLine(passFail[p.EmbedLinks] + T("nino.debug.channel.embed", locale));
+            }
             if (!canUseUpdateChannel)
+            {
                 body.AppendLine(T("error.missingMessagePerms", locale, $"<#{updateChannel!.Id}>"));
+                var p = botPermissionsService.GetChannelPermissions(updateChannel.Id)!.Value;
+
+                body.AppendLine(passFail[p.ViewChannel] + T("nino.debug.channel.view", locale));
+                body.AppendLine(passFail[p.SendMessages] + T("nino.debug.channel.send", locale));
+                body.AppendLine(passFail[p.EmbedLinks] + T("nino.debug.channel.embed", locale));
+            }
             if (!canUseReleaseChannel)
+            {
                 body.AppendLine(T("error.missingMessagePerms", locale, $"<#{releaseChannel!.Id}>"));
+                var p = botPermissionsService.GetChannelPermissions(releaseChannel.Id)!.Value;
+
+                body.AppendLine(passFail[p.ViewChannel] + T("nino.debug.channel.view", locale));
+                body.AppendLine(passFail[p.SendMessages] + T("nino.debug.channel.send", locale));
+                body.AppendLine(passFail[p.EmbedLinks] + T("nino.debug.channel.embed", locale));
+                body.AppendLine(
+                    passFail[p.MentionEveryone] + T("nino.debug.channel.mention", locale)
+                );
+                body.AppendLine(
+                    passWarn[releaseChannel.ChannelType is ChannelType.News]
+                        + T("nino.debug.channel.crosspost", locale)
+                );
+            }
         }
 
         // Success!
