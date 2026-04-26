@@ -65,11 +65,9 @@ public sealed class TaskProgressEventHandler(
         }
 
         logger.LogInformation(
-            "Publishing task progress ({ProgressType}) for {ProjectTitle} {EpisodeNumber} {Abbreviation} to {Channel}",
+            "Publishing task progress ({ProgressType}) for task {TaskId} to channel {Channel}",
             progressType,
-            data.ProjectData.ProjectTitle,
-            data.EpisodeNumber,
-            data.Abbreviation,
+            taskId,
             channel
         );
 
