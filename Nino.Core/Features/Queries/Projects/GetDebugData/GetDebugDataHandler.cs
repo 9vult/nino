@@ -18,6 +18,8 @@ public sealed class GetDebugDataHandler(ReadOnlyNinoDbContext db)
                 GroupId: p.GroupId,
                 OwnerId: p.OwnerId,
                 ProjectChannelId: p.ProjectChannelId,
+                UpdateChannelId: p.UpdateChannelId,
+                ReleaseChannelId: p.ReleaseChannelId,
                 Nickname: p.Nickname,
                 Title: p.Title,
                 AniListId: p.AniListId,
@@ -26,7 +28,8 @@ public sealed class GetDebugDataHandler(ReadOnlyNinoDbContext db)
                 EpisodeCount: p.Episodes.Count,
                 TemplateStaffCount: p.TemplateStaff.Count,
                 TaskCount: p.Episodes.SelectMany(e => e.Tasks).Count(),
-                CongaCount: p.CongaParticipants.Nodes.Count
+                CongaCount: p.CongaParticipants.Nodes.Count,
+                ObserverCount: p.Observers.Count
             ))
             .FirstOrDefaultAsync();
 

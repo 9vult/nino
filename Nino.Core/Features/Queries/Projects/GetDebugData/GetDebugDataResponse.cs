@@ -9,6 +9,8 @@ public sealed record GetDebugDataResponse(
     GroupId GroupId,
     UserId OwnerId,
     ChannelId ProjectChannelId,
+    ChannelId UpdateChannelId,
+    ChannelId ReleaseChannelId,
     Alias Nickname,
     string Title,
     AniListId AniListId,
@@ -17,5 +19,6 @@ public sealed record GetDebugDataResponse(
     int EpisodeCount,
     int TemplateStaffCount,
     int TaskCount,
-    int CongaCount
+    int CongaCount,
+    int ObserverCount
 );
