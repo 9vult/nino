@@ -70,7 +70,7 @@ public class CongaTaskProgressEventHandler(
             "Published notifications to {Count} Conga Participants following completion of {Episode}'s {Task}",
             remindedTasks.Count,
             data.Episode,
-            task
+            task.Abbreviation
         );
     }
 }
