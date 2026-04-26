@@ -54,7 +54,8 @@ public sealed class AddCongaGroupMemberHandler(
         return result switch
         {
             CongaModificationResult.NoGroup => Fail(ResultStatus.BadRequest, "noGroup"),
-            CongaModificationResult.Duplicate => Fail(ResultStatus.CongaConflict),
+            CongaModificationResult.Duplicate => Fail(ResultStatus.CongaConflict, "graph"),
+            CongaModificationResult.DuplicateMember => Fail(ResultStatus.CongaConflict, "member"),
             _ => Fail(ResultStatus.Error),
         };
     }

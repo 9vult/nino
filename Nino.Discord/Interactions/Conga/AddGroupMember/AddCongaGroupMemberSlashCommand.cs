@@ -75,7 +75,10 @@ public partial class CongaModule
                     ResultStatus.ProjectNotFound => "project.notFound",
                     ResultStatus.TaskNotFound => "task.resolutionFailed",
                     ResultStatus.BadRequest => $"conga.{result.Message}",
-                    ResultStatus.CongaConflict => "conga.member.add.conflict",
+                    ResultStatus.CongaConflict when result.Message is "group" =>
+                        "conga.member.add.groupConflict",
+                    ResultStatus.CongaConflict when result.Message is "graph" =>
+                        "conga.member.add.graphConflict",
                     _ => "error.generic",
                 };
                 var args = new Dictionary<string, object>

@@ -9,6 +9,7 @@ public enum CongaModificationResult
     SelfLoop,
     Cycle,
     Duplicate,
+    DuplicateMember,
     NoGroup,
     IllegalTree,
     NotFound,

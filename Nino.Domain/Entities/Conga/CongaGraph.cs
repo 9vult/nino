@@ -135,6 +135,10 @@ public sealed class CongaGraph
             || groupNode is not CongaNode.GroupNode group
         )
             return CongaModificationResult.NoGroup;
+
+        if (group.Children.Any(n => n.Name == name))
+            return CongaModificationResult.DuplicateMember;
+
         if (_nodes.TryGetValue(name, out _))
             return CongaModificationResult.Duplicate;
 
