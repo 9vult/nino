@@ -56,12 +56,15 @@ public sealed class BulkMarkTasksHandler(
 
         List<(EpisodeId, Number)> completedEpisodes = [];
 
+        var isPseudo = false;
         foreach (var episode in episodes)
         {
             var task = episode.Tasks.FirstOrDefault(t => t.Abbreviation == command.Abbreviation);
             if (task is null)
                 continue;
 
+            if (task.IsPseudo)
+                isPseudo = true;
             task.IsDone = command.ProgressType is ProgressType.Done or ProgressType.Skipped;
             task.UpdatedAt = DateTimeOffset.UtcNow;
             task.Episode.UpdatedAt = DateTimeOffset.UtcNow;
@@ -73,15 +76,17 @@ public sealed class BulkMarkTasksHandler(
         }
         await db.SaveChangesAsync();
 
-        var shouldPublish = await db
-            .Projects.Where(p => p.Id == command.ProjectId)
-            .Select(p => !p.IsPrivate || p.Group.Configuration.PublishPrivateProgress)
-            .FirstOrDefaultAsync();
+        var shouldPublish =
+            !isPseudo
+            && await db
+                .Projects.Where(p => p.Id == command.ProjectId)
+                .Select(p => !p.IsPrivate || p.Group.Configuration.PublishPrivateProgress)
+                .FirstOrDefaultAsync();
 
         if (!shouldPublish)
         {
             logger.LogInformation(
-                "Skipping publish of  bulk {ProgressType} of project {ProjectId} Episode {FirstEpisodeId} thru {LastEpisodeId} {Abbreviation} due to group configuration",
+                "Skipping publish of  bulk {ProgressType} of project {ProjectId} Episode {FirstEpisodeId} thru {LastEpisodeId} {Abbreviation} due to pseudo state or group config",
                 command.ProgressType,
                 command.ProjectId,
                 command.FirstEpisodeId,
@@ -113,7 +118,7 @@ public sealed class BulkMarkTasksHandler(
                     FirstEpisodeId: command.FirstEpisodeId,
                     LastEpisodeId: command.LastEpisodeId,
                     Abbreviation: command.Abbreviation,
-                    ProgressType.Done
+                    command.ProgressType
                 )
             ),
             .. observers.Select(observer =>
@@ -124,7 +129,7 @@ public sealed class BulkMarkTasksHandler(
                         FirstEpisodeId: command.FirstEpisodeId,
                         LastEpisodeId: command.LastEpisodeId,
                         Abbreviation: command.Abbreviation,
-                        ProgressType.Done
+                        command.ProgressType
                     )
                 )
             ),

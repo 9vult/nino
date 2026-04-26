@@ -43,15 +43,17 @@ public class MarkTaskDoneHandler(
         task.Episode.UpdatedAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync();
 
-        var shouldPublish = await db
-            .Projects.Where(p => p.Id == command.ProjectId)
-            .Select(p => !p.IsPrivate || p.Group.Configuration.PublishPrivateProgress)
-            .FirstOrDefaultAsync();
+        var shouldPublish =
+            !task.IsPseudo
+            && await db
+                .Projects.Where(p => p.Id == command.ProjectId)
+                .Select(p => !p.IsPrivate || p.Group.Configuration.PublishPrivateProgress)
+                .FirstOrDefaultAsync();
 
         if (!shouldPublish)
         {
             logger.LogInformation(
-                "Skipping publish of completion of task {TaskId} due to group configuration",
+                "Skipping publish of completion of task {TaskId} due to pseudo state or group config",
                 command.TaskId
             );
             return Success(task.Episode.Tasks.All(t => t.IsDone));
