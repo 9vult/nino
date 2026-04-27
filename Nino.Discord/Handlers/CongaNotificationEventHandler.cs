@@ -66,6 +66,8 @@ public sealed class CongaNotificationEventHandler(
                     T(localizationKey, locale, userMention, data.EpisodeNumber, pingee.TaskName)
                 );
 
+                content.AppendLine(); // Add newline
+
                 logger.LogInformation(
                     "Publishing conga notification for {ProjectTitle} {EpisodeNumber}'s {Task} to {Channel}",
                     data.ProjectData.ProjectTitle,
