@@ -44,7 +44,7 @@ public sealed class ObserverProjectAutocompleteHandler : AutocompleteHandler
         );
 
         var result = await handler.HandleAsync(
-            new ListAliasesQuery(userId, groupId.Value, false, false)
+            new ListAliasesQuery(userId, groupId.Value, true, false)
         );
 
         if (!result.IsSuccess)
