@@ -44,7 +44,14 @@ public sealed class CongaNotificationEventHandler(
         }
 
         var locale = data.Locale.ToDiscordLocale();
-        var localizationKey = isReminder ? "conga.notification.reminder" : "conga.notification";
+
+        var localizationKey = (data.IsSingleEpisodeMovie, isReminder) switch
+        {
+            (false, false) => "conga.notification",
+            (false, true) => "conga.notification.reminder",
+            (true, false) => "conga.notification.sem",
+            (true, true) => "conga.notification.sem.reminder",
+        };
 
         List<Task> msgTasks = [];
         foreach (var chunk in data.Staff.Chunk(13))
@@ -62,9 +69,12 @@ public sealed class CongaNotificationEventHandler(
                     }
                 );
 
-                content.Append(
-                    T(localizationKey, locale, userMention, data.EpisodeNumber, pingee.TaskName)
-                );
+                if (!data.IsSingleEpisodeMovie)
+                    content.Append(
+                        T(localizationKey, locale, userMention, data.EpisodeNumber, pingee.TaskName)
+                    );
+                else
+                    content.Append(T(localizationKey, locale, userMention, pingee.TaskName));
 
                 content.AppendLine(); // Add newline
 

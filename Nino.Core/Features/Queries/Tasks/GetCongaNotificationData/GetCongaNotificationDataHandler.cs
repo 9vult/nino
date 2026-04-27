@@ -3,6 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 using Nino.Core.Features.Queries.Projects.GetGenericData;
 using Nino.Domain.Dtos;
+using Nino.Domain.Enums;
 using Nino.Domain.ValueObjects;
 using static Nino.Core.Features.Result<Nino.Core.Features.Queries.Tasks.GetCongaNotificationData.GetCongaNotificationDataResponse>;
 
@@ -35,6 +36,7 @@ public sealed class GetCongaNotificationDataHandler(ReadOnlyNinoDbContext db)
                     .ToList(),
                 MappedIdDto<ChannelId>.From(e.Project.ProjectChannel),
                 e.Project.Group.Configuration.CongaPrefixType,
+                e.Project.Type == ProjectType.Movie && e.Project.Episodes.Count == 1,
                 e.Project.Group.Configuration.Locale
             ))
             .FirstOrDefaultAsync();

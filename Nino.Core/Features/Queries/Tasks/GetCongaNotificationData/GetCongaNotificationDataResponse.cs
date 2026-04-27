@@ -15,5 +15,6 @@ public sealed record GetCongaNotificationDataResponse(
     List<TaskAssigneeDto> Staff,
     MappedIdDto<ChannelId> NotificationChannel,
     CongaPrefixType PrefixType,
+    bool IsSingleEpisodeMovie,
     Locale Locale
 );
