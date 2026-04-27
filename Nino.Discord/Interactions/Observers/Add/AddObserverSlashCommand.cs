@@ -45,7 +45,7 @@ public partial class ObserverModule
             return await interaction.FailAsync(T("observer.unknownGroup", locale, serverId));
 
         var resolve = await projectResolver.HandleAsync(
-            new ResolveProjectQuery(alias, originGroupId.Value, requestedBy)
+            new ResolveProjectQuery(alias, originGroupId.Value, requestedBy, true)
         );
 
         if (!resolve.IsSuccess)
