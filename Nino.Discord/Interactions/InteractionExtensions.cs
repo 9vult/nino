@@ -64,6 +64,7 @@ public static class InteractionExtensions
                 ResultStatus.TaskResolutionFailed => "task.resolutionFailed",
                 ResultStatus.TemplateStaffResolutionFailed => "templateStaff.resolutionFailed",
                 ResultStatus.MissingProjectChannel => "error.missingProjectChannel",
+                ResultStatus.ObserverNotFound => "observer.notFound",
                 _ => "error.generic",
             };
 
@@ -71,6 +72,7 @@ public static class InteractionExtensions
                 key = value;
 
             var args = (context ?? new FailureContext()).ToLocalizationArgs();
+            args["errorCode"] = status.ToString();
 
             var embed = new EmbedBuilder()
                 .WithTitle("Baka.")
