@@ -15,7 +15,7 @@ public sealed class StateService(NinoDbContext db, ILogger<StateService> logger)
     public async Task<StateId> SaveStateAsync<T>(T data)
     {
         logger.LogTrace("Saving {Type} object to the state cache", typeof(T).FullName);
-        var state = new State { Json = JsonSerializer.Serialize(data) };
+        var state = new State { Json = JsonSerializer.Serialize<object?>(data) };
         await db.StateCache.AddAsync(state);
         await db.SaveChangesAsync();
         return state.Id;
