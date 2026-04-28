@@ -4,7 +4,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="GitInfo">
       <PrivateAssets>all</PrivateAssets>
@@ -18,11 +17,9 @@
     <PackageReference Include="Microsoft.Extensions.Http" />
     <PackageReference Include="NaturalSort.Extension" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Nino.Domain\Nino.Domain.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Folder Include="Migrations\" />
   </ItemGroup>

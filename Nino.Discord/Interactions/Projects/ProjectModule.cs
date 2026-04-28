@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MPL-2.0
 
+using System.Text.Json;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
@@ -11,6 +12,7 @@ using Nino.Core.Features.Commands.Projects.Aliases.Add;
 using Nino.Core.Features.Commands.Projects.Aliases.Remove;
 using Nino.Core.Features.Commands.Projects.Create;
 using Nino.Core.Features.Commands.Projects.Edit;
+using Nino.Core.Features.Queries.Projects.Export;
 using Nino.Core.Features.Queries.Projects.GetGenericData;
 using Nino.Core.Features.Queries.Projects.Resolve;
 using Nino.Core.Features.Queries.Projects.Roster;
@@ -29,7 +31,8 @@ public partial class ProjectModule(
     GetGenericProjectDataHandler getProjectDataHandler,
     CreateProjectHandler createHandler,
     EditProjectHandler editHandler,
-    ProjectRosterHandler rosterHandler
+    ProjectRosterHandler rosterHandler,
+    ExportProjectHandler exportHandler
 ) : InteractionModuleBase<IInteractionContext>
 {
     [Group("admin", "Admin management")]
@@ -60,4 +63,6 @@ public partial class ProjectModule(
         DisableAirNotificationsHandler disableHandler,
         GetGenericProjectDataHandler getGenericDataHandler
     ) : InteractionModuleBase<IInteractionContext>;
+
+    private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
 }

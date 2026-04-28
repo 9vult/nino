@@ -4,7 +4,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Discord.Net" />
     <PackageReference Include="Discord.Net.WebSocket" />
@@ -12,13 +11,11 @@
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Nino.Core\Nino.Core.csproj" />
     <ProjectReference Include="..\Nino.Domain\Nino.Domain.csproj" />
     <ProjectReference Include="..\Nino.Localization\Nino.Localization.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <None Include="I18N\**\*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>

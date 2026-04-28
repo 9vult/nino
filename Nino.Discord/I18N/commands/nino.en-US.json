@@ -648,6 +648,14 @@
         "description": "Number of episodes to offset AniList queries by"
       }
     },
+    "export": {
+      "name": "export",
+      "description": "Export a project",
+      "alias": {
+        "name": "project",
+        "description": "Project alias"
+      }
+    },
     "roster": {
       "name": "roster",
       "description": "Show who's working on a project",
