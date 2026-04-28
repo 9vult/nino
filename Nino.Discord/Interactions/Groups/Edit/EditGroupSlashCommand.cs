@@ -22,7 +22,8 @@ public partial class GroupModule
         ProgressResponseType? progressResponseType = null,
         ProgressPublishType? progressPublishType = null,
         CongaPrefixType? congaPrefixType = null,
-        string? releasePrefix = null
+        string? releasePrefix = null,
+        string? name = null
     )
     {
         var interaction = Context.Interaction;
@@ -30,6 +31,7 @@ public partial class GroupModule
 
         // Cleanup
         releasePrefix = releasePrefix?.Trim();
+        name = name?.Trim();
 
         if (releasePrefix == "-")
             releasePrefix = string.Empty;
@@ -49,7 +51,8 @@ public partial class GroupModule
             ProgressResponseType: progressResponseType,
             ProgressPublishType: progressPublishType,
             CongaPrefixType: congaPrefixType,
-            ReleasePrefix: releasePrefix
+            ReleasePrefix: releasePrefix,
+            Name: name
         );
 
         var result = await editHandler

@@ -90,6 +90,12 @@ public sealed class EditGroupHandler(
             config.ReleasePrefix = command.ReleasePrefix;
         }
 
+        if (command.Name is not null)
+        {
+            logger.LogTrace("Setting group {GroupId}'s name to {Name}", group.Id, command.Name);
+            group.Name = command.Name;
+        }
+
         await db.SaveChangesAsync();
         return Success();
     }
