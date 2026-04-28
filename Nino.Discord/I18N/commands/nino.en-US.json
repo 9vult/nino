@@ -119,8 +119,16 @@
     "debug": {
       "name": "debug",
       "description": "Debug commands",
-      "info": {
-        "name": "info",
+      "anilist-info": {
+        "name": "anilist-info",
+        "description": "AniList information",
+        "anilist-id": {
+          "name": "anilist-id",
+          "description": "AniList ID"
+        }
+      },
+      "project-info": {
+        "name": "project-info",
         "description": "Project information",
         "group": {
           "name": "group",

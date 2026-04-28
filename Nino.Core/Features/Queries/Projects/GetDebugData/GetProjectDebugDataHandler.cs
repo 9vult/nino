@@ -1,19 +1,21 @@
 // SPDX-License-Identifier: MPL-2.0
 
 using Microsoft.EntityFrameworkCore;
-using static Nino.Core.Features.Result<Nino.Core.Features.Queries.Projects.GetDebugData.GetDebugDataResponse>;
+using static Nino.Core.Features.Result<Nino.Core.Features.Queries.Projects.GetDebugData.GetProjectDebugDataResponse>;
 
 namespace Nino.Core.Features.Queries.Projects.GetDebugData;
 
-public sealed class GetDebugDataHandler(ReadOnlyNinoDbContext db)
-    : IQueryHandler<GetDebugDataQuery, Result<GetDebugDataResponse>>
+public sealed class GetProjectDebugDataHandler(ReadOnlyNinoDbContext db)
+    : IQueryHandler<GetProjectDebugDataQuery, Result<GetProjectDebugDataResponse>>
 {
     /// <inheritdoc />
-    public async Task<Result<GetDebugDataResponse>> HandleAsync(GetDebugDataQuery query)
+    public async Task<Result<GetProjectDebugDataResponse>> HandleAsync(
+        GetProjectDebugDataQuery query
+    )
     {
         var result = await db
             .Projects.Where(p => p.Id == query.ProjectId)
-            .Select(p => new GetDebugDataResponse(
+            .Select(p => new GetProjectDebugDataResponse(
                 ProjectId: p.Id,
                 GroupId: p.GroupId,
                 OwnerId: p.OwnerId,
@@ -23,6 +25,7 @@ public sealed class GetDebugDataHandler(ReadOnlyNinoDbContext db)
                 Nickname: p.Nickname,
                 Title: p.Title,
                 AniListId: p.AniListId,
+                AniListOffset: p.AniListOffset,
                 IsPrivate: p.IsPrivate,
                 IsArchived: p.IsArchived,
                 EpisodeCount: p.Episodes.Count,

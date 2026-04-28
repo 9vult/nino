@@ -13,8 +13,8 @@ public partial class DebugModule
 {
     private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
 
-    [SlashCommand("info", "Project information")]
-    public async Task<RuntimeResult> GetInfoAsync(
+    [SlashCommand("project-info", "Project information")]
+    public async Task<RuntimeResult> GetProjectInfoAsync(
         [Summary("group"), Autocomplete(typeof(DebugGroupAutocompleteHandler))] string rawGroupId,
         [Summary("project"), Autocomplete(typeof(DebugProjectAutocompleteHandler))]
             string rawProjectId
@@ -29,7 +29,7 @@ public partial class DebugModule
         )
             return await interaction.FailAsync(T("nino.debug.invalidId", locale));
 
-        var request = await dataHandler.HandleAsync(new GetDebugDataQuery(projectId));
+        var request = await projectDataHandler.HandleAsync(new GetProjectDebugDataQuery(projectId));
         if (!request.IsSuccess)
             return await interaction.FailAsync(request.Status, locale);
 

@@ -4,7 +4,7 @@ using Nino.Domain.ValueObjects;
 
 namespace Nino.Core.Features.Queries.Projects.GetDebugData;
 
-public sealed record GetDebugDataResponse(
+public sealed record GetProjectDebugDataResponse(
     ProjectId ProjectId,
     GroupId GroupId,
     UserId OwnerId,
@@ -14,6 +14,7 @@ public sealed record GetDebugDataResponse(
     Alias Nickname,
     string Title,
     AniListId AniListId,
+    int AniListOffset,
     bool IsPrivate,
     bool IsArchived,
     int EpisodeCount,
