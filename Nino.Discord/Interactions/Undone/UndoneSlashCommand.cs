@@ -72,7 +72,7 @@ public class UndoneSlashCommand(
             .BindAsync(() => getTaskInfoHandler.HandleAsync(new GetTaskInfoQuery(taskId)))
             .ThenAsync(_ =>
                 getProgressResponseDataHandler.HandleAsync(
-                    new GetProgressResponseDataQuery(episodeId)
+                    new GetProgressResponseDataQuery(episodeId, true)
                 )
             )
             .ThenAsync(

@@ -33,7 +33,7 @@ public partial class DoneModule
             .ThenAsync(
                 (_, _) =>
                     getProgressResponseDataHandler.HandleAsync(
-                        new GetProgressResponseDataQuery(episodeId)
+                        new GetProgressResponseDataQuery(episodeId, true)
                     )
             );
 

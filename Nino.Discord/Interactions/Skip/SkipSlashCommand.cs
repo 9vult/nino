@@ -77,7 +77,7 @@ public class SkipSlashCommand(
             .ThenAsync(
                 (_, _) =>
                     getProgressResponseDataHandler.HandleAsync(
-                        new GetProgressResponseDataQuery(episodeId)
+                        new GetProgressResponseDataQuery(episodeId, true)
                     )
             )
             .ThenAsync(

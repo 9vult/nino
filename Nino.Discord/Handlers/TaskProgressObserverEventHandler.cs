@@ -31,7 +31,7 @@ public sealed class TaskProgressObserverEventHandler(
             .HandleAsync(new GetObserverUpdateNotificationDataQuery(observerId, taskId))
             .ThenAsync(_ =>
                 getProgressResponseDataHandler.HandleAsync(
-                    new GetProgressResponseDataQuery(episodeId)
+                    new GetProgressResponseDataQuery(episodeId, false)
                 )
             );
         if (!queryResult.IsSuccess)
