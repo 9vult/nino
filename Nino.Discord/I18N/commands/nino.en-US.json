@@ -373,6 +373,10 @@
         "release-prefix": {
           "name": "release-prefix",
           "description": "Prefix for releases"
+        },
+        "group-name": {
+          "name": "name",
+          "description": "Group name"
         }
       }
     }
