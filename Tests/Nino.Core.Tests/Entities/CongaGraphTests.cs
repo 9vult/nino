@@ -213,7 +213,7 @@ public class CongaGraphTests
         g.AddGroupMember(Group1, A);
         var result = g.AddGroupMember(Group1, A);
 
-        await Assert.That(result).IsEqualTo(CongaModificationResult.Duplicate);
+        await Assert.That(result).IsEqualTo(CongaModificationResult.DuplicateMember);
     }
 
     [Test]

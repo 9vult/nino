@@ -40,6 +40,7 @@ public class MarkTaskUndoneHandler(
         task.IsDone = false;
         task.UpdatedAt = DateTimeOffset.UtcNow;
         task.Episode.UpdatedAt = DateTimeOffset.UtcNow;
+        task.Episode.IsDone = false;
         await db.SaveChangesAsync();
 
         await eventBus.PublishAsync(

@@ -41,6 +41,7 @@ public class MarkTaskSkippedHandler(
         task.IsDone = true;
         task.UpdatedAt = DateTimeOffset.UtcNow;
         task.Episode.UpdatedAt = DateTimeOffset.UtcNow;
+        task.Episode.IsDone = task.Episode.Tasks.All(t => t.IsDone);
         await db.SaveChangesAsync();
 
         await eventBus.PublishAsync(
