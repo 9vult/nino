@@ -19,8 +19,7 @@ public sealed class GetProgressResponseDataHandler(ReadOnlyNinoDbContext db)
             .Episodes.Where(e => e.Id == episodeId)
             .Select(e => new GetProgressResponseDataResponse(
                 e.Group.Configuration.ProgressResponseType,
-                e.Tasks.Where(t => !t.IsPseudo)
-                    .Select(t => new GetProgressResponseDataStatus(
+                e.Tasks.Select(t => new GetProgressResponseDataStatus(
                         t.Abbreviation,
                         t.Name,
                         t.IsDone,

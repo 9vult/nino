@@ -43,6 +43,15 @@ public class MarkTaskSkippedHandler(
         task.Episode.UpdatedAt = DateTimeOffset.UtcNow;
         await db.SaveChangesAsync();
 
+        await eventBus.PublishAsync(
+            new TaskProgressCongaEvent(
+                ProjectId: command.ProjectId,
+                EpisodeId: command.EpisodeId,
+                TaskId: command.TaskId,
+                ProgressType.Done
+            )
+        );
+
         var shouldPublish =
             !task.IsPseudo
             && await db

@@ -61,7 +61,7 @@ public static class CoreServiceCollectionExtensions
 #endif
 
         // EventHandlers
-        services.AddScoped<IEventHandler<TaskProgressEvent>, CongaTaskProgressEventHandler>();
+        services.AddScoped<IEventHandler<TaskProgressCongaEvent>, TaskProgressCongaEventHandler>();
 
         return services;
 

@@ -57,6 +57,7 @@ public sealed class BulkMarkTasksHandler(
         List<(EpisodeId, Number)> completedEpisodes = [];
 
         var isPseudo = false;
+        List<Domain.Entities.Task> completedTasks = [];
         foreach (var episode in episodes)
         {
             var task = episode.Tasks.FirstOrDefault(t => t.Abbreviation == command.Abbreviation);
@@ -68,6 +69,7 @@ public sealed class BulkMarkTasksHandler(
             task.IsDone = command.ProgressType is ProgressType.Done or ProgressType.Skipped;
             task.UpdatedAt = DateTimeOffset.UtcNow;
             task.Episode.UpdatedAt = DateTimeOffset.UtcNow;
+            completedTasks.Add(task);
 
             episode.IsDone = episode.Tasks.All(t => t.IsDone);
 
@@ -75,6 +77,20 @@ public sealed class BulkMarkTasksHandler(
                 completedEpisodes.Add((episode.Id, episode.Number));
         }
         await db.SaveChangesAsync();
+
+        var congaEvents = completedTasks
+            .Select(t =>
+                eventBus.PublishAsync(
+                    new TaskProgressCongaEvent(
+                        ProjectId: command.ProjectId,
+                        EpisodeId: t.EpisodeId,
+                        TaskId: t.Id,
+                        ProgressType.Done
+                    )
+                )
+            )
+            .ToList();
+        await Task.WhenAll(congaEvents);
 
         var shouldPublish =
             !isPseudo

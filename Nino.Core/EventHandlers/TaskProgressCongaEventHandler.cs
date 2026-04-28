@@ -7,14 +7,14 @@ using Nino.Domain.Enums;
 
 namespace Nino.Core.EventHandlers;
 
-public class CongaTaskProgressEventHandler(
+public class TaskProgressCongaEventHandler(
     NinoDbContext db,
     IEventBus eventBus,
-    ILogger<CongaTaskProgressEventHandler> logger
-) : IEventHandler<TaskProgressEvent>
+    ILogger<TaskProgressCongaEventHandler> logger
+) : IEventHandler<TaskProgressCongaEvent>
 {
     /// <inheritdoc />
-    public async Task HandleAsync(TaskProgressEvent @event)
+    public async Task HandleAsync(TaskProgressCongaEvent @event)
     {
         var (projectId, episodeId, taskId, progressType) = @event;
 
