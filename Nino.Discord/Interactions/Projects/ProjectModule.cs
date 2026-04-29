@@ -14,6 +14,7 @@ using Nino.Core.Features.Commands.Projects.Create;
 using Nino.Core.Features.Commands.Projects.Edit;
 using Nino.Core.Features.Queries.Projects.Export;
 using Nino.Core.Features.Queries.Projects.GetGenericData;
+using Nino.Core.Features.Queries.Projects.List;
 using Nino.Core.Features.Queries.Projects.Resolve;
 using Nino.Core.Features.Queries.Projects.Roster;
 using Nino.Core.Services;
@@ -24,6 +25,7 @@ namespace Nino.Discord.Interactions.Projects;
 [Group("project", "Project management")]
 public partial class ProjectModule(
     DiscordSocketClient client,
+    HttpClient httpClient,
     IIdentityService identityService,
     IInteractionIdentityService interactionIdService,
     IBotPermissionsService botPermissionsService,
@@ -32,7 +34,8 @@ public partial class ProjectModule(
     CreateProjectHandler createHandler,
     EditProjectHandler editHandler,
     ProjectRosterHandler rosterHandler,
-    ExportProjectHandler exportHandler
+    ExportProjectHandler exportHandler,
+    ListProjectsHandler listProjectsHandler
 ) : InteractionModuleBase<IInteractionContext>
 {
     [Group("admin", "Admin management")]

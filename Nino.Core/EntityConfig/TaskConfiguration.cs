@@ -18,6 +18,11 @@ public sealed class TaskConfiguration : IEntityTypeConfiguration<Task>
             .HasForeignKey(t => t.EpisodeId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        task.HasOne(t => t.Project)
+            .WithMany(t => t.Tasks)
+            .HasForeignKey(t => t.ProjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         task.HasOne(t => t.Assignee)
             .WithMany()
             .HasForeignKey(t => t.AssigneeId)

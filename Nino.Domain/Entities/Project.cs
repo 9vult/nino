@@ -68,6 +68,7 @@ public sealed class Project
     public ICollection<Administrator> Administrators { get; set; } = [];
     public ICollection<Episode> Episodes { get; set; } = [];
     public ICollection<Observer> Observers { get; set; } = [];
+    public ICollection<Task> Tasks { get; set; } = [];
 
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
