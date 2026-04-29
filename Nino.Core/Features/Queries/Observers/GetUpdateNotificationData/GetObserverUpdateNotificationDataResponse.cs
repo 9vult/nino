@@ -15,5 +15,7 @@ public sealed record GetObserverUpdateNotificationDataResponse(
     Number EpisodeNumber,
     ProgressPublishType PublishType,
     MappedIdDto<ChannelId> NotificationChannel,
+    string OriginGroupName,
+    bool IncludeOriginGroupName,
     Locale Locale
 );

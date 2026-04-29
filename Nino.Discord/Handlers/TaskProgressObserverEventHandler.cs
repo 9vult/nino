@@ -131,9 +131,11 @@ public sealed class TaskProgressObserverEventHandler(
         var embed = new EmbedBuilder()
             .WithProjectInfo(data.ProjectData, locale)
             .WithTitle(T("episode.title", locale, data.EpisodeNumber))
-            .WithDescription(body.ToString())
-            .Build();
+            .WithDescription(body.ToString());
 
-        await channel.SendMessageAsync(embed: embed);
+        if (data.IncludeOriginGroupName)
+            embed = embed.WithFooter(data.OriginGroupName);
+
+        await channel.SendMessageAsync(embed: embed.Build());
     }
 }

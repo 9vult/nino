@@ -377,6 +377,10 @@
         "group-name": {
           "name": "name",
           "description": "Group name"
+        },
+        "group-name-in-observer-progress": {
+          "name": "group-name-in-observer-progress",
+          "description": "Include the origin group name in observer progress embeds"
         }
       }
     }

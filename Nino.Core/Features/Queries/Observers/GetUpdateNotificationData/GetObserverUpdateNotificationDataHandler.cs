@@ -48,6 +48,8 @@ public sealed class GetObserverUpdateNotificationDataHandler(ReadOnlyNinoDbConte
                 taskInfo.Number,
                 o.Group.Configuration.ProgressPublishType,
                 MappedIdDto<ChannelId>.From(o.UpdateChannel),
+                o.OriginGroup.Name,
+                o.Group.Configuration.IncludeGroupNameInObserverProgress,
                 o.Group.Configuration.Locale
             ))
             .FirstOrDefaultAsync();

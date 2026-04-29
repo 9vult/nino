@@ -96,6 +96,17 @@ public sealed class EditGroupHandler(
             group.Name = command.Name;
         }
 
+        if (command.IncludeGroupNameInObserverProgress is not null)
+        {
+            logger.LogTrace(
+                "Setting group {GroupId}'s include observer group name to {IncludeGroupNameInObserverProgress}",
+                group.Id,
+                command.IncludeGroupNameInObserverProgress.Value
+            );
+            config.IncludeGroupNameInObserverProgress = command
+                .IncludeGroupNameInObserverProgress
+                .Value;
+        }
         await db.SaveChangesAsync();
         return Success();
     }

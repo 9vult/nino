@@ -22,8 +22,9 @@ public sealed class GetBulkObserverUpdateNotificationDataHandler(ReadOnlyNinoDbC
     {
         var observer = await db
             .Observers.Include(o => o.Project)
-            .ThenInclude(p => p.Episodes)
+                .ThenInclude(p => p.Episodes)
             .Include(o => o.Group)
+            .Include(o => o.OriginGroup)
             .Include(observer => observer.UpdateChannel)
             .FirstOrDefaultAsync(p => p.Id == query.ObserverId);
 
@@ -71,6 +72,8 @@ public sealed class GetBulkObserverUpdateNotificationDataHandler(ReadOnlyNinoDbC
                 firstNumber,
                 lastNumber,
                 MappedIdDto<ChannelId>.From(observer.UpdateChannel),
+                observer.OriginGroup.Name,
+                observer.Group.Configuration.IncludeGroupNameInObserverProgress,
                 observer.Group.Configuration.Locale
             )
         );

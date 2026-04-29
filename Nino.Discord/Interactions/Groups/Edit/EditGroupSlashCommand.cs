@@ -23,7 +23,8 @@ public partial class GroupModule
         ProgressPublishType? progressPublishType = null,
         CongaPrefixType? congaPrefixType = null,
         string? releasePrefix = null,
-        string? groupName = null
+        string? groupName = null,
+        bool? groupNameInObserverProgress = null
     )
     {
         var interaction = Context.Interaction;
@@ -52,7 +53,8 @@ public partial class GroupModule
             ProgressPublishType: progressPublishType,
             CongaPrefixType: congaPrefixType,
             ReleasePrefix: releasePrefix,
-            Name: groupName
+            Name: groupName,
+            IncludeGroupNameInObserverProgress: groupNameInObserverProgress
         );
 
         var result = await editHandler

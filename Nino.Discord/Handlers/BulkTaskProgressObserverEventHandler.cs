@@ -5,7 +5,6 @@ using Discord;
 using Discord.WebSocket;
 using Nino.Core.Events;
 using Nino.Core.Features.Queries.Observers.GetBulkUpdateNotificationData;
-using Nino.Core.Features.Queries.Tasks.GetBulkProgressNotificationData;
 using Nino.Discord.Interactions;
 using Nino.Discord.Services;
 using Nino.Domain.Enums;
@@ -98,9 +97,11 @@ public sealed class BulkTaskProgressObserverEventHandler(
             .WithTitle(
                 T("bulk.publish.title", locale, data.FirstEpisodeNumber, data.LastEpisodeNumber)
             )
-            .WithDescription(body.ToString())
-            .Build();
+            .WithDescription(body.ToString());
 
-        await channel.SendMessageAsync(embed: embed);
+        if (data.IncludeOriginGroupName)
+            embed = embed.WithFooter(data.OriginGroupName);
+
+        await channel.SendMessageAsync(embed: embed.Build());
     }
 }

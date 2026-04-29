@@ -25,6 +25,7 @@ public sealed class Configuration
     public Locale Locale { get; set; } = Locale.EnglishUS;
 
     public bool PublishPrivateProgress { get; set; } = true;
+    public bool IncludeGroupNameInObserverProgress { get; set; } = false;
 
     public ICollection<Administrator> Administrators { get; set; } = [];
 }

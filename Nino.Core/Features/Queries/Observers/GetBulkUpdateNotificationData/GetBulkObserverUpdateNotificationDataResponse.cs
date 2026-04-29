@@ -14,5 +14,7 @@ public sealed record GetBulkObserverUpdateNotificationDataResponse(
     Number FirstEpisodeNumber,
     Number LastEpisodeNumber,
     MappedIdDto<ChannelId> NotificationChannel,
+    string OriginGroupName,
+    bool IncludeOriginGroupName,
     Locale Locale
 );

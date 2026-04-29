@@ -16,5 +16,6 @@ public sealed record EditGroupCommand(
     ProgressPublishType? ProgressPublishType = null,
     CongaPrefixType? CongaPrefixType = null,
     string? ReleasePrefix = null,
-    string? Name = null
+    string? Name = null,
+    bool? IncludeGroupNameInObserverProgress = null
 ) : ICommand;
