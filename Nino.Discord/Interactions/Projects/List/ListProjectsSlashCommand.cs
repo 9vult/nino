@@ -122,15 +122,11 @@ public partial class ProjectModule
         if (response.IsSuccessStatusCode)
         {
             using var stream = new MemoryStream(await response.Content.ReadAsByteArrayAsync());
-            // successEmbed = successEmbed.WithImageUrl("attachment://congo.png");
-            await interaction.FollowupWithFileAsync(
-                stream,
-                "projects.png" // ,
-            // embed: successEmbed.Build()
-            );
+            await interaction.FollowupWithFileAsync(stream, "projects.png");
             return ExecutionResult.Success;
         }
 
+        await interaction.FollowupAsync($"{response.StatusCode} {response.ReasonPhrase}");
         return ExecutionResult.Success;
     }
 

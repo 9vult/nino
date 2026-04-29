@@ -440,6 +440,10 @@
         }
       }
     },
+    "list": {
+      "name": "list",
+      "description": "List all observers"
+    },
     "remove": {
       "name": "remove",
       "description": "Remove an observer from a project",
@@ -655,6 +659,10 @@
         "name": "project",
         "description": "Project alias"
       }
+    },
+    "list": {
+      "name": "list",
+      "description": "List all projects"
     },
     "roster": {
       "name": "roster",
