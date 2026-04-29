@@ -361,27 +361,27 @@
         "progress-response-type": {
           "name": "progress-response-type",
           "description": "Information to include in progress response embeds"
-        },
-        "progress-publish-type": {
-          "name": "progress-publish-type",
-          "description": "Information to include in progress publish embeds"
-        },
-        "conga-prefix-type": {
-          "name": "conga-prefix-type",
-          "description": "Conga notification prefix"
-        },
-        "release-prefix": {
-          "name": "release-prefix",
-          "description": "Prefix for releases"
-        },
-        "group-name": {
-          "name": "name",
-          "description": "Group name"
-        },
-        "group-name-in-observer-progress": {
-          "name": "group-name-in-observer-progress",
-          "description": "Include the origin group name in observer progress embeds"
         }
+      },
+      "progress-publish-type": {
+        "name": "progress-publish-type",
+        "description": "Information to include in progress publish embeds"
+      },
+      "conga-prefix-type": {
+        "name": "conga-prefix-type",
+        "description": "Conga notification prefix"
+      },
+      "release-prefix": {
+        "name": "release-prefix",
+        "description": "Prefix for releases"
+      },
+      "group-name": {
+        "name": "name",
+        "description": "Group name"
+      },
+      "group-name-in-observer-progress": {
+        "name": "group-name-in-observer-progress",
+        "description": "Include the origin group name in observer progress embeds"
       }
     }
   },
