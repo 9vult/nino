@@ -40,6 +40,9 @@ public partial class ProjectModule
         var congaRemindersEnabled = T("project.list.congaRemindersEnabled", locale);
         var taskCompletionStatus = T("project.list.taskCompletionStatus", locale);
 
+        var yes = T("project.list.true", locale);
+        var no = T("project.list.false", locale);
+
         var tableData = new Table
         {
             Columns =
@@ -93,11 +96,11 @@ public partial class ProjectModule
                     p.OwnerName,
                     EpisodeCount = $"{p.EpisodeCount}",
                     ObserverCount = $"{p.ObserverCount}",
-                    IsPrivate = p.IsPrivate ? "true" : "false",
-                    IsArchived = p.IsArchived ? "true" : "false",
-                    AirNotificationsEnabled = p.AirNotificationsEnabled ? "true" : "false",
-                    CongaRemindersEnabled = p.CongaRemindersEnabled ? "true" : "false",
-                    HasDelegateObserver = p.HasDelegateObserver ? "true" : "false",
+                    IsPrivate = p.IsPrivate ? yes : no,
+                    IsArchived = p.IsArchived ? yes : no,
+                    AirNotificationsEnabled = p.AirNotificationsEnabled ? yes : no,
+                    CongaRemindersEnabled = p.CongaRemindersEnabled ? yes : no,
+                    HasDelegateObserver = p.HasDelegateObserver ? yes : no,
                     TaskCompletion = $"{p.TotalNonPseudoTaskCompletedCount}/{p.TotalNonPseudoTaskCount} ({p.TotalTaskCompletedCount}/{p.TotalTaskCount})*",
                 })
                 .ToList<object>(),
