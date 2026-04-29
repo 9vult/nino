@@ -170,6 +170,7 @@
     "project.list.episodeCount": "Episodes",
     "project.list.airNotificationsEnabled": "Air Notifications",
     "project.list.congaRemindersEnabled": "Conga Reminders",
+    "project.list.empty": "There aren't any projects!",
     "project.list.false": "false",
     "project.list.hasDelegateObserver": "Has Delegate",
     "project.list.isArchived": "Archived",

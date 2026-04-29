@@ -27,7 +27,11 @@ public partial class ProjectModule
 
         var projects = request.Value;
 
-        if (projects.Count == 0) { }
+        if (projects.Count == 0)
+        {
+            await interaction.FollowupAsync(T("project.list.empty", locale));
+            return ExecutionResult.Success;
+        }
 
         var nick = T("project.list.nickname", locale);
         var owner = T("project.list.owner", locale);
