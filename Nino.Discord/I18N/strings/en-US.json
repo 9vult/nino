@@ -149,6 +149,7 @@
     "observer.delete.success": "Successfully removed the observer!",
     "observer.invalidServerId": "`{id_1}` is not a valid Discord server ID.",
     "observer.list.empty": "There's no observers!",
+    "observer.list.groupName": "Group",
     "observer.list.isDelegateObserver": "Is Delegate",
     "observer.list.nickname": "Nickname",
     "observer.list.owner": "Owner",

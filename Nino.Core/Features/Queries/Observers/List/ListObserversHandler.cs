@@ -28,6 +28,7 @@ public sealed class ListObserversHandler(
         var results = await db
             .Observers.Where(p => p.GroupId == query.GroupId)
             .Select(p => new ListObserversResult(
+                p.OriginGroup.Name,
                 p.Project.Nickname,
                 p.Owner.Name,
                 p.Project.DelegateObserverId == p.Id

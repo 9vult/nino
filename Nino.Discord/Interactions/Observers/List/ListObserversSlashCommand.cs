@@ -34,6 +34,7 @@ public partial class ObserverModule
             return ExecutionResult.Success;
         }
 
+        var group = T("observer.list.groupName", locale);
         var nick = T("observer.list.nickname", locale);
         var owner = T("observer.list.owner", locale);
         var isDelegateObserver = T("observer.list.isDelegateObserver", locale);
@@ -45,6 +46,12 @@ public partial class ObserverModule
         {
             Columns =
             [
+                new
+                {
+                    title = group,
+                    dataIndex = nameof(ListObserversResult.GroupName),
+                    width = 200,
+                },
                 new
                 {
                     title = nick,
@@ -60,7 +67,7 @@ public partial class ObserverModule
                 new
                 {
                     title = isDelegateObserver,
-                    dataIndex = nameof(ListProjectsResult.HasDelegateObserver),
+                    dataIndex = nameof(ListObserversResult.IsDelegate),
                     width = 150,
                 },
             ],
@@ -68,9 +75,10 @@ public partial class ObserverModule
             DataSource = observers
                 .Select(p => new
                 {
+                    p.GroupName,
                     p.ProjectNickname,
                     p.OwnerName,
-                    IsPrivate = p.IsDelegate ? yes : no,
+                    IsDelegate = p.IsDelegate ? yes : no,
                 })
                 .ToList<object>(),
         };

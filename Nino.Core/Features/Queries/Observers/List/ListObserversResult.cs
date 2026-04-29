@@ -4,4 +4,9 @@ using Nino.Domain.ValueObjects;
 
 namespace Nino.Core.Features.Queries.Observers.List;
 
-public sealed record ListObserversResult(Alias ProjectNickname, string OwnerName, bool IsDelegate);
+public sealed record ListObserversResult(
+    string GroupName,
+    Alias ProjectNickname,
+    string OwnerName,
+    bool IsDelegate
+);
