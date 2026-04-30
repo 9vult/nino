@@ -45,7 +45,7 @@ public sealed class GetTasksAtMeHandler(ReadOnlyNinoDbContext db, IAniListServic
         var pagedResults = results
             .OrderBy(r => r.Nickname.Value)
             .ThenBy(r => r.EpisodeNumber.Value, StringComparer.OrdinalIgnoreCase.WithNaturalSort())
-            .Skip(ItemsPerPage * (page - 1))
+            .Skip(ItemsPerPage * page)
             .Take(ItemsPerPage);
 
         return Result<GetTasksAtMeResponse>.Success(

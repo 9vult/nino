@@ -109,7 +109,11 @@ public sealed class AtMePreviousButton(
                 .WithButton("▶", nextId, disabled: !hasNext);
         }
 
-        await interaction.FollowupAsync(embed: successEmbed, components: component?.Build());
+        await interaction.ModifyOriginalResponseAsync(m =>
+        {
+            m.Embed = successEmbed;
+            m.Components = component?.Build();
+        });
         return ExecutionResult.Success;
     }
 }
