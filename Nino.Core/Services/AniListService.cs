@@ -21,7 +21,11 @@ public sealed class AniListService(
 ) : IAniListService
 {
     private const string BaseUrl = "https://graphql.anilist.co";
-    private static readonly TimeSpan CacheTtl = TimeSpan.FromHours(60); // 2.5 days
+
+    // Cache time-to-live for different statuses
+    private static readonly TimeSpan CompletedTtl = TimeSpan.FromDays(360);
+    private static readonly TimeSpan HiatusTtl = TimeSpan.FromDays(30);
+    private static readonly TimeSpan OngoingTtl = TimeSpan.FromDays(3);
 
     /// <inheritdoc />
     public async Task<Result<AniListResponse>> GetAnimeAsync(AniListId aniListId)
@@ -30,10 +34,15 @@ public sealed class AniListService(
             return Result<AniListResponse>.Fail(ResultStatus.BadRequest);
 
         var cachedResponse = await db.AniListCache.SingleOrDefaultAsync(r => r.Id == aniListId);
-        if (
-            cachedResponse is not null
-            && DateTimeOffset.UtcNow - cachedResponse.FetchedAt < CacheTtl
-        )
+
+        var ttl = cachedResponse?.Status switch
+        {
+            AniListStatus.Finished or AniListStatus.Cancelled => CompletedTtl,
+            AniListStatus.Releasing or AniListStatus.NotYetReleased => OngoingTtl,
+            _ => HiatusTtl,
+        };
+
+        if (cachedResponse is not null && DateTimeOffset.UtcNow - cachedResponse.FetchedAt < ttl)
             return Result<AniListResponse>.Success(cachedResponse);
 
         // Need to request new data
@@ -52,7 +61,7 @@ public sealed class AniListService(
                 while (page < (data?.Data?.Media?.AiringSchedule?.PageInfo?.LastPage ?? 1))
                 {
                     // Sleep to try and avoid rate limiting
-                    await Task.Delay(1000);
+                    await Task.Delay(250);
 
                     page++;
                     response = await client.PostAsync(BaseUrl, CreateQuery(aniListId, page));
@@ -212,6 +221,7 @@ public sealed class AniListService(
                     query = """
                     query ($id: Int, $page: Int) {
                         Media (id: $id) {
+                            status,
                             startDate { year month day },
                             airingSchedule(page: $page) {
                                 pageInfo { lastPage },

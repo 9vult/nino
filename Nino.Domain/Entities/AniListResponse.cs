@@ -24,6 +24,19 @@ public class AniListResponse
     public string? PosterUrl => Data?.Data?.Media?.CoverImage?.ExtraLarge;
 
     [NotMapped]
+    public AniListStatus Status =>
+        Data?.Data?.Media?.Status is not null
+            ? Data?.Data?.Media?.Status switch
+            {
+                "FINISHED" => AniListStatus.Finished,
+                "CANCELLED" => AniListStatus.Cancelled,
+                "RELEASING" => AniListStatus.Releasing,
+                "NOT_YET_RELEASED" => AniListStatus.NotYetReleased,
+                _ => AniListStatus.Hiatus,
+            }
+            : AniListStatus.Hiatus;
+
+    [NotMapped]
     public ProjectType Type =>
         Data?.Data?.Media?.Format is not null
             ? Data?.Data?.Media?.Format switch

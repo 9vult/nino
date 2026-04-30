@@ -7,6 +7,10 @@ namespace Nino.Domain.Dtos.AniList;
 
 public class Media
 {
+    [JsonPropertyName("status")]
+    [MaxLength(64)]
+    public string? Status { get; set; }
+
     [JsonPropertyName("startDate")]
     public FuzzyDate? StartDate { get; set; }
 
