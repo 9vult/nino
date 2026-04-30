@@ -3,6 +3,18 @@
     "name": "about",
     "description": "About Nino"
   },
+  "atme": {
+    "name": "atme",
+    "description": "View tasks At Me",
+    "global": {
+      "name": "global",
+      "description": "Include projects from all groups"
+    },
+    "exclude-pseudo": {
+      "name": "exclude-pseudo",
+      "description": "Exclude pseudotasks from results"
+    }
+  },
   "blame": {
     "name": "blame",
     "description": "Check the status of a project",
