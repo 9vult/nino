@@ -6,10 +6,8 @@ namespace Nino.Core.Features.Queries.Tasks.AtMe;
 
 public sealed record GetTasksAtMeResult(
     ProjectId ProjectId,
-    Alias ProjectAlias,
+    Alias Nickname,
     Number EpisodeNumber,
-    string TaskName,
-    decimal Weight,
-    bool IsPseudo,
-    AniListId AniListId
+    AniListId AniListId,
+    IReadOnlyList<GetTasksAtMeTaskResult> Tasks
 );

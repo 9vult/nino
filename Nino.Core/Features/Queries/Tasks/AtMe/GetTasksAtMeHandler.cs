@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 using Microsoft.EntityFrameworkCore;
+using NaturalSort.Extension;
 using Nino.Core.Services;
 using Nino.Domain.Enums;
 using Nino.Domain.ValueObjects;
@@ -15,38 +16,56 @@ public sealed class GetTasksAtMeHandler(ReadOnlyNinoDbContext db, IAniListServic
     /// <inheritdoc />
     public async Task<Result<GetTasksAtMeResponse>> HandleAsync(GetTasksAtMeQuery query)
     {
-        var page = query.Page ?? 1;
+        var page = query.Page ?? 0;
         List<GetTasksAtMeResult> results = [];
+        var resultingType = AtMeType.Auto;
         switch (query.Type)
         {
             case AtMeType.Incomplete:
                 results = await GetViaIncomplete(query);
+                resultingType = AtMeType.Incomplete;
                 break;
             case AtMeType.Conga:
                 results = await GetViaConga(query);
+                resultingType = AtMeType.Conga;
                 break;
             case AtMeType.Auto:
                 results = await GetViaConga(query);
+                resultingType = AtMeType.Conga;
+
                 if (results.Count == 0)
+                {
                     results = await GetViaIncomplete(query);
+                    resultingType = AtMeType.Incomplete;
+                }
                 break;
         }
+
+        // Order results for consistency
+        var pagedResults = results
+            .OrderBy(r => r.Nickname.Value)
+            .ThenBy(r => r.EpisodeNumber.Value, StringComparer.OrdinalIgnoreCase.WithNaturalSort())
+            .Skip(ItemsPerPage * (page - 1))
+            .Take(ItemsPerPage);
+
         return Result<GetTasksAtMeResponse>.Success(
             new GetTasksAtMeResponse(
-                results.Skip(ItemsPerPage * (page - 1)).Take(ItemsPerPage).ToList(),
+                pagedResults.ToList(),
+                resultingType,
                 page,
-                results.Count / ItemsPerPage
+                (int)Math.Max(1, Math.Ceiling(results.Count / (decimal)ItemsPerPage))
             )
         );
     }
 
     private async Task<List<GetTasksAtMeResult>> GetViaConga(GetTasksAtMeQuery query)
     {
-        var lookup = db.Projects.AsQueryable();
+        var lookup = db.Projects.Where(p =>
+            p.Tasks.Any(t => !t.IsDone && t.AssigneeId == query.RequestedBy)
+        );
         if (!query.Global)
             lookup = lookup.Where(p => p.GroupId == query.GroupId);
         var projects = await lookup
-            .Where(p => p.CongaParticipants.Nodes.Count > 0)
             .Select(p => new
             {
                 p.Id,
@@ -64,6 +83,8 @@ public sealed class GetTasksAtMeHandler(ReadOnlyNinoDbContext db, IAniListServic
             })
             .ToListAsync();
 
+        projects = projects.Where(p => p.CongaParticipants.Nodes.Count > 0).ToList();
+
         // Get aired episodes
         var airedEpisodesByAniListId = new Dictionary<AniListId, List<decimal>?>();
         foreach (var aniListId in projects.Select(t => t.AniListId).Distinct())
@@ -75,7 +96,8 @@ public sealed class GetTasksAtMeHandler(ReadOnlyNinoDbContext db, IAniListServic
             }
 
             var result = await aniListService.GetAiredEpisodesAsync(aniListId);
-            airedEpisodesByAniListId[aniListId] = result.IsSuccess ? result.Value : null;
+            airedEpisodesByAniListId[aniListId] =
+                result.IsSuccess && result.Value.Count > 0 ? result.Value : null;
         }
 
         List<GetTasksAtMeResult> results = [];
@@ -91,28 +113,41 @@ public sealed class GetTasksAtMeHandler(ReadOnlyNinoDbContext db, IAniListServic
             });
             foreach (var episode in episodes)
             {
-                var tasks = episode.Tasks.Where(e => e.AssigneeId == query.RequestedBy).ToList();
-                if (tasks.Count == 0)
+                var epTasks = episode
+                    .Tasks.Where(t => t.AssigneeId == query.RequestedBy && !t.IsDone)
+                    .ToList();
+                if (epTasks.Count == 0)
                     continue;
 
-                foreach (var task in tasks)
+                List<GetTasksAtMeTaskResult> tasks = [];
+
+                foreach (var task in epTasks)
                 {
                     if (!project.CongaParticipants.TryGetNode(task.Abbreviation, out var node))
                         continue;
                     if (node.CanBeActivated(episode.Tasks.ToList()))
                     {
-                        results.Add(
-                            new GetTasksAtMeResult(
-                                project.Id,
-                                project.Nickname,
-                                episode.Number,
-                                task.Name,
+                        tasks.Add(
+                            new GetTasksAtMeTaskResult(
+                                task.Abbreviation,
                                 task.Weight,
-                                task.IsPseudo,
-                                project.AniListId
+                                task.IsPseudo
                             )
                         );
                     }
+                }
+
+                if (tasks.Count > 0)
+                {
+                    results.Add(
+                        new GetTasksAtMeResult(
+                            project.Id,
+                            project.Nickname,
+                            episode.Number,
+                            project.AniListId,
+                            tasks
+                        )
+                    );
                 }
             }
         }
@@ -131,15 +166,16 @@ public sealed class GetTasksAtMeHandler(ReadOnlyNinoDbContext db, IAniListServic
 
         var assignedTasks = (
             await lookup
-                .Select(t => new GetTasksAtMeResult(
+                .Select(t => new
+                {
                     t.ProjectId,
                     t.Project.Nickname,
                     t.Episode.Number,
-                    t.Name,
+                    t.Abbreviation,
                     t.Weight,
                     t.IsPseudo,
-                    t.Project.AniListId
-                ))
+                    t.Project.AniListId,
+                })
                 .ToListAsync()
         ).ToList();
 
@@ -158,7 +194,7 @@ public sealed class GetTasksAtMeHandler(ReadOnlyNinoDbContext db, IAniListServic
         }
 
         // Restrict to only aired episodes
-        return assignedTasks
+        assignedTasks = assignedTasks
             .Where(t =>
             {
                 var airedEpisodes = airedEpisodesByAniListId[t.AniListId];
@@ -166,8 +202,23 @@ public sealed class GetTasksAtMeHandler(ReadOnlyNinoDbContext db, IAniListServic
                 if (airedEpisodes is null)
                     return true;
 
-                return !t.EpisodeNumber.IsDecimal(out var value) || airedEpisodes.Contains(value);
+                return !t.Number.IsDecimal(out var value) || airedEpisodes.Contains(value);
             })
             .ToList();
+
+        List<GetTasksAtMeResult> results = [];
+        foreach (var episode in assignedTasks.GroupBy(t => t.Number))
+        {
+            var number = episode.Key;
+            var data = episode.First();
+            var projectId = data.ProjectId;
+            var nickname = data.Nickname;
+            var aniListId = data.AniListId;
+            var tasks = episode
+                .Select(t => new GetTasksAtMeTaskResult(t.Abbreviation, t.Weight, t.IsPseudo))
+                .ToList();
+            results.Add(new GetTasksAtMeResult(projectId, nickname, number, aniListId, tasks));
+        }
+        return results;
     }
 }
