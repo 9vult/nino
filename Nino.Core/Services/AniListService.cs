@@ -21,7 +21,7 @@ public sealed class AniListService(
 ) : IAniListService
 {
     private const string BaseUrl = "https://graphql.anilist.co";
-    private static readonly TimeSpan OneDay = TimeSpan.FromDays(1);
+    private static readonly TimeSpan CacheTtl = TimeSpan.FromHours(60); // 2.5 days
 
     /// <inheritdoc />
     public async Task<Result<AniListResponse>> GetAnimeAsync(AniListId aniListId)
@@ -30,7 +30,10 @@ public sealed class AniListService(
             return Result<AniListResponse>.Fail(ResultStatus.BadRequest);
 
         var cachedResponse = await db.AniListCache.SingleOrDefaultAsync(r => r.Id == aniListId);
-        if (cachedResponse is not null && DateTimeOffset.UtcNow - cachedResponse.FetchedAt < OneDay)
+        if (
+            cachedResponse is not null
+            && DateTimeOffset.UtcNow - cachedResponse.FetchedAt < CacheTtl
+        )
             return Result<AniListResponse>.Success(cachedResponse);
 
         // Need to request new data
