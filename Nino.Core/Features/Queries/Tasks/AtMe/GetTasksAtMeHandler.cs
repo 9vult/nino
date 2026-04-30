@@ -60,9 +60,9 @@ public sealed class GetTasksAtMeHandler(ReadOnlyNinoDbContext db, IAniListServic
 
     private async Task<List<GetTasksAtMeResult>> GetViaConga(GetTasksAtMeQuery query)
     {
-        var lookup = db.Projects.Where(p =>
-            p.Tasks.Any(t => !t.IsDone && t.AssigneeId == query.RequestedBy)
-        );
+        var lookup = db
+            .Projects.Where(p => !p.IsArchived)
+            .Where(p => p.Tasks.Any(t => !t.IsDone && t.AssigneeId == query.RequestedBy));
         if (!query.Global)
             lookup = lookup.Where(p => p.GroupId == query.GroupId);
         var projects = await lookup
@@ -156,7 +156,9 @@ public sealed class GetTasksAtMeHandler(ReadOnlyNinoDbContext db, IAniListServic
 
     private async Task<List<GetTasksAtMeResult>> GetViaIncomplete(GetTasksAtMeQuery query)
     {
-        var lookup = db.Tasks.Where(t => t.AssigneeId == query.RequestedBy).Where(t => !t.IsDone);
+        var lookup = db
+            .Tasks.Where(t => !t.Project.IsArchived)
+            .Where(t => t.AssigneeId == query.RequestedBy && !t.IsDone);
 
         if (!query.Global)
             lookup = lookup.Where(t => t.Project.GroupId == query.GroupId);
