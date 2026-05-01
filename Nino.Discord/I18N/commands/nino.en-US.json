@@ -400,7 +400,7 @@
         "description": "Group name"
       },
       "group-name-in-observer-progress": {
-        "name": "group-name-in-observer-progress",
+        "name": "show-origin-group-in-progress",
         "description": "Include the origin group name in observer progress embeds"
       }
     }
