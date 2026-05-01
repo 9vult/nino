@@ -56,6 +56,13 @@ public interface IUserVerificationService
     );
 
     /// <summary>
+    /// Check if the user is a system administrator
+    /// </summary>
+    /// <param name="userId">User ID</param>
+    /// <returns><see langword="true"/> if the user is a system administrator</returns>
+    Task<bool> VerifySystemAdministratorAsync(UserId userId);
+
+    /// <summary>
     /// Get the effective permissions level for a user
     /// </summary>
     /// <param name="project">Project</param>

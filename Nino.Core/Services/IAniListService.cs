@@ -3,6 +3,7 @@
 using Nino.Core.Features;
 using Nino.Domain.Entities;
 using Nino.Domain.ValueObjects;
+using Task = Nino.Domain.Entities.Task;
 
 namespace Nino.Core.Services;
 
@@ -51,4 +52,11 @@ public interface IAniListService
     /// <param name="aniListId">AniList ID</param>
     /// <returns>List of episodes that have already aired</returns>
     Task<Result<List<decimal>>> GetAiredEpisodesAsync(AniListId aniListId);
+
+    /// <summary>
+    /// Force update an anime, bypassing the cache expiration scheme
+    /// </summary>
+    /// <param name="aniListId">AniList ID</param>
+    /// <returns>Details about the anime</returns>
+    Task<Result<AniListResponse>> ForceUpdateAnimeAsync(AniListId aniListId);
 }

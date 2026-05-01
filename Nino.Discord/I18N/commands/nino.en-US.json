@@ -131,6 +131,14 @@
     "debug": {
       "name": "debug",
       "description": "Debug commands",
+      "anilist-force-update": {
+        "name": "anilist-force-update",
+        "description": "Force update an AniList entry",
+        "anilist-id": {
+          "name": "anilist-id",
+          "description": "AniList ID"
+        }
+      },
       "anilist-info": {
         "name": "anilist-info",
         "description": "AniList information",

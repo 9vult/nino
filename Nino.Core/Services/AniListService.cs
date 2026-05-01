@@ -33,7 +33,7 @@ public sealed class AniListService(
         if (aniListId == AniListId.Unset)
             return Result<AniListResponse>.Fail(ResultStatus.BadRequest);
 
-        var cachedResponse = await db.AniListCache.SingleOrDefaultAsync(r => r.Id == aniListId);
+        var cachedResponse = await db.AniListCache.FirstOrDefaultAsync(r => r.Id == aniListId);
 
         var ttl = cachedResponse?.Status switch
         {
@@ -46,77 +46,7 @@ public sealed class AniListService(
             return Result<AniListResponse>.Success(cachedResponse);
 
         // Need to request new data
-        try
-        {
-            var page = 1;
-            var response = await client.PostAsync(BaseUrl, CreateQuery(aniListId, page));
-
-            if (response.IsSuccessStatusCode)
-            {
-                var data = await response.Content.ReadFromJsonAsync<AniListRoot>();
-                if (data?.Data?.Media?.AiringSchedule?.Nodes is null)
-                    return Result<AniListResponse>.Fail(ResultStatus.Error);
-
-                // Round to the nearest multiple of 30 minutes
-                while (page < (data?.Data?.Media?.AiringSchedule?.PageInfo?.LastPage ?? 1))
-                {
-                    // Sleep to try and avoid rate limiting
-                    await Task.Delay(250);
-
-                    page++;
-                    response = await client.PostAsync(BaseUrl, CreateQuery(aniListId, page));
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var innerData = await response.Content.ReadFromJsonAsync<AniListRoot>();
-                        if (innerData?.Data?.Media?.AiringSchedule?.Nodes is null)
-                            continue;
-
-                        data!.Data!.Media!.AiringSchedule!.Nodes?.AddRange(
-                            innerData.Data.Media.AiringSchedule.Nodes
-                        );
-                    }
-                }
-
-                if (cachedResponse is not null)
-                {
-                    cachedResponse.Data = data;
-                    cachedResponse.FetchedAt = DateTimeOffset.UtcNow;
-                }
-                else
-                {
-                    cachedResponse = new AniListResponse
-                    {
-                        Id = aniListId,
-                        Data = data,
-                        FetchedAt = DateTimeOffset.UtcNow,
-                    };
-                    await db.AniListCache.AddAsync(cachedResponse);
-                }
-
-                await db.SaveChangesAsync();
-                return Result<AniListResponse>.Success(cachedResponse);
-            }
-            return Result<AniListResponse>.Fail(ResultStatus.Error);
-        }
-        catch (HttpRequestException e) when (e.StatusCode == HttpStatusCode.NotFound)
-        {
-            return Result<AniListResponse>.Fail(ResultStatus.NotFound);
-        }
-        catch (HttpRequestException e)
-        {
-            logger.LogError(
-                e,
-                "HTTP Status {Code} when getting AniList ID {AniListID}",
-                e.StatusCode,
-                aniListId
-            );
-            return Result<AniListResponse>.Fail(ResultStatus.Error);
-        }
-        catch (Exception e)
-        {
-            logger.LogError(e, "Error when getting AniList ID {AniListID}", aniListId);
-            return Result<AniListResponse>.Fail(ResultStatus.Error);
-        }
+        return await FetchNewDataFromAniListAsync(aniListId, cachedResponse);
     }
 
     /// <inheritdoc />
@@ -209,6 +139,91 @@ public sealed class AniListService(
             .Select(e => Convert.ToDecimal(e.Episode))
             .ToList();
         return Result<List<decimal>>.Success(episodeNumbers);
+    }
+
+    /// <inheritdoc />
+    public async Task<Result<AniListResponse>> ForceUpdateAnimeAsync(AniListId aniListId)
+    {
+        var cachedResponse = await db.AniListCache.FirstOrDefaultAsync(r => r.Id == aniListId);
+        return await FetchNewDataFromAniListAsync(aniListId, cachedResponse);
+    }
+
+    private async Task<Result<AniListResponse>> FetchNewDataFromAniListAsync(
+        AniListId aniListId,
+        AniListResponse? cachedResponse
+    )
+    {
+        try
+        {
+            var page = 1;
+            var response = await client.PostAsync(BaseUrl, CreateQuery(aniListId, page));
+
+            if (response.IsSuccessStatusCode)
+            {
+                var data = await response.Content.ReadFromJsonAsync<AniListRoot>();
+                if (data?.Data?.Media?.AiringSchedule?.Nodes is null)
+                    return Result<AniListResponse>.Fail(ResultStatus.Error);
+
+                // Round to the nearest multiple of 30 minutes
+                while (page < (data?.Data?.Media?.AiringSchedule?.PageInfo?.LastPage ?? 1))
+                {
+                    // Sleep to try and avoid rate limiting
+                    await Task.Delay(250);
+
+                    page++;
+                    response = await client.PostAsync(BaseUrl, CreateQuery(aniListId, page));
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var innerData = await response.Content.ReadFromJsonAsync<AniListRoot>();
+                        if (innerData?.Data?.Media?.AiringSchedule?.Nodes is null)
+                            continue;
+
+                        data!.Data!.Media!.AiringSchedule!.Nodes?.AddRange(
+                            innerData.Data.Media.AiringSchedule.Nodes
+                        );
+                    }
+                }
+
+                if (cachedResponse is not null)
+                {
+                    cachedResponse.Data = data;
+                    cachedResponse.FetchedAt = DateTimeOffset.UtcNow;
+                }
+                else
+                {
+                    cachedResponse = new AniListResponse
+                    {
+                        Id = aniListId,
+                        Data = data,
+                        FetchedAt = DateTimeOffset.UtcNow,
+                    };
+                    await db.AniListCache.AddAsync(cachedResponse);
+                }
+
+                await db.SaveChangesAsync();
+                return Result<AniListResponse>.Success(cachedResponse);
+            }
+            return Result<AniListResponse>.Fail(ResultStatus.Error);
+        }
+        catch (HttpRequestException e) when (e.StatusCode == HttpStatusCode.NotFound)
+        {
+            return Result<AniListResponse>.Fail(ResultStatus.NotFound);
+        }
+        catch (HttpRequestException e)
+        {
+            logger.LogError(
+                e,
+                "HTTP Status {Code} when getting AniList ID {AniListID}",
+                e.StatusCode,
+                aniListId
+            );
+            return Result<AniListResponse>.Fail(ResultStatus.Error);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error when getting AniList ID {AniListID}", aniListId);
+            return Result<AniListResponse>.Fail(ResultStatus.Error);
+        }
     }
 
     private static StringContent CreateQuery(AniListId aniListId, int page)

@@ -1,6 +1,7 @@
 {
   "singular": {
     "action.canceled": "Okay, I won't do anything then.",
+    "action.completed": "Done!",
     "action.question": "❓ What do you want me to do?",
     "admin.add.badRequest": "That user is already an admin!",
     "admin.add.success": "Gave {user_1} administrator privileges.",

@@ -95,6 +95,13 @@ public class UserVerificationService(
     }
 
     /// <inheritdoc />
+    public async Task<bool> VerifySystemAdministratorAsync(UserId userId)
+    {
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        return user?.IsSystemAdministrator ?? false;
+    }
+
+    /// <inheritdoc />
     public async Task<PermissionsLevel> GetProjectPermissionsAsync(Project project, UserId userId)
     {
         if (project.OwnerId == userId)

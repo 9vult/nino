@@ -11,6 +11,8 @@ namespace Nino.Discord.Interactions.Debug;
 [Group("debug", "Debug commands")]
 public partial class DebugModule(
     IAniListService aniListService,
+    IInteractionIdentityService interactionIdService,
+    IUserVerificationService verificationService,
     GetProjectDebugDataHandler projectDataHandler,
     IBotPermissionsService botPermissionsService
 ) : InteractionModuleBase<IInteractionContext>;
