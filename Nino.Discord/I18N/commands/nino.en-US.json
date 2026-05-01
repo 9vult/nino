@@ -368,8 +368,8 @@
         }
       }
     },
-    "edit": {
-      "name": "edit",
+    "config": {
+      "name": "config",
       "description": "Edit group configuration",
       "locale": {
         "name": "locale",

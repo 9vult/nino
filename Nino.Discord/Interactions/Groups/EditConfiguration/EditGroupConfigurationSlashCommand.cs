@@ -15,8 +15,8 @@ namespace Nino.Discord.Interactions.Groups;
 
 public partial class GroupModule
 {
-    [SlashCommand("edit", "Edit group configuration")]
-    public async Task<RuntimeResult> EditAsync(
+    [SlashCommand("config", "Edit group configuration")]
+    public async Task<RuntimeResult> EditConfigurationAsync(
         [Autocomplete(typeof(LocaleAutocompleteHandler))] Locale? locale = null,
         bool? publishPrivateProgress = null,
         ProgressResponseType? progressResponseType = null,

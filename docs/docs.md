@@ -94,10 +94,10 @@ less visible to users who are not working on it.
 2. Users cannot [observe](#observer-add) the project unless they are a member of
    the project staff or an administrator. Note that if the project used to be
    public, any existing observers will continue to function unless the updates
-   are disabled via `/group edit publish-private-progress`.
+   are disabled via `/group config publish-private-progress`.
 3. By default, Nino will still post progress updates for private projects to the
    configured update channel. However, there is the option to disable these
-   updates globally for the group with `/group edit publish-private-progress`.
+   updates globally for the group with `/group config publish-private-progress`.
 
 > **Info**: If you are coming from Deschtimes and have been using its Joint feature to relay progress updates and use
 > /blame in another server, see the section for [Adding an Observer](#observer-add).
