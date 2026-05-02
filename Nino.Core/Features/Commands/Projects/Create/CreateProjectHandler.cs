@@ -4,6 +4,7 @@ using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Nino.Core.Services;
+using Nino.Domain;
 using Nino.Domain.Entities;
 using Nino.Domain.Enums;
 using Nino.Domain.ValueObjects;
@@ -83,13 +84,20 @@ public sealed class CreateProjectHandler(
             return Fail(ResultStatus.BadRequest, message: missingFields);
         }
 
+        // Truncate the title if too long
+
+        var truncTitle =
+            command.Title.Length <= Length.Title
+                ? command.Title
+                : command.Title[..(Length.Title - 3)] + "...";
+
         var project = new Project
         {
             GroupId = command.GroupId,
             OwnerId = command.RequestedBy,
             Type = command.Type.Value,
             Nickname = command.Nickname,
-            Title = command.Title,
+            Title = truncTitle,
             PosterUrl = command.PosterUrl,
             AniListId = command.AniListId,
             ProjectChannelId = command.ProjectChannelId,
