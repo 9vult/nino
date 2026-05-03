@@ -141,7 +141,7 @@
     "nino.maintenance.body": "Nino is currently undergoing maintenance! What a predicament...",
     "nino.maintenance.title": "Under Maintenance!",
     "nino.stats.empty": "There's no stats!",
-    "nino.stats.episodes": "Of **{episodes_1}** episodes, **{percent_2}** are complete.",
+    "nino.stats.episodes": "Of **{episodes_1}** episodes, **{percent_2}**% are complete.",
     "nino.stats.observers": "There are also **{observer_1}** observers observing **{projects_2}** unique projects.",
     "nino.stats.projects": "Nino is currently managing **{projects_1}** projects from **{groups_2}** groups.",
     "nino.stats.tasks": "**{tasks_1}** tasks have been completed.",
