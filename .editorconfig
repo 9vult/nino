@@ -1,0 +1,10 @@
+# Remove the line below if you want to inherit .editorconfig settings from higher directories
+root = true
+
+# C# files
+[*.cs]
+
+insert_final_newline = true
+file_header_template = SPDX-License-Identifier: MPL-2.0
+
+dotnet_diagnostic.CA1873.severity = none

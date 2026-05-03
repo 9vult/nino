@@ -1,5 +1,11 @@
 <Solution>
-  <Project Path="Localizer/Localizer.csproj" />
-  <Project Path="Nino.Records/Nino.Records.csproj" />
-  <Project Path="Nino/Nino.csproj" />
+  <Folder Name="/Tests/">
+    <Project Path="Tests/Nino.Core.Tests/Nino.Core.Tests.csproj" />
+  </Folder>
+  <Project Path="Nino.Core/Nino.Core.csproj" />
+  <Project Path="Nino.Discord/Nino.Discord.csproj" />
+  <Project Path="Nino.Domain/Nino.Domain.csproj" />
+  <Project Path="Nino.Host/Nino.Host.csproj" />
+  <Project Path="Nino.Localization/Nino.Localization.csproj" />
+  <Project Path="Nino.Web/Nino.Web.csproj" />
 </Solution>

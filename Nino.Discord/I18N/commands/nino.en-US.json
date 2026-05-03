@@ -1,0 +1,1051 @@
+{
+  "about": {
+    "name": "about",
+    "description": "About Nino"
+  },
+  "atme": {
+    "name": "atme",
+    "description": "View tasks At Me",
+    "global": {
+      "name": "global",
+      "description": "Include projects from all groups"
+    },
+    "exclude-pseudo": {
+      "name": "exclude-pseudo",
+      "description": "Exclude pseudotasks from results"
+    }
+  },
+  "blame": {
+    "name": "blame",
+    "description": "Check the status of a project",
+    "alias": {
+      "name": "project",
+      "description": "Project alias"
+    },
+    "episode-number": {
+      "name": "episode",
+      "description": "Episode to blame"
+    },
+    "explain": {
+      "name": "explain",
+      "description": "Explain what any of this means"
+    },
+    "include-pseudo": {
+      "name": "include-pseudo",
+      "description": "Include pseudo-tasks in the output"
+    }
+  },
+  "blameall": {
+    "name": "blameall",
+    "description": "Check the status of a project",
+    "alias": {
+      "name": "project",
+      "description": "Project alias"
+    },
+    "filter": {
+      "name": "filter",
+      "description": "Filter results",
+      "All": {
+        "name": "All"
+      },
+      "InProgress": {
+        "name": "In Progress"
+      },
+      "Incomplete": {
+        "name": "Incomplete"
+      }
+    },
+    "include-pseudo": {
+      "name": "include-pseudo",
+      "description": "Include pseudo-tasks in the output"
+    }
+  },
+  "bulk": {
+    "name": "bulk",
+    "description": "Do many episodes' tasks at once",
+    "alias": {
+      "name": "project",
+      "description": "Project alias"
+    },
+    "abbreviation": {
+      "name": "abbreviation",
+      "description": "Task abbreviation"
+    },
+    "first-episode": {
+      "name": "first-episode",
+      "description": "First episode to add the task to"
+    },
+    "last-episode": {
+      "name": "last-episode",
+      "description": "Last episode to add the task to"
+    },
+    "action": {
+      "name": "action",
+      "description": "Action to perform",
+      "Done": {
+        "name": "Done"
+      },
+      "Undone": {
+        "name": "Undone"
+      },
+      "Skipped": {
+        "name": "Skip"
+      }
+    }
+  },
+  "conga": {
+    "name": "conga",
+    "description": "Conga management",
+    "edge": {
+      "name": "edge",
+      "description": "Edge management",
+      "add": {
+        "name": "add",
+        "description": "Add an edge to a project's Conga graph",
+        "alias": {
+          "name": "project",
+          "description": "Project alias"
+        },
+        "from": {
+          "name": "from",
+          "description": "From"
+        },
+        "to": {
+          "name": "to",
+          "description": "To"
+        }
+      },
+      "remove": {
+        "name": "remove",
+        "description": "Remove an edge from a project's Conga graph",
+        "alias": {
+          "name": "project",
+          "description": "Project alias"
+        },
+        "edge": {
+          "name": "edge",
+          "description": "Edge to remove"
+        }
+      }
+    },
+    "debug": {
+      "name": "debug",
+      "description": "Debug commands",
+      "anilist-force-update": {
+        "name": "anilist-force-update",
+        "description": "Force update an AniList entry",
+        "anilist-id": {
+          "name": "anilist-id",
+          "description": "AniList ID"
+        }
+      },
+      "anilist-info": {
+        "name": "anilist-info",
+        "description": "AniList information",
+        "anilist-id": {
+          "name": "anilist-id",
+          "description": "AniList ID"
+        }
+      },
+      "project-info": {
+        "name": "project-info",
+        "description": "Project information",
+        "group": {
+          "name": "group",
+          "description": "Group"
+        },
+        "project": {
+          "name": "project",
+          "description": "project"
+        }
+      },
+      "validate-channel": {
+        "name": "validate-channel",
+        "description": "Validate that Nino can use a Channel",
+        "channel": {
+          "name": "channel",
+          "description": "Channel to validate"
+        }
+      }
+    },
+    "group": {
+      "name": "group",
+      "description": "Group management",
+      "add-member": {
+        "name": "add-member",
+        "description": "Add a member to a Conga group",
+        "alias": {
+          "name": "project",
+          "description": "Project alias"
+        },
+        "group": {
+          "name": "group",
+          "description": "Group name"
+        },
+        "task-name": {
+          "name": "task",
+          "description": "Task name"
+        }
+      },
+      "create": {
+        "name": "create",
+        "description": "Add a group to a project's Conga graph",
+        "alias": {
+          "name": "project",
+          "description": "Project alias"
+        },
+        "group-name": {
+          "name": "name",
+          "description": "Group name"
+        }
+      },
+      "delete": {
+        "name": "delete",
+        "description": "Remove a group from a project's Conga graph",
+        "alias": {
+          "name": "project",
+          "description": "Project alias"
+        },
+        "group-name": {
+          "name": "name",
+          "description": "Group name"
+        }
+      },
+      "remove-member": {
+        "name": "remove-member",
+        "description": "Remove a member from a Conga group",
+        "alias": {
+          "name": "project",
+          "description": "Project alias"
+        },
+        "group": {
+          "name": "group",
+          "description": "Group name"
+        },
+        "task-name": {
+          "name": "task",
+          "description": "Task name"
+        }
+      }
+    },
+    "import": {
+      "name": "import",
+      "description": "Import a new Conga graph",
+      "alias": {
+        "name": "project",
+        "description": "Project alias"
+      },
+      "file": {
+        "name": "file",
+        "description": "Conga file"
+      }
+    },
+    "reminders": {
+      "name": "reminders",
+      "description": "Reminder management",
+      "disable": {
+        "name": "disable",
+        "description": "Disable Conga reminders for a project",
+        "alias": {
+          "name": "project",
+          "description": "Project alias"
+        }
+      },
+      "enable": {
+        "name": "enable",
+        "description": "Enable Conga reminders for a project",
+        "alias": {
+          "name": "project",
+          "description": "Project alias"
+        },
+        "days": {
+          "name": "days",
+          "description": "Reminder period"
+        }
+      }
+    },
+    "view": {
+      "name": "view",
+      "description": "View a project's Conga graph",
+      "alias": {
+        "name": "project",
+        "description": "Project alias"
+      },
+      "episode": {
+        "name": "episode",
+        "description": "Episode number"
+      }
+    }
+  },
+  "done": {
+    "name": "done",
+    "description": "Mark a task done",
+    "alias": {
+      "name": "project",
+      "description": "Project alias"
+    },
+    "abbreviation": {
+      "name": "abbreviation",
+      "description": "Task abbreviation"
+    },
+    "episode-number": {
+      "name": "episode",
+      "description": "Episode to blame"
+    }
+  },
+  "episode": {
+    "name": "episode",
+    "description": "Episode management",
+    "add": {
+      "name": "add",
+      "description": "Add episodes to a project",
+      "alias": {
+        "name": "project",
+        "description": "Project alias"
+      },
+      "first": {
+        "name": "first",
+        "description": "First episode number"
+      },
+      "count": {
+        "name": "count",
+        "description": "Number of episodes to add"
+      },
+      "format": {
+        "name": "format",
+        "description": "Episode naming format (default: '$')"
+      }
+    },
+    "remove": {
+      "name": "remove",
+      "description": "Remove episodes from a project",
+      "alias": {
+        "name": "project",
+        "description": "Project alias"
+      },
+      "first": {
+        "name": "first",
+        "description": "First episode number"
+      },
+      "last": {
+        "name": "last",
+        "description": "Last episode number"
+      }
+    },
+    "roster": {
+      "name": "roster",
+      "description": "Show who's working on an episode",
+      "alias": {
+        "name": "project",
+        "description": "Project alias"
+      },
+      "episode-number": {
+        "name": "episode",
+        "description": "Episode number"
+      }
+    }
+  },
+  "group": {
+    "name": "group",
+    "description": "Group management",
+    "admin": {
+      "name": "admin",
+      "description": "Admin management",
+      "add": {
+        "name": "add",
+        "description": "Add an admin to a group",
+        "user": {
+          "name": "user",
+          "description": "User to add"
+        }
+      },
+      "remove": {
+        "name": "remove",
+        "description": "Remove an admin from a group",
+        "user": {
+          "name": "user",
+          "description": "User to remove"
+        }
+      }
+    },
+    "config": {
+      "name": "config",
+      "description": "Edit group configuration",
+      "locale": {
+        "name": "locale",
+        "description": "Group locale"
+      },
+      "publish-private-progress": {
+        "name": "publish-private-progress",
+        "description": "If progress for private projects should be published",
+        "progress-response-type": {
+          "name": "progress-response-type",
+          "description": "Information to include in progress response embeds"
+        }
+      },
+      "progress-publish-type": {
+        "name": "progress-publish-type",
+        "description": "Information to include in progress publish embeds"
+      },
+      "conga-prefix-type": {
+        "name": "conga-prefix-type",
+        "description": "Conga notification prefix"
+      },
+      "release-prefix": {
+        "name": "release-prefix",
+        "description": "Prefix for releases"
+      },
+      "group-name": {
+        "name": "name",
+        "description": "Group name"
+      },
+      "group-name-in-observer-progress": {
+        "name": "show-origin-group-in-progress",
+        "description": "Include the origin group name in observer progress embeds"
+      }
+    }
+  },
+  "observer": {
+    "name": "observer",
+    "description": "Observer management",
+    "add": {
+      "name": "add",
+      "description": "Add an observer to a project",
+      "server-id": {
+        "name": "server-id",
+        "description": "Server ID of the project to observe"
+      },
+      "alias": {
+        "name": "project",
+        "description": "Project alias"
+      },
+      "update-channel": {
+        "name": "update-channel",
+        "description": "Channel for progress updates"
+      },
+      "release-channel": {
+        "name": "release-channel",
+        "description": "Channel for releases"
+      },
+      "primary-role": {
+        "name": "primary-role",
+        "description": "Primary role for releases"
+      },
+      "secondary-role": {
+        "name": "secondary-role",
+        "description": "Secondary role for releases"
+      },
+      "tertiary-role": {
+        "name": "tertiary-role",
+        "description": "Tertiary role for releases"
+      }
+    },
+    "delegate": {
+      "name": "delegate",
+      "description": "Manage delegate observers",
+      "set": {
+        "name": "set",
+        "description": "Set a delegate observer",
+        "alias": {
+          "name": "project",
+          "description": "Project alias"
+        },
+        "observer": {
+          "name": "observer",
+          "description": "Observer to delegate"
+        }
+      },
+      "remove": {
+        "name": "remove",
+        "description": "Remove a delegate observer",
+        "alias": {
+          "name": "project",
+          "description": "Project alias"
+        }
+      }
+    },
+    "list": {
+      "name": "list",
+      "description": "List all observers"
+    },
+    "remove": {
+      "name": "remove",
+      "description": "Remove an observer from a project",
+      "observer": {
+        "name": "observer",
+        "description": "Observer to remove"
+      }
+    }
+  },
+  "project": {
+    "name": "project",
+    "description": "Project management",
+    "admin": {
+      "name": "admin",
+      "description": "Admin management",
+      "add": {
+        "name": "add",
+        "description": "Add an admin to a project",
+        "alias": {
+          "name": "project",
+          "description": "Project alias"
+        },
+        "user": {
+          "name": "user",
+          "description": "User to add"
+        }
+      },
+      "remove": {
+        "name": "remove",
+        "description": "Remove an admin from a project",
+        "alias": {
+          "name": "project",
+          "description": "Project alias"
+        },
+        "user": {
+          "name": "user",
+          "description": "User to remove"
+        }
+      }
+    },
+    "air-notification": {
+      "name": "air-notification",
+      "description": "Air Notification management",
+      "disable": {
+        "name": "disable",
+        "description": "Disable air notifications for a project",
+        "alias": {
+          "name": "project",
+          "description": "Project alias"
+        }
+      },
+      "enable": {
+        "name": "enable",
+        "description": "Enable air notifications for a project",
+        "alias": {
+          "name": "project",
+          "description": "Project alias"
+        },
+        "user": {
+          "name": "user",
+          "description": "User to ping"
+        },
+        "role": {
+          "name": "role",
+          "description": "Role to ping"
+        },
+        "delay-hours": {
+          "name": "delay-hours",
+          "description": "Hours to delay the notification by"
+        },
+        "delay-minutes": {
+          "name": "delay-minutes",
+          "description": "Minutes to delay the notification by"
+        }
+      }
+    },
+    "alias": {
+      "name": "alias",
+      "description": "Alias management",
+      "add": {
+        "name": "add",
+        "description": "Add an alias to a project",
+        "project": {
+          "name": "project",
+          "description": "Project alias"
+        },
+        "alias": {
+          "name": "alias",
+          "description": "Alias to add"
+        }
+      },
+      "remove": {
+        "name": "remove",
+        "description": "Remove an alias from a project",
+        "project": {
+          "name": "project",
+          "description": "Project alias"
+        },
+        "alias": {
+          "name": "alias",
+          "description": "Alias to remove"
+        }
+      }
+    },
+    "create": {
+      "name": "create",
+      "description": "Create a project",
+      "nickname": {
+        "name": "nickname",
+        "description": "Project nickname"
+      },
+      "anilist-id": {
+        "name": "anilist-id",
+        "description": "AniList ID"
+      },
+      "is-private": {
+        "name": "is-private",
+        "description": "If the project is private"
+      },
+      "project-channel": {
+        "name": "project-channel",
+        "description": "Project channel"
+      },
+      "update-channel": {
+        "name": "update-channel",
+        "description": "Progress updates channel"
+      },
+      "release-channel": {
+        "name": "release-channel",
+        "description": "Releases channel"
+      },
+      "title": {
+        "name": "title",
+        "description": "Series title"
+      },
+      "type": {
+        "name": "type",
+        "description": "Project type"
+      },
+      "length": {
+        "name": "length",
+        "description": "Number of episodes"
+      },
+      "poster-url": {
+        "name": "poster-url",
+        "description": "Project poster URL"
+      },
+      "first-episode": {
+        "name": "first-episode",
+        "description": "First episode (default: 1)"
+      }
+    },
+    "edit": {
+      "name": "edit",
+      "description": "edit a project",
+      "alias": {
+        "name": "project",
+        "description": "Project alias"
+      },
+      "nickname": {
+        "name": "nickname",
+        "description": "Project nickname"
+      },
+      "anilist-id": {
+        "name": "anilist-id",
+        "description": "AniList ID"
+      },
+      "is-private": {
+        "name": "is-private",
+        "description": "If the project is private"
+      },
+      "project-channel": {
+        "name": "project-channel",
+        "description": "Project channel"
+      },
+      "update-channel": {
+        "name": "update-channel",
+        "description": "Progress updates channel"
+      },
+      "release-channel": {
+        "name": "release-channel",
+        "description": "Releases channel"
+      },
+      "title": {
+        "name": "title",
+        "description": "Series title"
+      },
+      "type": {
+        "name": "type",
+        "description": "Project type"
+      },
+      "length": {
+        "name": "length",
+        "description": "Number of episodes"
+      },
+      "poster-url": {
+        "name": "poster-url",
+        "description": "Project poster URL"
+      },
+      "motd": {
+        "name": "motd",
+        "description": "Message of the Day"
+      },
+      "anilist-offset": {
+        "name": "anilist-offset",
+        "description": "Number of episodes to offset AniList queries by"
+      }
+    },
+    "export": {
+      "name": "export",
+      "description": "Export a project",
+      "alias": {
+        "name": "project",
+        "description": "Project alias"
+      }
+    },
+    "list": {
+      "name": "list",
+      "description": "List all projects"
+    },
+    "roster": {
+      "name": "roster",
+      "description": "Show who's working on a project",
+      "alias": {
+        "name": "project",
+        "description": "Project alias"
+      }
+    }
+  },
+  "release": {
+    "name": "release",
+    "description": "Release to the world!",
+    "batch": {
+      "name": "batch",
+      "description": "Release a batch",
+      "alias": {
+        "name": "project",
+        "description": "Project alias"
+      },
+      "first-episode": {
+        "name": "first-episode",
+        "description": "First episode being released"
+      },
+      "last-episode": {
+        "name": "last-episode",
+        "description": "Last episode being released"
+      },
+      "url": {
+        "name": "url",
+        "description": "Release URL (markdown, '|' splits allowed)"
+      },
+      "primary-role": {
+        "name": "primary-role",
+        "description": "Primary role to ping"
+      },
+      "secondary-role": {
+        "name": "secondary-role",
+        "description": "Secondary role to ping"
+      },
+      "tertiary-role": {
+        "name": "tertiary-role",
+        "description": "Tertiary role to ping"
+      }
+    },
+    "episode": {
+      "name": "episode",
+      "description": "Release an episode",
+      "alias": {
+        "name": "project",
+        "description": "Project alias"
+      },
+      "episode-number": {
+        "name": "episode",
+        "description": "Episode being released"
+      },
+      "url": {
+        "name": "url",
+        "description": "Release URL (markdown, '|' splits allowed)"
+      },
+      "primary-role": {
+        "name": "primary-role",
+        "description": "Primary role to ping"
+      },
+      "secondary-role": {
+        "name": "secondary-role",
+        "description": "Secondary role to ping"
+      },
+      "tertiary-role": {
+        "name": "tertiary-role",
+        "description": "Tertiary role to ping"
+      }
+    },
+    "volume": {
+      "name": "volume",
+      "description": "Release a volume",
+      "alias": {
+        "name": "project",
+        "description": "Project alias"
+      },
+      "volume": {
+        "name": "volume",
+        "description": "Volume being released"
+      },
+      "url": {
+        "name": "url",
+        "description": "Release URL (markdown, '|' splits allowed)"
+      },
+      "primary-role": {
+        "name": "primary-role",
+        "description": "Primary role to ping"
+      },
+      "secondary-role": {
+        "name": "secondary-role",
+        "description": "Secondary role to ping"
+      },
+      "tertiary-role": {
+        "name": "tertiary-role",
+        "description": "Tertiary role to ping"
+      }
+    }
+  },
+  "skip": {
+    "name": "skip",
+    "description": "Skip a task",
+    "alias": {
+      "name": "project",
+      "description": "Project alias"
+    },
+    "episode-number": {
+      "name": "episode",
+      "description": "Episode number"
+    },
+    "abbreviation": {
+      "name": "abbreviation",
+      "description": "Task abbreviation"
+    }
+  },
+  "statistics": {
+    "name": "statistics",
+    "description": "Nino Statistics"
+  },
+  "task": {
+    "name": "task",
+    "description": "Manage Tasks",
+    "add": {
+      "name": "add",
+      "description": "Add a task to an episode",
+      "alias": {
+        "name": "project",
+        "description": "Project alias"
+      },
+      "abbreviation": {
+        "name": "abbreviation",
+        "description": "Task abbreviation"
+      },
+      "fullName": {
+        "name": "name",
+        "description": "Task name"
+      },
+      "assignee": {
+        "name": "assignee",
+        "description": "User assigned to the task"
+      },
+      "is-pseudo": {
+        "name": "is-pseudo",
+        "description": "If the task is a pseudo-task"
+      },
+      "first-episode": {
+        "name": "first-episode",
+        "description": "First episode to add the task to"
+      },
+      "last-episode": {
+        "name": "last-episode",
+        "description": "Last episode to add the task to"
+      }
+    },
+    "edit": {
+      "name": "edit",
+      "description": "Add an episode's task",
+      "alias": {
+        "name": "project",
+        "description": "Project alias"
+      },
+      "abbreviation": {
+        "name": "abbreviation",
+        "description": "Task abbreviation"
+      },
+      "fullName": {
+        "name": "name",
+        "description": "Task name"
+      },
+      "assignee": {
+        "name": "assignee",
+        "description": "User assigned to the task"
+      },
+      "is-pseudo": {
+        "name": "is-pseudo",
+        "description": "If the task is a pseudo-task"
+      },
+      "first-episode": {
+        "name": "first-episode",
+        "description": "First episode to edit the task for"
+      },
+      "last-episode": {
+        "name": "last-episode",
+        "description": "Last episode to edit the task for"
+      },
+      "weight": {
+        "name": "weight",
+        "description": "Ordering weight (decimals allowed)"
+      }
+    },
+    "import": {
+      "name": "import",
+      "description": "Import tasks",
+      "alias": {
+        "name": "project",
+        "description": "Project alias"
+      },
+      "file": {
+        "name": "file",
+        "description": "JsonL task file"
+      }
+    },
+    "remove": {
+      "name": "remove",
+      "description": "Remove a task from an episode",
+      "alias": {
+        "name": "project",
+        "description": "Project alias"
+      },
+      "abbreviation": {
+        "name": "abbreviation",
+        "description": "Task abbreviation"
+      },
+      "first-episode": {
+        "name": "first-episode",
+        "description": "First episode to add the task to"
+      },
+      "last-episode": {
+        "name": "last-episode",
+        "description": "Last episode to add the task to"
+      }
+    }
+  },
+  "template-staff": {
+    "name": "template-staff",
+    "description": "Manage Template Staff",
+    "add": {
+      "name": "add",
+      "description": "Add a template staff to a project",
+      "alias": {
+        "name": "project",
+        "description": "Project alias"
+      },
+      "abbreviation": {
+        "name": "abbreviation",
+        "description": "Task abbreviation"
+      },
+      "fullName": {
+        "name": "name",
+        "description": "Task name"
+      },
+      "assignee": {
+        "name": "assignee",
+        "description": "User assigned to the task"
+      },
+      "is-pseudo": {
+        "name": "is-pseudo",
+        "description": "If the task is a pseudo-task"
+      },
+      "apply-to": {
+        "name": "apply-to",
+        "description": "Apply this change to which episodes?",
+        "AllEpisodes": {
+          "name": "All Episodes"
+        },
+        "IncompleteEpisodes": {
+          "name": "Incomplete Episodes"
+        },
+        "FutureEpisodes": {
+          "name": "Future Episodes"
+        }
+      }
+    },
+    "edit": {
+      "name": "edit",
+      "description": "Add a project's template staff",
+      "alias": {
+        "name": "project",
+        "description": "Project alias"
+      },
+      "abbreviation": {
+        "name": "abbreviation",
+        "description": "Task abbreviation"
+      },
+      "fullName": {
+        "name": "name",
+        "description": "Task name"
+      },
+      "assignee": {
+        "name": "assignee",
+        "description": "User assigned to the task"
+      },
+      "is-pseudo": {
+        "name": "is-pseudo",
+        "description": "If the task is a pseudo-task"
+      },
+      "apply-to": {
+        "name": "apply-to",
+        "description": "Apply this change to which episodes?",
+        "AllEpisodes": {
+          "name": "All Episodes"
+        },
+        "IncompleteEpisodes": {
+          "name": "Incomplete Episodes"
+        },
+        "FutureEpisodes": {
+          "name": "Future Episodes"
+        }
+      },
+      "weight": {
+        "name": "weight",
+        "description": "Ordering weight (decimals allowed)"
+      }
+    },
+    "import": {
+      "name": "import",
+      "description": "Import template staff",
+      "alias": {
+        "name": "project",
+        "description": "Project alias"
+      },
+      "file": {
+        "name": "file",
+        "description": "JsonL staff file"
+      }
+    },
+    "remove": {
+      "name": "remove",
+      "description": "Remove a template staff from a project",
+      "alias": {
+        "name": "project",
+        "description": "Project alias"
+      },
+      "abbreviation": {
+        "name": "abbreviation",
+        "description": "Task abbreviation"
+      },
+      "apply-to": {
+        "name": "apply-to",
+        "description": "Apply this change to which episodes?",
+        "AllEpisodes": {
+          "name": "All Episodes"
+        },
+        "IncompleteEpisodes": {
+          "name": "Incomplete Episodes"
+        },
+        "FutureEpisodes": {
+          "name": "Future Episodes"
+        }
+      }
+    }
+  },
+  "undone": {
+    "name": "undone",
+    "description": "Mark a task undone",
+    "alias": {
+      "name": "project",
+      "description": "Project alias"
+    },
+    "episode-number": {
+      "name": "episode",
+      "description": "Episode number"
+    },
+    "abbreviation": {
+      "name": "abbreviation",
+      "description": "Task abbreviation"
+    }
+  }
+}

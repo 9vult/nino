@@ -2,249 +2,154 @@
 
 ## Getting Started
 
-### Creating a Project
+### Create a project
 
-Despite there being a single `/project create` command, it actually takes a few different commands to get a project fully set up. Here's an outline of the steps to take to bootstrap a new project:
+Use the `/project create` command to create the project. Here, you can choose a nickname for the project, its relevant
+channels, and its [privacy settings](#privacy-settings). Note that many of the fields for this command are optional -
+if left blank, Nino will auto-populate them with data from AniList.
 
-0. Ensure Nino has permission to view, send messages and embeds, and mention everyone in your Progress, Releases, and project channels.
-1. `/project create`. This command will initialize the project. I recommend picking something short for the project nickname.
-2. `/keystaff add`. Key Staff are tasks that need to be done for every episode. You can set placeholder members and use `/keystaff swap` to swap in someone else later.
-    - If you need to re-arrange your Key Staff, you can use `/keystaff setweight`. By default, each Key Staff's weight is equal to their position in the line.
-3. Use `/additionalstaff add` to add any one-off tasks, like Song Styling.
+### Template Staff
 
-Some additional setup options:
+Once you have a project, you'll probably want to add some staff. Template Staff will automatically add tasks to new
+episodes, and you have some choices when working with them. You'll need to specify an *applicator* when using Template
+Staff commands:
 
-- If you want subsequent Key Staff members to be notified when the preceding task is completed, use `/project conga add`.
-- If you would like air times to be displayed in /blame embeds, use `/project edit` to set the `AniDB ID` and `Air Time 24h` properties.
-    - If you would like to be notified when an episode airs, use `/project airreminder enable`.
-- You might want to use `/project alias add` to add aliases. These aliases can be used as alternatives to the project's nickname for most commands.
+- **All Episodes**: The operation (e.g. "add staff") will apply to all episodes in the project.
+- **Incomplete Episodes**: The operation will apply to incomplete episodes. This is useful if, for example, the person
+  assigned to the task is changing: the original user remains assigned to the task for the episodes they did, and the
+  new person to the incomplete episodes.
+- **Future Episodes**: The operation will only apply to episodes added in the future. No changes are made to existing
+  episodes.
+
+You can use `/template-staff add` to add staff to the project, or `/template-staff import` to import them.
+See [importing Template Staff](#template-staff-import).
+
+#### Important note on Template Staff
+
+Template Staff aren't some special entity on episodes. Template Staff are essentially a one-to-many link to Tasks,
+which can be created, modified, and deleted using Task commands. Template Staff are linked to tasks by their
+abbreviation. Therefore, if you use a Task command to change the abbreviation of a Template Staff task for an episode,
+that task will no longer be "linked". Inversely, if you use a Task command to create a task with a Template Staff
+abbreviation, it will be "linked".
+
+Furthermore, Template Staff commands act like a broadcast, and will overwrite tasks with the changes being made. For
+example, if you use a Task command to change the assigned user for an episode, then use a Template Staff command to
+change the assigned user for all episodes, the Task command's change will be overwritten. Just something to keep in
+mind!
+
+### Tasks
+
+Tasks are the backbone of the system. Task commands can work on a single episode or a range of episodes. You can use
+`/task add` to add tasks, or `/task import` to import them. See [importing tasks](#task-import).
 
 > **Recomendation**: Set task names to `-ing` verbs, as they look the best in status embeds.
 
-> **Info**: If you are coming from Deschtimes and have been using its Joint feature to relay progress updates and use /blame in another server, see the section for [Adding an Observer](#observer-add).
+#### Pseudotasks
 
-#### Creating a Project from a JSON file
+Sometimes you want a task (especially for use with the [Conga graph](#conga)) that you don't want publically displayed
+in progress embeds, etc. For example, an "apply QC" task. Pseudotasks will not be displayed in `/blame` or trigger
+progress updates, but they are valid Conga targets.
 
-If you are creating many projects or want a template, you can [create a project from a JSON file](./create-from-json.md).
+### Conga
 
-### Server Options
+Nino has a very comprehensive task dependency system, here called the "Conga graph", an artifact from a simpler time
+when there was just a single "conga line" of tasks - one entry point, one exit point.
 
-Once you've created a project in your server, you have the option to set some server settings. For more details, see the section on Server Commands.
+When the Conga graph is in use, tasks will ping downstream tasks upon completion. For example, if `ED` depends on
+`TL`'s completion, you can add `TL -> ED` to the graph, and `ED`'s assignee will be pinged when `TL` completes.
+Tasks can have multiple dependants, where all dependents will be pinged, and multiple prerequisites, where the
+task won't be pinged until all prerequisites are complete.
 
-## Commands
+![](./conga.png)
 
-### about
+Another powerful feature is Groups. Conga Groups are intended for parallel workflows, but they can also be used for
+categorization. Just note that groups can't be nested.
 
-This simple command displays some basic information about the version of Nino currently running.
+![](./conga-group-parallel.png)
 
-### additionalstaff
+In this example, the completion of `ED` will ping *both* `TLC` and `TM`. If `TM` completes before `TLC`,
+then `TLC` will be re-pinged. `TLC` has a dependant task, `ATLC`, so when `TLC` completes, `ATLC` will be pinged. If
+`TLC`'s entire subtree completed before `TM`, then `TM` would be re-pinged. This behavior works with as many group
+members as you need. When all members of the group are complete, any tasks downstream of the group (`QC1` in the
+example) will be pinged.
 
-#### additionalstaff add
+![](./conga-group-label.png)
 
-Add a one-off task to a single episode.
+In this example, the song tasks are grouped together for clarity. Because there's a single sub-tree, it's functionally
+the same as if the group wasn't there.
 
-#### additionalstaff remove
+Conga commands include `/conga edge add`, `/conga group create`, and `/conga group add-member`. Additionally, you can
+[import a Conga graph](#conga-import).
 
-Remove a one-off task from a single episode.
+> **Note**: To use the `$AIR` special node, episode air notifications need to be enabled.
 
-#### additionalstaff swap
-
-Swap someone else in for an additionalstaff task.
-
-#### additionalstaff setweight
-
-Set the weight of an Additional Staff position. The weight determines the order staff appear in progress and blame embeds. By default, Additional Staff have a weight of `1000000`. This does mean that [setting a Key Staff weight](#keystaff-setweight) to greater than `1000000` will place it after (default weight) Additional Staff positions for all episodes.
-
-### blame
-
-Check on the status of a project. May include observed projects if the `blame` flag was set during observer creation. Defaults to the current "working episode", but any episode can be requested using the `episode` option.
-
-Additionally, an explanatory version of the embed can be requested using the `explain` option.
-
-### blameall
-
-Similar to [/blame](#blame), but it displays an entire cour's worth at a time. The page length is determined via `Episodes.Count() % 13 == 0 ? 13 : 12`, or, 12 episodes, unless the episode count is divisible by 13.
-
-Use the `page` option to request pages other than page 1.
-
-### bulk
-
-A shortcut command for running [/done](#done), [/undone](#undone), or [/skip](#skip) on multiple sequential episodes. Note that the `start` and `end` episodes are inclusive.
-
-### done
-
-Mark a task complete. The episode number is optional if:
-
-- you are working on the same episode as everyone else
-- you are working ahead in a sequential manner
-
-### episode
-
-#### episode add
-
-Add an episode to the project. Decimals are permitted.
-
-#### episode remove
-
-Remove an episode from the project.
-
-### Help
-
-Provides some basic tips.
-
-### keystaff
-
-#### keystaff add
-
-Add a task to every episode in the project.
-
-#### keystaff remove
-
-Remove a task from every episode in the project.
-
-#### keystaff setweight
-
-Set the weight of a Key Staff position. The weight determines the order staff appear in progress and blame embeds. By default, each staff's weight is its index, ie the first staff added's weight is 1.
-
-#### keystaff swap
-
-Swap someone else into a Key Staff position.
-
-### observer
-
-#### observer add
-
-Observe a project on another server. Provides options for displaying that project's aliases in your server's [/blame](#blame) autocomplete and for subscribing to updates and releases with webhooks.
-
-#### observer remove
-
-Stop observing a project on another server.
-
-### project
-
-#### project admin add
-
-Add someone as a project admin. Project admins have permission to add/remove tasks, mark tasks complete, release, etc.
-
-#### project admin remove
-
-Remove a project admin.
-
-#### project airreminder enable
-
-Receive a notification in the project channel when an episode airs. Requires the series' [AniDB ID to be set](#project-edit).
-
-#### project airreminder disable
-
-Turn off air reminders.
-
-#### project alias add
-
-Add an alias to a project. Aliases can be used in place of the project nickname for most commands.
-
-#### project alias remove
-
-Remove an alias. Note that the proejct nickname cannot be removed.
-
-#### project conga add
-
-Add a link to the project's Conga line. Members of the Conga line will be pinged when the preceeding task is complete.
-
-For example, if TL →  ED is in the conga line, ED will be pinged when TL is complete.
-
-#### project conga list
-
-List all the links in the project's Conga line.
-
-#### project conga remove
-
-Remove a link from the Conga line.
-
-#### project create
-
-Scaffold a new project. See [Getting Started](#getting-started) for tips.
-
-For the differences between a public project and a private project, see
-[Privacy Settings](#privacy-settings).
-
-Note that only users with discord server administrator permissions can create projects. You can [transfer](#project-transferownership) the project to someone if this poses an issue.
-
-#### project delete
-
-Delete a project. Will also remove all observers observing the project.
-
-#### project edit
-
-Edit the project. This is also where you can change [privacy settings](#privacy-settings) and add the series' AniDB ID and air time.
-
-The MOTD option can be reset by setting it to a hyphen (`-`).
-
-#### project transferownership
-
-Transfer ownership of the project to someone else. Useful if the project owner isn't a server administrator and can't create projects themselves.
-
-#### project transferserver
-
-Transfer a project from another server. You must be the owner of the project and an administrator in the server.
-
-### release
-
-Notify your server of a release. The Release command allows you to streamline your release notifications will automatically broadcast the release message if the channel is an announcements channel, and forward the notification to any observers.
-
-### roster
-
-See who's assigned to each task in an episode.
-
-### server
-
-#### server admin add
-
-Add someone as a server admin. Being a server admin gives the same permissions as project admins, but for all projects at once.
-
-> [!NOTE]
->
-> This is _not_ the same thing as the discord server administrator permission!!
-
-#### server admin remove
-
-Remove a server admin.
-
-#### server display progress
-
-Control how Nino's replies to [/done](#done), etc look. For example, add a blame status string.
-
-#### server display updates
-
-Control how updates in the Progress channel look. For example, set it to use the [explanatory blame](#blame) format instead of the short format.
-
-#### server conga-prefix
-
-Adds a prefix to Conga notifications. Choose between None (default), Nickname, and Title.
-
-#### server release-prefix
-
-Add a prefix to releases. The release prefix can be reset by setting it to a hyphen (`-`).
-
-### skip
-
-Skip a task. Considers the task complete.
-
-### Undone
-
-Mark a task as not done.
-
-## Privacy Settings
+### Privacy Settings
 
 A project can be either public or private. A private project is designed to be
 less visible to users who are not working on it.
 
 1. Private projects will not appear in autocomplete suggestions (e.g., when
-  typing [`/blame`](#blame) or [`/done`](#done)) for users who are not involved
-  with the project.
+   typing [`/blame`](#blame) or [`/done`](#done)) for users who are not involved
+   with the project.
 2. Users cannot [observe](#observer-add) the project unless they are a member of
-  the project staff or an administrator. Note that if the project used to be
-  public, any existing observers will continue to function unless the updates
-  are disabled via `/server display publish-private-progress`.
+   the project staff or an administrator. Note that if the project used to be
+   public, any existing observers will continue to function unless the updates
+   are disabled via `/group config publish-private-progress`.
 3. By default, Nino will still post progress updates for private projects to the
-  configured update channel. However, there is the option to disable these
-  updates globally for the server with `/server display publish-private-progress`.
+   configured update channel. However, there is the option to disable these
+   updates globally for the group with `/group config publish-private-progress`.
+
+> **Info**: If you are coming from Deschtimes and have been using its Joint feature to relay progress updates and use
+> /blame in another server, see the section for [Adding an Observer](#observer-add).
+
+## Importing
+
+Discord slash commands can be quite limiting, so Conga, Tasks, and Template Staff all have import commands for loading
+data from a file.
+
+### Conga Import
+
+Conga graphs can be imported using `/conga import`. Link nodes with `A -> B`, and add group nodes with `@Group + C`:
+
+```
+$AIR -> TL
+TL -> ED
+ED -> @POST-ED
+@POST-ED -> QC
+
+@POST-ED + TM
+@POST-ED + TLC
+
+TLC -> ATLC
+```
+
+A couple things to note:
+
+- `/conga import` *replaces* the existing graph.
+- Group members can only be added after the group is created.
+- Group sub-trees can only be added after the root task is added to the group.
+
+### Task Import
+
+Tasks can be imported by supplying `/task import` a `jsonl`-formatted file. `jsonl` ("json lines") is a file containing
+one complete entry per line:
+
+```json lines
+{ "Abbreviation": "TEST1", "Name": "Test 1", "Assignee": { "DiscordId": 12345 }, "IsPseudo": false, "First": "2" }
+{ "Abbreviation": "TEST2", "Name": "Test 2", "Assignee": { "DiscordId": 67890 }, "IsPseudo": true, "First": "3", "Last": "6", "Weight": -10.5 }
+```
+
+- The `Last` episode and `Weight` fields are optional.
+
+### Template Staff import
+
+Template Staff can be imported by supplying `/template-staff import` a `jsonl`-formatted file. `jsonl` ("json lines")
+is a file containing one complete entry per line:
+
+```json lines
+{ "Applicator": "AllEpisodes", "Abbreviation": "TEST3", "Name": "Test 3", "Assignee": { "DiscordId": 12345 }, "IsPseudo": false }
+{ "Applicator": "IncompleteEpisodes", "Abbreviation": "TEST4", "Name": "Test 4", "Assignee": { "DiscordId": 67890 }, "IsPseudo": false, "Weight": -10.5 }
+```
+
+- The `Weight` field is optional.
+- `Applicator` may be `AllEpisodes`, `IncompleteEpisodes`, or `FutureEpisodes`.
