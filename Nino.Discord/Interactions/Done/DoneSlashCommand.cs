@@ -93,8 +93,12 @@ public partial class DoneModule
                 {
                     case ResultStatus.EpisodeNotFound:
                         return await interaction.FailAsync(T("done.noIncompleteEpisodes", locale));
-                    case ResultStatus.TaskNotFound:
+                    case ResultStatus.TaskNotFound when resolve.Message == "all-complete":
                         return await interaction.FailAsync(T("done.noIncompleteTasks", locale));
+                    case ResultStatus.TaskNotFound:
+                        return await interaction.FailAsync(
+                            T("task.resolutionFailed", locale, abbreviation)
+                        );
                     default:
                         return await interaction.FailAsync(
                             resolve.Status,

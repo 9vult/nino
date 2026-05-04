@@ -26,27 +26,35 @@ public sealed class GetWorkingTaskEpisodeHandler(ReadOnlyNinoDbContext db)
                 .ToListAsync()
         ).OrderBy(e => e.Number.Value, StringComparison.OrdinalIgnoreCase.WithNaturalSort()).ToList();
 
-        var workingIdx = episodes.FindIndex(e => !e.IsDone);
-        if (workingIdx < 0)
-            return Fail(ResultStatus.EpisodeNotFound);
-
-        var taskIdx = episodes.FindIndex(e =>
+        var taskEpisode = episodes.FirstOrDefault(e =>
             e.Tasks.Any(t => t.Abbreviation == query.Abbreviation && !t.IsDone)
         );
-        if (taskIdx < 0)
-            return Fail(ResultStatus.TaskNotFound);
 
-        var task = episodes[taskIdx].Tasks.First(t => t.Abbreviation == query.Abbreviation);
+        if (taskEpisode is null)
+        {
+            var taskExists = episodes.Any(e =>
+                e.Tasks.Any(t => t.Abbreviation == query.Abbreviation)
+            );
+            return taskExists
+                ? Fail(ResultStatus.TaskNotFound, message: "all-complete")
+                : Fail(ResultStatus.TaskNotFound);
+        }
+
+        var workingEpisode = episodes.FirstOrDefault(e => !e.IsDone);
+        if (workingEpisode is null)
+            return Fail(ResultStatus.EpisodeNotFound);
+
+        var task = taskEpisode.Tasks.First(t => t.Abbreviation == query.Abbreviation);
 
         return Success(
             new GetWorkingTaskEpisodeResponse(
-                episodes[workingIdx].Id,
-                episodes[taskIdx].Id,
-                episodes[workingIdx].Number,
-                episodes[taskIdx].Number,
+                workingEpisode.Id,
+                taskEpisode.Id,
+                workingEpisode.Number,
+                taskEpisode.Number,
                 task.Id,
                 task.Name,
-                taskIdx - workingIdx
+                episodes.IndexOf(taskEpisode) - episodes.IndexOf(workingEpisode)
             )
         );
     }
