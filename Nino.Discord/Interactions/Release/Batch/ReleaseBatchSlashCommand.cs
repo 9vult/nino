@@ -25,11 +25,15 @@ public partial class ReleaseModule
         string url,
         SocketRole? primaryRole = null,
         SocketRole? secondaryRole = null,
-        SocketRole? tertiaryRole = null
+        SocketRole? tertiaryRole = null,
+        [MaxLength(Length.Commentary)] string? commentary = null
     )
     {
         var interaction = Context.Interaction;
         var locale = interaction.UserLocale;
+
+        // Cleanup
+        commentary = commentary?.Trim();
 
         var (requestedBy, groupId) = await interactionIdService.GetUserAndGroupAsync(interaction);
 
@@ -68,7 +72,8 @@ public partial class ReleaseModule
             urls,
             primaryRoleId,
             secondaryRoleId,
-            tertiaryRoleId
+            tertiaryRoleId,
+            commentary
         );
 
         var validate = await validateReleaseHandler

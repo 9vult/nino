@@ -9,5 +9,6 @@ public sealed record EpisodeReleasedObserverEvent(
     ObserverId ObserverId,
     Number Number,
     List<string> Urls,
+    string? Commentary,
     bool Publish
 ) : IEvent;

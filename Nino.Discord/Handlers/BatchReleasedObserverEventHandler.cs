@@ -20,7 +20,7 @@ public sealed class BatchReleasedObserverEventHandler(
     /// <inheritdoc />
     public async Task HandleAsync(BatchReleasedObserverEvent @event)
     {
-        var (_, observerId, firstNumber, lastNumber, urls, publish) = @event;
+        var (_, observerId, firstNumber, lastNumber, urls, commentary, publish) = @event;
 
         var queryResult = await getDataHandler.HandleAsync(
             new GetObserverReleaseNotificationDataQuery(observerId)
@@ -87,11 +87,25 @@ public sealed class BatchReleasedObserverEventHandler(
         b.AppendLine(
             T("release.broadcast.batch", locale, data.ProjectTitle, firstNumber, lastNumber)
         );
-        b.Append(string.Join(' ', primaryRoleMention, secondaryRoleMention, tertiaryRoleMention));
+        b.Append(
+            string.Join(' ', primaryRoleMention, secondaryRoleMention, tertiaryRoleMention).Trim()
+        );
+
+        var hasCommentary = !string.IsNullOrEmpty(commentary);
+        if (hasCommentary)
+        {
+            b.AppendLine();
+            b.Append(commentary);
+        }
 
         if (urls.Count == 1)
         {
-            b.Append(' ');
+            // If there's commentary, link will be on own line
+            if (hasCommentary)
+                b.AppendLine();
+            else
+                b.Append(' ');
+
             b.Append(urls[0]);
         }
         else if (urls.Count > 1)

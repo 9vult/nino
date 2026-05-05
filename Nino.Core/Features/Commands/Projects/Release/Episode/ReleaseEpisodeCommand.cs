@@ -11,5 +11,6 @@ public sealed record ReleaseEpisodeCommand(
     List<string> Urls,
     RoleId? PrimaryRoleId = null,
     RoleId? SecondaryRoleId = null,
-    RoleId? TertiaryRoleId = null
+    RoleId? TertiaryRoleId = null,
+    string? Commentary = null
 ) : ReleaseCommandBase(ProjectId, RequestedBy), ICommand;

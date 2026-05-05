@@ -57,7 +57,8 @@ public sealed class ReleaseEpisodeHandler(
                     Publish: project.DelegateObserver is null,
                     PrimaryRoleId: command.PrimaryRoleId,
                     SecondaryRoleId: command.SecondaryRoleId,
-                    TertiaryRoleId: command.TertiaryRoleId
+                    TertiaryRoleId: command.TertiaryRoleId,
+                    Commentary: command.Commentary
                 )
             ),
             .. project.Observers.Select(observer =>
@@ -67,6 +68,7 @@ public sealed class ReleaseEpisodeHandler(
                         ObserverId: observer.Id,
                         Number: command.Number,
                         Urls: command.Urls,
+                        Commentary: command.Commentary,
                         Publish: observer.Id == project.DelegateObserverId
                     )
                 )

@@ -20,7 +20,7 @@ public sealed class VolumeReleasedObserverEventHandler(
     /// <inheritdoc />
     public async Task HandleAsync(VolumeReleasedObserverEvent @event)
     {
-        var (_, observerId, volumeNumber, urls, publish) = @event;
+        var (_, observerId, volumeNumber, urls, commentary, publish) = @event;
 
         var queryResult = await getDataHandler.HandleAsync(
             new GetObserverReleaseNotificationDataQuery(observerId)
@@ -84,11 +84,25 @@ public sealed class VolumeReleasedObserverEventHandler(
             b.Append(data.ReleasePrefix + ' ');
 
         b.AppendLine(T("release.broadcast.volume", locale, data.ProjectTitle, volumeNumber));
-        b.Append(string.Join(' ', primaryRoleMention, secondaryRoleMention, tertiaryRoleMention));
+        b.Append(
+            string.Join(' ', primaryRoleMention, secondaryRoleMention, tertiaryRoleMention).Trim()
+        );
+
+        var hasCommentary = !string.IsNullOrEmpty(commentary);
+        if (hasCommentary)
+        {
+            b.AppendLine();
+            b.Append(commentary);
+        }
 
         if (urls.Count == 1)
         {
-            b.Append(' ');
+            // If there's commentary, link will be on own line
+            if (hasCommentary)
+                b.AppendLine();
+            else
+                b.Append(' ');
+
             b.Append(urls[0]);
         }
         else if (urls.Count > 1)

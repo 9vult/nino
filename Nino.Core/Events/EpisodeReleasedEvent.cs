@@ -11,5 +11,6 @@ public sealed record EpisodeReleasedEvent(
     bool Publish,
     RoleId? PrimaryRoleId = null,
     RoleId? SecondaryRoleId = null,
-    RoleId? TertiaryRoleId = null
+    RoleId? TertiaryRoleId = null,
+    string? Commentary = null
 ) : IEvent;

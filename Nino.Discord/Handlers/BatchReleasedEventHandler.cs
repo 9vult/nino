@@ -30,7 +30,8 @@ public sealed class BatchReleasedEventHandler(
             publish,
             primaryRoleId,
             secondaryRoleId,
-            tertiaryRoleId
+            tertiaryRoleId,
+            commentary
         ) = @event;
 
         var queryResult = await getDataHandler.HandleAsync(
@@ -103,11 +104,25 @@ public sealed class BatchReleasedEventHandler(
         b.AppendLine(
             T("release.broadcast.batch", locale, data.ProjectTitle, firstNumber, lastNumber)
         );
-        b.Append(string.Join(' ', primaryRoleMention, secondaryRoleMention, tertiaryRoleMention));
+        b.Append(
+            string.Join(' ', primaryRoleMention, secondaryRoleMention, tertiaryRoleMention).Trim()
+        );
+
+        var hasCommentary = !string.IsNullOrEmpty(commentary);
+        if (hasCommentary)
+        {
+            b.AppendLine();
+            b.Append(commentary);
+        }
 
         if (urls.Count == 1)
         {
-            b.Append(' ');
+            // If there's commentary, link will be on own line
+            if (hasCommentary)
+                b.AppendLine();
+            else
+                b.Append(' ');
+
             b.Append(urls[0]);
         }
         else if (urls.Count > 1)

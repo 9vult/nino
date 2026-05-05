@@ -20,7 +20,7 @@ public sealed class EpisodeReleasedObserverEventHandler(
     /// <inheritdoc />
     public async Task HandleAsync(EpisodeReleasedObserverEvent @event)
     {
-        var (_, observerId, episodeNumber, urls, publish) = @event;
+        var (_, observerId, episodeNumber, urls, commentary, publish) = @event;
 
         var queryResult = await getDataHandler.HandleAsync(
             new GetObserverReleaseNotificationDataQuery(observerId)
@@ -84,11 +84,25 @@ public sealed class EpisodeReleasedObserverEventHandler(
             b.Append(data.ReleasePrefix + ' ');
 
         b.AppendLine(T("release.broadcast.episode", locale, data.ProjectTitle, episodeNumber));
-        b.Append(string.Join(' ', primaryRoleMention, secondaryRoleMention, tertiaryRoleMention));
+        b.Append(
+            string.Join(' ', primaryRoleMention, secondaryRoleMention, tertiaryRoleMention).Trim()
+        );
+
+        var hasCommentary = !string.IsNullOrEmpty(commentary);
+        if (hasCommentary)
+        {
+            b.AppendLine();
+            b.Append(commentary);
+        }
 
         if (urls.Count == 1)
         {
-            b.Append(' ');
+            // If there's commentary, link will be on own line
+            if (hasCommentary)
+                b.AppendLine();
+            else
+                b.Append(' ');
+
             b.Append(urls[0]);
         }
         else if (urls.Count > 1)

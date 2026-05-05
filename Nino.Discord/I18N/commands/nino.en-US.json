@@ -730,6 +730,10 @@
       "tertiary-role": {
         "name": "tertiary-role",
         "description": "Tertiary role to ping"
+      },
+      "commentary": {
+        "name": "commentary",
+        "description": "Add additional commentary to the release"
       }
     },
     "episode": {
@@ -758,6 +762,10 @@
       "tertiary-role": {
         "name": "tertiary-role",
         "description": "Tertiary role to ping"
+      },
+      "commentary": {
+        "name": "commentary",
+        "description": "Add additional commentary to the release"
       }
     },
     "volume": {
@@ -786,6 +794,10 @@
       "tertiary-role": {
         "name": "tertiary-role",
         "description": "Tertiary role to ping"
+      },
+      "commentary": {
+        "name": "commentary",
+        "description": "Add additional commentary to the release"
       }
     }
   },

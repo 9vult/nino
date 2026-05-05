@@ -23,4 +23,5 @@ public static class Length
     // 256
     public const int Motd = 256;
     public const int PosterUrl = 256;
+    public const int Commentary = 256;
 }

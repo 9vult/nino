@@ -59,7 +59,8 @@ public sealed class ReleaseBatchHandler(
                     Publish: project.DelegateObserver is null,
                     PrimaryRoleId: command.PrimaryRoleId,
                     SecondaryRoleId: command.SecondaryRoleId,
-                    TertiaryRoleId: command.TertiaryRoleId
+                    TertiaryRoleId: command.TertiaryRoleId,
+                    Commentary: command.Commentary
                 )
             ),
             .. project.Observers.Select(observer =>
@@ -70,6 +71,7 @@ public sealed class ReleaseBatchHandler(
                         FirstNumber: command.FirstNumber,
                         LastNumber: command.LastNumber,
                         Urls: command.Urls,
+                        Commentary: command.Commentary,
                         Publish: observer.Id == project.DelegateObserverId
                     )
                 )
