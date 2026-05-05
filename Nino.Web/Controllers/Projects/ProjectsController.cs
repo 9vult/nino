@@ -6,12 +6,12 @@ using Microsoft.AspNetCore.Mvc;
 using Nino.Core.Features.Queries.Episodes.GetWorkingEpisode;
 using Nino.Domain.ValueObjects;
 
-namespace Nino.Web.Controllers.Project;
+namespace Nino.Web.Controllers.Projects;
 
 [ApiController]
 [ApiVersion(1.0)]
 [Route("api/v{version:apiVersion}/[controller]")]
-public sealed class ProjectController(GetWorkingEpisodeHandler workingEpisodeHandler)
+public sealed class ProjectsController(GetWorkingEpisodeHandler workingEpisodeHandler)
     : ControllerBase
 {
     [HttpGet("{projectId}/working-episode")]
