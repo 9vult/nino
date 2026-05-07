@@ -87,6 +87,14 @@ public sealed class BatchReleasedEventHandler(
                 : $"<@&{data.TertiaryRole.DiscordId.Value}>"
             : string.Empty;
 
+        var roleMentions = string.Join(
+                ' ',
+                primaryRoleMention,
+                secondaryRoleMention,
+                tertiaryRoleMention
+            )
+            .Trim();
+
         logger.LogInformation(
             "Publishing batch release for {ProjectTitle} {FirstNumber}-{LastNumber} to {Channel}",
             data.ProjectTitle,
@@ -94,6 +102,11 @@ public sealed class BatchReleasedEventHandler(
             lastNumber,
             channel
         );
+
+        var hasCommentary = !string.IsNullOrEmpty(commentary);
+        var hasRoleMentions = !string.IsNullOrEmpty(roleMentions);
+        var hasMultipleUrls = urls.Count > 1;
+        var inlineUrl = hasRoleMentions && !hasCommentary && !hasMultipleUrls;
 
         var locale = data.Locale.ToDiscordLocale();
         var b = new StringBuilder();
@@ -104,32 +117,20 @@ public sealed class BatchReleasedEventHandler(
         b.AppendLine(
             T("release.broadcast.batch", locale, data.ProjectTitle, firstNumber, lastNumber)
         );
-        b.Append(
-            string.Join(' ', primaryRoleMention, secondaryRoleMention, tertiaryRoleMention).Trim()
-        );
 
-        var hasCommentary = !string.IsNullOrEmpty(commentary);
+        if (hasRoleMentions)
+        {
+            b.Append(roleMentions);
+            b.Append(inlineUrl ? ' ' : Environment.NewLine);
+        }
+
         if (hasCommentary)
-        {
-            b.AppendLine();
-            b.Append(commentary);
-        }
+            b.AppendLine(commentary);
 
-        if (urls.Count == 1)
-        {
-            // If there's commentary, link will be on own line
-            if (hasCommentary)
-                b.AppendLine();
-            else
-                b.Append(' ');
-
+        if (inlineUrl)
             b.Append(urls[0]);
-        }
-        else if (urls.Count > 1)
-        {
-            b.AppendLine();
-            b.Append(string.Join(Environment.NewLine, urls));
-        }
+        else
+            b.AppendJoin(Environment.NewLine, urls);
 
         var message = await channel.SendMessageAsync(text: b.ToString());
 
