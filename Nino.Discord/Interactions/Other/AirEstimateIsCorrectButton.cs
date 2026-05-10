@@ -39,14 +39,14 @@ public class AirEstimateIsCorrectButton(
 
         var @event = await stateService.LoadStateAsync<EpisodeAiredEstimateEvent>(stateId);
         if (@event is null)
-            return await interaction.FailAsync(T("error.state", locale));
+            return await interaction.FailAsync(T("error.state", locale), ephemeral: true);
 
         var result = await confirmHandler.HandleAsync(
             new ConfirmAirEstimateCommand(@event.EpisodeId, requestedBy)
         );
 
         if (!result.IsSuccess)
-            return await interaction.FailAsync(result.Status, locale);
+            return await interaction.FailAsync(result.Status, locale, ephemeral: true);
 
         await stateService.DeleteStateAsync(stateId);
 
@@ -59,7 +59,7 @@ public class AirEstimateIsCorrectButton(
                 "Failed to get air notification data for episode {EpisodeId}",
                 @event.EpisodeId
             );
-            return await interaction.FailAsync(queryResult.Status, locale);
+            return await interaction.FailAsync(queryResult.Status, locale, ephemeral: true);
         }
 
         var data = queryResult.Value;
