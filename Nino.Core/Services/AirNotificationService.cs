@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Nino.Core.Events;
+using Nino.Domain.Dtos.AniList;
 using Nino.Domain.Enums;
 using Nino.Domain.ValueObjects;
 using Task = System.Threading.Tasks.Task;
@@ -68,6 +69,11 @@ public sealed class AirNotificationService(
                 {
                     // Don't re-estimate if previous estimate was wrong
                     if (episode.AirNotificationStatus == AirNotificationStatus.EstimatedIncorrectly)
+                        continue;
+
+                    // Don't estimate if the anime is not actively releasing
+                    var anime = await aniListService.GetAnimeAsync(episode.Project.AniListId);
+                    if (anime.IsSuccess && anime.Value.Status is not AniListStatus.Releasing)
                         continue;
 
                     // Try estimating
