@@ -21,6 +21,7 @@ public sealed class GetProgressNotificationDataHandler(ReadOnlyNinoDbContext db)
             .Select(t => new GetProgressNotificationDataResponse(
                 new GetGenericProjectDataResponse(
                     t.ProjectId,
+                    MappedIdDto<UserId>.From(t.Project.Owner),
                     t.Project.Title,
                     t.Project.Type,
                     t.Project.AniListId,

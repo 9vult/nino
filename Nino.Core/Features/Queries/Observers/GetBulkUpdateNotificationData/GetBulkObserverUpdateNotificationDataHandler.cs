@@ -60,6 +60,7 @@ public sealed class GetBulkObserverUpdateNotificationDataHandler(ReadOnlyNinoDbC
             new GetBulkObserverUpdateNotificationDataResponse(
                 new GetGenericProjectDataResponse(
                     observer.Project.Id,
+                    MappedIdDto<UserId>.From(observer.Project.Owner),
                     observer.Project.Title,
                     observer.Project.Type,
                     observer.Project.AniListId,

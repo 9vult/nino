@@ -36,6 +36,7 @@ public sealed class GetObserverUpdateNotificationDataHandler(ReadOnlyNinoDbConte
             .Select(o => new GetObserverUpdateNotificationDataResponse(
                 new GetGenericProjectDataResponse(
                     o.ProjectId,
+                    MappedIdDto<UserId>.From(o.Project.Owner),
                     o.Project.Title,
                     o.Project.Type,
                     o.Project.AniListId,

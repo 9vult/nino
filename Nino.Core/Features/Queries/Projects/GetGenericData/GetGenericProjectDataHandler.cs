@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 using Microsoft.EntityFrameworkCore;
+using Nino.Domain.Dtos;
+using Nino.Domain.ValueObjects;
 using static Nino.Core.Features.Result<Nino.Core.Features.Queries.Projects.GetGenericData.GetGenericProjectDataResponse>;
 
 namespace Nino.Core.Features.Queries.Projects.GetGenericData;
@@ -16,6 +18,7 @@ public sealed class GetGenericProjectDataHandler(ReadOnlyNinoDbContext db)
             .Projects.Where(p => p.Id == query.ProjectId)
             .Select(p => new GetGenericProjectDataResponse(
                 ProjectId: p.Id,
+                Owner: MappedIdDto<UserId>.From(p.Owner),
                 ProjectTitle: p.Title,
                 ProjectType: p.Type,
                 AniListId: p.AniListId,

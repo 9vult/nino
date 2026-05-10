@@ -57,6 +57,7 @@ public sealed class GetBulkProgressNotificationDataHandler(ReadOnlyNinoDbContext
             new GetBulkProgressNotificationDataResponse(
                 new GetGenericProjectDataResponse(
                     project.Id,
+                    MappedIdDto<UserId>.From(project.Owner),
                     project.Title,
                     project.Type,
                     project.AniListId,

@@ -21,6 +21,7 @@ public sealed class GetAirNotificationDataHandler(ReadOnlyNinoDbContext db)
             .Select(e => new GetAirNotificationDataResponse(
                 new GetGenericProjectDataResponse(
                     e.ProjectId,
+                    MappedIdDto<UserId>.From(e.Project.Owner),
                     e.Project.Title,
                     e.Project.Type,
                     e.Project.AniListId,
