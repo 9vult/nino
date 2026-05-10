@@ -87,6 +87,46 @@ public sealed class AniListService(
     }
 
     /// <inheritdoc />
+    public async Task<Result<DateTimeOffset>> EstimateEpisodeAirTimeAsync(
+        AniListId aniListId,
+        decimal episodeNumber
+    )
+    {
+        var anime = await GetAnimeAsync(aniListId);
+        if (!anime.IsSuccess)
+            return Result<DateTimeOffset>.Fail(anime.Status);
+
+        var episodes = anime.Value?.Data?.Data?.Media?.AiringSchedule?.Nodes ?? [];
+
+        var floor = Convert.ToInt32(Math.Floor(episodeNumber));
+
+        // No estimate needed?
+        var episode = episodes.FirstOrDefault(e => e.Episode == floor);
+        if (episode is not null)
+        {
+            return Result<DateTimeOffset>.Success(
+                DateTimeOffset
+                    .FromUnixTimeSeconds(episode.AiringAt)
+                    .AddMinutes(anime.Value?.Data?.Data?.Media?.Duration ?? 0)
+            );
+        }
+
+        // Estimate time
+        var orderedEpisodes = episodes.OrderBy(n => n.Episode).ToList();
+        var closest = orderedEpisodes.LastOrDefault(n => n.Episode < floor);
+        if (closest?.AiringAt is null)
+            return Result<DateTimeOffset>.Fail(ResultStatus.Error); // No dates
+
+        var difference = floor - closest.Episode;
+        return Result<DateTimeOffset>.Success(
+            DateTimeOffset
+                .FromUnixTimeSeconds(closest.AiringAt)
+                .AddMinutes(anime.Value?.Data?.Data?.Media?.Duration ?? 0)
+                .AddDays(difference * 7) // Assuming a weekly release schedule
+        );
+    }
+
+    /// <inheritdoc />
     public async Task<Result<bool>> AnimeHasStartedAsync(AniListId aniListId)
     {
         var startDate = await GetAnimeStartDateAsync(aniListId);

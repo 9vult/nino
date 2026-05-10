@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 using System.ComponentModel.DataAnnotations;
+using Nino.Domain.Enums;
 using Nino.Domain.ValueObjects;
 
 namespace Nino.Domain.Entities;
@@ -20,7 +21,8 @@ public sealed class Episode
 
     public required bool IsDone { get; set; }
 
-    public bool AirNotificationPosted { get; set; } = false;
+    public AirNotificationStatus AirNotificationStatus { get; set; } =
+        AirNotificationStatus.NotYetNotified;
 
     public DateTimeOffset? UpdatedAt { get; set; }
 

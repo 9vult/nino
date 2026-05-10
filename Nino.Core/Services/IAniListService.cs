@@ -32,6 +32,17 @@ public interface IAniListService
     Task<Result<DateTimeOffset>> GetEpisodeAirTimeAsync(AniListId aniListId, decimal episodeNumber);
 
     /// <summary>
+    /// Estimate the date and time an episode is scheduled to air at
+    /// </summary>
+    /// <param name="aniListId">AniList ID</param>
+    /// <param name="episodeNumber">Episode to check</param>
+    /// <returns>Date and time the episode airs at</returns>
+    Task<Result<DateTimeOffset>> EstimateEpisodeAirTimeAsync(
+        AniListId aniListId,
+        decimal episodeNumber
+    );
+
+    /// <summary>
     /// Check if an anime has started airing
     /// </summary>
     /// <param name="aniListId">AniList ID</param>

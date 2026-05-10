@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Nino.Core.Events;
+using Nino.Domain.Enums;
 using Nino.Domain.ValueObjects;
 using Task = System.Threading.Tasks.Task;
 
@@ -45,7 +46,10 @@ public sealed class AirNotificationService(
                         !e.Project.IsArchived
                         && e.Project.AirNotificationsEnabled
                         && !e.IsDone
-                        && !e.AirNotificationPosted
+                        && (
+                            e.AirNotificationStatus == AirNotificationStatus.NotYetNotified
+                            || e.AirNotificationStatus == AirNotificationStatus.EstimatedIncorrectly
+                        )
                     )
                     .ToListAsync()
             ).Where(e => e.Project.AniListId.Value > 0);
@@ -55,12 +59,26 @@ public sealed class AirNotificationService(
                 if (!episode.Number.IsDecimal(out var episodeNumber))
                     continue;
 
+                var isEstimate = false;
                 var aniListResult = await aniListService.GetEpisodeAirTimeAsync(
                     episode.Project.AniListId,
                     episodeNumber
                 );
                 if (!aniListResult.IsSuccess)
-                    continue;
+                {
+                    // Don't re-estimate if previous estimate was wrong
+                    if (episode.AirNotificationStatus == AirNotificationStatus.EstimatedIncorrectly)
+                        continue;
+
+                    // Try estimating
+                    aniListResult = await aniListService.EstimateEpisodeAirTimeAsync(
+                        episode.Project.AniListId,
+                        episodeNumber
+                    );
+                    if (!aniListResult.IsSuccess)
+                        continue;
+                    isEstimate = true;
+                }
 
                 var airTime = aniListResult.Value.Add(episode.Project.AirNotificationDelay);
                 if (airTime > DateTimeOffset.UtcNow)
@@ -68,9 +86,18 @@ public sealed class AirNotificationService(
 
                 logger.LogTrace("Publishing Episode Aired event for {Episode}", episode);
 
-                var airEvent = new EpisodeAiredEvent(episode.ProjectId, episode.Id, airTime);
-                await eventBus.PublishAsync(airEvent);
-                episode.AirNotificationPosted = true;
+                if (isEstimate)
+                    await eventBus.PublishAsync(
+                        new EpisodeAiredEstimateEvent(episode.ProjectId, episode.Id, airTime)
+                    );
+                else
+                    await eventBus.PublishAsync(
+                        new EpisodeAiredEvent(episode.ProjectId, episode.Id, airTime)
+                    );
+
+                episode.AirNotificationStatus = isEstimate
+                    ? AirNotificationStatus.Estimated
+                    : AirNotificationStatus.Notified;
 
                 // Conga time!
 

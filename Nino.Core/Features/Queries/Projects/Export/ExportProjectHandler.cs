@@ -72,7 +72,7 @@ public sealed class ExportProjectHandler(
                     {
                         Number = e.Number,
                         IsDone = e.IsDone,
-                        AirNotificationPosted = e.AirNotificationPosted,
+                        AirNotificationStatus = e.AirNotificationStatus,
                         Tasks = e
                             .Tasks.Select(t => new TaskExportDto
                             {
