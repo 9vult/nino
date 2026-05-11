@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Nino.Core.Events;
+using Nino.Core.Extensions;
 using Nino.Domain.Entities;
 using Task = System.Threading.Tasks.Task;
 
@@ -47,7 +48,7 @@ public sealed class CongaReminderService(
             ).Where(e => e.Project.CongaParticipants.Nodes.Count > 0);
 
             List<Task> awaitable = [];
-            foreach (var episode in episodes)
+            foreach (var episode in episodes.OrderByNumber())
             {
                 var tasks = GetTardyTasks(episode.Project, episode);
                 foreach (var task in tasks)

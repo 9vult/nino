@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 using Microsoft.EntityFrameworkCore;
-using NaturalSort.Extension;
+using Nino.Core.Extensions;
 using Nino.Core.Features.Queries.Projects.GetGenericData;
 using Nino.Domain.Dtos;
 using Nino.Domain.ValueObjects;
@@ -28,12 +28,7 @@ public sealed class GetBulkProgressNotificationDataHandler(ReadOnlyNinoDbContext
         if (project is null)
             return Fail(ResultStatus.ProjectNotFound);
 
-        var episodes = project
-            .Episodes.OrderBy(
-                e => e.Number.Value,
-                StringComparison.OrdinalIgnoreCase.WithNaturalSort()
-            )
-            .ToList();
+        var episodes = project.Episodes.OrderByNumber().ToList();
 
         var firstIdx = episodes.FindIndex(e => e.Id == query.FirstEpisodeId);
         var lastIdx = episodes.FindIndex(e => e.Id == query.LastEpisodeId) + 1;

@@ -2,7 +2,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using NaturalSort.Extension;
+using Nino.Core.Extensions;
 using Nino.Core.Services;
 using Nino.Domain.Enums;
 using static Nino.Core.Features.Result;
@@ -30,7 +30,7 @@ public sealed class AddTaskHandler(
         var episodes = (
             await db.Episodes.Where(e => e.ProjectId == command.ProjectId).ToListAsync()
         )
-            .OrderBy(e => e.Number.Value, StringComparison.OrdinalIgnoreCase.WithNaturalSort())
+            .OrderByNumber()
             .ToList();
 
         var firstIdx = episodes.FindIndex(e => e.Id == command.FirstEpisodeId);

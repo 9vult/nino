@@ -2,8 +2,8 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using NaturalSort.Extension;
 using Nino.Core.Events;
+using Nino.Core.Extensions;
 using Nino.Core.Services;
 using Nino.Domain.Enums;
 using Nino.Domain.ValueObjects;
@@ -41,7 +41,7 @@ public sealed class BulkMarkTasksHandler(
         var episodes = (
             await db.Episodes.Where(e => e.ProjectId == command.ProjectId).ToListAsync()
         )
-            .OrderBy(e => e.Number.Value, StringComparison.OrdinalIgnoreCase.WithNaturalSort())
+            .OrderByNumber()
             .ToList();
 
         var firstIdx = episodes.FindIndex(e => e.Id == command.FirstEpisodeId);

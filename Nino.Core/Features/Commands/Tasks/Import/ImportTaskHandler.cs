@@ -4,8 +4,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using NaturalSort.Extension;
 using Nino.Core.Dtos;
+using Nino.Core.Extensions;
 using Nino.Core.Features.Commands.Tasks.Add;
 using Nino.Core.Services;
 using Nino.Domain.Enums;
@@ -40,7 +40,7 @@ public sealed class ImportTaskHandler(
         var allEpisodes = (
             await db.Episodes.Where(e => e.ProjectId == command.ProjectId).ToListAsync()
         )
-            .OrderBy(e => e.Number.Value, StringComparison.OrdinalIgnoreCase.WithNaturalSort())
+            .OrderByNumber()
             .ToList();
 
         var added = 0;

@@ -3,7 +3,7 @@
 using Nino.Domain.Entities;
 using Nino.Domain.ValueObjects;
 
-namespace Nino.Core.QueryExtensions;
+namespace Nino.Core.Extensions;
 
 public static class ProjectQueryExtensions
 {

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 using Microsoft.EntityFrameworkCore;
-using NaturalSort.Extension;
+using Nino.Core.Extensions;
 using Nino.Core.Services;
 using Nino.Domain.Enums;
 using static Nino.Core.Features.Result<Nino.Core.Features.Queries.Episodes.BlameAll.BlameAllResponse>;
@@ -44,7 +44,7 @@ public sealed class BlameAllHandler(
                     _ => true,
                 }
             )
-            .OrderBy(e => e.Number.Value, StringComparer.OrdinalIgnoreCase.WithNaturalSort())
+            .OrderByNumber()
             .ToList();
 
         // Calculate pages

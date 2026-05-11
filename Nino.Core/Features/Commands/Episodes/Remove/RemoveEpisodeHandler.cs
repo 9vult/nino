@@ -2,7 +2,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using NaturalSort.Extension;
+using Nino.Core.Extensions;
 using Nino.Core.Services;
 using Nino.Domain.Enums;
 using static Nino.Core.Features.Result<Nino.Core.Features.Commands.Episodes.Remove.RemoveEpisodeResponse>;
@@ -27,9 +27,7 @@ public sealed class RemoveEpisodeHandler(
             return Fail(verification.Status);
 
         var episodes = await db.Episodes.Where(e => e.ProjectId == command.ProjectId).ToListAsync();
-        episodes = episodes
-            .OrderBy(e => e.Number.Value, StringComparison.OrdinalIgnoreCase.WithNaturalSort())
-            .ToList();
+        episodes = episodes.OrderByNumber().ToList();
 
         var firstIdx = episodes.FindIndex(e => e.Id == command.FirstEpisodeId);
         var lastIdx = episodes.FindIndex(e => e.Id == command.LastEpisodeId) + 1;
