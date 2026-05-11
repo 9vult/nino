@@ -7,16 +7,25 @@ namespace Nino.Core.QueryExtensions;
 
 public static class ProjectQueryExtensions
 {
-    public static IQueryable<Project> WhereVisibleTo(
-        this IQueryable<Project> query,
-        UserId userId
-    ) =>
-        query.Where(p =>
-            !p.IsPrivate
-            || p.OwnerId == userId
-            || p.Administrators.Any(a => a.UserId == userId)
-            || p.Group.Configuration.Administrators.Any(a => a.UserId == userId)
-            || p.TemplateStaff.Any(s => s.AssigneeId == userId)
-            || p.Tasks.Any(t => t.AssigneeId == userId)
-        );
+    extension(IQueryable<Project> query)
+    {
+        public IQueryable<Project> WhereVisibleTo(UserId userId) =>
+            query.Where(p =>
+                !p.IsPrivate
+                || p.OwnerId == userId
+                || p.Tasks.Any(t => t.AssigneeId == userId)
+                || p.TemplateStaff.Any(s => s.AssigneeId == userId)
+                || p.Administrators.Any(a => a.UserId == userId)
+                || p.Group.Configuration.Administrators.Any(a => a.UserId == userId)
+            );
+
+        public IQueryable<Project> WhereIsMember(UserId userId) =>
+            query.Where(p =>
+                p.OwnerId == userId
+                || p.Tasks.Any(t => t.AssigneeId == userId)
+                || p.TemplateStaff.Any(s => s.AssigneeId == userId)
+                || p.Administrators.Any(a => a.UserId == userId)
+                || p.Group.Configuration.Administrators.Any(a => a.UserId == userId)
+            );
+    }
 }
