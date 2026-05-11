@@ -17,6 +17,6 @@ public static class ProjectQueryExtensions
             || p.Administrators.Any(a => a.UserId == userId)
             || p.Group.Configuration.Administrators.Any(a => a.UserId == userId)
             || p.TemplateStaff.Any(s => s.AssigneeId == userId)
-            || p.Episodes.Any(e => e.Tasks.Any(s => s.AssigneeId == userId))
+            || p.Tasks.Any(t => t.AssigneeId == userId)
         );
 }
