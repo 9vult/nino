@@ -23,11 +23,11 @@ public partial class TaskModule
         [MaxLength(Length.Abbreviation)] Abbreviation abbreviation,
         [MaxLength(Length.RoleName)] string fullName,
         SocketUser assignee,
-        bool isPseudo,
         [MaxLength(Length.Number), Autocomplete(typeof(EpisodeAutocompleteHandler))]
             Number firstEpisode,
         [MaxLength(Length.Number), Autocomplete(typeof(EpisodeAutocompleteHandler))]
-            Number? lastEpisode = null
+            Number? lastEpisode = null,
+        bool isPseudo = false
     )
     {
         var interaction = Context.Interaction;

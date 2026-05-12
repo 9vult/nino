@@ -24,8 +24,8 @@ public partial class TemplateStaffModule
         [MaxLength(Length.Abbreviation)] Abbreviation abbreviation,
         [MaxLength(Length.RoleName)] string fullName,
         SocketUser assignee,
-        bool isPseudo,
-        TemplateStaffApplicator applyTo
+        TemplateStaffApplicator applyTo,
+        bool isPseudo = false
     )
     {
         var interaction = Context.Interaction;
