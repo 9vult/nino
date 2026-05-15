@@ -180,10 +180,29 @@ public class AddTemplateStaffHandlerTests : TestBase
     }
 
     [Test]
-    public async Task IncompleteEpisodes_Selection_Does_Not_Add_When_Conflict_Exists_In_Incomplete_Episode()
+    public async Task IncompleteEpisodes_Selection_Does_Not_Add_When_Conflict_Exists_In_All_Incomplete_Episode()
     {
         var seed = await Db.SeedAsync(IdentityService);
         var db = Db.Context;
+
+        // Setup
+        foreach (var episode in db.Episodes)
+        {
+            episode.Tasks.Add(
+                new Domain.Entities.Task
+                {
+                    Abbreviation = Abbreviation.From("QC4"),
+                    Name = "QC4",
+                    IsPseudo = false,
+                    IsDone = false,
+                    EpisodeId = episode.Id,
+                    AssigneeId = seed.User1Id,
+                    ProjectId = episode.ProjectId,
+                    Weight = 0,
+                }
+            );
+        }
+        await db.SaveChangesAsync();
 
         var handler = new AddTemplateStaffHandler(
             db,
@@ -196,7 +215,7 @@ public class AddTemplateStaffHandlerTests : TestBase
             seed.User1Id,
             TemplateStaffApplicator.IncompleteEpisodes,
             seed.User1Id,
-            Abbreviation.From("KFX"),
+            Abbreviation.From("QC4"),
             "Karaoke",
             false
         );

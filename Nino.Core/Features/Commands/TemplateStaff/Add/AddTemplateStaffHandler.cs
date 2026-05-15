@@ -44,16 +44,15 @@ public sealed class AddTemplateStaffHandler(
                 if (
                     project
                         .Episodes.Where(e => !e.IsDone)
-                        .SelectMany(e => e.Tasks)
-                        .Any(t => t.Abbreviation == command.Abbreviation)
+                        .All(e => e.Tasks.Any(t => t.Abbreviation == command.Abbreviation))
                 )
                     return Fail(ResultStatus.TaskConflict);
                 break;
             case TemplateStaffApplicator.AllEpisodes:
                 if (
-                    project
-                        .Episodes.SelectMany(e => e.Tasks)
-                        .Any(t => t.Abbreviation == command.Abbreviation)
+                    project.Episodes.All(e =>
+                        e.Tasks.Any(t => t.Abbreviation == command.Abbreviation)
+                    )
                 )
                     return Fail(ResultStatus.TaskConflict);
                 break;
@@ -86,6 +85,8 @@ public sealed class AddTemplateStaffHandler(
         // Add to episodes
         foreach (var episode in episodes)
         {
+            if (episode.Tasks.Any(t => t.Abbreviation == command.Abbreviation))
+                continue;
             episode.Tasks.Add(
                 new Task
                 {

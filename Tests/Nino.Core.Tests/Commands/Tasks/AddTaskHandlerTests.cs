@@ -108,7 +108,7 @@ public class AddTaskHandlerTests : TestBase
     }
 
     [Test]
-    public async Task Multiple_Episode_Selection_With_Conflict_Does_Not_Add_To_Episodes()
+    public async Task Multiple_Episode_Selection_With_Conflict_Adds_To_Episodes_Without_Conflice()
     {
         var seed = await Db.SeedAsync(IdentityService);
         var db = Db.Context;
@@ -132,8 +132,12 @@ public class AddTaskHandlerTests : TestBase
 
         var result = await handler.HandleAsync(command);
 
-        await Assert.That(result.IsSuccess).IsFalse();
-        await Assert.That(result.Status).IsEqualTo(ResultStatus.TaskConflict);
+        await Assert.That(result.IsSuccess).IsTrue();
+        var episode1 = await db.Episodes.FirstAsync(e => e.Id == seed.Episode1Id);
+        var episode2 = await db.Episodes.FirstAsync(e => e.Id == seed.Episode2Id);
+
+        await Assert.That(episode1.Tasks).Contains(t => t.Abbreviation == command.Abbreviation);
+        await Assert.That(episode2.Tasks).Contains(t => t.Abbreviation == command.Abbreviation);
     }
 
     [Test]

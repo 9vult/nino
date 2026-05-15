@@ -44,12 +44,14 @@ public sealed class AddTaskHandler(
         episodes = episodes[firstIdx..lastIdx].ToList();
 
         // Check for conflicts
-        if (episodes.Any(e => e.Tasks.Any(t => t.Abbreviation == command.Abbreviation)))
+        if (episodes.All(e => e.Tasks.Any(t => t.Abbreviation == command.Abbreviation)))
             return Fail(ResultStatus.TaskConflict);
 
         // Add to episodes
         foreach (var episode in episodes)
         {
+            if (episode.Tasks.Any(t => t.Abbreviation == command.Abbreviation))
+                continue;
             episode.Tasks.Add(
                 new Task
                 {
