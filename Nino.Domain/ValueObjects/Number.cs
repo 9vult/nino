@@ -37,7 +37,7 @@ public readonly partial struct Number
         var replaced = input.Replace(',', '.');
         return decimal.TryParse(replaced, CultureInfo.InvariantCulture, out var decimalValue)
             ? decimalValue.ToString(CultureInfo.InvariantCulture)
-            : input;
+            : input.ToUpperInvariant();
     }
 
     private static Validation Validate(string input)
