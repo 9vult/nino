@@ -24,7 +24,7 @@ public partial class DebugModule
 
         var aniListId = AniListId.From(rawAniListId);
 
-        var request = await aniListService.GetAnimeAsync(aniListId);
+        var request = await aniListService.ForceUpdateAnimeAsync(aniListId);
         if (!request.IsSuccess)
             return await interaction.FailAsync(request.Status, locale);
 
