@@ -926,7 +926,7 @@
     }
   },
   "template-staff": {
-    "name": "default-tasks",
+    "name": "default-task",
     "description": "Manage Default Tasks",
     "add": {
       "name": "add",
