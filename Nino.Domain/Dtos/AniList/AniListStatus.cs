@@ -9,4 +9,5 @@ public enum AniListStatus
     Releasing,
     NotYetReleased,
     Hiatus,
+    Unknown,
 }

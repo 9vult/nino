@@ -34,7 +34,7 @@ public class AniListResponse
                 "NOT_YET_RELEASED" => AniListStatus.NotYetReleased,
                 _ => AniListStatus.Hiatus,
             }
-            : AniListStatus.Hiatus;
+            : AniListStatus.Unknown;
 
     [NotMapped]
     public ProjectType Type =>

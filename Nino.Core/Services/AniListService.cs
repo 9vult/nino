@@ -26,6 +26,7 @@ public sealed class AniListService(
     private static readonly TimeSpan CompletedTtl = TimeSpan.FromDays(360);
     private static readonly TimeSpan HiatusTtl = TimeSpan.FromDays(30);
     private static readonly TimeSpan OngoingTtl = TimeSpan.FromDays(3);
+    private static readonly TimeSpan UnknownTtl = TimeSpan.FromDays(1);
 
     /// <inheritdoc />
     public async Task<Result<AniListResponse>> GetAnimeAsync(AniListId aniListId)
@@ -39,6 +40,7 @@ public sealed class AniListService(
         {
             AniListStatus.Finished or AniListStatus.Cancelled => CompletedTtl,
             AniListStatus.Releasing or AniListStatus.NotYetReleased => OngoingTtl,
+            AniListStatus.Unknown => UnknownTtl,
             _ => HiatusTtl,
         };
 
