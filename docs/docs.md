@@ -8,11 +8,11 @@ Use the `/project create` command to create the project. Here, you can choose a 
 channels, and its [privacy settings](#privacy-settings). Note that many of the fields for this command are optional -
 if left blank, Nino will auto-populate them with data from AniList.
 
-### Template Staff
+### Default Tasks
 
-Once you have a project, you'll probably want to add some staff. Template Staff will automatically add tasks to new
-episodes, and you have some choices when working with them. You'll need to specify an *applicator* when using Template
-Staff commands:
+Once you have a project, you'll probably want to add some staff. Default Tasks will automatically add tasks to new
+episodes, and you have some choices when working with them. You'll need to specify an *applicator* when using Default
+Task commands:
 
 - **All Episodes**: The operation (e.g. "add staff") will apply to all episodes in the project.
 - **Incomplete Episodes**: The operation will apply to incomplete episodes. This is useful if, for example, the person
@@ -21,19 +21,19 @@ Staff commands:
 - **Future Episodes**: The operation will only apply to episodes added in the future. No changes are made to existing
   episodes.
 
-You can use `/template-staff add` to add staff to the project, or `/template-staff import` to import them.
-See [importing Template Staff](#template-staff-import).
+You can use `/default-task add` to add default tasks to the project, or `/default-task import` to import them.
+See [importing default tasks](#default-task-import).
 
-#### Important note on Template Staff
+#### Important note on Default Tasks
 
-Template Staff aren't some special entity on episodes. Template Staff are essentially a one-to-many link to Tasks,
-which can be created, modified, and deleted using Task commands. Template Staff are linked to tasks by their
-abbreviation. Therefore, if you use a Task command to change the abbreviation of a Template Staff task for an episode,
-that task will no longer be "linked". Inversely, if you use a Task command to create a task with a Template Staff
-abbreviation, it will be "linked".
+Default Tasks aren't some special entity on episodes. Default Tasks just a one-to-many link to Tasks,
+which can be created, modified, and deleted using Task commands. Default Tasks are linked to episode tasks by their
+abbreviation. Therefore, if you use a Task command to change the abbreviation of a Default Task-linked task for an
+episode, that task will no longer be "linked". Inversely, if you use a Task command to create a task with a Default
+Task abbreviation, it will be "linked".
 
-Furthermore, Template Staff commands act like a broadcast, and will overwrite tasks with the changes being made. For
-example, if you use a Task command to change the assigned user for an episode, then use a Template Staff command to
+Furthermore, Default Task commands act like a broadcast, and will overwrite tasks with the changes being made. For
+example, if you use a Task command to change the assigned user for an episode, then use a Default Task command to
 change the assigned user for all episodes, the Task command's change will be overwritten. Just something to keep in
 mind!
 
@@ -141,9 +141,9 @@ one complete entry per line:
 
 - The `Last` episode and `Weight` fields are optional.
 
-### Template Staff import
+### Default Task import
 
-Template Staff can be imported by supplying `/template-staff import` a `jsonl`-formatted file. `jsonl` ("json lines")
+Default Tasks can be imported by supplying `/default-task import` a `jsonl`-formatted file. `jsonl` ("json lines")
 is a file containing one complete entry per line:
 
 ```json lines

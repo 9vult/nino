@@ -926,11 +926,11 @@
     }
   },
   "template-staff": {
-    "name": "template-staff",
-    "description": "Manage Template Staff",
+    "name": "default-tasks",
+    "description": "Manage Default Tasks",
     "add": {
       "name": "add",
-      "description": "Add a template staff to a project",
+      "description": "Add a default task to a project",
       "alias": {
         "name": "project",
         "description": "Project alias"
@@ -967,7 +967,7 @@
     },
     "edit": {
       "name": "edit",
-      "description": "Add a project's template staff",
+      "description": "Edit a default task",
       "alias": {
         "name": "project",
         "description": "Project alias"
@@ -1008,19 +1008,19 @@
     },
     "import": {
       "name": "import",
-      "description": "Import template staff",
+      "description": "Import default tasks",
       "alias": {
         "name": "project",
         "description": "Project alias"
       },
       "file": {
         "name": "file",
-        "description": "JsonL staff file"
+        "description": "JsonL default task file"
       }
     },
     "remove": {
       "name": "remove",
-      "description": "Remove a template staff from a project",
+      "description": "Remove a default task from a project",
       "alias": {
         "name": "project",
         "description": "Project alias"
