@@ -25,7 +25,7 @@ public partial class TaskModule
         [MaxLength(Length.Number), Autocomplete(typeof(EpisodeAutocompleteHandler))]
             Number firstEpisode,
         [MaxLength(Length.Number), Autocomplete(typeof(EpisodeAutocompleteHandler))]
-            Number? lastEpisode = null,
+            Number? thruEpisode = null,
         [MaxLength(Length.Abbreviation)] Abbreviation? newAbbreviation = null,
         [MaxLength(Length.RoleName)] string? fullName = null,
         SocketUser? assignee = null,
@@ -60,17 +60,17 @@ public partial class TaskModule
         var lastId = firstId;
 
         // Resolve the last episode if needed
-        if (lastEpisode is not null)
+        if (thruEpisode is not null)
         {
             var lastResolve = await episodeResolver.HandleAsync(
-                new ResolveEpisodeQuery(projectId, lastEpisode.Value)
+                new ResolveEpisodeQuery(projectId, thruEpisode.Value)
             );
             if (!resolve.IsSuccess)
             {
                 return await interaction.FailAsync(
                     resolve.Status,
                     locale,
-                    new FailureContext { Alias = alias, Episode = lastEpisode.Value }
+                    new FailureContext { Alias = alias, Episode = thruEpisode.Value }
                 );
             }
             lastId = lastResolve.Value;
@@ -113,13 +113,13 @@ public partial class TaskModule
         }
 
         var pData = result.Value;
-        var locKey = lastEpisode is null ? "task.edit.success" : "task.edit.success.range";
+        var locKey = thruEpisode is null ? "task.edit.success" : "task.edit.success.range";
 
         // Success!
         var successEmbed = new EmbedBuilder()
             .WithProjectInfo(pData, locale)
             .WithTitle(T("project.modification.title", locale))
-            .WithDescription(T(locKey, locale, abbreviation, firstEpisode, lastEpisode))
+            .WithDescription(T(locKey, locale, abbreviation, firstEpisode, thruEpisode))
             .Build();
 
         await interaction.FollowupAsync(embed: successEmbed);

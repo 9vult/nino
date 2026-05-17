@@ -26,7 +26,7 @@ public partial class TaskModule
         [MaxLength(Length.Number), Autocomplete(typeof(EpisodeAutocompleteHandler))]
             Number firstEpisode,
         [MaxLength(Length.Number), Autocomplete(typeof(EpisodeAutocompleteHandler))]
-            Number? lastEpisode = null
+            Number? thruEpisode = null
     )
     {
         var interaction = Context.Interaction;
@@ -53,17 +53,17 @@ public partial class TaskModule
         var lastId = firstId;
 
         // Resolve the last episode if needed
-        if (lastEpisode is not null)
+        if (thruEpisode is not null)
         {
             var lastResolve = await episodeResolver.HandleAsync(
-                new ResolveEpisodeQuery(projectId, lastEpisode.Value)
+                new ResolveEpisodeQuery(projectId, thruEpisode.Value)
             );
             if (!resolve.IsSuccess)
             {
                 return await interaction.FailAsync(
                     resolve.Status,
                     locale,
-                    new FailureContext { Alias = alias, Episode = lastEpisode.Value }
+                    new FailureContext { Alias = alias, Episode = thruEpisode.Value }
                 );
             }
             lastId = lastResolve.Value;
@@ -94,10 +94,10 @@ public partial class TaskModule
 
         var completedEpisodes = result.Value.Item1.CompletedEpisodes;
         var pData = result.Value.Item2;
-        var locKey = lastEpisode is null ? "task.delete.success" : "task.delete.success.range";
+        var locKey = thruEpisode is null ? "task.delete.success" : "task.delete.success.range";
 
         var body = new StringBuilder();
-        body.AppendLine(T(locKey, locale, abbreviation, firstEpisode, lastEpisode));
+        body.AppendLine(T(locKey, locale, abbreviation, firstEpisode, thruEpisode));
 
         if (completedEpisodes.Count > 0)
         {

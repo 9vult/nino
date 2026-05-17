@@ -26,7 +26,7 @@ public partial class TaskModule
         [MaxLength(Length.Number), Autocomplete(typeof(EpisodeAutocompleteHandler))]
             Number firstEpisode,
         [MaxLength(Length.Number), Autocomplete(typeof(EpisodeAutocompleteHandler))]
-            Number? lastEpisode = null,
+            Number? thruEpisode = null,
         bool isPseudo = false
     )
     {
@@ -57,17 +57,17 @@ public partial class TaskModule
         var lastId = firstId;
 
         // Resolve the last episode if needed
-        if (lastEpisode is not null)
+        if (thruEpisode is not null)
         {
             var lastResolve = await episodeResolver.HandleAsync(
-                new ResolveEpisodeQuery(projectId, lastEpisode.Value)
+                new ResolveEpisodeQuery(projectId, thruEpisode.Value)
             );
             if (!resolve.IsSuccess)
             {
                 return await interaction.FailAsync(
                     resolve.Status,
                     locale,
-                    new FailureContext { Alias = alias, Episode = lastEpisode.Value }
+                    new FailureContext { Alias = alias, Episode = thruEpisode.Value }
                 );
             }
             lastId = lastResolve.Value;
@@ -105,14 +105,14 @@ public partial class TaskModule
         }
 
         var pData = result.Value;
-        var locKey = lastEpisode is null ? "task.creation.success" : "task.creation.success.range";
+        var locKey = thruEpisode is null ? "task.creation.success" : "task.creation.success.range";
 
         // Success!
         var staffMention = $"<@{assignee.Id}>";
         var successEmbed = new EmbedBuilder()
             .WithProjectInfo(pData, locale)
             .WithTitle(T("project.modification.title", locale))
-            .WithDescription(T(locKey, locale, staffMention, fullName, firstEpisode, lastEpisode))
+            .WithDescription(T(locKey, locale, staffMention, fullName, firstEpisode, thruEpisode))
             .Build();
 
         await interaction.FollowupAsync(embed: successEmbed);

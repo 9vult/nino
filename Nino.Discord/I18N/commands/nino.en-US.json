@@ -73,11 +73,11 @@
     },
     "first-episode": {
       "name": "first-episode",
-      "description": "First episode to add the task to"
+      "description": "First episode to mark"
     },
     "last-episode": {
       "name": "last-episode",
-      "description": "Last episode to add the task to"
+      "description": "Last episode to mark"
     },
     "action": {
       "name": "action",
@@ -848,12 +848,12 @@
         "description": "If the task is a pseudo-task"
       },
       "first-episode": {
-        "name": "first-episode",
+        "name": "episode",
         "description": "First episode to add the task to"
       },
-      "last-episode": {
-        "name": "last-episode",
-        "description": "Last episode to add the task to"
+      "thru-episode": {
+        "name": "thru-episode",
+        "description": "Last episode to add the task to (inclusive)"
       }
     },
     "edit": {
@@ -880,12 +880,12 @@
         "description": "If the task is a pseudo-task"
       },
       "first-episode": {
-        "name": "first-episode",
+        "name": "episode",
         "description": "First episode to edit the task for"
       },
-      "last-episode": {
-        "name": "last-episode",
-        "description": "Last episode to edit the task for"
+      "thru-episode": {
+        "name": "thru-episode",
+        "description": "Last episode to edit the task for (inclusive)"
       },
       "weight": {
         "name": "weight",
@@ -916,12 +916,12 @@
         "description": "Task abbreviation"
       },
       "first-episode": {
-        "name": "first-episode",
-        "description": "First episode to add the task to"
+        "name": "episode",
+        "description": "First episode to remove the task from"
       },
-      "last-episode": {
-        "name": "last-episode",
-        "description": "Last episode to add the task to"
+      "thru-episode": {
+        "name": "thru-episode",
+        "description": "Last episode to remove the task from (inclusive)"
       }
     }
   },
