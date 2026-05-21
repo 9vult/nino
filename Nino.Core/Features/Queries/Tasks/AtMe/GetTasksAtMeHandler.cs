@@ -107,7 +107,7 @@ public sealed class GetTasksAtMeHandler(ReadOnlyNinoDbContext db, IAniListServic
             var episodes = project.Episodes.Where(e =>
             {
                 var airedEpisodes = airedEpisodesByAniListId[project.AniListId];
-                if (airedEpisodes is null)
+                if (airedEpisodes is null || airedEpisodes.Count == 0)
                     return true;
                 return !e.Number.IsDecimal(out var value) || airedEpisodes.Contains(value);
             });
@@ -201,7 +201,7 @@ public sealed class GetTasksAtMeHandler(ReadOnlyNinoDbContext db, IAniListServic
             {
                 var airedEpisodes = airedEpisodesByAniListId[t.AniListId];
 
-                if (airedEpisodes is null)
+                if (airedEpisodes is null || airedEpisodes.Count == 0)
                     return true;
 
                 return !t.Number.IsDecimal(out var value) || airedEpisodes.Contains(value);
