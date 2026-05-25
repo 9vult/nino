@@ -112,7 +112,7 @@ public sealed class EditProjectHandler(
                 project.Id,
                 command.UpdateChannelId
             );
-            project.ProjectChannelId = command.UpdateChannelId.Value;
+            project.UpdateChannelId = command.UpdateChannelId.Value;
         }
 
         if (command.ReleaseChannelId is not null)
