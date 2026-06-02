@@ -85,7 +85,7 @@ public sealed class EditTemplateStaffHandler(
                 staff.Id,
                 command.AssigneeId
             );
-            foreach (var task in tasks.Where(task => task.AssigneeId == staff.AssigneeId))
+            foreach (var task in tasks)
                 task.AssigneeId = command.AssigneeId.Value;
             staff.AssigneeId = command.AssigneeId.Value;
         }
@@ -97,7 +97,7 @@ public sealed class EditTemplateStaffHandler(
                 staff.Id,
                 command.NewAbbreviation.Value
             );
-            foreach (var task in tasks.Where(task => task.Abbreviation == staff.Abbreviation))
+            foreach (var task in tasks)
                 task.Abbreviation = command.NewAbbreviation.Value;
             staff.Abbreviation = command.NewAbbreviation.Value;
         }
@@ -109,7 +109,7 @@ public sealed class EditTemplateStaffHandler(
                 staff.Id,
                 command.Name
             );
-            foreach (var task in tasks.Where(task => task.Name == staff.Name))
+            foreach (var task in tasks)
                 task.Name = command.Name;
             staff.Name = command.Name;
         }
@@ -121,7 +121,7 @@ public sealed class EditTemplateStaffHandler(
                 staff.Id,
                 command.Weight.Value
             );
-            foreach (var task in tasks.Where(task => task.Weight == staff.Weight))
+            foreach (var task in tasks)
                 task.Weight = command.Weight.Value;
             staff.Weight = command.Weight.Value;
         }
@@ -133,7 +133,7 @@ public sealed class EditTemplateStaffHandler(
                 staff.Id,
                 command.IsPseudo.Value
             );
-            foreach (var task in tasks.Where(task => task.IsPseudo == staff.IsPseudo))
+            foreach (var task in tasks)
                 task.IsPseudo = command.IsPseudo.Value;
             staff.IsPseudo = command.IsPseudo.Value;
         }
