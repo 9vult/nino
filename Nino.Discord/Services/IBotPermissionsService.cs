@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 using Discord;
+using Nino.Discord.Entities;
 
 namespace Nino.Discord.Services;
 
@@ -25,5 +26,5 @@ public interface IBotPermissionsService
     /// </summary>
     /// <param name="channelId">Discord channel ID</param>
     /// <returns>Permissions the bot has</returns>
-    ChannelPermissions? GetChannelPermissions(ulong channelId);
+    BotPermissions? GetChannelPermissions(ulong channelId);
 }

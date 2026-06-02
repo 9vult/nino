@@ -16,13 +16,13 @@ public partial class DebugModule
         var interaction = Context.Interaction;
         var locale = interaction.UserLocale;
 
-        var perms = botPermissionsService.GetChannelPermissions(channel.Id);
+        var p = botPermissionsService.GetChannelPermissions(channel.Id);
 
         var body = new StringBuilder();
 
         body.AppendLine($"<#{channel.Id}>");
 
-        if (perms is null)
+        if (p is null)
         {
             body.AppendLine(T("nino.debug.invalidChanel", locale));
         }
@@ -30,7 +30,6 @@ public partial class DebugModule
         {
             var passFail = new Dictionary<bool, string> { [true] = "✅ ", [false] = "❌ " };
             var passWarn = new Dictionary<bool, string> { [true] = "✅ ", [false] = "⚠️ " };
-            var p = perms.Value;
 
             body.AppendLine(passFail[p.ViewChannel] + T("nino.debug.channel.view", locale));
             body.AppendLine(passFail[p.SendMessages] + T("nino.debug.channel.send", locale));

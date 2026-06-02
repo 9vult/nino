@@ -503,7 +503,7 @@ public class NotifyAboutFailureService(
     {
         var passFail = new Dictionary<bool, string> { [true] = "✅ ", [false] = "❌ " };
 
-        var p = botPermissionsService.GetChannelPermissions(channel.Id)!.Value;
+        var p = botPermissionsService.GetChannelPermissions(channel.Id)!;
         body.AppendLine(passFail[p.ViewChannel] + T("nino.debug.channel.view", Locale));
         body.AppendLine(passFail[p.SendMessages] + T("nino.debug.channel.send", Locale));
         body.AppendLine(passFail[p.EmbedLinks] + T("nino.debug.channel.embed", Locale));
@@ -515,7 +515,7 @@ public class NotifyAboutFailureService(
         var passFail = new Dictionary<bool, string> { [true] = "✅ ", [false] = "❌ " };
         var passWarn = new Dictionary<bool, string> { [true] = "✅ ", [false] = "⚠️ " };
 
-        var p = botPermissionsService.GetChannelPermissions(channel.Id)!.Value;
+        var p = botPermissionsService.GetChannelPermissions(channel.Id)!;
         body.AppendLine(passFail[p.ViewChannel] + T("nino.debug.channel.view", Locale));
         body.AppendLine(passFail[p.SendMessages] + T("nino.debug.channel.send", Locale));
         body.AppendLine(passFail[p.EmbedLinks] + T("nino.debug.channel.embed", Locale));

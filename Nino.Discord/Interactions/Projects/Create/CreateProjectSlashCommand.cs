@@ -129,7 +129,7 @@ public partial class ProjectModule
             if (!canUseProjectChannel)
             {
                 body.AppendLine(T("error.missingMessagePerms", locale, $"<#{projectChannel.Id}>"));
-                var p = botPermissionsService.GetChannelPermissions(projectChannel.Id)!.Value;
+                var p = botPermissionsService.GetChannelPermissions(projectChannel.Id)!;
 
                 body.AppendLine(passFail[p.ViewChannel] + T("nino.debug.channel.view", locale));
                 body.AppendLine(passFail[p.SendMessages] + T("nino.debug.channel.send", locale));
@@ -138,7 +138,7 @@ public partial class ProjectModule
             if (!canUseUpdateChannel)
             {
                 body.AppendLine(T("error.missingMessagePerms", locale, $"<#{updateChannel.Id}>"));
-                var p = botPermissionsService.GetChannelPermissions(updateChannel.Id)!.Value;
+                var p = botPermissionsService.GetChannelPermissions(updateChannel.Id)!;
 
                 body.AppendLine(passFail[p.ViewChannel] + T("nino.debug.channel.view", locale));
                 body.AppendLine(passFail[p.SendMessages] + T("nino.debug.channel.send", locale));
@@ -147,7 +147,7 @@ public partial class ProjectModule
             if (!canUseReleaseChannel)
             {
                 body.AppendLine(T("error.missingMessagePerms", locale, $"<#{releaseChannel.Id}>"));
-                var p = botPermissionsService.GetChannelPermissions(releaseChannel.Id)!.Value;
+                var p = botPermissionsService.GetChannelPermissions(releaseChannel.Id)!;
 
                 body.AppendLine(passFail[p.ViewChannel] + T("nino.debug.channel.view", locale));
                 body.AppendLine(passFail[p.SendMessages] + T("nino.debug.channel.send", locale));

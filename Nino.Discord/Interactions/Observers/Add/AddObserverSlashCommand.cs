@@ -127,8 +127,7 @@ public partial class ObserverModule
             if (!canUseUpdateChannel)
             {
                 body.AppendLine(T("error.missingMessagePerms", locale, $"<#{updateChannel.Id}>"));
-                var perms = botPermissionsService.GetChannelPermissions(updateChannel.Id)!;
-                var p = perms.Value;
+                var p = botPermissionsService.GetChannelPermissions(updateChannel.Id)!;
 
                 body.AppendLine(passFail[p.ViewChannel] + T("nino.debug.channel.view", locale));
                 body.AppendLine(passFail[p.SendMessages] + T("nino.debug.channel.send", locale));
@@ -137,8 +136,7 @@ public partial class ObserverModule
             if (!canUseReleaseChannel)
             {
                 body.AppendLine(T("error.missingMessagePerms", locale, $"<#{releaseChannel.Id}>"));
-                var perms = botPermissionsService.GetChannelPermissions(releaseChannel.Id)!;
-                var p = perms.Value;
+                var p = botPermissionsService.GetChannelPermissions(releaseChannel.Id)!;
 
                 body.AppendLine(passFail[p.ViewChannel] + T("nino.debug.channel.view", locale));
                 body.AppendLine(passFail[p.SendMessages] + T("nino.debug.channel.send", locale));
