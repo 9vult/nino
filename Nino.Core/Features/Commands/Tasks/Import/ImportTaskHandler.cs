@@ -47,6 +47,9 @@ public sealed class ImportTaskHandler(
         var lines = command.Data.Split(Environment.NewLine);
         foreach (var line in lines)
         {
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
             var input = JsonSerializer.Deserialize<TaskImportDto>(line, JsonSerializerOptions);
             if (input is null)
             {

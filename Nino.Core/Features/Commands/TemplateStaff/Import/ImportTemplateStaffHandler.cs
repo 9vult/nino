@@ -48,6 +48,9 @@ public sealed class ImportTemplateStaffHandler(
         var lines = command.Data.Split(Environment.NewLine);
         foreach (var line in lines)
         {
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
             var input = JsonSerializer.Deserialize<TemplateStaffImportDto>(
                 line,
                 JsonSerializerOptions
