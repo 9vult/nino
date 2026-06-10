@@ -3,6 +3,7 @@
 using Discord;
 using Discord.Interactions;
 using Nino.Core.Features.Commands.Projects.Release.Batch;
+using Nino.Core.Features.Commands.Projects.Release.Custom;
 using Nino.Core.Features.Commands.Projects.Release.Episode;
 using Nino.Core.Features.Commands.Projects.Release.Volume;
 using Nino.Core.Features.Queries.Episodes.ValidateRelease;
@@ -23,6 +24,7 @@ public partial class ReleaseModule(
     ReleaseEpisodeHandler releaseEpisodeHandler,
     ReleaseVolumeHandler releaseVolumeHandler,
     ReleaseBatchHandler releaseBatchHandler,
+    ReleaseCustomHandler releaseCustomHandler,
     ValidateReleaseHandler validateReleaseHandler,
     ILogger<ReleaseModule> logger
 ) : InteractionModuleBase<IInteractionContext>;

@@ -83,6 +83,7 @@ public static class DiscordBotServiceCollectionExtensions
         services.AddScoped<IEventHandler<EpisodeReleasedEvent>, EpisodeReleasedEventHandler>();
         services.AddScoped<IEventHandler<VolumeReleasedEvent>, VolumeReleasedEventHandler>();
         services.AddScoped<IEventHandler<BatchReleasedEvent>, BatchReleasedEventHandler>();
+        services.AddScoped<IEventHandler<CustomReleasedEvent>, CustomReleasedEventHandler>();
         services.AddScoped<
             IEventHandler<EpisodeReleasedObserverEvent>,
             EpisodeReleasedObserverEventHandler
@@ -94,6 +95,10 @@ public static class DiscordBotServiceCollectionExtensions
         services.AddScoped<
             IEventHandler<BatchReleasedObserverEvent>,
             BatchReleasedObserverEventHandler
+        >();
+        services.AddScoped<
+            IEventHandler<CustomReleasedObserverEvent>,
+            CustomReleasedObserverEventHandler
         >();
         services.AddScoped<IEventHandler<TaskProgressEvent>, TaskProgressEventHandler>();
         services.AddScoped<

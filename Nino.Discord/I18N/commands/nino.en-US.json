@@ -736,6 +736,38 @@
         "description": "Add additional commentary to the release"
       }
     },
+    "custom": {
+      "name": "custom",
+      "description": "Release something special!",
+      "alias": {
+        "name": "project",
+        "description": "Project alias"
+      },
+      "label": {
+        "name": "label",
+        "description": "Release label (optional)"
+      },
+      "url": {
+        "name": "url",
+        "description": "Release URL (markdown, '|' splits allowed)"
+      },
+      "primary-role": {
+        "name": "primary-role",
+        "description": "Primary role to ping"
+      },
+      "secondary-role": {
+        "name": "secondary-role",
+        "description": "Secondary role to ping"
+      },
+      "tertiary-role": {
+        "name": "tertiary-role",
+        "description": "Tertiary role to ping"
+      },
+      "commentary": {
+        "name": "commentary",
+        "description": "Add additional commentary to the release"
+      }
+    },
     "episode": {
       "name": "episode",
       "description": "Release an episode",

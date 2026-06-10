@@ -1,0 +1,141 @@
+// SPDX-License-Identifier: MPL-2.0
+
+using System.Text;
+using Discord;
+using Discord.WebSocket;
+using Nino.Core.Events;
+using Nino.Core.Features.Queries.Projects.GetReleaseNotificationData;
+using Nino.Discord.Services;
+using Nino.Localization;
+
+namespace Nino.Discord.Handlers;
+
+public sealed class CustomReleasedEventHandler(
+    DiscordSocketClient client,
+    IBotPermissionsService botPermissionsService,
+    GetReleaseNotificationDataHandler getDataHandler,
+    ILogger<CustomReleasedEventHandler> logger
+) : IEventHandler<CustomReleasedEvent>
+{
+    /// <inheritdoc />
+    public async Task HandleAsync(CustomReleasedEvent @event)
+    {
+        var (
+            projectId,
+            label,
+            urls,
+            publish,
+            primaryRoleId,
+            secondaryRoleId,
+            tertiaryRoleId,
+            commentary
+        ) = @event;
+
+        var queryResult = await getDataHandler.HandleAsync(
+            new GetReleaseNotificationDataQuery(
+                projectId,
+                primaryRoleId,
+                secondaryRoleId,
+                tertiaryRoleId
+            )
+        );
+        if (!queryResult.IsSuccess)
+        {
+            logger.LogWarning("Failed to get release data for project {ProjectId}", projectId);
+            return;
+        }
+
+        var data = queryResult.Value;
+
+        if (data.NotificationChannel.DiscordId is null)
+            return;
+
+        if (
+            await client.GetChannelAsync(data.NotificationChannel.DiscordId.Value)
+            is not SocketTextChannel channel
+        )
+        {
+            logger.LogWarning(
+                "Discord channel {Channel} was not found",
+                data.NotificationChannel.DiscordId.Value
+            );
+            return;
+        }
+
+        if (!botPermissionsService.HasReleasePermissions(channel.Id))
+        {
+            logger.LogWarning("No release permissions for {Channel}", channel.Id);
+            return;
+        }
+
+        var primaryRoleMention = data.PrimaryRole?.DiscordId is not null
+            ? data.PrimaryRole.DiscordId.Value == channel.Guild.Id
+                ? "@everyone"
+                : $"<@&{data.PrimaryRole.DiscordId.Value}>"
+            : string.Empty;
+        var secondaryRoleMention = data.SecondaryRole?.DiscordId is not null
+            ? data.SecondaryRole.DiscordId.Value == channel.Guild.Id
+                ? "@everyone"
+                : $"<@&{data.SecondaryRole.DiscordId.Value}>"
+            : string.Empty;
+        var tertiaryRoleMention = data.TertiaryRole?.DiscordId is not null
+            ? data.TertiaryRole.DiscordId.Value == channel.Guild.Id
+                ? "@everyone"
+                : $"<@&{data.TertiaryRole.DiscordId.Value}>"
+            : string.Empty;
+
+        var roleMentions = string.Join(
+                ' ',
+                primaryRoleMention,
+                secondaryRoleMention,
+                tertiaryRoleMention
+            )
+            .Trim();
+
+        logger.LogInformation(
+            "Publishing episode release for {ProjectTitle} \"{ReleaseLabel}\" to {Channel}",
+            data.ProjectTitle,
+            label ?? string.Empty,
+            channel
+        );
+
+        var hasCommentary = !string.IsNullOrEmpty(commentary);
+        var hasRoleMentions = !string.IsNullOrEmpty(roleMentions);
+        var hasMultipleUrls = urls.Count > 1;
+        var inlineUrl = hasRoleMentions && !hasCommentary && !hasMultipleUrls;
+
+        var locale = data.Locale.ToDiscordLocale();
+        var b = new StringBuilder();
+
+        if (!string.IsNullOrEmpty(data.ReleasePrefix))
+            b.Append(data.ReleasePrefix + ' ');
+
+        b.AppendLine(
+            !string.IsNullOrEmpty(label)
+                ? T("release.broadcast.custom.labeled", locale, data.ProjectTitle, label)
+                : T("release.broadcast.custom.notLabeled", locale, data.ProjectTitle)
+        );
+
+        if (hasRoleMentions)
+        {
+            b.Append(roleMentions);
+            b.Append(inlineUrl ? ' ' : Environment.NewLine);
+        }
+
+        if (hasCommentary)
+            b.AppendLine(commentary);
+
+        if (inlineUrl)
+            b.Append(urls[0]);
+        else
+            b.AppendJoin(Environment.NewLine, urls);
+
+        var message = await channel.SendMessageAsync(text: b.ToString());
+
+        if (!publish)
+            return;
+
+        if (message.Channel.GetChannelType() == ChannelType.News) // Announcement channel
+            await message.CrosspostAsync(); // Publish announcement
+    }
+}

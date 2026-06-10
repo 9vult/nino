@@ -2,6 +2,7 @@
 
 using System.Text.Json.Serialization;
 using Nino.Core.Features.Commands.Projects.Release.Batch;
+using Nino.Core.Features.Commands.Projects.Release.Custom;
 using Nino.Core.Features.Commands.Projects.Release.Episode;
 using Nino.Core.Features.Commands.Projects.Release.Volume;
 using Nino.Domain.ValueObjects;
@@ -12,4 +13,5 @@ namespace Nino.Core.Features.Commands.Projects.Release;
 [JsonDerivedType(typeof(ReleaseEpisodeCommand), "episode")]
 [JsonDerivedType(typeof(ReleaseVolumeCommand), "volume")]
 [JsonDerivedType(typeof(ReleaseBatchCommand), "batch")]
+[JsonDerivedType(typeof(ReleaseCustomCommand), "custom")]
 public abstract record ReleaseCommandBase(ProjectId ProjectId, UserId RequestedBy);
