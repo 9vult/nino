@@ -21,7 +21,8 @@ public sealed class BlameSlashCommand(
     GetGenericProjectDataHandler getProjectDataHandler,
     ResolveProjectHandler projectResolver,
     ResolveEpisodeHandler episodeResolver,
-    BlameHandler blameHandler
+    BlameHandler blameHandler,
+    ILogger<BlameSlashCommand> logger
 ) : InteractionModuleBase<IInteractionContext>
 {
     [SlashCommand("blame", "Check the status of a project")]
@@ -69,6 +70,13 @@ public sealed class BlameSlashCommand(
             }
             episodeId = episodeResolve.Value;
         }
+
+        logger.LogInformation(
+            "Generating Blame for project {ProjectId} episode {EpisodeId} for {User}",
+            projectId,
+            episodeId is not null ? episodeId : "(unset)",
+            requestedBy
+        );
 
         var command = new BlameQuery(
             ProjectId: projectId,

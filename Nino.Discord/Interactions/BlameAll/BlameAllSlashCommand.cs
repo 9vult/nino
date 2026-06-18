@@ -30,7 +30,7 @@ public sealed class BlameAllSlashCommand(
     [SlashCommand("blameall", "Check the status of a project")]
     public async Task<RuntimeResult> BlameAllAsync(
         [MaxLength(Length.Alias), Autocomplete(typeof(ProjectAutocompleteHandler))] Alias alias,
-        BlameAllFilter filter = BlameAllFilter.All,
+        BlameAllFilter filter = BlameAllFilter.Incomplete,
         bool includePseudo = false
     )
     {
@@ -55,9 +55,10 @@ public sealed class BlameAllSlashCommand(
         var projectId = projectResolve.Value;
 
         logger.LogInformation(
-            "Generating Blame All for project {ProjectId} for {User}",
+            "Generating Blame All for project {ProjectId} for {User} using {Filter} filter",
             projectId,
-            requestedBy
+            requestedBy,
+            filter
         );
 
         var command = new BlameAllQuery(

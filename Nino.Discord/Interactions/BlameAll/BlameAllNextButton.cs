@@ -56,10 +56,11 @@ public class BlameAllNextButton(
         };
 
         logger.LogInformation(
-            "Generating Blame All page {Page} for project {ProjectId} for user {User}",
+            "Generating Blame All page {Page} for project {ProjectId} for user {User} using {Filter} filter",
             command.Page,
             command.ProjectId,
-            command.RequestedBy
+            command.RequestedBy,
+            command.Filter
         );
 
         var result = await blameHandler
