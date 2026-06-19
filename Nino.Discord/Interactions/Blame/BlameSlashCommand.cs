@@ -147,7 +147,13 @@ public sealed class BlameSlashCommand(
         else if (bData.AiredAt is not null)
         {
             var relativeTime = $"<t:{bData.AiredAt.Value.ToUnixTimeSeconds()}:R>";
-            var key = bData.AiredAt > DateTimeOffset.UtcNow ? "blame.airs" : "blame.aired";
+            var key = (bData.AiredAt < DateTimeOffset.UtcNow, bData.IsAirTimeEstimated) switch
+            {
+                (true, false) => "blame.aired",
+                (true, true) => "blame.aired.estimate",
+                (false, false) => "blame.airs",
+                (false, true) => "blame.airs.estimate",
+            };
             b.AppendLine();
             b.AppendLine(T(key, locale, relativeTime));
         }

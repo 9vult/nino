@@ -100,6 +100,15 @@ public sealed class BlameAllSlashCommand(
         )
         {
             b.Append($"{episode.EpisodeNumber}: ");
+
+            // All complete
+            if (episode.Statuses.All(t => t.IsDone))
+            {
+                b.AppendLine('*' + T("blameAll.done", locale) + '*');
+                continue;
+            }
+
+            // All incomplete
             if (episode.Statuses.All(t => !t.IsDone))
             {
                 if (episode.AiredAt is not null && episode.AiredAt.Value > DateTimeOffset.UtcNow)

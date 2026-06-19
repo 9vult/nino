@@ -53,6 +53,7 @@ public sealed class BlameHandler(
             .Select(e => new BlameResponse(
                 e.Number,
                 e.Project.AniListId,
+                false,
                 null,
                 e.UpdatedAt,
                 e.Tasks.Where(t => includePseudo && t.IsPseudo || !t.IsPseudo)
@@ -75,9 +76,16 @@ public sealed class BlameHandler(
         if (result.Statuses.All(t => t.IsDone) || !result.EpisodeNumber.IsInteger(out var number))
             return Success(result);
 
+        var isEstimate = false;
         var alResult = await aniListService.GetEpisodeAirTimeAsync(result.AniListId, number);
+        if (alResult.Status is ResultStatus.NotFound)
+        {
+            isEstimate = true;
+            alResult = await aniListService.EstimateEpisodeAirTimeAsync(result.AniListId, number);
+        }
+
         return alResult.IsSuccess
-            ? Success(result with { AiredAt = alResult.Value })
+            ? Success(result with { AiredAt = alResult.Value, IsAirTimeEstimated = isEstimate })
             : Success(result);
     }
 }
