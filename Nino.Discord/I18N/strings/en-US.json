@@ -180,7 +180,7 @@
     "project.creation.failed.badRequest": "An error occured while creating the project.\nPlease make sure the AniList ID is correct, or manually specify `{autoFields_1}`",
     "project.creation.firstEpisodeNote": "First episode **{episode_1}** is non-standard and may cause misalignment with AniList.\nConsider using `/project edit AniListOffset` to align with AniList.",
     "project.creation.publishPrivateProgressInfo": "**Note**: By default, progress updates are published for private projects.\nThis can be configured with `/server display publish-private-progress`.",
-    "project.creation.success": "I created project `{nickname_1}` for you. You may want to consider the following:\n1. `/task (/template-staff) add` to add positions\n2. `/task (/template-staff) edit weight` to re-order positions\n3. `/project edit AniList` to set airing date/times, and `/project air-reminder enable` to get airing notifications.",
+    "project.creation.success": "I created project `{nickname_1}` for you. You may want to consider the following:\n1. `/task (/default-task) add` to add positions\n2. `/task (/default-task) edit weight` to re-order positions\n3. `/project edit AniList` to set airing date/times, and `/project air-reminder enable` to get airing notifications.",
     "project.creation.title": "Project Creation",
     "project.edit.clearable": "Note: To clear the MOTD, set the MOTD to `-`.",
     "project.edit.success": "Edit successful!",
@@ -235,8 +235,8 @@
     "templateStaff.creation.success": "Assigned {assignee_1} to **{task_2}** for {applicator_3}.",
     "templateStaff.edit.success": "Edited {abbreviation_1} for {applicator_2}.",
     "templateStaff.delete.success": "Removed {abbreviation_1} for {applicator_2}.",
-    "templateStaff.notFound": "Template staff not found.",
-    "templateStaff.resolutionFailed": "A template staff with the abbreviation {abbreviation_1} was not found.",
+    "templateStaff.notFound": "Default Task not found.",
+    "templateStaff.resolutionFailed": "A default task with the abbreviation {abbreviation_1} was not found.",
     "undone.badRequest": "That task isn't done!",
     "undone.response.title": "Task Incomplete",
     "undone.success": "So the episode {episode_1} **{taskName_2}** wasn't done, after all.",
@@ -264,8 +264,8 @@
       "other": "I imported {number_1} tasks for you."
     },
     "templateStaff.import.success": {
-      "one": "I imported {number_1} template staff for you.",
-      "other": "I imported {number_1} template staff for you."
+      "one": "I imported {number_1} default task for you.",
+      "other": "I imported {number_1} default tasks for you."
     }
   }
 }
