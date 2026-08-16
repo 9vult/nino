@@ -49,7 +49,7 @@ public class MarkTaskSkippedHandler(
                 ProjectId: command.ProjectId,
                 EpisodeId: command.EpisodeId,
                 TaskId: command.TaskId,
-                ProgressType.Done
+                ProgressType.Skipped
             )
         );
 

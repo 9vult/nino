@@ -123,6 +123,8 @@ public abstract class CongaNode(Abbreviation name)
         return last;
     }
 
+    public override string ToString() => Name.Value;
+
     /// <inheritdoc />
     public override bool Equals(object? obj) => obj is CongaNode node && node.Name.Equals(Name);
 

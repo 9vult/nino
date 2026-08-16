@@ -292,7 +292,7 @@ public sealed class CongaGraph
                 // Root child node with no deps
                 if (edge.From == group.Name)
                 {
-                    var child = new CongaNode.TaskNode(edge.To);
+                    var child = new CongaNode.TaskNode(edge.To) { ContainingGroup = group };
                     group.AddChild(child);
                     graph.RegisterNode(child);
                     continue;
@@ -303,14 +303,14 @@ public sealed class CongaGraph
 
                 if (from is null)
                 {
-                    from = new CongaNode.TaskNode(edge.From);
+                    from = new CongaNode.TaskNode(edge.From) { ContainingGroup = group };
                     group.AddChild(from);
                     graph.RegisterNode(from);
                 }
 
                 if (to is null)
                 {
-                    to = new CongaNode.TaskNode(edge.To);
+                    to = new CongaNode.TaskNode(edge.To) { ContainingGroup = group };
                     group.AddChild(to);
                     graph.RegisterNode(to);
                 }

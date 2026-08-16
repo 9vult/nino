@@ -48,7 +48,7 @@ public class MarkTaskUndoneHandler(
                 ProjectId: command.ProjectId,
                 EpisodeId: command.EpisodeId,
                 TaskId: command.TaskId,
-                ProgressType.Done
+                ProgressType.Undone
             )
         );
 
