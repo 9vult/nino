@@ -156,16 +156,16 @@ public static class Localizer
                 try
                 {
                     using StreamReader sr = new(file);
-                    var table = JsonSerializer.Deserialize<Localization>(sr.ReadToEnd(), options);
-                    if (table == null)
+                    var strings =
+                        JsonSerializer.Deserialize<Dictionary<string, string>>(sr.ReadToEnd(), options)!;
+                    
+                    if (strings is null)
                         continue;
 
                     var locale = Path.GetFileNameWithoutExtension(file);
                     var ci = new CultureInfo(locale);
                     Cultures.Add(locale.FromDiscordLocale().ToDotNetLocale(), ci); // Convert Discord naming to .NET naming
-                    table.PluralRules = PluralRules.GetInstance(ci);
-
-                    locales.Add(locale, table);
+                    locales.Add(locale, new Localization(strings, PluralRules.GetInstance(ci)));
                 }
                 catch (Exception)
                 {
