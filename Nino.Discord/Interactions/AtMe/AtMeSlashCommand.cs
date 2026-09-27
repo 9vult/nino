@@ -54,7 +54,7 @@ public class AtMeSlashCommand(
                         ", ",
                         entry
                             .Tasks.OrderBy(t => t.Weight)
-                            .Select(t => t.IsPseudo ? $"{t.Abbreviation}*" : t.Abbreviation.Value)
+                            .Select(t => t.IsPseudo ? $"{t.Abbreviation}\\*" : t.Abbreviation.Value)
                     )
                 );
             }
