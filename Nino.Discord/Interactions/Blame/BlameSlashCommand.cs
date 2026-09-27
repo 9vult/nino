@@ -120,10 +120,9 @@ public sealed class BlameSlashCommand(
         {
             foreach (var task in bData.Statuses.OrderBy(t => t.Weight))
             {
-                if (task.IsDone)
-                    b.Append($"~~{task.Abbreviation}~~ ");
-                else
-                    b.Append($"**{task.Abbreviation}** ");
+                b.Append(task.IsDone ? "~~" : "**");
+                b.Append(task.IsPseudo ? $"{task.Abbreviation}\\*" : task.Abbreviation);
+                b.Append(task.IsDone ? "~~ " : "** ");
             }
             b.AppendLine(); // Adds newline to the end
         }
@@ -131,10 +130,9 @@ public sealed class BlameSlashCommand(
         {
             foreach (var task in bData.Statuses.OrderBy(t => t.Weight))
             {
-                if (task.IsDone)
-                    b.AppendLine($"~~{task.Name}~~");
-                else
-                    b.AppendLine($"**{task.Name}**");
+                b.Append(task.IsDone ? "~~" : "**");
+                b.Append(task.IsPseudo ? $"{task.Name}\\*" : task.Name);
+                b.AppendLine(task.IsDone ? "~~ " : "**");
             }
         }
 

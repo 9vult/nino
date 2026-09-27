@@ -107,10 +107,9 @@ public class BlameAllPreviousButton(
 
             foreach (var task in episode.Statuses.OrderBy(t => t.Weight))
             {
-                if (task.IsDone)
-                    b.Append($"~~{task.Abbreviation}~~ ");
-                else
-                    b.Append($"**{task.Abbreviation}** ");
+                b.Append(task.IsDone ? "~~" : "**");
+                b.Append(task.IsPseudo ? $"{task.Abbreviation}\\*" : task.Abbreviation);
+                b.Append(task.IsDone ? "~~ " : "** ");
             }
             b.AppendLine(); // Adds newline to the end
         }
