@@ -208,12 +208,17 @@ public sealed class GetTasksAtMeHandler(ReadOnlyNinoDbContext db, IAniListServic
             })
             .ToList();
 
+        var episodes = assignedTasks
+            .GroupBy(t => new { t.ProjectId, t.Number })
+            .OrderBy(i => i.Key.ProjectId)
+            .ThenBy(i => i.Key.Number.Value, StringComparison.OrdinalIgnoreCase.WithNaturalSort());
+
         List<GetTasksAtMeResult> results = [];
-        foreach (var episode in assignedTasks.GroupBy(t => t.Number))
+        foreach (var episode in episodes)
         {
-            var number = episode.Key;
+            var projectId = episode.Key.ProjectId;
+            var number = episode.Key.Number;
             var data = episode.First();
-            var projectId = data.ProjectId;
             var nickname = data.Nickname;
             var aniListId = data.AniListId;
             var tasks = episode
