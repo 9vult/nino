@@ -840,7 +840,7 @@
       "name": "project",
       "description": "Project alias"
     },
-    "episode-number": {
+    "episode": {
       "name": "episode",
       "description": "Episode number"
     },
@@ -1083,7 +1083,7 @@
       "name": "project",
       "description": "Project alias"
     },
-    "episode-number": {
+    "episode": {
       "name": "episode",
       "description": "Episode number"
     },
