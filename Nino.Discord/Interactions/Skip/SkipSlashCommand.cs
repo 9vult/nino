@@ -106,7 +106,7 @@ public class SkipSlashCommand(
         var pData = result.Value.Item4;
 
         var body = new StringBuilder();
-        body.AppendLine(T("skip.success", locale, taskInfo.EpisodeNumber, taskInfo.TaskName));
+        body.AppendLine(T("skip.success", locale, taskInfo.TaskName, taskInfo.EpisodeNumber));
 
         if (episodeIsDone)
             body.AppendLine(T("done.episodeComplete", locale, taskInfo.EpisodeNumber));
