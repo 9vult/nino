@@ -35,8 +35,7 @@ public class SkipSlashCommand(
     [SlashCommand("skip", "Skip a task")]
     public async Task<RuntimeResult> HandleSkipAsync(
         [MaxLength(Length.Alias), Autocomplete(typeof(ProjectAutocompleteHandler))] Alias alias,
-        [MaxLength(Length.Number), Autocomplete(typeof(EpisodeAutocompleteHandler))]
-            Number episodeNumber,
+        [MaxLength(Length.Number), Autocomplete(typeof(EpisodeAutocompleteHandler))] Number episode,
         [MaxLength(Length.Abbreviation), Autocomplete(typeof(EpisodeTaskAutocompleteHandler))]
             Abbreviation abbreviation
     )
@@ -48,9 +47,7 @@ public class SkipSlashCommand(
 
         var resolve = await projectResolver
             .HandleAsync(new ResolveProjectQuery(alias, groupId, requestedBy))
-            .ThenAsync(pId =>
-                episodeResolver.HandleAsync(new ResolveEpisodeQuery(pId, episodeNumber))
-            )
+            .ThenAsync(pId => episodeResolver.HandleAsync(new ResolveEpisodeQuery(pId, episode)))
             .ThenAsync(
                 (_, eId) => taskResolver.HandleAsync(new ResolveTaskQuery(eId, abbreviation))
             );
@@ -63,7 +60,7 @@ public class SkipSlashCommand(
                 new FailureContext
                 {
                     Alias = alias,
-                    Episode = episodeNumber,
+                    Episode = episode,
                     Task = abbreviation,
                 }
             );
