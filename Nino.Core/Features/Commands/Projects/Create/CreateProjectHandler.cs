@@ -106,7 +106,7 @@ public sealed class CreateProjectHandler(
             IsPrivate = command.IsPrivate,
         };
 
-        logger.LogInformation("Creating project {Project}", project);
+        logger.LogInformation("Creating project {Project}", project.Nickname);
 
         var episodes = new List<Episode>(command.Length.Value);
         for (var i = command.FirstEpisode; i < command.FirstEpisode + command.Length.Value; i++)
