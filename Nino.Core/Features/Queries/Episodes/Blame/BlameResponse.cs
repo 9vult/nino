@@ -7,6 +7,7 @@ namespace Nino.Core.Features.Queries.Episodes.Blame;
 public sealed record BlameResponse(
     Number EpisodeNumber,
     AniListId AniListId,
+    int AniListOffset,
     bool IsAirTimeEstimated,
     DateTimeOffset? AiredAt,
     DateTimeOffset? UpdatedAt,

@@ -61,7 +61,8 @@ public sealed class GetBulkObserverUpdateNotificationDataHandler(ReadOnlyNinoDbC
                     observer.Project.AniListId,
                     observer.Project.PosterUrl,
                     observer.Project.AniListUrl,
-                    observer.Project.IsPrivate
+                    observer.Project.IsPrivate,
+                    observer.Project.AniListOffset
                 ),
                 query.Abbreviation,
                 taskName,

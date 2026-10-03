@@ -86,9 +86,10 @@ public sealed class BlameAllHandler(
                 episodeStatuses.Add(status);
                 continue;
             }
+            var offsetEpisodeNumber = number + project.AniListOffset;
             var alResult = await aniListService.EstimateEpisodeAirTimeAsync(
                 project.AniListId,
-                number
+                offsetEpisodeNumber
             );
             if (alResult.IsSuccess)
                 episodeStatuses.Add(status with { AiredAt = alResult.Value });

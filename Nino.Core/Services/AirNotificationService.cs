@@ -61,9 +61,10 @@ public sealed class AirNotificationService(
                     continue;
 
                 var isEstimate = false;
+                var offsetEpisodeNumber = episodeNumber + episode.Project.AniListOffset;
                 var aniListResult = await aniListService.GetEpisodeAirTimeAsync(
                     episode.Project.AniListId,
-                    episodeNumber
+                    offsetEpisodeNumber
                 );
                 if (!aniListResult.IsSuccess)
                 {
@@ -79,7 +80,7 @@ public sealed class AirNotificationService(
                     // Try estimating
                     aniListResult = await aniListService.EstimateEpisodeAirTimeAsync(
                         episode.Project.AniListId,
-                        episodeNumber
+                        offsetEpisodeNumber
                     );
                     if (!aniListResult.IsSuccess)
                         continue;

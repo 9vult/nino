@@ -128,9 +128,10 @@ public partial class DoneModule
         // Perform episode aired check
         if (tData.EpisodeNumber.IsDecimal(out var decimalNumber))
         {
+            var offsetEpisodeNumber = decimalNumber + pData.AniListOffset;
             var airCheckResult = await aniListService.GetEpisodeAirTimeAsync(
                 pData.AniListId,
-                decimalNumber
+                offsetEpisodeNumber
             );
             if (airCheckResult.IsSuccess && airCheckResult.Value > DateTimeOffset.UtcNow)
             {

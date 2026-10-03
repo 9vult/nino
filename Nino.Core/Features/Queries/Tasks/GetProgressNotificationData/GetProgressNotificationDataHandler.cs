@@ -27,7 +27,8 @@ public sealed class GetProgressNotificationDataHandler(ReadOnlyNinoDbContext db)
                     t.Project.AniListId,
                     t.Project.PosterUrl,
                     t.Project.AniListUrl,
-                    t.Project.IsPrivate
+                    t.Project.IsPrivate,
+                    t.Project.AniListOffset
                 ),
                 t.Abbreviation,
                 t.Name,

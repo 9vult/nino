@@ -53,6 +53,7 @@ public sealed class BlameHandler(
             .Select(e => new BlameResponse(
                 e.Number,
                 e.Project.AniListId,
+                e.Project.AniListOffset,
                 false,
                 null,
                 e.UpdatedAt,
@@ -77,11 +78,18 @@ public sealed class BlameHandler(
             return Success(result);
 
         var isEstimate = false;
-        var alResult = await aniListService.GetEpisodeAirTimeAsync(result.AniListId, number);
+        var offsetEpisodeNumber = number + result.AniListOffset;
+        var alResult = await aniListService.GetEpisodeAirTimeAsync(
+            result.AniListId,
+            offsetEpisodeNumber
+        );
         if (alResult.Status is ResultStatus.NotFound)
         {
             isEstimate = true;
-            alResult = await aniListService.EstimateEpisodeAirTimeAsync(result.AniListId, number);
+            alResult = await aniListService.EstimateEpisodeAirTimeAsync(
+                result.AniListId,
+                offsetEpisodeNumber
+            );
         }
 
         return alResult.IsSuccess

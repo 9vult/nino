@@ -28,7 +28,8 @@ public sealed class GetCongaNotificationDataHandler(ReadOnlyNinoDbContext db)
                     e.Project.AniListId,
                     e.Project.PosterUrl,
                     e.Project.AniListUrl,
-                    e.Project.IsPrivate
+                    e.Project.IsPrivate,
+                    e.Project.AniListOffset
                 ),
                 e.Project.Nickname,
                 e.Number,

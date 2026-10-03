@@ -27,7 +27,8 @@ public sealed class GetAirNotificationDataHandler(ReadOnlyNinoDbContext db)
                     e.Project.AniListId,
                     e.Project.PosterUrl,
                     e.Project.AniListUrl,
-                    e.Project.IsPrivate
+                    e.Project.IsPrivate,
+                    e.Project.AniListOffset
                 ),
                 e.Number,
                 MappedIdDto<ChannelId>.From(e.Project.ProjectChannel),

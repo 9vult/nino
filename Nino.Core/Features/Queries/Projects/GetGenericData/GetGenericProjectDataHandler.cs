@@ -24,7 +24,8 @@ public sealed class GetGenericProjectDataHandler(ReadOnlyNinoDbContext db)
                 AniListId: p.AniListId,
                 PosterUrl: p.PosterUrl,
                 AniListUrl: p.AniListUrl,
-                IsPrivate: p.IsPrivate
+                IsPrivate: p.IsPrivate,
+                AniListOffset: p.AniListOffset
             ))
             .FirstOrDefaultAsync();
 

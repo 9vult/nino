@@ -27,7 +27,8 @@ public class GetGenericObserverDataHandler(ReadOnlyNinoDbContext db)
                     o.Project.AniListId,
                     o.Project.PosterUrl,
                     o.Project.AniListUrl,
-                    o.Project.IsPrivate
+                    o.Project.IsPrivate,
+                    o.Project.AniListOffset
                 ),
                 Owner: MappedIdDto<UserId>.From(o.Owner)
             ))

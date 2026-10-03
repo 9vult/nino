@@ -23,5 +23,6 @@ public record GetGenericProjectDataResponse(
     AniListId AniListId,
     string PosterUrl,
     string AniListUrl,
-    bool IsPrivate
+    bool IsPrivate,
+    int AniListOffset
 );

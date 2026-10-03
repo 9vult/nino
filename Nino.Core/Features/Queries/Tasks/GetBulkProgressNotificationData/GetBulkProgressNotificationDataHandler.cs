@@ -58,7 +58,8 @@ public sealed class GetBulkProgressNotificationDataHandler(ReadOnlyNinoDbContext
                     project.AniListId,
                     project.PosterUrl,
                     project.AniListUrl,
-                    project.IsPrivate
+                    project.IsPrivate,
+                    project.AniListOffset
                 ),
                 query.Abbreviation,
                 taskName,

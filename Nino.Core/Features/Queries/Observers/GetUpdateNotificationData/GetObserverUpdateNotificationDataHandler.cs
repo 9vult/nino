@@ -42,7 +42,8 @@ public sealed class GetObserverUpdateNotificationDataHandler(ReadOnlyNinoDbConte
                     o.Project.AniListId,
                     o.Project.PosterUrl,
                     o.Project.AniListUrl,
-                    o.Project.IsPrivate
+                    o.Project.IsPrivate,
+                    o.Project.AniListOffset
                 ),
                 taskInfo.Abbreviation,
                 taskInfo.Name,
