@@ -3,5 +3,5 @@ files:
     translation: /Nino.Discord/I18N/strings/%locale%.json
     type: i18next_json
   - source: /Nino.Discord/I18N/commands/nino.en-US.json
-    translation: /Nino.Discord/I18N/strings/nino.%locale%.json
+    translation: /Nino.Discord/I18N/commands/nino.%locale%.json
     type: json
