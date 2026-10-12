@@ -46,6 +46,13 @@ public sealed class DiscordBotHostedService(
         logger.Log(
             logLevel: message.Severity switch
             {
+                LogSeverity.Info
+                    when message.Message
+                        is "Disconnecting"
+                            or "Disconnected"
+                            or "Connecting"
+                            or "Connected"
+                            or "Resumed previous session" => LogLevel.Trace,
                 LogSeverity.Critical => LogLevel.Critical,
                 LogSeverity.Error => LogLevel.Error,
                 LogSeverity.Warning => LogLevel.Warning,
