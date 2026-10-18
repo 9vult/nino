@@ -534,6 +534,10 @@
           "name": "role",
           "description": "Role to ping"
         },
+        "delay-days": {
+          "name": "delay-days",
+          "description": "Days to delay the notification by"
+        },
         "delay-hours": {
           "name": "delay-hours",
           "description": "Hours to delay the notification by"

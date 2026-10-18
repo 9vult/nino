@@ -23,6 +23,7 @@ public partial class ProjectModule
             [MaxLength(Length.Alias), Autocomplete(typeof(ProjectAutocompleteHandler))] Alias alias,
             SocketUser? user = null,
             SocketRole? role = null,
+            [MinValue(-7), MaxValue(7)] int delayDays = 0,
             [MinValue(-24), MaxValue(24)] int delayHours = 0,
             [MinValue(-60), MaxValue(60)] int delayMinutes = 0
         )
@@ -49,7 +50,10 @@ public partial class ProjectModule
 
             var projectId = resolve.Value;
 
-            var delay = TimeSpan.FromHours(delayHours).Add(TimeSpan.FromMinutes(delayMinutes));
+            var delay = TimeSpan
+                .FromDays(delayDays)
+                .Add(TimeSpan.FromHours(delayHours))
+                .Add(TimeSpan.FromMinutes(delayMinutes));
 
             var userId = user is null
                 ? null
