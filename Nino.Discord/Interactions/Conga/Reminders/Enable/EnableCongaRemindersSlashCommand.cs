@@ -20,7 +20,7 @@ public partial class CongaModule
         [SlashCommand("enable", "Enable Conga reminders for a project")]
         public async Task<RuntimeResult> EnableAsync(
             [MaxLength(Length.Alias), Autocomplete(typeof(ProjectAutocompleteHandler))] Alias alias,
-            [MinValue(1), MaxValue(90)] int days = 0
+            [MinValue(1), MaxValue(90)] int days
         )
         {
             var interaction = Context.Interaction;
