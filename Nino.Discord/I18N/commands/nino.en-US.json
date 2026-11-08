@@ -97,34 +97,34 @@
     "name": "conga",
     "description": "Conga management",
     "edge": {
-      "name": "edge",
-      "description": "Edge management",
+      "name": "dependency",
+      "description": "Dependency management",
       "add": {
         "name": "add",
-        "description": "Add an edge to a project's Conga graph",
+        "description": "Add a dependency to a project's Conga graph",
         "alias": {
           "name": "project",
           "description": "Project alias"
         },
         "from": {
           "name": "from",
-          "description": "From"
+          "description": "Task that must be completed as a prerequisite of To"
         },
         "to": {
           "name": "to",
-          "description": "To"
+          "description": "Task that is unblocked by completing From"
         }
       },
       "remove": {
         "name": "remove",
-        "description": "Remove an edge from a project's Conga graph",
+        "description": "Remove a dependency from a project's Conga graph",
         "alias": {
           "name": "project",
           "description": "Project alias"
         },
         "edge": {
-          "name": "edge",
-          "description": "Edge to remove"
+          "name": "dependency",
+          "description": "Dependency to remove"
         }
       }
     },
