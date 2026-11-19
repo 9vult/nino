@@ -68,7 +68,10 @@ public partial class ProjectModule
         var b = new StringBuilder();
         foreach (var task in bData.OrderBy(t => t.Weight))
         {
-            b.Append($"{task.Abbreviation}: ");
+            b.Append($"{task.Abbreviation}");
+            if (task.IsPseudo)
+                b.Append(@"\*");
+            b.Append(": ");
 
             var assigneeParts = new List<string>();
             foreach (var assignee in task.Assignees)

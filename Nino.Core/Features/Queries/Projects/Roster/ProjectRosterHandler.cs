@@ -61,11 +61,11 @@ public sealed class ProjectRosterHandler(
             }
         }
 
-        // Get a weight for each task
-        var weightMap = episodes
+        // Get a weight for each task and whether any instance of it is pseudo
+        var detailsMap = episodes
             .SelectMany(e => e.Tasks)
             .GroupBy(t => t.Abbreviation)
-            .ToDictionary(t => t.Key, t => t.First().Weight);
+            .ToDictionary(t => t.Key, t => (t.First().Weight, IsPseudo: t.Any(p => p.IsPseudo)));
 
         // Group KVPs from the dictionary by abbreviation (merge the different users under one umbrella)
         var taskGroups = rangeMap.GroupBy(r => r.Key.Item1);
@@ -80,7 +80,8 @@ public sealed class ProjectRosterHandler(
                             g.Value
                         ))
                         .ToList(),
-                    Weight: weightMap[group.Key]
+                    Weight: detailsMap[group.Key].Weight,
+                    IsPseudo: detailsMap[group.Key].IsPseudo
                 ))
                 .ToList()
         );

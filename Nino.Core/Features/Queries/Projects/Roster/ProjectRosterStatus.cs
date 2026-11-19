@@ -7,5 +7,6 @@ namespace Nino.Core.Features.Queries.Projects.Roster;
 public sealed record ProjectRosterStatus(
     Abbreviation Abbreviation,
     List<ProjectRosterRange> Assignees,
-    decimal Weight
+    decimal Weight,
+    bool IsPseudo
 );
